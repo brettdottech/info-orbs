@@ -12,9 +12,10 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
 
+
+
 // JPG weather icons
 #include "icons.h" 
-#include "credentials.h" 
 
 // Constant/quality of life vars
 #define bgcl 0x20a1 // clock shadow colour(Light brown)
@@ -28,8 +29,9 @@ int centre = 120;            // centre location of the screen(240x240)
 
 String weatherLocation ="Victoira,BC"; //Change this to your currently location in format "CITY,STATECODE"
 String weatherUnits ="metric"; // Units for eeather "us" for F,  "metric" for C
-const char *ssid = "";  //Wifi U
-const char *password = ""; //Wifi P
+#include "credentials.h" 
+//const char *ssid = "";  //Wifi U
+//const char *password = ""; //Wifi P
 String stocks[]{"AMD","VT","AAPL","SPY","META"}; // These are the stocks you will be tracking on the stock widget(s
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
