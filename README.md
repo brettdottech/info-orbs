@@ -20,10 +20,10 @@ Lastly, two big things coming over the next few days that will make development 
 This project only has three components; 5x Round TFT Displays, a pushbutton, and a standard ESP32 Development board
 [These](https://s.click.aliexpress.com/e/_DmZVAIL)240x240 TFT displays are the heart of the project, and we use 5 of them here.
 We'll be driving them primarily using the [TFT_eSPI library](https://github.com/Bodmer/TFT_eSPI).
-If this is your first time using the library, you'll need to define some things in the userSetup.H folder found in that library to the screens working. This is primarily outlining which displays you're using and which pins they will be connected to. For your convenience, I've included the pin setup I am using below so you can match my wiring/surestep if you wish:
-#define TFT_MOSI 17
-#define TFT_SCLK 23
-#define TFT_CS   15
+If this is your first time using the library, you'll need to define some things in the userSetup.H folder found in that library to the screens working. This is primarily outlining which displays you're using and which pins they will be connected to. For your convenience, I've included the pin setup I am using below so you can match my wiring/surestep if you wish:  
+#define TFT_MOSI 17  
+#define TFT_SCLK 23  
+#define TFT_CS   15  
 #define TFT_DC   19  
 #define TFT_RST  18  
 #define TFT_BL   22  
