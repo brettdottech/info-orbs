@@ -17,10 +17,11 @@ Lastly, two big things coming over the next few days that will make development 
 2) A simulated dev environment so folks can test code without needing to get their hands on hardware
 
 ## 1. Hardware and Wiring.
-This project only has three components; 5x Round TFT Displays, a pushbutton, and a standard ESP32 Development board
-[These](https://s.click.aliexpress.com/e/_DmZVAIL)240x240 TFT displays are the heart of the project, and we use 5 of them here.
+This project only has three components; 5x Round TFT Displays, a pushbutton, and a standard ESP32 Development board.
+[These 240x240 TFT displays](https://s.click.aliexpress.com/e/_DmZVAIL) are the heart of the project, and we use 5 of them here.
 We'll be driving them primarily using the [TFT_eSPI library](https://github.com/Bodmer/TFT_eSPI).
-If this is your first time using the library, you'll need to define some things in the userSetup.H folder found in that library to the screens working. This is primarily outlining which displays you're using and which pins they will be connected to. For your convenience, I've included the pin setup I am using below so you can match my wiring/surestep if you wish:  
+If this is your first time using the library, you'll need to define some things in the userSetup.H folder found in that library to the screens working. 
+This will outlining which display model you're using aswell as which pins they will be connected to. For your convenience, I've included the pin setup I am using below so you can match my wiring/surestep if you wish:  
 #define TFT_MOSI 17  
 #define TFT_SCLK 23  
 #define TFT_CS   15  
@@ -29,19 +30,16 @@ If this is your first time using the library, you'll need to define some things 
 #define TFT_BL   22  
 (I would suggest first running one of the TFT_espi demo sketches on a single screen before you continue to the next steps of the setup.)
 
+We are going to be wiring all 5 displays in series to one another with the exception of the CS pin. So this means the all of the VIN pins will be connected together and then to the ESP, all of the RST pins etc, see the wiring diagram below a visual reference of this.
 ![Wiring Diagram](references/wiringDiag.png)
 
-We are going to be wiring all 5 displays in series to one another with the exception of the CS pin. So this means the all of the VIN pins will be connected together and then to the ESP, all of the RST pins etc, see the wiring diagram for a visual reference of this.
-
 Now you might think with all the displays wired together like this they will just display the same images as they are getting the same data right? Well....kind of....and this is where the CS pin comes in.
-Each screen will have its own unique CS pin wired to the board, I have mine in this order in the sketch, so if you want to drag/drop, use these left to right: int pins[]{ 13, 33, 32, 25, 21 };
+Each screen will have its own unique CS pin wired to the board, I have mine in this order in the sketch; left to right: pins[]{ 13, 33, 32, 25, 21 };
 
 The CS pin stands for "Chip Select" and it effectively turns the screen's data lines on and off whether it's pulled low (on) or high(off). This means that even if all of the screens are receiving a stream of data, we can set all but one of the screens CS pins to low, which will only allow that screen to have data written into it. We are able to display images on multiple screens by manually managing this CS pin.
 
 The library is not built for this natively, and will just keep the default CS pin always low, so we'll need to make sure to not use the library's default set CS pin(ie. 19 above).
-
 I have included a few simple functions in the sketch to make this whole process easy, the function selDsp(1), will pull a displays CS ping low, and unSelDsp(1) will pull it high(you can pass in 0-4 for which display you'd like to target). This makes it easy to dictate which display you are directing your code to. You can also manually manage this if needed by simply using digitalWrite(pin, 0);.
-
 Lastly, we wire a button to allow for switching between different displays. I'll eventually add more buttons for more functionality, but one does the trick for now!
 
 ## 2. Code Structure/Context
