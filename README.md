@@ -1,8 +1,8 @@
 # Welcome To info orbs!
 info orbs is a low cost open source multi-use desktop widget that can be used for things like time, weather, sports score, stock prices, notifications & much more! I would love some help developing more widgets and fixing the codebase so that its a good foundation for building this to be something really cool :)
-![Weather Widget](references/weather.jpg)
-![CLock Widget](references/time.jpg)
-![Sock Widget](references/stocks.jpg)
+![Weather Widget](references/weather.png)
+![CLock Widget](references/time.png)
+![Sock Widget](references/stocks.png)
 
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
@@ -21,7 +21,6 @@ This project only has three components; 5x Round TFT Displays, a pushbutton, and
 [These](https://s.click.aliexpress.com/e/_DmZVAIL)240x240 TFT displays are the heart of the project, and we use 5 of them here.
 We'll be driving them primarily using the [TFT_eSPI library](https://github.com/Bodmer/TFT_eSPI).
 If this is your first time using the library, you'll need to define some things in the userSetup.H folder found in that library to the screens working. This is primarily outlining which displays you're using and which pins they will be connected to. For your convenience, I've included the pin setup I am using below so you can match my wiring/surestep if you wish:
-
 #define TFT_MOSI 17
 #define TFT_SCLK 23
 #define TFT_CS   15
