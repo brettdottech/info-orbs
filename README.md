@@ -58,7 +58,7 @@ A few other key pieces use to give context:
 
 - The other thing that idk if I did right was time. I use the NTP client to get the time over Wifi(I also use the timezone offset that we get from the weather API to determine the UTC offset), and I currently check that timer single second for any widgets that have/need time displayed. That said nothing happens aside from assigning the values to a variable, and the screens will only update/refresh if that variables comes back as different as the last time it was checked. I'm sure checking the time every second is awful practice, and maybe a better solution would be checking it say; every hour? 10 mins? and then using that to sync time thats stored locally so we get the best of both worlds. But this is something I again am pretty out of my depths on, but that's how I did it
 
-but yeah TLDR: for loop checks at full speed, calls function within that loop at full speed, and then things in that function only trigger if one of the timer conditions are met.
+but yeah TLDR: loop checks at full speed, calls function within that loop at full speed, and then things in that function only trigger if one of the timer conditions are met.
 
 I'm working on this very actively and adding lots of resources to make development more smooth for others, but wanted to get a scrappy readme out so folks can start getting up to speed!
 
