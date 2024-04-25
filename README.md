@@ -1,5 +1,10 @@
 # Welcome To info orbs!
 info orbs is a low cost open source multi-use desktop widget that can be used for things like time, weather, sports score, stock prices, notifications & much more! I would love some help developing more widgets and fixing the codebase so that its a good foundation for building this to be something really cool :)
+![Weather Widget](references/weather.jpg)
+![CLock Widget](references/time.jpg)
+![Sock Widget](references/stocks.jpg)
+
+
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
 - If you would like to help out or have questions, please join my discord [here](https://discord.gg/f5YqpMTJNm) and mention you have questions/want to help out with the project and i'll invite you to the appropriate channels.
 - The soldering/ wiring on this is tricky, I'm currently in the process of building out dev kits that will include both full kits with all parts needed, or just PCBs to save hassle on wiring. Please enquire over email at brett@btruner.tech or via the discord above if you'd like to get your hands on one early.
@@ -25,6 +30,8 @@ If this is your first time using the library, you'll need to define some things 
 #define TFT_BL   22  
 (I would suggest first running one of the TFT_espi demo sketches on a single screen before you continue to the next steps of the setup.)
 
+![Wiring Diagram](references/wiringDiag.png)
+
 We are going to be wiring all 5 displays in series to one another with the exception of the CS pin. So this means the all of the VIN pins will be connected together and then to the ESP, all of the RST pins etc, see the wiring diagram for a visual reference of this.
 
 Now you might think with all the displays wired together like this they will just display the same images as they are getting the same data right? Well....kind of....and this is where the CS pin comes in.
@@ -40,6 +47,9 @@ Lastly, we wire a button to allow for switching between different displays. I'll
 
 ## 2. Code Structure/Context
 I'll iterate again that this is one of the first bits of code i've ever written, below i've documented how i've handled key parts of the project, however I encourage anyone who has ideas on how to do any of it better you put your hand up (:
+
+At the top of the main sketch(Info_Orbs.ino), theres a few paramters you'll need to define in order to have the clock work you for, your city for timzone and weather (in simple format "CITY,STATECODE)m and then your wifi credentials.
+(alternativly for developers, you can comment out the wifi creds and create gitignored file called credentials.h and go off that instead as to not accident push your wifi creds)
 
 The code has a few main parts
 1) High level "Helper" functions, broken out in their own file. This has functions for display management, converting variables to byte arrays, updating the time via API, updating the weather via API, etc
