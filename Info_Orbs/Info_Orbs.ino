@@ -14,6 +14,7 @@ NTPClient timeClient(ntpUDP);
 
 // JPG weather icons
 #include "icons.h" 
+#include "credentials.h" 
 
 // Constant/quality of life vars
 #define bgcl 0x20a1 // clock shadow colour(Light brown)
