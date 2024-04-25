@@ -45,10 +45,10 @@ Lastly, we wire a button to allow for switching between different displays. I'll
 ## 2. Code Structure/Context
 I'll iterate again that this is one of the first bits of code i've ever written, below i've documented how i've handled key parts of the project, however I encourage anyone who has ideas on how to do any of it better you put your hand up (:
 
-At the top of the main sketch(Info_Orbs.ino), theres a few paramters you'll need to define in order to have the clock work you for, your city for timzone and weather (in simple format "CITY,STATECODE)m and then your wifi credentials.
+At the top of the main sketch(Info_Orbs.ino), theres a few paramters you'll need to define in order to get up and running, your city; for timzone and weather (in simple format "CITY,STATECODE) and then your wifi credentials.
 (alternativly for developers, you can comment out the wifi creds and create gitignored file called credentials.h and go off that instead as to not accident push your wifi creds)
 
-The code has a few main parts
+The code then has a few main parts
 1) High level "Helper" functions, broken out in their own file. This has functions for display management, converting variables to byte arrays, updating the time via API, updating the weather via API, etc
 2) Single screen functions(currently in screen_display_functions). These are functions that will write a single "orb"s worth of data. Whether that's a clock, a stock, etc. I originally just defined these alongside the widgets, however I would like these to be reusable in other widgets in the case that people want to add a clock to their widget for example, or should we eventually get to a point of customization where the user can choose orb by orb what they want their display to be
 3) Widgets, a "widget" is a collection of 5 orbs that make up a certain functionality. Currently there is a CLock, Weather, and Stock Widget. While some widgets have rather bespoke elements that will not need to be reused that are coded directly into the widget function, most of the data for the widgets is pulled from the above single screens. The widget functions are called directly in the loop
