@@ -11,7 +11,7 @@ Lastly, two big things coming over the next few days that will make development 
 1) A Trello board
 2) A simulated dev environment so folks can test code without needing to get their hands on hardware
 
-## 1. Hardwire and Wiring.
+## 1. Hardware and Wiring.
 This project only has three components; 5x Round TFT Displays, a pushbutton, and a standard ESP32 Development board
 [These](https://s.click.aliexpress.com/e/_DmZVAIL)240x240 TFT displays are the heart of the project, and we use 5 of them here.
 We'll be driving them primarily using the [TFT_eSPI library](https://github.com/Bodmer/TFT_eSPI).
@@ -52,7 +52,7 @@ A few other key pieces use to give context:
 - ArduinoJSON for parsing API requests
 - NTPClient to get time (basically an we API for time from my understanding)
 
-## 3.There was a few parts of the project I made some executive decisions on that I don't know if it made sense, but here how I did them:
+## 3. There was a few parts of the project I made some executive decisions on that I don't know if it made sense, but here how I did them:
 
 - For refresh rates of APIs/Screens I've used a millis to track time passed and use a pair of variables(last time read & time to delay) to trigger when a given screen needs to be refreshed/re-written. These timers are defined on the widget level. I wanted to first do it on the individual screen level, but if I had 3 weather screens on one widget, it would result in 3 weather API calls being made, which is not needed. So I manually define the delay for each widget(or set of widgets) at the widget level. I have multiple of these set for a bunch of different cases. Ie, weather refreshes every 10 minutes, stocks every 5 mins, time every 1 second (more on that below). I then reset the refresh delay every time the button is pressed to cycle through displays so that any longer timers won't result in a user moving off a certain set of displays, then coming back to them and the displays being blank(because the timer hasn't "refreshed" yet and hasn't written to the screen). Currently for most API related screens the screen refresh and API refresh are on the same timer, it may make sense to break these two out into separate timers, and or build some form of caching so that in the case above where people are cycling through widgets with similar display types we're not constantly re-calling APIs. This delay stuff was allot for me to figure out and i'm sure there was many better ways to do it so i'd love other opinions.
 
