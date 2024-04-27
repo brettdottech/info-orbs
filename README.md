@@ -4,11 +4,11 @@ Info Orbs is a low cost, open source, multi-use desktop widget that can be used 
 
 Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Wokwi](https://wokwi.com/projects/396279678672494593) | [Brett (:](https://bturner.tech/links)
 
-<div style="overflow: hidden;">
-    <img src="references/weather.png" alt="Weather Widget" style="float: left; width: 33.33%;">
-    <img src="references/time.png" alt="Clock Widget" style="float: left; width: 33.33%;">
-    <img src="references/stocks.png" alt="Stock Widget" style="float: left; width: 33.33%;">
-</div>
+<p>
+    <img src="references/weather.png" alt="Weather Widget" style="width: 33%;">
+    <img src="references/time.png" alt="Clock Widget" style="width: 33%;">
+    <img src="references/stocks.png" alt="Stock Widget" style="width: 33%;">
+</p>
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
 
