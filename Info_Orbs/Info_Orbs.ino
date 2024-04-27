@@ -20,6 +20,14 @@ NTPClient timeClient(ntpUDP);
 int centre = 120;            // centre location of the screen(240x240)
 
 
+//uncomment these if youre using wokwi simulated dev enviorment
+//#define TFT_DC 2
+//#define TFT_MOSI 23
+//#define TFT_SCLK 18
+//const char *ssid = "Wokwi-GUEST";  
+//const char *password = "";
+
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++ CONFIG, CHANGE THESE BEFORE BOOTING +++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
