@@ -4,10 +4,10 @@ Info Orbs is a low cost, open source, multi-use desktop widget that can be used 
 
 Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Wokwi](https://wokwi.com/projects/396279678672494593) | [Brett (:](https://bturner.tech/links)
 
-<div style="display: flex;">
-    <img src="references/weather.png" alt="Weather Widget" style="flex: 1; max-width: 33.33%;">
-    <img src="references/time.png" alt="Clock Widget" style="flex: 1; max-width: 33.33%;">
-    <img src="references/stocks.png" alt="Stock Widget" style="flex: 1; max-width: 33.33%;">
+<div style="overflow: hidden;">
+    <img src="references/weather.png" alt="Weather Widget" style="float: left; width: 33.33%;">
+    <img src="references/time.png" alt="Clock Widget" style="float: left; width: 33.33%;">
+    <img src="references/stocks.png" alt="Stock Widget" style="float: left; width: 33.33%;">
 </div>
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
@@ -18,10 +18,13 @@ Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Wokwi](https://wokwi.com
 - I chose the ESP32 for this build due to its low cost and ease of production when I build more refined PCBs, however if it's restricting people's abilities to develop your own widgets I would love to hear ideas for other options (:
 - If you want to make something that needs an API please let me know and I'll pay for a key if it makes sense
 
-Lastly, two big things that will make development allot easier:
+Lastly, some big things that will make development allot easier:
 
 1. A Trello [Board](https://trello.com/b/R8soU39O) (access can be given in the discord)
 2. A simulated dev environment so folks can test code without needing to get their hands on hardware, currently using [Wokwi](https://wokwi.com/projects/396279678672494593)
+3. Schematics
+   - [EasyEDA](https://easyeda.com/editor) using this [json](schematics/EasyEDA/info-orbs.json)
+   - [KiCad](https://www.kicad.org/download/) using this [project file](schematics/KiCad/info-orbs.kicad_pro)
 
 ### 1. Hardware and Wiring.
 

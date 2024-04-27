@@ -21,7 +21,8 @@
       "vsciot-vscode.vscode-arduino",
       "ms-vscode.cpptools",
       "ms-vscode.vscode-serial-monitor",
-      "esbenp.prettier-vscode"
+      "esbenp.prettier-vscode",
+      "wokwi.wokwi-vscode"
     ]
   }
 }
