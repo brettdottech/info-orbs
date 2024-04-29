@@ -14,6 +14,3 @@
 
 # Arduino libraries (if installed in the project directory)
 libraries/
-
-# Headers
-*.h
