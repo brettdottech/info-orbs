@@ -14,3 +14,4 @@
 
 # Arduino libraries (if installed in the project directory)
 libraries/
+Info-Orbs/include/user.h

@@ -1,8 +1,7 @@
 #include <Arduino.h>
 #include "user.h"
 #include <WiFi.h>
-#include "display.h"
-
+#include "screenManager.h"
 
 
 void setup()
@@ -13,7 +12,7 @@ void setup()
 
   // Initialize the display
   TFT_eSPI tft = TFT_eSPI();
-  Display display(tft);
+  ScreenManager sm(tft); // Initialize the screen manager and the displays
 
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 

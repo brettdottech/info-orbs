@@ -18,21 +18,17 @@
 
 // Define your class or functions here
 
-class Display
+class ScreenManager
 {
 public:
-    Display(TFT_eSPI& tft);
+    ScreenManager(TFT_eSPI& tft);
 
-    void displayText(String text);
-    void displayDidget(int screen, String text, int font, int size, uint32_t fontColor);
+    void selectScreen(int screen, bool state);
+    void selectAllScreens(bool state);
 
 private:
     uint8_t screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& tft;
-
-    void selectScreen(int screen, bool state);
-
-    void selectAllScreens(bool state);
 };
 
 #endif // DISPLAY_H
