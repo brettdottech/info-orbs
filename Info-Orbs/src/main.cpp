@@ -30,12 +30,10 @@ void setup() {
   sm->getDisplay().fillScreen(TFT_BLACK);
 
   clockWidget = new ClockWidget(*sm);
-  clockWidget->draw();
+  //clockWidget->draw();
 }
 
 void loop() {
   clockWidget->update();
   clockWidget->draw();
-
-  delay(1000);
 }

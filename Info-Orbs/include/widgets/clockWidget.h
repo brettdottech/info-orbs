@@ -28,14 +28,14 @@ private:
 
     // Didgets
     String m_display1Didget;
-    String m_prevDisplay1Didget;    
+    String m_lastDisplay1Didget;    
     String m_display2Didget;
-    String m_prevDisplay2Didget;
+    String m_lastDisplay2Didget;
     //Display 3 is : 
     String m_display4Didget;
-    String m_prevDisplay4Didget;
+    String m_lastDisplay4Didget;
     String m_display5Didget;
-    String m_prevDisplay5Didget;
+    String m_lastDisplay5Didget;
 
     const int m_oneSecond{ 1000 };
     int m_updateTimer{ 0 };
