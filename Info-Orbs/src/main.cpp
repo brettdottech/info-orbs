@@ -4,8 +4,7 @@
 #include "screenManager.h"
 
 
-void setup()
-{
+void setup() {
 
   Serial.begin(115200);
   Serial.println("Starting up...");
@@ -16,15 +15,14 @@ void setup()
 
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  Serial.println("Connecting to WiFi..");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
     delay(500);
-    Serial.println("Connecting to WiFi..");
   }
 
   Serial.println("Connected to the WiFi network");
 }
 
-void loop()
-{
+void loop() {
 }
