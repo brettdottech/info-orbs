@@ -5,8 +5,13 @@
 #define WIFI_SSID "SSID"
 #define WIFI_PASS "PASSWORD"
 
+#define NTP_SERVER "pool.ntp.org"
+
+
 #define BUTTON_OK 26
 #define BUTTON_LEFT 25
 #define BUTTON_RIGHT 39
+
+#define SHADOWING 1
 
 #endif

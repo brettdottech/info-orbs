@@ -22,6 +22,8 @@ class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
 
+    TFT_eSPI& getDisplay();
+
     void selectScreen(int screen);
     void selectAllScreens();
     void reset();

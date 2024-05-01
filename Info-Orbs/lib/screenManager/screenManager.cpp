@@ -15,6 +15,10 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : tft(tft) {
   reset();
 }
 
+TFT_eSPI &ScreenManager::getDisplay() {
+  return tft;
+}
+
 // Selects a single screen
 void ScreenManager::selectScreen(int screen) {
   for (int i = 0; i < NUM_SCREENS; i++) {
