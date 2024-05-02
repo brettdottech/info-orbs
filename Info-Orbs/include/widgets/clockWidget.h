@@ -2,7 +2,6 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-
 class ClockWidget : public Widget {
 public:
     ClockWidget(ScreenManager& manager);
@@ -12,6 +11,7 @@ public:
 private:
 
     void timeUpdate();
+    void displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color, bool shadowing);
     void displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color);
 
     time_t m_unixEpoch;

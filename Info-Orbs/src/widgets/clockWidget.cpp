@@ -32,6 +32,12 @@ void ClockWidget::draw() {
         displayDidget(4, m_display5Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay5Didget = m_display5Didget;
     }
+
+    if(m_unixEpoch % 2 == 0) {
+        displayDidget(2, ":", 7, 5, LIGHT_ORANGE, false);
+    } else {
+        displayDidget(2, " ", 7, 5, LIGHT_ORANGE, false);
+    }
 }
 
 void ClockWidget::update() {
@@ -53,6 +59,7 @@ void ClockWidget::update() {
 
         m_lastMinuteSingle = m_minuteSingle;
     }
+
 }
 
 void ClockWidget::timeUpdate() {
@@ -71,12 +78,12 @@ void ClockWidget::timeUpdate() {
 }
 
 //TODO: Ask what Font is
-void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color) {
+void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.reset();
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();
     display.setTextSize(fontSize);
-    if(SHADOWING && font == 7){
+    if(shadowing && font == 7){
         display.setTextColor(BG_COLOR, TFT_BLACK);
         display.drawString("8", SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
         display.setTextColor(color);
@@ -84,4 +91,8 @@ void ClockWidget::displayDidget(int displayIndex, String didget, int font, int f
         display.setTextColor(color, TFT_BLACK);
     }
     display.drawString(didget, SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
+}
+
+void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color) {
+    this->displayDidget(displayIndex, didget, font, fontSize, color, SHADOWING);
 }
