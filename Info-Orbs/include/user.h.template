@@ -7,17 +7,15 @@
 
 #define NTP_SERVER "pool.ntp.org"
 
-
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define LIGHT_ORANGE 0xfc80     // orange for clock
 #define SCREEN_SIZE 240
 
 #define FORMAT_24_HOUR true
+#define SHADOWING true
 
 #define BUTTON_OK 26
 #define BUTTON_LEFT 25
 #define BUTTON_RIGHT 39
-
-#define SHADOWING 1
 
 #endif
