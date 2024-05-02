@@ -8,12 +8,14 @@ TFT_eSPI tft = TFT_eSPI();
 ScreenManager* sm; // Initialize the screen manager and the displays
 ClockWidget* clockWidget; // Initialize the clock widget
 
+Widget* widgets[1];
+uint8_t widgetCount = sizeof(widgets) / sizeof(widgets[0]);
+uint8_t currentWidget = 0;
+
 void setup() {
 
   Serial.begin(115200);
   Serial.println("Starting up...");
-
-  // Initialize the display
 
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
@@ -28,12 +30,13 @@ void setup() {
   sm = new ScreenManager(tft);
   sm->selectAllScreens();
   sm->getDisplay().fillScreen(TFT_BLACK);
+  sm->reset();
 
-  clockWidget = new ClockWidget(*sm);
-  //clockWidget->draw();
+  widgets[0] = new ClockWidget(*sm);
+
 }
 
 void loop() {
-  clockWidget->update();
-  clockWidget->draw();
+  widgets[currentWidget]->update();
+  widgets[currentWidget]->draw();
 }
