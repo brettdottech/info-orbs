@@ -7,10 +7,9 @@ ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
     m_timeClient->begin();
     m_timeClient->setPoolServerName(NTP_SERVER);
     // m_timeClient->setUpdateInterval(6000); // default is 6000
-    m_timeClient->update();
-    m_unixEpoch = m_timeClient->getEpochTime();
+    //m_timeClient->update();
+    //m_unixEpoch = m_timeClient->getEpochTime();
     m_timeZoneOffset = 0;
-    m_updateTimer = millis();
 }
 
 ClockWidget::~ClockWidget() {
@@ -37,10 +36,9 @@ void ClockWidget::draw() {
 
 void ClockWidget::update() {
     this->timeUpdate();
-
     if(m_lastHourSingle != m_hourSingle) {
         String currentHourPadded = String(m_hourSingle).length() == 1 ? "0" + String(m_hourSingle) : String(m_hourSingle);
-        
+
         m_display1Didget = currentHourPadded.substring(0, 1);
         m_display2Didget = currentHourPadded.substring(1, 2);
 
