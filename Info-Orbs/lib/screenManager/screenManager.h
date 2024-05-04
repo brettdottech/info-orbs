@@ -1,5 +1,5 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef SCREENMANAGER_H
+#define SCREENMANAGER_H
 
 // Include any necessary libraries here
 
@@ -33,4 +33,4 @@ private:
     TFT_eSPI& tft;
 };
 
-#endif // DISPLAY_H
+#endif // SCREENMANAGER_H

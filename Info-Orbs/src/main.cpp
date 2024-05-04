@@ -1,15 +1,18 @@
 #include <Arduino.h>
 #include "user.h"
 #include <WiFi.h>
+#include <time.h>
 #include "screenManager.h"
 #include "widgets/clockWidget.h"
 
 TFT_eSPI tft = TFT_eSPI();
 ScreenManager* sm; // Initialize the screen manager and the displays
+Time* time; // Initialize the time object
+
+#define COUNT_OF_WIDGETS 1
 ClockWidget* clockWidget; // Initialize the clock widget
 
-Widget* widgets[1];
-uint8_t widgetCount = sizeof(widgets) / sizeof(widgets[0]);
+Widget* widgets[COUNT_OF_WIDGETS];
 uint8_t currentWidget = 0;
 
 void setup() {
@@ -27,6 +30,7 @@ void setup() {
   Serial.println();
   Serial.println("Connected to the WiFi network");
 
+  time = new Time();
   sm = new ScreenManager(tft);
   sm->selectAllScreens();
   sm->getDisplay().fillScreen(TFT_BLACK);
@@ -37,6 +41,7 @@ void setup() {
 }
 
 void loop() {
+  time->updateTime();
   widgets[currentWidget]->update();
   widgets[currentWidget]->draw();
 }

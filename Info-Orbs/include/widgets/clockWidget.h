@@ -1,6 +1,8 @@
+#ifndef CLOCKWIDGET_H
+#define CLOCKWIDGET_H
+
 #include <widget.h>
-#include <NTPClient.h>
-#include <WiFiUdp.h>
+#include <time.h>
 
 class ClockWidget : public Widget {
 public:
@@ -10,9 +12,9 @@ public:
     void update() override;
 private:
 
-    void timeUpdate();
     void displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color, bool shadowing);
     void displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color);
+    void displaySeconds(int displayIndex, int seconds, int color);
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
@@ -22,9 +24,11 @@ private:
 
     int m_minuteSingle;
     int m_hourSingle;
+    int m_secondSingle;
 
     int m_lastMinuteSingle;
     int m_lastHourSingle;
+    int m_lastSecondSingle;
 
     // Didgets
     String m_display1Didget;
@@ -36,7 +40,5 @@ private:
     String m_lastDisplay4Didget;
     String m_display5Didget;
     String m_lastDisplay5Didget;
-
-    const int m_oneSecond{ 1000 };
-    int m_updateTimer{ 0 };
 };
+#endif // CLOCKWIDGET_H

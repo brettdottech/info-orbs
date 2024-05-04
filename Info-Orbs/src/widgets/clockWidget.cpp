@@ -1,19 +1,14 @@
 #include "widgets/clockWidget.h"
 #include "user.h"
-#include <TimeLib.h>
+#include <time.h>
+
 
 ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
-    m_timeClient = new NTPClient(m_udp);
-    m_timeClient->begin();
-    m_timeClient->setPoolServerName(NTP_SERVER);
-    // m_timeClient->setUpdateInterval(6000); // default is 6000
-    //m_timeClient->update();
-    //m_unixEpoch = m_timeClient->getEpochTime();
-    m_timeZoneOffset = 0;
+    
 }
 
 ClockWidget::~ClockWidget() {
-    delete m_timeClient;
+
 }
 void ClockWidget::draw() {
     if(m_lastDisplay1Didget != m_display1Didget) {
@@ -33,15 +28,22 @@ void ClockWidget::draw() {
         m_lastDisplay5Didget = m_display5Didget;
     }
 
-    if(m_unixEpoch % 2 == 0) {
-        displayDidget(2, ":", 7, 5, LIGHT_ORANGE, false);
-    } else {
-        displayDidget(2, " ", 7, 5, LIGHT_ORANGE, false);
+    if(m_secondSingle != m_lastSecondSingle) {
+        if(m_secondSingle % 2 == 0) {
+            displayDidget(2, ":", 7, 5, LIGHT_ORANGE, false);
+        } else {
+            displayDidget(2, " ", 7, 5, LIGHT_ORANGE, false);
+        }
+        //displaySeconds(2, m_secondSingle, m_minuteSingle % 2 == 0 ? LIGHT_ORANGE : BG_COLOR);
+        m_lastSecondSingle = m_secondSingle;
     }
+    
 }
 
 void ClockWidget::update() {
-    this->timeUpdate();
+    Time::getHourAndMinute(m_hourSingle, m_minuteSingle);
+    Time::getSecond(m_secondSingle);
+
     if(m_lastHourSingle != m_hourSingle) {
         String currentHourPadded = String(m_hourSingle).length() == 1 ? "0" + String(m_hourSingle) : String(m_hourSingle);
 
@@ -62,22 +64,6 @@ void ClockWidget::update() {
 
 }
 
-void ClockWidget::timeUpdate() {
-    if(millis() - m_updateTimer > m_oneSecond) {
-        m_timeClient->update();
-        m_unixEpoch = m_timeClient->getEpochTime();
-        m_updateTimer = millis();
-
-        m_minuteSingle = minute(m_unixEpoch);
-        #if FORMAT_24_HOUR == true
-        m_hourSingle = hour(m_unixEpoch);
-        #else
-        m_hourSingle = hourFormat12(m_unixEpoch);
-        #endif
-    }
-}
-
-//TODO: Ask what Font is
 void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.reset();
     m_manager.selectScreen(displayIndex);
@@ -95,4 +81,17 @@ void ClockWidget::displayDidget(int displayIndex, String didget, int font, int f
 
 void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color) {
     this->displayDidget(displayIndex, didget, font, fontSize, color, SHADOWING);
+}
+
+
+// working on it
+void ClockWidget::displaySeconds(int displayIndex, int seconds, int color){
+    m_manager.reset();
+    m_manager.selectScreen(displayIndex);
+    TFT_eSPI& display = m_manager.getDisplay(); 
+    if(seconds < 30){
+        display.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds + 180, 6 * seconds + 180 + 6, color, TFT_BLACK);
+    } else {
+        display.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds - 180, 6 * seconds - 180 + 6, color, TFT_BLACK);
+    }
 }

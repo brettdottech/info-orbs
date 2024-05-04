@@ -1,3 +1,6 @@
+#ifndef WIDGET_H
+#define WIDGET_H
+
 #include <screenManager.h>
 
 class Widget {
@@ -10,3 +13,4 @@ public:
 protected:
     ScreenManager& m_manager;
 };
+#endif // WIDGET_H
