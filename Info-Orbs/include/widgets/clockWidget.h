@@ -2,14 +2,14 @@
 #define CLOCKWIDGET_H
 
 #include <widget.h>
-#include <time.h>
+#include <globalTime.h>
 
 class ClockWidget : public Widget {
 public:
     ClockWidget(ScreenManager& manager);
     ~ClockWidget() override;
-    void draw() override;
-    void update() override;
+    void update(bool force) override;
+    void draw(bool force) override;
 private:
 
     void displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color, bool shadowing);

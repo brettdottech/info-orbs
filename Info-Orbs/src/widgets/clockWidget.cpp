@@ -1,6 +1,6 @@
 #include "widgets/clockWidget.h"
 #include "user.h"
-#include <time.h>
+#include <globalTime.h>
 
 
 ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
@@ -10,25 +10,25 @@ ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
 ClockWidget::~ClockWidget() {
 
 }
-void ClockWidget::draw() {
-    if(m_lastDisplay1Didget != m_display1Didget) {
+void ClockWidget::draw(bool force) {
+    if(m_lastDisplay1Didget != m_display1Didget || force) {
         displayDidget(0, m_display1Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay1Didget = m_display1Didget;
     }
-    if(m_lastDisplay2Didget != m_display2Didget) {
+    if(m_lastDisplay2Didget != m_display2Didget || force) {
         displayDidget(1, m_display2Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay2Didget = m_display2Didget;
     }
-    if(m_lastDisplay4Didget != m_display4Didget) {
+    if(m_lastDisplay4Didget != m_display4Didget || force) {
         displayDidget(3, m_display4Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay4Didget = m_display4Didget;
     }
-    if(m_lastDisplay5Didget != m_display5Didget) {
+    if(m_lastDisplay5Didget != m_display5Didget || force) {
         displayDidget(4, m_display5Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay5Didget = m_display5Didget;
     }
 
-    if(m_secondSingle != m_lastSecondSingle) {
+    if(m_secondSingle != m_lastSecondSingle || force) {
         if(m_secondSingle % 2 == 0) {
             displayDidget(2, ":", 7, 5, LIGHT_ORANGE, false);
         } else {
@@ -40,11 +40,11 @@ void ClockWidget::draw() {
     
 }
 
-void ClockWidget::update() {
+void ClockWidget::update(bool force) {
     Time::getHourAndMinute(m_hourSingle, m_minuteSingle);
     Time::getSecond(m_secondSingle);
 
-    if(m_lastHourSingle != m_hourSingle) {
+    if(m_lastHourSingle != m_hourSingle || force) {
         String currentHourPadded = String(m_hourSingle).length() == 1 ? "0" + String(m_hourSingle) : String(m_hourSingle);
 
         m_display1Didget = currentHourPadded.substring(0, 1);
@@ -53,7 +53,7 @@ void ClockWidget::update() {
         m_lastHourSingle = m_hourSingle;
     }
 
-    if(m_lastMinuteSingle != m_minuteSingle) {
+    if(m_lastMinuteSingle != m_minuteSingle || force) {
         String currentMinutePadded = String(m_minuteSingle).length() == 1 ? "0" + String(m_minuteSingle) : String(m_minuteSingle);
         
         m_display4Didget = currentMinutePadded.substring(0, 1);

@@ -28,6 +28,8 @@ public:
     void selectAllScreens();
     void reset();
 
+    void fillAllScreens(uint32_t color);
+
 private:
     uint8_t screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& tft;

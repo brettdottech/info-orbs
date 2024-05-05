@@ -26,6 +26,13 @@ void ScreenManager::selectScreen(int screen) {
   }
 }
 
+// Fills all screens with a color
+void ScreenManager::fillAllScreens(uint32_t color) {
+  selectAllScreens();
+  tft.fillScreen(color);
+  reset();
+}
+
 // Selects all screens
 // I don't think that state should be used, It's kinda wierd saying "ow select
 // all the screens to "off"
