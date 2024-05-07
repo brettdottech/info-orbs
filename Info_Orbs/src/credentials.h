@@ -1,2 +1,2 @@
-const char *ssid = "BrettWifi";  //Wifi U
-const char *password = "Turner12"; //Wifi P
+const char *ssid = "foo";  //Wifi U
+const char *password = "bar"; //Wifi P
