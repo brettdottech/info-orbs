@@ -1,6 +1,7 @@
 #include "widgets/clockWidget.h"
 #include "user.h"
 #include <globalTime.h>
+#include "widgets/clockWidget.h"
 
 
 ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
@@ -10,25 +11,31 @@ ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
 ClockWidget::~ClockWidget() {
 
 }
-void ClockWidget::draw(bool force) {
-    if(m_lastDisplay1Didget != m_display1Didget || force) {
+
+void ClockWidget::setup() {
+
+
+}
+
+void ClockWidget::draw() {
+    if(m_lastDisplay1Didget != m_display1Didget) {
         displayDidget(0, m_display1Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay1Didget = m_display1Didget;
     }
-    if(m_lastDisplay2Didget != m_display2Didget || force) {
+    if(m_lastDisplay2Didget != m_display2Didget) {
         displayDidget(1, m_display2Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay2Didget = m_display2Didget;
     }
-    if(m_lastDisplay4Didget != m_display4Didget || force) {
+    if(m_lastDisplay4Didget != m_display4Didget) {
         displayDidget(3, m_display4Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay4Didget = m_display4Didget;
     }
-    if(m_lastDisplay5Didget != m_display5Didget || force) {
+    if(m_lastDisplay5Didget != m_display5Didget) {
         displayDidget(4, m_display5Didget, 7, 5, LIGHT_ORANGE);
         m_lastDisplay5Didget = m_display5Didget;
     }
 
-    if(m_secondSingle != m_lastSecondSingle || force) {
+    if(m_secondSingle != m_lastSecondSingle) {
         if(m_secondSingle % 2 == 0) {
             displayDidget(2, ":", 7, 5, LIGHT_ORANGE, false);
         } else {
@@ -40,11 +47,17 @@ void ClockWidget::draw(bool force) {
     
 }
 
-void ClockWidget::update(bool force) {
-    Time::getHourAndMinute(m_hourSingle, m_minuteSingle);
-    Time::getSecond(m_secondSingle);
+void ClockWidget::update() {
+    // Time::getHourAndMinute(m_hourSingle, m_minuteSingle);
+    // Time::getSecond(m_secondSingle);
 
-    if(m_lastHourSingle != m_hourSingle || force) {
+    GlobalTime* time = GlobalTime::getInstance();
+    m_hourSingle = time->getHour();
+    m_minuteSingle = time->getMinute();
+    m_secondSingle = time->getSecond();
+
+
+    if(m_lastHourSingle != m_hourSingle) {
         String currentHourPadded = String(m_hourSingle).length() == 1 ? "0" + String(m_hourSingle) : String(m_hourSingle);
 
         m_display1Didget = currentHourPadded.substring(0, 1);
@@ -53,7 +66,7 @@ void ClockWidget::update(bool force) {
         m_lastHourSingle = m_hourSingle;
     }
 
-    if(m_lastMinuteSingle != m_minuteSingle || force) {
+    if(m_lastMinuteSingle != m_minuteSingle) {
         String currentMinutePadded = String(m_minuteSingle).length() == 1 ? "0" + String(m_minuteSingle) : String(m_minuteSingle);
         
         m_display4Didget = currentMinutePadded.substring(0, 1);
@@ -64,10 +77,11 @@ void ClockWidget::update(bool force) {
 
 }
 
-void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color, bool shadowing) {
-    m_manager.reset();
+void ClockWidget::displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing) {
+    //m_manager.reset();
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();
+    display.fillScreen(BG_COLOR);
     display.setTextSize(fontSize);
     if(shadowing && font == 7){
         display.setTextColor(BG_COLOR, TFT_BLACK);
@@ -79,7 +93,7 @@ void ClockWidget::displayDidget(int displayIndex, String didget, int font, int f
     display.drawString(didget, SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
 }
 
-void ClockWidget::displayDidget(int displayIndex, String didget, int font, int fontSize, uint32_t color) {
+void ClockWidget::displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color) {
     this->displayDidget(displayIndex, didget, font, fontSize, color, SHADOWING);
 }
 

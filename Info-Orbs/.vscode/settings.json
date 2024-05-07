@@ -1,0 +1,12 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#063334",
+        "titleBar.activeBackground": "#094849",
+        "titleBar.activeForeground": "#EFFDFD"
+    },
+    "files.associations": {
+        "*.ejs": "html",
+        "*.tcc": "cpp",
+        "new": "cpp"
+    }
+}

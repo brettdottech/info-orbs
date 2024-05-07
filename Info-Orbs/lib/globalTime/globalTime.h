@@ -4,45 +4,45 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-
-class Time {
+class GlobalTime {
 public:
-    Time();
-    ~Time();
+  static GlobalTime* getInstance();
 
-    void updateTime();
-    static void getHourAndMinute(int &hour, int &minute);
-    static void getUnixEpoch(time_t &epoch);
-    static void getSecond(int &second);
-    static void getDay(int &day);
-    static void getMonth(int &month);
-    static void getMonthName(String &monthName);
-    static void getYear(int &year);
-    static void getTime(String &time);
-    static void getWeekday(String &weekday);
+  void updateTime();
+  void getHourAndMinute(int &hour, int &minute);
+  int getHour();
+  int getMinute();
+  time_t getUnixEpoch();
+  int getSecond();
+  int getDay();
+  int getMonth();
+  String getMonthName();
+  int getYear();
+  String getTime();
+  String getWeekday();
 
 private:
+  GlobalTime();
+  ~GlobalTime();
 
-    static time_t m_unixEpoch;
-    static int m_hour;
-    static int m_minute;
-    static int m_second;
-    static int m_day;
-    static int m_month;
-    static String m_monthName;
-    static int m_year;
-    static String m_time;
-    static String m_weekday;
+  static GlobalTime *m_instance;
 
-    WiFiUDP m_udp;
-    NTPClient* m_timeClient{ nullptr };
+  time_t m_unixEpoch;
+  int m_hour;
+  int m_minute;
+  int m_second;
+  int m_day;
+  int m_month;
+  String m_monthName;
+  int m_year;
+  String m_time;
+  String m_weekday;
 
-    const int m_oneSecond{ 1000 };
-    int m_updateTimer{ 0 };
+  WiFiUDP m_udp;
+  NTPClient *m_timeClient{nullptr};
+
+  const int m_oneSecond{1000};
+  int m_updateTimer{0};
 };
-
-
-
-
 
 #endif

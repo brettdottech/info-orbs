@@ -9,8 +9,9 @@ class WeatherWidget : public Widget {
 public:
     WeatherWidget(ScreenManager& manager);
     ~WeatherWidget() override;
-    void update(bool force) override;
-    void draw(bool force) override;
+    void setup() override;
+    void update() override;
+    void draw() override;
 private:
 
     void displayClock(int displayIndex, String time, String monthName, int day, String weekday, int color);

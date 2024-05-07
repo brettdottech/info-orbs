@@ -7,8 +7,9 @@ class Widget {
 public:
     Widget(ScreenManager& manager);
     virtual ~Widget() = default;
-    virtual void update(bool force = false) = 0;
-    virtual void draw(bool force = false) = 0;
+    virtual void setup() = 0;
+    virtual void update() = 0;
+    virtual void draw() = 0;
 
 protected:
     ScreenManager& m_manager;

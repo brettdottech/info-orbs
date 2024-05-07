@@ -11,19 +11,24 @@ WeatherWidget::~WeatherWidget() {
 
 }
 
+void WeatherWidget::setup() {
 
-void WeatherWidget::draw(bool force) {
-    if(strcmp(m_time.c_str(), m_lastTime.c_str()) != 0 || force) {
+}
+
+
+void WeatherWidget::draw() {
+    if(strcmp(m_time.c_str(), m_lastTime.c_str()) != 0) {
         displayClock(0, m_time, m_monthName, m_day, m_weekday, TFT_WHITE);
         m_lastTime = m_time;
     }
 }
 
-void WeatherWidget::update(bool force) {
-    Time::getTime(m_time);
-    Time::getMonthName(m_monthName);
-    Time::getDay(m_day);
-    Time::getWeekday(m_weekday);
+void WeatherWidget::update() {
+    GlobalTime* time = GlobalTime::getInstance();
+    m_time = time->getTime();
+    m_monthName = time->getMonthName();
+    m_day = time->getDay();
+    m_weekday = time->getWeekday();
 }
 
 
