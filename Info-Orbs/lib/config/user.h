@@ -2,7 +2,7 @@
 #define USER_H
 
 #define USER_SETUP_LOADED
-#define WOKWI true
+#define WOKWI false
 
 #if WOKWI != true // If not Wokwi
 

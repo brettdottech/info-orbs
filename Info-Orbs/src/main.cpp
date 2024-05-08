@@ -26,8 +26,10 @@ WeatherWidget* weatherWidget; // Initialize the weather widget
 
 GlobalTime* globalTime; // Initialize the global time
 
+String connectingString{ "" };
+
 Widget* widgets[COUNT_OF_WIDGETS];
-int8_t currentWidget = 1;
+int8_t currentWidget = 0;
 
 void setup() {
 
@@ -43,21 +45,37 @@ void setup() {
 
   sm = new ScreenManager(tft);
   sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_ORANGE);
+  sm->getDisplay().fillScreen(TFT_BLACK);
   sm->reset();
+
+  sm->selectScreen(0);
+  TFT_eSPI& display = sm->getDisplay();
+  display.fillScreen(TFT_BLACK);
+  display.setTextSize(2);
+  display.setTextColor(TFT_WHITE);
+  display.drawCentreString("Connecting" + connectingString, 120, 80, 1);
+
+  sm->selectScreen(1);
+  display.fillScreen(TFT_BLACK);
+  display.setTextSize(2);
+  display.setTextColor(TFT_WHITE);
+  display.drawCentreString("Connecting to", 120, 80, 1);
+  display.drawCentreString("WiFi..", 120, 100, 1);
+  display.drawCentreString(WIFI_SSID, 120, 130, 1);
 
   Serial.println("Connecting to WiFi..");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
+    connectingString += ".";
+    if(connectingString.length() > 3) {
+      connectingString = "";
+    }
+    sm->selectScreen(0);
+    display.fillScreen(TFT_BLACK);
+    display.drawCentreString("Connecting", 120, 80, 1);
+    display.drawCentreString(connectingString, 120, 100, 1);
     delay(500);
   }
-
-  Serial.println("TFT_MOSI:" + String(TFT_MOSI));
-  Serial.println("TFT_MISO:" + String(TFT_MISO));
-  Serial.println("TFT_SCLK:" + String(TFT_SCLK));
-  Serial.println("TFT_CS:" + String(TFT_CS));
-  Serial.println("TFT_DC:" + String(TFT_DC));
-  Serial.println("TFT_RST:" + String(TFT_RST));
 
   #ifdef GC9A01_DRIVER
     Serial.println("GC9A01 Driver");
@@ -76,8 +94,8 @@ void setup() {
   Serial.println();
   Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
-
- 
+  
+   
 
   globalTime = GlobalTime::getInstance();
 
