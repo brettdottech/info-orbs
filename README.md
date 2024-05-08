@@ -6,9 +6,9 @@ Info Orbs is a low cost, open source, multi-use desktop widget that can be used 
 Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Discord](https://discord.gg/xZhYuQ9y64) | [Brett (:](https://bturner.tech/links)
 
 <p>
-    <img src="references/weather.png" alt="Weather Widget" style="width: %;">
-    <img src="references/time.png" alt="Clock Widget" style="width: 20%;">
-    <img src="references/stocks.png" alt="Stock Widget" style="width: 20%;">
+    <img src="references/weather.png" alt="Weather Widget" style="width:30%;">
+    <img src="references/time.png" alt="Clock Widget" style="width: 30%;">
+    <img src="references/stocks.png" alt="Stock Widget" style="width: 30%;">
 </p>
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
