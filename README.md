@@ -31,7 +31,7 @@ Lastly, some little things things that will make development allot easier:
 **Component List:**
 _once again full dev kits with all needed components & a custom PCB are coming very soon, I advise waiting for these_
 - [240x240 TFT displays](https://s.click.aliexpress.com/e/_DmZVAIL) x 5
-- ESP32 x2 - I use [this 38 pin dev board](https://s.click.aliexpress.com/e/_DdEtAHN) for this project, however any ESP32 _should_ work. 
+- ESP32 x1 - I use [this 38 pin dev board](https://s.click.aliexpress.com/e/_DdEtAHN) for this project, however any ESP32 _should_ work. 
 - Any momentary button x1
 
 **Pinouts/Wiring Diagram** 
