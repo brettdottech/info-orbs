@@ -61,6 +61,7 @@ Diagram can be seen below:
 
 ### 2. Dev Environment Setup/Project Config
 **IDE Setup**
+
 While built on Arduino, the codebase for this project has been built using the  [Platform IO IDE](https://platformio.org/), which allows you to compile/run Arduino code in VSC, as well as quite a few other creature comfort items.
 Once you have platform.io installed and configured in VSC, you'll want to select "Open Project", and select & open the main "Info-Orbs" directory.
 
