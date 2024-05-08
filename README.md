@@ -99,7 +99,7 @@ Included in the GitHub is a preconfigured [Wokwi simulator](https://wokwi.com/) 
 
 Lastly, you will need to change two config settings in order to have your codebase work with the simulator:
 
-1. In  "Info_Orbs/platformio.ini", comment out `-D GC9A01_DRIVER` and uncomment `-D ILI9341_DRIVER` (the displays available in the wow are different than the live hardware
+1. In  "Info_Orbs/platformio.ini", comment out `-D GC9A01_DRIVER` and uncomment `-D ILI9341_DRIVER` (the displays available in the Wokwi are slightly different than the live hardware
 2. In src/main.cpp, set your wifi credential to be: `u:"Wokwi-GUEST" p:""` (this is what they are by default in the sketch).
 
 You will now be able to run simulation hardware by opening the "diagram.json" in VSC!! Wooo!!!
@@ -115,6 +115,7 @@ The CS pin stands for "Chip Select" and it effectively turns the screen's data l
 
 ## Contributors
 A massive thank you to the community that has helped, this is my first open source project(honestly first project of any sort) so thy help of all you super smart people has just been so so incredible and I couldn't have got this anywhere near where it is now without everyone. Thanks for building this with me. Love ya'll! ♥️
+
 <a href="https://github.com/brett-dot-tech/info-orbs/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=brett-dot-tech/info-orbs" />
 </a>
