@@ -17,7 +17,7 @@ Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Discord](https://discord
 - The soldering/wiring on this is tricky, I'm currently in the process of building out dev kits that will a custom PCB and all needed parts. Those will be available in the next 1-2 weeks.
 - The code base currently consists of two branches:
 	- The main branch, which is written using very elementary/inefficient code. This code is entirely functional and will display 	 3 widgets; A clock, a weather widget, and a stock price tracker widget.
-	- A nightly branch, so far written primarily by [@brammie15] (https://www.github.com/brammie15), this branch is written in a much more efficient object oriented codebase. While still a work in progress, the goal is to eventually get this code base caught up with the functionality of the main codebase and use this as the basis to develop the orbs moving forward assuming everyone likes the layout/structure.
+	- A nightly branch, so far written primarily by [@brammie15](https://www.github.com/brammie15), this branch is written in a much more efficient object oriented codebase. While still a work in progress, the goal is to eventually get this code base caught up with the functionality of the main codebase and use this as the basis to develop the orbs moving forward assuming everyone likes the layout/structure.
 
 
 Lastly, some little things things that will make development allot easier:
