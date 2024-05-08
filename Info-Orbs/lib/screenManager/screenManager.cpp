@@ -10,9 +10,22 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : tft(tft) {
 
   tft.init();
   tft.setRotation(DISPLAY_ROTATION);
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_WHITE);
   tft.setTextDatum(MC_DATUM);
   reset();
+
+  Serial.println("ScreenManager initialized");
+  Serial.println("TFT_MOSI:" + String(TFT_MOSI));
+  Serial.println("TFT_MISO:" + String(TFT_MISO));
+  Serial.println("TFT_SCLK:" + String(TFT_SCLK));
+  Serial.println("TFT_CS:" + String(TFT_CS));
+  Serial.println("TFT_DC:" + String(TFT_DC));
+  Serial.println("TFT_RST:" + String(TFT_RST));
+  Serial.println("SCREEN_1_CS:" + String(SCREEN_1_CS));
+  Serial.println("SCREEN_2_CS:" + String(SCREEN_2_CS));
+  Serial.println("SCREEN_3_CS:" + String(SCREEN_3_CS));
+  Serial.println("SCREEN_4_CS:" + String(SCREEN_4_CS));
+  Serial.println("SCREEN_5_CS:" + String(SCREEN_5_CS));
 }
 
 TFT_eSPI &ScreenManager::getDisplay() {

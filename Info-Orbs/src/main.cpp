@@ -1,6 +1,6 @@
 #include <Arduino.h>
+#include <user.h>
 #include "screenManager.h"
-#include "user.h"
 #include <WiFi.h>
 #include <globalTime.h>
 #include "widgets/clockWidget.h"
@@ -51,6 +51,23 @@ void setup() {
     Serial.print(".");
     delay(500);
   }
+
+  Serial.println("TFT_MOSI:" + String(TFT_MOSI));
+  Serial.println("TFT_MISO:" + String(TFT_MISO));
+  Serial.println("TFT_SCLK:" + String(TFT_SCLK));
+  Serial.println("TFT_CS:" + String(TFT_CS));
+  Serial.println("TFT_DC:" + String(TFT_DC));
+  Serial.println("TFT_RST:" + String(TFT_RST));
+
+  #ifdef GC9A01_DRIVER
+    Serial.println("GC9A01 Driver");
+  #endif
+  #ifdef ILI9341_DRIVER
+    Serial.println("ILI9341 Driver");
+  #endif
+  #ifdef WOKWI
+    Serial.println("Wokwi Build");
+  #endif
 
   sm->selectAllScreens();
   sm->getDisplay().fillScreen(TFT_GREEN);
