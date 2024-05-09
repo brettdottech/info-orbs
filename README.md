@@ -1,7 +1,7 @@
 
 # Welcome to Info Orbs!
 
-Info Orbs is a low cost, open source, multi-use desktop widget that can be used for things like time, weather, sports score, stock prices, notifications & much more!
+Info Orbs is a desk display widget built ontop of an ESP32 with the intention of creating a large library of widgets/functionality!
 
 Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Discord](https://discord.gg/xZhYuQ9y64) | [Brett (:](https://bturner.tech/links)
 
