@@ -2,19 +2,11 @@
 #define SCREENMANAGER_H
 
 // Include any necessary libraries here
+#include <user.h>
 #include <TFT_eSPI.h>
 #include <SPI.h>
-#include <user.h>
 
 #define NUM_SCREENS 5
-        
-// #define SCREEN_1_CS 15
-// #define SCREEN_2_CS 2
-// #define SCREEN_3_CS 27
-// #define SCREEN_4_CS 4
-// #define SCREEN_5_CS 5
-
-#define DISPLAY_ROTATION 0
 
 // Define your class or functions here
 
