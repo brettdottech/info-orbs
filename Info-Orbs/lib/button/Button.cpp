@@ -2,7 +2,7 @@
 
 
 Button::Button(uint8_t pin)
-    : m_pin(pin), m_delay(500), m_state(HIGH), m_ignoreUntil(0),
+    : m_pin(pin), m_delay(100), m_state(HIGH), m_ignoreUntil(0),
       m_hasChanged(false) {}
 
 void Button::begin() { pinMode(m_pin, INPUT_PULLUP); }

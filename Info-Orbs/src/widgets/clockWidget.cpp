@@ -5,7 +5,7 @@
 
 
 ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
-    
+    setup();
 }
 
 ClockWidget::~ClockWidget() {
@@ -13,7 +13,10 @@ ClockWidget::~ClockWidget() {
 }
 
 void ClockWidget::setup() {
-
+    m_lastDisplay1Didget = "-1";
+    m_lastDisplay2Didget = "-1";
+    m_lastDisplay4Didget = "-1";
+    m_lastDisplay5Didget = "-1";
 
 }
 

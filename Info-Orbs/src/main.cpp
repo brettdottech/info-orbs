@@ -88,7 +88,7 @@ void setup() {
   #endif
 
   sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_GREEN);
+  sm->getDisplay().fillScreen(TFT_BLACK);
   sm->reset();
 
   Serial.println();
@@ -102,23 +102,18 @@ void setup() {
   widgets[0] = new ClockWidget(*sm);
   widgets[1] = new WeatherWidget(*sm);
 
-  widgets[currentWidget]->setup();
-
-
-
 }
 
 void loop() {
   globalTime->updateTime();
 
-  // if(buttonRight.pressed()) {
-  //   Serial.println("Right button pressed");
-  //   currentWidget++;
-  //   currentWidget %= COUNT_OF_WIDGETS;
-  //   sm->fillAllScreens(TFT_BLACK);
-  //   widgets[currentWidget]->setup();
-  // }
-  // This is a BIG WIP
+  if(buttonRight.pressed()) {
+    Serial.println("Right button pressed");
+    currentWidget++;
+    currentWidget %= COUNT_OF_WIDGETS;
+    sm->fillAllScreens(TFT_BLACK);
+    widgets[currentWidget]->setup();
+  }
 
   widgets[currentWidget]->update();
   widgets[currentWidget]->draw();

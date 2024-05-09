@@ -4,7 +4,7 @@
 #include <globalTime.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager): Widget(manager) {
-    
+    setup();
 }
 
 WeatherWidget::~WeatherWidget() {
@@ -12,12 +12,12 @@ WeatherWidget::~WeatherWidget() {
 }
 
 void WeatherWidget::setup() {
-
+    m_lastTime = "-1";
 }
 
 
 void WeatherWidget::draw() {
-    if(strcmp(m_time.c_str(), m_lastTime.c_str()) != 0) {
+    if(m_time != m_lastTime) {
         displayClock(0, m_time, m_monthName, m_day, m_weekday, TFT_WHITE);
         m_lastTime = m_time;
     }
