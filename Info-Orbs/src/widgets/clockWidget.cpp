@@ -5,7 +5,6 @@
 
 
 ClockWidget::ClockWidget(ScreenManager &manager): Widget(manager) {
-    setup();
 }
 
 ClockWidget::~ClockWidget() {

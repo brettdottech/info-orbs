@@ -4,7 +4,6 @@
 #include <globalTime.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager): Widget(manager) {
-    setup();
 }
 
 WeatherWidget::~WeatherWidget() {
