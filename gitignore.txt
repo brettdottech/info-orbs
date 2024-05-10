@@ -1,0 +1,17 @@
+# macOS system files
+.DS_Store
+
+# Compiled binary files and executables
+*.o
+*.elf
+*.hex
+*.exe
+*.out
+
+# Build directory and Arduino IDE specific files
+/build/
+*.d
+
+# Arduino libraries (if installed in the project directory)
+libraries/
+Info-Orbs/lib/config/user.h
