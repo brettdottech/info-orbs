@@ -66,6 +66,13 @@ void connectionTimedOut() {
   display.drawCentreString(connectingString, 120, 100, 1);
 }
 
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
+  if (y >= tft.height())
+    return 0;
+  tft.pushImage(x, y, w, h, bitmap);
+  return 1;
+}
+
 void setup() {
 
   buttonLeft.begin();
@@ -82,6 +89,8 @@ void setup() {
   sm->reset();
 
   TFT_eSPI& display = sm->getDisplay();
+  TJpgDec.setSwapBytes(true); // jpeg rendering setup
+  TJpgDec.setCallback(tft_output);
 
   sm->selectScreen(0);
   display.fillScreen(TFT_BLACK);
