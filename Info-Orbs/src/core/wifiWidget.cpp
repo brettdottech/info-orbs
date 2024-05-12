@@ -25,6 +25,8 @@ void WifiWidget::setup() {
 
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
+  Serial.println("Connecting to WiFi..");
+
 
 
 }
@@ -36,6 +38,7 @@ void WifiWidget::update() {
 	} else {
 		m_connectionTimer += 500;
 		m_dotsString += ".";
+    Serial.print(".");
 		if(m_dotsString.length() > 3) {
 			m_dotsString = "";
 		}
@@ -58,6 +61,8 @@ void WifiWidget::draw() {
 		m_manager.selectScreen(0);
 		display.fillScreen(TFT_BLACK);
 		display.drawCentreString("Connected", 120, 100, 1);
+    Serial.println();
+    Serial.println("Connected to WiFi");
 		m_isConnected = true;
 	} else if(m_connectionFailed && !m_hasDisplayedError) {
 		m_hasDisplayedError = true;

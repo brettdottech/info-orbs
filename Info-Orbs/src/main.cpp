@@ -6,6 +6,7 @@
 #include <Button.h>
 #include <globalTime.h>
 #include <user.h>
+#include <widgets/screenWidgets/stockScreenWidget.h>
 
 TFT_eSPI tft = TFT_eSPI();
 ScreenManager* sm = new ScreenManager(tft); // Initialize the screen manager and the displays
@@ -36,6 +37,8 @@ int connectionTimer{0};
 const int connectionTimeout{10000};
 bool isConnected{true};
 
+StockScreenWidget *stockScreenWidget;
+
 void setup() {
 
   buttonLeft.begin();
@@ -45,15 +48,12 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println("Starting up...");
-  Serial.println("Connecting to: " + String(WIFI_SSID));
 
   sm = new ScreenManager(tft);
   sm->selectAllScreens();
   sm->getDisplay().fillScreen(TFT_WHITE);
   sm->reset();
 
-  wifiWidget = new WifiWidget(*sm);
-  wifiWidget->setup();
 
 #ifdef GC9A01_DRIVER
   Serial.println("GC9A01 Driver");
@@ -65,10 +65,18 @@ void setup() {
   Serial.println("Wokwi Build");
 #endif
 
+
+  Serial.println("Connecting to: " + String(WIFI_SSID));
+
+  wifiWidget = new WifiWidget(*sm);
+  wifiWidget->setup();
+
   globalTime = GlobalTime::getInstance();
 
   widgets[0] = new ClockWidget(*sm);
   widgets[1] = new WeatherWidget(*sm);
+
+  stockScreenWidget = new StockScreenWidget(*sm, "AAPL", 1);
 }
 
 void loop() {
@@ -88,8 +96,11 @@ void loop() {
     // }
     // This is a BIG WIP
 
-    widgets[currentWidget]->update();
-    widgets[currentWidget]->draw();
+    stockScreenWidget->update();
+    stockScreenWidget->draw();
+
+    // widgets[currentWidget]->update();
+    // widgets[currentWidget]->draw();
     delay(100);
   }
 }
