@@ -39,6 +39,13 @@ bool isConnected{true};
 
 StockScreenWidget *stockScreenWidget;
 
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
+  if (y >= tft.height())
+    return 0;
+  tft.pushImage(x, y, w, h, bitmap);
+  return 1;
+}
+
 void setup() {
 
   buttonLeft.begin();
@@ -53,7 +60,6 @@ void setup() {
   sm->selectAllScreens();
   sm->getDisplay().fillScreen(TFT_WHITE);
   sm->reset();
-
 
 #ifdef GC9A01_DRIVER
   Serial.println("GC9A01 Driver");

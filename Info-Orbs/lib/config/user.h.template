@@ -85,6 +85,9 @@
 #define TIME_ZONE_OFFSET 2
 #define FORMAT_24_HOUR true
 
+#define WEATHER_LOCAION "Aberdeen,ID";
+#define WEATHER_UNITS "us";
+#define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define LIGHT_ORANGE 0xfc80  // orange for clock
