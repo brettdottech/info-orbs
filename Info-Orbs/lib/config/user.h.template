@@ -1,7 +1,6 @@
 #ifndef USER_H
 #define USER_H
 
-#define USER_SETUP_LOADED
 #define WOKWI false
 
 #if WOKWI != true // If not Wokwi
@@ -12,12 +11,12 @@
 #undef TFT_CS
 #undef TFT_DC
 
-
 #undef ILI9341_DRIVER
 #define GC9A01_DRIVER
+#define TFT_SDA_READ
 
-#define WIFI_SSID "Tecnovel's Home"
-#define WIFI_PASS "Gummibaerchen*12"
+#define WIFI_SSID "WIFI_SSID"
+#define WIFI_PASS "WIFI_PASS"
 
 #define BUTTON_OK 26
 #define BUTTON_LEFT 25
@@ -36,7 +35,7 @@
 #define SCREEN_4_CS 18
 #define SCREEN_5_CS 23
 
-#define DISPLAY_ROTATION 0
+#define DISPLAY_ROTATION 2
 
 #else
 
@@ -68,10 +67,20 @@
 
 #define NTP_SERVER "pool.ntp.org"
 
+#define SCREEN_SIZE 240
+#define TFT_WIDTH SCREEN_SIZE
+#define TFT_HEIGHT SCREEN_SIZE
+#define LOAD_GLCD
+#define LOAD_FONT2
+#define LOAD_FONT4
+#define LOAD_FONT6
+#define LOAD_FONT7
+#define LOAD_FONT8N
+#define LOAD_GFXFF
+#define SMOOTH_FONT
+#define SPI_FREQUENCY 27000000
 
 #define SHADOWING 1
-
-#define SCREEN_SIZE 240
 
 #define TIME_ZONE_OFFSET 2
 #define FORMAT_24_HOUR true
