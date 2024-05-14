@@ -1,6 +1,6 @@
 
 #include "widgets/weatherWidget.h"
-#include <user.h>
+#include <config.h>
 #include <globalTime.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {

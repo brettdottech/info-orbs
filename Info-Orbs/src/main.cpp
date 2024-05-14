@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <Button.h>
 #include <globalTime.h>
-#include <user.h>
+#include <config.h>
 #include <widgets/screenWidgets/stockScreenWidget.h>
 
 TFT_eSPI tft = TFT_eSPI();
@@ -82,7 +82,7 @@ void setup() {
   widgets[0] = new ClockWidget(*sm);
   widgets[1] = new WeatherWidget(*sm);
 
-  stockScreenWidget = new StockScreenWidget(*sm, "AAPL", 1);
+  // stockScreenWidget = new StockScreenWidget(*sm, "AAPL", 1);
 }
 
 void loop() {
@@ -102,11 +102,11 @@ void loop() {
     // }
     // This is a BIG WIP
 
-    stockScreenWidget->update();
-    stockScreenWidget->draw();
+    // stockScreenWidget->update();
+    // stockScreenWidget->draw();
 
-    // widgets[currentWidget]->update();
-    // widgets[currentWidget]->draw();
+    widgets[currentWidget]->update();
+    widgets[currentWidget]->draw();
     delay(100);
   }
 }

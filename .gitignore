@@ -14,4 +14,4 @@
 
 # Arduino libraries (if installed in the project directory)
 libraries/
-Info-Orbs/lib/config/user.h
+Info-Orbs/lib/config/config.h
