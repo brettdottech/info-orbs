@@ -3,11 +3,15 @@
 #include <config.h>
 #include <globalTime.h>
 
+
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+    
 }
 
 WeatherWidget::~WeatherWidget() {
 }
+
+
 
 void WeatherWidget::setup() {
     m_lastTime = "-1";
