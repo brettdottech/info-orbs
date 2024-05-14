@@ -46,6 +46,11 @@ void ScreenManager::fillAllScreens(uint32_t color) {
   reset();
 }
 
+// clears all screens but resetting them to black
+void ScreenManager::clearAllScreens() {
+  fillAllScreens(TFT_BLACK);
+}
+
 // Selects all screens
 // I don't think that state should be used, It's kinda wierd saying "ow select
 // all the screens to "off"
