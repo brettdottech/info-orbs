@@ -66,7 +66,7 @@ void WeatherWidget::getWeatherData() {
     int httpCode;
     http.begin(httpRequestAddress);
     httpCode = http.GET();
-    DynamicJsonDocument doc(200);
+    JsonDocument doc;
     deserializeJson(doc, http.getString());
     timeZoneOffSet = doc["tzoffset"].as<String>();
     cityName = doc["resolvedAddress"].as<String>();
@@ -87,8 +87,6 @@ void WeatherWidget::getWeatherData() {
 // getting the byte array size is very annoying as its computed on compile so you cant do it dynamicly.
 void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[], int jpgDataSize, int scale) {
     m_manager.selectScreen(displayIndex);
-    jpgData = sun;
-    jpgDataSize = 4892;
 
     TJpgDec.setJpgScale(scale);
     uint16_t w = 0, h = 0;
