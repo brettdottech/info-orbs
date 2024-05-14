@@ -1,5 +1,5 @@
 #include "widgets/clockWidget.h"
-#include <user.h>
+#include <config.h>
 #include <globalTime.h>
 #include "widgets/clockWidget.h"
 
