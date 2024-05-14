@@ -50,6 +50,9 @@ void ClockWidget::draw() {
 }
 
 void ClockWidget::update() {
+    if (millis() - m_secondTimerPrev < m_secondTimer) {
+        return;
+    }
     // Time::getHourAndMinute(m_hourSingle, m_minuteSingle);
     // Time::getSecond(m_secondSingle);
 
