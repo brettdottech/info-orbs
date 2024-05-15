@@ -93,14 +93,14 @@ void loop() {
   } else {
     globalTime->updateTime();
 
-    if(buttonLeft.pressed()) {
+    if (buttonLeft.pressed()) {
       Serial.println("Left button pressed");
       widgetSet->prev();
     }
-    if(buttonOK.pressed()) {
+    if (buttonOK.pressed()) {
       Serial.println("OK button pressed");
     }
-    if(buttonRight.pressed()) {
+    if (buttonRight.pressed()) {
       Serial.println("Right button pressed");
       widgetSet->next();
     }
