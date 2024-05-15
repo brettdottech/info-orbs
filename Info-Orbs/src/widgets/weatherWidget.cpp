@@ -4,6 +4,11 @@
 #include <globalTime.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+    daysDegs[0] = "0";
+    daysDegs[1] = "0";
+    daysDegs[2] = "0";
+    m_hour = "0";
+    m_minute = "0";
 }
 
 WeatherWidget::~WeatherWidget() {
@@ -12,38 +17,44 @@ WeatherWidget::~WeatherWidget() {
 void WeatherWidget::setup() {
     m_lastTime = 0;
     m_lastWeather = 0;
-    m_weatherStamp = "";
-    m_clockStamp = "";
+    m_weatherStamp = 0;
+    m_clockStamp = 0;
 }
 
 void WeatherWidget::draw() {
-    String clockStamp = getClockStamp();
-    if (clockStamp != m_clockStamp && m_day.length() > 0) {
-        m_clockStamp = clockStamp;
+    draw(false);
+}
+
+void WeatherWidget::draw(bool force) {
+    int clockStamp = getClockStamp();
+    if ((clockStamp != m_clockStamp || force) && m_day.toInt() != 0) {
         displayClock(0, TFT_WHITE);
+        m_clockStamp = clockStamp;
     }
 
     // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
-    String weatherStamp = getWeatherStamp();
-    if (weatherStamp != m_weatherStamp && currentWeatherText.length() > 0) {
-        m_weatherStamp = weatherStamp;
+    int weatherStamp = getWeatherStamp();
+    if ((weatherStamp != m_weatherStamp || force) && cityName != "") {
         weatherText(1, TFT_WHITE, TFT_BLACK);
-        drawWeatherIcon(currentWeatherIcon, 2, 0, 0, 1);
+        drawWeatherIcon(m_currentWeatherIcon, 2, 0, 0, 1);
         singleWeatherDeg(3, TFT_WHITE, TFT_BLACK);
         threeDayWeather(4);
+        m_weatherStamp = weatherStamp;
     }
 }
 
 void WeatherWidget::update() {
+    update(false);
+}
+
+void WeatherWidget::update(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
-    if (m_lastTime == 0 || millis() - m_lastTime >= m_timeDelay) {
-        m_hour = time->getHour();
-        m_minute = time->getMinute();
-        m_monthName = time->getMonthName();
-        m_day = time->getDay();
-        m_weekday = time->getWeekday();
-        m_lastTime = millis();
-    }
+    time->updateTime();
+    m_hour = time->getHour();
+    m_minute = time->getMinute();
+    m_monthName = time->getMonthName();
+    m_day = time->getDay();
+    m_weekday = time->getWeekday();
 
     if (m_lastWeather == 0 || (millis() - m_lastWeather) >= m_weatherDelay) {
         HTTPClient http;
@@ -52,20 +63,22 @@ void WeatherWidget::update() {
         httpCode = http.GET();
         JsonDocument doc;
         deserializeJson(doc, http.getString());
-        timeZoneOffSet = doc["tzoffset"].as<int>();
-        time->setTimeZoneOffset(timeZoneOffSet);
-        cityName = doc["resolvedAddress"].as<String>();
-        currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
-        currentWeatherText = doc["days"][0]["description"].as<String>();
-        currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
-        daysIcons[0] = doc["days"][1]["icon"].as<String>();
-        daysDegs[0] = doc["days"][1]["temp"].as<String>();
-        daysIcons[1] = doc["days"][2]["icon"].as<String>(); // I hade these set up on a loop but I ran out of DRAM and had some varibles returning Nulls removing the loop fixed it however there is allot to optomize here.
-        daysDegs[1] = doc["days"][2]["temp"].as<String>();  // I think the API call is too heavy, may need to be filtered before calling using the arduinoJson library, which is built in.
-        daysIcons[2] = doc["days"][3]["icon"].as<String>();
-        daysDegs[2] = doc["days"][3]["temp"].as<String>();
+        if (doc["resolvedAddress"].as<String>() != "null") {
+            timeZoneOffSet = doc["tzoffset"].as<int>();
+            time->setTimeZoneOffset(timeZoneOffSet);
+            cityName = doc["resolvedAddress"].as<String>();
+            currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
+            currentWeatherText = doc["days"][0]["description"].as<String>();
+            m_currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
+            daysIcons[0] = doc["days"][1]["icon"].as<String>();
+            daysDegs[0] = doc["days"][1]["temp"].as<String>();
+            daysIcons[1] = doc["days"][2]["icon"].as<String>(); // I hade these set up on a loop but I ran out of DRAM and had some varibles returning Nulls removing the loop fixed it however there is allot to optomize here.
+            daysDegs[1] = doc["days"][2]["temp"].as<String>();  // I think the API call is too heavy, may need to be filtered before calling using the arduinoJson library, which is built in.
+            daysIcons[2] = doc["days"][3]["icon"].as<String>();
+            daysDegs[2] = doc["days"][3]["temp"].as<String>();
+            m_lastWeather = millis();
+        }
         http.end();
-        m_lastWeather = millis();
     }
 }
 
@@ -253,10 +266,10 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     display.drawString("Next 3 Days..", centre, 201, 1);
 }
 
-String WeatherWidget::getClockStamp() {
-    return m_hour + " " + m_minute;
+int WeatherWidget::getClockStamp() {
+    return m_hour.toInt() * 60 + m_minute.toInt();
 }
 
-String WeatherWidget::getWeatherStamp() {
-    return currentWeatherDeg + daysDegs[0] + daysDegs[1] + daysDegs[2];
+int WeatherWidget::getWeatherStamp() {
+    return currentWeatherDeg.toInt() + daysDegs[0].toInt() * 100 + daysDegs[1].toInt() * 10000 + daysDegs[2].toInt() * 1000000;
 }

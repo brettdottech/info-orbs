@@ -14,7 +14,9 @@ public:
     ~WeatherWidget() override;
     void setup() override;
     void update() override;
+    void update(bool force) override;
     void draw() override;
+    void draw(bool force) override;
 private:
 
     void displayClock(int displayIndex, int color);
@@ -24,15 +26,15 @@ private:
     void singleWeatherDeg(int displayIndex, uint32_t background, uint32_t textColor);
     void weatherText(int displayIndex, int16_t background, int16_t textColor);
     void threeDayWeather(int displayIndex);
-    String getClockStamp();
-    String getWeatherStamp();
+    int getClockStamp();
+    int getWeatherStamp();
 
-    String m_hour;
-    String m_minute;
-    String m_month;
-    String m_monthName;
-    String m_weekday;
-    String m_day;
+    String m_hour = "";
+    String m_minute = "";
+    String m_month = "";
+    String m_monthName = "";
+    String m_weekday = "";
+    String m_day = "";
 
 
     const long m_weatherDelay = 600000; // weather refresh rate
@@ -43,15 +45,15 @@ private:
 
     const int centre = 120; // centre location of the screen(240x240)
 
-    String m_clockStamp = "";
-    String m_weatherStamp = "";
+    int m_clockStamp = 0;
+    int m_weatherStamp = 0;
 
     // Global Variables to track/store weather data
     int timeZoneOffSet;
     String cityName;
-    String currentWeatherText; // Weather Description
-    String currentWeatherIcon; // Text refrence for weather icon
-    String currentWeatherDeg;
+    String currentWeatherText = ""; // Weather Description
+    String m_currentWeatherIcon = ""; // Text refrence for weather icon
+    String currentWeatherDeg = "";
     String daysIcons[3]; // Icons/Temp For Next 3 days
     String daysDegs[3];
 

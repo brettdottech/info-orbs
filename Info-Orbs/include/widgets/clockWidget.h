@@ -10,7 +10,9 @@ public:
     ~ClockWidget() override;
     void setup() override;
     void update() override;
+    void update(bool force) override;
     void draw() override;
+    void draw(bool force) override;
 private:
 
     void displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing);

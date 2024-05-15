@@ -31,13 +31,13 @@ private:
   static GlobalTime *m_instance;
 
   time_t m_unixEpoch;
-  int m_hour;
-  int m_minute;
-  int m_second;
-  int m_day;
-  int m_month;
+  int m_hour = 0;
+  int m_minute = 0;
+  int m_second = 0;
+  int m_day = 0;
+  int m_month = 0;
   String m_monthName;
-  int m_year;
+  int m_year = 0;
   String m_time;
   String m_weekday;
   int m_timeZoneOffset = TIME_ZONE_OFFSET;

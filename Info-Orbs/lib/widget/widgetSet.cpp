@@ -44,4 +44,5 @@ void WidgetSet::prev() {
 void WidgetSet::switchWidget() {
   m_screenManager->clearAllScreens();
   getCurrent()->setup();
+  getCurrent()->draw(true);
 }
