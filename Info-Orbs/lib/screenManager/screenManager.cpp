@@ -1,17 +1,17 @@
 #include "screenManager.h"
 #include <Arduino.h>
 
-ScreenManager::ScreenManager(TFT_eSPI &tft) : tft(tft) {
+ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
 
   for (int i = 0; i < NUM_SCREENS; i++) {
-    pinMode(screen_cs[i], OUTPUT);
-    digitalWrite(screen_cs[i], LOW);
+    pinMode(m_screen_cs[i], OUTPUT);
+    digitalWrite(m_screen_cs[i], LOW);
   }
 
-  tft.init();
-  tft.setRotation(DISPLAY_ROTATION);
-  tft.fillScreen(TFT_WHITE);
-  tft.setTextDatum(MC_DATUM);
+  m_tft.init();
+  m_tft.setRotation(DISPLAY_ROTATION);
+  m_tft.fillScreen(TFT_WHITE);
+  m_tft.setTextDatum(MC_DATUM);
   reset();
 
   Serial.println("ScreenManager initialized");
@@ -29,21 +29,26 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : tft(tft) {
 }
 
 TFT_eSPI &ScreenManager::getDisplay() {
-  return tft;
+  return m_tft;
 }
 
 // Selects a single screen
 void ScreenManager::selectScreen(int screen) {
   for (int i = 0; i < NUM_SCREENS; i++) {
-    digitalWrite(screen_cs[i], i == screen ? LOW : HIGH);
+    digitalWrite(m_screen_cs[i], i == screen ? LOW : HIGH);
   }
 }
 
 // Fills all screens with a color
 void ScreenManager::fillAllScreens(uint32_t color) {
   selectAllScreens();
-  tft.fillScreen(color);
+  m_tft.fillScreen(color);
   reset();
+}
+
+// clears all screens but resetting them to black
+void ScreenManager::clearAllScreens() {
+  fillAllScreens(TFT_BLACK);
 }
 
 // Selects all screens
@@ -51,12 +56,12 @@ void ScreenManager::fillAllScreens(uint32_t color) {
 // all the screens to "off"
 void ScreenManager::selectAllScreens() {
   for (int i = 0; i < NUM_SCREENS; i++) {
-    digitalWrite(screen_cs[i], LOW);
+    digitalWrite(m_screen_cs[i], LOW);
   }
 }
 
 void ScreenManager::reset() {
   for (int i = 0; i < NUM_SCREENS; i++) {
-    digitalWrite(screen_cs[i], HIGH);
+    digitalWrite(m_screen_cs[i], HIGH);
   }
 }

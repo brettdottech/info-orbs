@@ -15,6 +15,7 @@ WeatherWidget::~WeatherWidget() {
 
 void WeatherWidget::setup() {
     m_lastTime = "-1";
+    m_weatherDelayPrev = 0;
 }
 
 void WeatherWidget::draw() {
@@ -24,7 +25,8 @@ void WeatherWidget::draw() {
         m_lastTime = m_time;
     }
 
-    if (millis() - m_weatherDelayPrev >= m_weatherDelay) {
+    // get initial weather then every m_weatherDelay milliseconds
+    if (m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
         getWeatherData();
         weatherText(1, TFT_WHITE, TFT_BLACK);
         drawWeatherIcon(currentWeatherIcon, 2, 0, 0, 1);

@@ -21,10 +21,11 @@ public:
     void reset();
 
     void fillAllScreens(uint32_t color);
+    void clearAllScreens();
 
 private:
-    uint8_t screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
-    TFT_eSPI& tft;
+    uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
+    TFT_eSPI& m_tft;
 };
 
 #endif // SCREENMANAGER_H
