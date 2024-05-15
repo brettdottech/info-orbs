@@ -3,89 +3,111 @@
 #include <config.h>
 #include <globalTime.h>
 
-
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
-    
 }
 
 WeatherWidget::~WeatherWidget() {
 }
 
-
-
 void WeatherWidget::setup() {
-    m_lastTime = "-1";
-    m_weatherDelayPrev = 0;
+    m_lastTime = -1;
+    m_lastWeather = 0;
+    m_weatherStamp = "";
+    m_clockStamp = "";
 }
 
 void WeatherWidget::draw() {
-    // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
-    if (m_time != m_lastTime) {
-        displayClock(0, m_time, m_monthName, m_day, m_weekday, TFT_WHITE);
-        m_lastTime = m_time;
+    String clockStamp = getClockStamp();
+    if (clockStamp != m_clockStamp && m_day.length() > 0) {
+        m_clockStamp = clockStamp;
+        displayClock(0, TFT_WHITE);
     }
 
-    // get initial weather then every m_weatherDelay milliseconds
-    if (m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
-        getWeatherData();
+    // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
+    String weatherStamp = getWeatherStamp();
+    if (weatherStamp != m_weatherStamp && currentWeatherText.length() > 0) {
+        m_weatherStamp = weatherStamp;
         weatherText(1, TFT_WHITE, TFT_BLACK);
         drawWeatherIcon(currentWeatherIcon, 2, 0, 0, 1);
         singleWeatherDeg(3, TFT_WHITE, TFT_BLACK);
         threeDayWeather(4);
-        m_weatherDelayPrev = millis();
     }
 }
 
 void WeatherWidget::update() {
     GlobalTime* time = GlobalTime::getInstance();
-    m_time = time->getTime();
-    m_monthName = time->getMonthName();
-    m_day = time->getDay();
-    m_weekday = time->getWeekday();
+    if (m_lastTime == 0 || millis() - m_lastTime >= m_timeDelay) {
+        m_hour = time->getHour();
+        m_minute = time->getMinute();
+        m_monthName = time->getMonthName();
+        m_day = time->getDay();
+        m_weekday = time->getWeekday();
+        m_lastTime = millis();
+    }
+
+    if (m_lastWeather == 0 || (millis() - m_lastWeather) >= m_weatherDelay) {
+        HTTPClient http;
+        int httpCode;
+        http.begin(httpRequestAddress);
+        httpCode = http.GET();
+        JsonDocument doc;
+        deserializeJson(doc, http.getString());
+        timeZoneOffSet = doc["tzoffset"].as<int>();
+        time->setTimeZoneOffset(timeZoneOffSet);
+        cityName = doc["resolvedAddress"].as<String>();
+        currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
+        currentWeatherText = doc["days"][0]["description"].as<String>();
+        currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
+        daysIcons[0] = doc["days"][1]["icon"].as<String>();
+        daysDegs[0] = doc["days"][1]["temp"].as<String>();
+        daysIcons[1] = doc["days"][2]["icon"].as<String>(); // I hade these set up on a loop but I ran out of DRAM and had some varibles returning Nulls removing the loop fixed it however there is allot to optomize here.
+        daysDegs[1] = doc["days"][2]["temp"].as<String>();  // I think the API call is too heavy, may need to be filtered before calling using the arduinoJson library, which is built in.
+        daysIcons[2] = doc["days"][3]["icon"].as<String>();
+        daysDegs[2] = doc["days"][3]["temp"].as<String>();
+        http.end();
+        m_lastWeather = millis();
+    }
 }
 
-void WeatherWidget::displayClock(int displayIndex, String time, String monthName, int day, String weekday, int color) {
+void WeatherWidget::displayClock(int displayIndex, int color) {
     m_manager.selectScreen(displayIndex);
+    uint32_t background = TFT_BLACK;
 
     TFT_eSPI &display = m_manager.getDisplay();
-    display.fillScreen(TFT_BLACK);
+
+    int clky = 95;
     display.setTextColor(color);
+    display.setTextSize(1);
     display.setTextDatum(MC_DATUM);
 
+    display.fillScreen(background);
+    display.setTextColor(color);
+    display.setTextSize(2);
+    display.setTextDatum(MC_DATUM);
+    display.drawString(m_monthName + " " + m_day, centre, 151, 2);
+    display.setTextSize(3);
+    display.drawString(m_weekday, centre, 178, 2);
+    display.setTextColor(color);
+    display.setTextDatum(MR_DATUM);
     display.setTextSize(1);
-    display.drawString(time, 120, 80, 6);
-    display.drawString(monthName, 160, 120, 4);
-    display.drawString(String(day), 80, 120, 4);
-    display.drawString(weekday, 120, 180, 4);
-}
 
-// This just populates weather data into global variables, does not display anything
-void WeatherWidget::getWeatherData() {
-    String weatherLocation = WEATHER_LOCAION;
-    String weatherUnits = WEATHER_UNITS;
-    String weatherApiKey = WEATHER_API_KEY;
+    if (m_hour.length() == 2) {
+        display.drawString(m_hour, centre - 5, clky, 8);
+    } else {
+        display.drawString("0" + m_hour, centre - 5, clky, 8);
+    }
 
-    String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
-                                weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                "&include=days,current&iconSet=icons1";
-    HTTPClient http;
-    int httpCode;
-    http.begin(httpRequestAddress);
-    httpCode = http.GET();
-    JsonDocument doc;
-    deserializeJson(doc, http.getString());
-    timeZoneOffSet = doc["tzoffset"].as<String>();
-    cityName = doc["resolvedAddress"].as<String>();
-    currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
-    currentWeatherText = doc["days"][0]["description"].as<String>();
-    currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
-    daysIcons[0] = doc["days"][1]["icon"].as<String>();
-    daysDegs[0] = doc["days"][1]["temp"].as<String>();
-    daysIcons[1] = doc["days"][2]["icon"].as<String>(); // I hade these set up on a loop but I ran out of DRAM and had some varibles returning Nulls removing the loop fixed it however there is allot to optomize here.
-    daysDegs[1] = doc["days"][2]["temp"].as<String>();  // I think the API call is too heavy, may need to be filtered before calling using the arduinoJson library, which is built in.
-    daysIcons[2] = doc["days"][3]["icon"].as<String>();
-    daysDegs[2] = doc["days"][3]["temp"].as<String>();
-    http.end();
+    display.setTextColor(color);
+    display.setTextDatum(ML_DATUM);
+    display.setTextSize(1);
+    if (m_minute.length() == 2) {
+        display.drawString(m_minute, centre + 5, clky, 8);
+    } else {
+        display.drawString("0" + m_minute, centre + 5, clky, 8);
+    }
+    display.setTextDatum(MC_DATUM);
+    display.setTextColor(color);
+    display.drawString(":", centre, clky, 8);
 }
 
 // This will wrie an image to the screen when called from a hex array. Pass in:
@@ -97,10 +119,6 @@ void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[]
     TJpgDec.setJpgScale(scale);
     uint16_t w = 0, h = 0;
     TJpgDec.getJpgSize(&w, &h, jpgData, jpgDataSize);
-    Serial.print("Width = ");
-    Serial.print(w);
-    Serial.print(", height = ");
-    Serial.println(h);
     TJpgDec.drawJpg(x, y, jpgData, jpgDataSize);
 }
 
@@ -233,4 +251,12 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     display.fillRect(0, 180, 240, 70, TFT_RED);
     display.setTextColor(TFT_WHITE);
     display.drawString("Next 3 Days..", centre, 201, 1);
+}
+
+String WeatherWidget::getClockStamp() {
+    return m_hour + " " + m_minute;
+}
+
+String WeatherWidget::getWeatherStamp() {
+    return currentWeatherDeg + daysDegs[0] + daysDegs[1] + daysDegs[2];
 }

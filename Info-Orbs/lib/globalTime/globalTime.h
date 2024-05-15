@@ -4,6 +4,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <TimeLib.h>
+#include <config.h>
 
 class GlobalTime {
 public:
@@ -21,6 +22,7 @@ public:
   int getYear();
   String getTime();
   String getWeekday();
+  void setTimeZoneOffset(int tz);
 
 private:
   GlobalTime();
@@ -38,6 +40,7 @@ private:
   int m_year;
   String m_time;
   String m_weekday;
+  int m_timeZoneOffset = TIME_ZONE_OFFSET;
 
   WiFiUDP m_udp;
   NTPClient *m_timeClient{nullptr};
