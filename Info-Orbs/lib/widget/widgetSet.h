@@ -17,11 +17,11 @@ public:
     void prev();
 
 private:
-    ScreenManager *screenManager;
-    Widget *_widgets[MAX_WIDGETS];
-    int8_t _widgetCount = 0;
-    int8_t _currentWidget = 0;
+    ScreenManager *m_screenManager;
+    Widget *m_widgets[MAX_WIDGETS];
+    int8_t m_widgetCount = 0;
+    int8_t m_currentWidget = 0;
 
-    void _switchWidget();
+    void switchWidget();
 };
 #endif // WIDGET_SET_H

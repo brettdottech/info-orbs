@@ -1,47 +1,47 @@
 #include <widgetSet.h>
 
-WidgetSet::WidgetSet(ScreenManager *sm) {
-  screenManager = sm;
+WidgetSet::WidgetSet(ScreenManager *sm) : m_screenManager(sm) {
+
 }
 void WidgetSet::add(Widget *widget) {
-  if (_widgetCount == MAX_WIDGETS) {
+  if (m_widgetCount == MAX_WIDGETS) {
     Serial.println("MAX WIDGETS UNABLE TO ADD");
     return;
   }
-  _widgets[_widgetCount] = widget;
-  _widgets[_widgetCount]->setup();
-  _widgetCount++;
+  m_widgets[m_widgetCount] = widget;
+  m_widgets[m_widgetCount]->setup();
+  m_widgetCount++;
 
 }
 
 void WidgetSet::drawCurrent() {
-  _widgets[_currentWidget]->draw();
+  m_widgets[m_currentWidget]->draw();
 }
 void WidgetSet::updateCurrent() {
-  _widgets[_currentWidget]->update();
+  m_widgets[m_currentWidget]->update();
 }
 
 Widget *WidgetSet::getCurrent() {
-  return _widgets[_currentWidget];
+  return m_widgets[m_currentWidget];
 }
 
 void WidgetSet::next() {
-  _currentWidget++;
-  if (_currentWidget >= _widgetCount) {
-    _currentWidget = 0;
+  m_currentWidget++;
+  if (m_currentWidget >= m_widgetCount) {
+    m_currentWidget = 0;
   }
-  _switchWidget();
+  switchWidget();
 }
 
 void WidgetSet::prev() {
-  _currentWidget--;
-  if (_currentWidget < 0) {
-    _currentWidget = _widgetCount-1;
+  m_currentWidget--;
+  if (m_currentWidget < 0) {
+    m_currentWidget = m_widgetCount-1;
   }
-  _switchWidget();
+  switchWidget();
 }
 
-void WidgetSet::_switchWidget() {
-  screenManager->clearAllScreens();
+void WidgetSet::switchWidget() {
+  m_screenManager->clearAllScreens();
   getCurrent()->setup();
 }
