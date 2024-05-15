@@ -24,7 +24,6 @@ private:
     void singleWeatherDeg(int displayIndex, uint32_t background, uint32_t textColor);
     void weatherText(int displayIndex, int16_t background, int16_t textColor);
     void threeDayWeather(int displayIndex);
-    void singleClockScreen(int displayIndex, uint32_t background, uint32_t textColor);
     String getClockStamp();
     String getWeatherStamp();
 

@@ -10,7 +10,7 @@ WeatherWidget::~WeatherWidget() {
 }
 
 void WeatherWidget::setup() {
-    m_lastTime = -1;
+    m_lastTime = 0;
     m_lastWeather = 0;
     m_weatherStamp = "";
     m_clockStamp = "";
