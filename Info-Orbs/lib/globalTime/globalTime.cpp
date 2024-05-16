@@ -24,6 +24,9 @@ GlobalTime* GlobalTime::getInstance() {
 
 void GlobalTime::updateTime() {
   if (millis() - m_updateTimer > m_oneSecond) {
+    if (m_timeZoneOffset != 0) {
+        m_timeClient->setTimeOffset(3600 * m_timeZoneOffset);
+    }
     m_timeClient->update();
     m_unixEpoch = m_timeClient->getEpochTime();
     m_updateTimer = millis();
@@ -31,7 +34,7 @@ void GlobalTime::updateTime() {
 #if FORMAT_24_HOUR == true
     m_hour = hour(m_unixEpoch);
 #else
-    phour = hourFormat12(m_unixEpoch);
+    m_hour = hourFormat12(m_unixEpoch);
 #endif
     m_second = second(m_unixEpoch);
 
@@ -90,6 +93,11 @@ String GlobalTime::getWeekday() {
     return m_weekday;
 }
 
+void GlobalTime::setTimeZoneOffset(int tz) {
+    Serial.print("Timezone Offset: ");
+    Serial.println(tz);
+    m_timeZoneOffset = tz;
+}
 
 
 

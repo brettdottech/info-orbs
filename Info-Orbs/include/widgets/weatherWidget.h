@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <TJpg_Decoder.h>
 #include "icons.h"
+#include <config.h>
 
 class WeatherWidget : public Widget {
 public:
@@ -13,37 +14,57 @@ public:
     ~WeatherWidget() override;
     void setup() override;
     void update() override;
+    void update(bool force) override;
     void draw() override;
+    void draw(bool force) override;
 private:
 
-    void displayClock(int displayIndex, String time, String monthName, int day, String weekday, int color);
+    void displayClock(int displayIndex, int color);
 
-    void getWeatherData();
-    void showJPG(int displayIndex, int x, int y, const byte a[], int z, int s);
-    void drawWeatherIcon(String N, int displayIndex, int x, int y, int s);
-    void singleWeatherDeg(int displayIndex, uint32_t b, uint32_t t);
-    void weatherText(int displayIndex, int16_t b, int16_t t);
+    void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
+    void drawWeatherIcon(String condition, int displayIndex, int x, int y, int scale);
+    void singleWeatherDeg(int displayIndex, uint32_t background, uint32_t textColor);
+    void weatherText(int displayIndex, int16_t background, int16_t textColor);
     void threeDayWeather(int displayIndex);
-    void singleClockScreen(int displayIndex, uint32_t b, uint32_t t);
+    int getClockStamp();
+    int getWeatherStamp();
 
-    String m_time;
-    String m_lastTime;
-    String m_monthName;
-    String m_weekday;
-    int m_day;
+    String m_hour = "";
+    String m_minute = "";
+    String m_month = "";
+    String m_monthName = "";
+    String m_weekday = "";
+    String m_day = "";
+
 
     const long m_weatherDelay = 600000; // weather refresh rate
-    unsigned long m_weatherDelayPrev = 600000;
+    unsigned long m_lastWeather = 600000;
+
+    const long m_timeDelay = 1000; // time refresh rate
+    unsigned long m_lastTime;
+
     const int centre = 120; // centre location of the screen(240x240)
 
+    int m_clockStamp = 0;
+    int m_weatherStamp = 0;
+
     // Global Variables to track/store weather data
-    String timeZoneOffSet;
+    int timeZoneOffSet;
     String cityName;
-    String currentWeatherText; // Weather Description
-    String currentWeatherIcon; // Text refrence for weather icon
-    String currentWeatherDeg;
+    String currentWeatherText = ""; // Weather Description
+    String m_currentWeatherIcon = ""; // Text refrence for weather icon
+    String currentWeatherDeg = "";
     String daysIcons[3]; // Icons/Temp For Next 3 days
     String daysDegs[3];
+
+    String weatherLocation = WEATHER_LOCAION;
+    String weatherUnits = WEATHER_UNITS;
+    String weatherApiKey = WEATHER_API_KEY;
+
+    String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
+                                weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
+                                "&include=days,current&iconSet=icons1";
+
 };
 
 

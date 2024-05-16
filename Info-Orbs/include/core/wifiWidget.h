@@ -9,7 +9,9 @@ public:
     ~WifiWidget() override;
     void setup() override;
     void update() override;
+    void update(bool force) override;
     void draw() override;
+    void draw(bool force) override;
 
     bool isConnected() { return m_isConnected; }
 

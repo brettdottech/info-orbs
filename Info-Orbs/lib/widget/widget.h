@@ -8,7 +8,9 @@ public:
     Widget(ScreenManager& manager);
     virtual ~Widget() = default;
     virtual void setup() = 0;
+    virtual void update(bool force) = 0;
     virtual void update() = 0;
+    virtual void draw(bool force) = 0;
     virtual void draw() = 0;
 
 protected:

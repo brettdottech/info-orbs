@@ -32,6 +32,12 @@ void WifiWidget::setup() {
 }
 
 void WifiWidget::update() {
+  update(false);
+}
+
+void WifiWidget::update(bool force) {
+  //force is currently an unhandled due to not knowing what behavior it would change
+
 	if(WiFi.status() == WL_CONNECTED) {
 		m_isConnected = true;
 		m_connectionString = "Connected";
@@ -50,6 +56,12 @@ void WifiWidget::update() {
 }
 
 void WifiWidget::draw() {
+  draw(false);
+}
+
+void WifiWidget::draw(bool force) {
+  //force is currently an unhandled due to not knowing what behavior it would change
+
 	if(!m_isConnected && !m_connectionFailed) {
 		TFT_eSPI &display = m_manager.getDisplay();
 		m_manager.selectScreen(0);

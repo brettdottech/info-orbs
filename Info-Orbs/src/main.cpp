@@ -105,6 +105,7 @@ void loop() {
       widgetSet->next();
     }
 
+    
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
 
