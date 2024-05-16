@@ -7,7 +7,7 @@
 #include <Button.h>
 #include <globalTime.h>
 #include <config.h>
-#include <widgets/screenWidgets/stockScreenWidget.h>
+#include <widgets/stockScreenWidget.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -40,7 +40,7 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
 
 ScreenManager* sm;
 WidgetSet* widgetSet;
-StockScreenWidget *stockScreenWidget;
+//StockScreenWidget* stockScreenWidget;
 
 void setup() {
 
@@ -80,9 +80,8 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
+  widgetSet->add(new StockScreenWidget(*sm));
   widgetSet->add(new WeatherWidget(*sm));
-
-  // stockScreenWidget = new StockScreenWidget(*sm, "AAPL", 1);
 }
 
 void loop() {
@@ -109,8 +108,6 @@ void loop() {
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
 
-    // stockScreenWidget->update();
-    // stockScreenWidget->draw();
     delay(100);
   }
 }
