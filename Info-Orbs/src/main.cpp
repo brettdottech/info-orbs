@@ -105,8 +105,9 @@ void loop() {
       widgetSet->next();
     }
 
-    widgetSet->drawCurrent();
+    
     widgetSet->updateCurrent();
+    widgetSet->drawCurrent();
 
     // stockScreenWidget->update();
     // stockScreenWidget->draw();
