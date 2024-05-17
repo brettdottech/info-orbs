@@ -3,11 +3,15 @@
 #include <config.h>
 #include <globalTime.h>
 
+
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+    
 }
 
 WeatherWidget::~WeatherWidget() {
 }
+
+
 
 void WeatherWidget::setup() {
     m_lastTime = "-1";
@@ -17,7 +21,7 @@ void WeatherWidget::setup() {
 void WeatherWidget::draw() {
     // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
     if (m_time != m_lastTime) {
-        displayClock(0, m_time, m_monthName, m_day, m_weekday, TFT_BLACK);
+        displayClock(0, m_time, m_monthName, m_day, m_weekday, TFT_WHITE);
         m_lastTime = m_time;
     }
 
@@ -44,15 +48,15 @@ void WeatherWidget::displayClock(int displayIndex, String time, String monthName
     m_manager.selectScreen(displayIndex);
 
     TFT_eSPI &display = m_manager.getDisplay();
-    //display.fillScreen(TFT_BLACK);
-    display.fillScreen(TFT_WHITE);
+    display.fillScreen(TFT_BLACK);
     display.setTextColor(color);
     display.setTextDatum(MC_DATUM);
 
     display.setTextSize(1);
-    display.drawString(time, centre, 80, 6);
-    display.drawString(String(day)+ " " +monthName, centre, 120, 4);
-    display.drawString(weekday, centre, 180, 4);
+    display.drawString(time, 120, 80, 6);
+    display.drawString(monthName, 160, 120, 4);
+    display.drawString(String(day), 80, 120, 4);
+    display.drawString(weekday, 120, 180, 4);
 }
 
 // This just populates weather data into global variables, does not display anything
