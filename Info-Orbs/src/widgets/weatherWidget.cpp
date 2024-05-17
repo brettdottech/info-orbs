@@ -4,9 +4,9 @@
 #include <globalTime.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
-    daysDegs[0] = "0";
-    daysDegs[1] = "0";
-    daysDegs[2] = "0";
+    m_daysDegs[0] = "0";
+    m_daysDegs[1] = "0";
+    m_daysDegs[2] = "0";
     m_hour = "0";
     m_minute = "0";
 }
@@ -28,13 +28,13 @@ void WeatherWidget::draw() {
 void WeatherWidget::draw(bool force) {
     int clockStamp = getClockStamp();
     if ((clockStamp != m_clockStamp || force) && m_day.toInt() != 0) {
-        displayClock(0, TFT_WHITE);
+        displayClock(0, TFT_WHITE, TFT_BLACK);
         m_clockStamp = clockStamp;
     }
 
     // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
     int weatherStamp = getWeatherStamp();
-    if ((weatherStamp != m_weatherStamp || force) && cityName != "") {
+    if ((weatherStamp != m_weatherStamp || force) && m_cityName != "") {
         weatherText(1, TFT_WHITE, TFT_BLACK);
         drawWeatherIcon(m_currentWeatherIcon, 2, 0, 0, 1);
         singleWeatherDeg(3, TFT_WHITE, TFT_BLACK);
@@ -58,33 +58,38 @@ void WeatherWidget::update(bool force) {
 
     if (m_lastWeather == 0 || (millis() - m_lastWeather) >= m_weatherDelay) {
         HTTPClient http;
-        int httpCode;
         http.begin(httpRequestAddress);
-        httpCode = http.GET();
-        JsonDocument doc;
-        deserializeJson(doc, http.getString());
-        if (doc["resolvedAddress"].as<String>() != "null") {
-            timeZoneOffSet = doc["tzoffset"].as<int>();
-            time->setTimeZoneOffset(timeZoneOffSet);
-            cityName = doc["resolvedAddress"].as<String>();
-            currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
-            currentWeatherText = doc["days"][0]["description"].as<String>();
-            m_currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
-            daysIcons[0] = doc["days"][1]["icon"].as<String>();
-            daysDegs[0] = doc["days"][1]["temp"].as<String>();
-            daysIcons[1] = doc["days"][2]["icon"].as<String>(); // I hade these set up on a loop but I ran out of DRAM and had some varibles returning Nulls removing the loop fixed it however there is allot to optomize here.
-            daysDegs[1] = doc["days"][2]["temp"].as<String>();  // I think the API call is too heavy, may need to be filtered before calling using the arduinoJson library, which is built in.
-            daysIcons[2] = doc["days"][3]["icon"].as<String>();
-            daysDegs[2] = doc["days"][3]["temp"].as<String>();
-            m_lastWeather = millis();
+        int httpCode = http.GET();
+
+        if (httpCode > 0) { // Check for the returning code
+            JsonDocument doc;
+            DeserializationError error = deserializeJson(doc, http.getString());
+            if (!error) {
+                m_timeZoneOffSet = doc["tzoffset"].as<int>();
+                time->setTimeZoneOffset(m_timeZoneOffSet);
+                m_cityName = doc["resolvedAddress"].as<String>();
+                m_currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
+                m_currentWeatherText = doc["days"][0]["description"].as<String>();
+                m_currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
+                for (int i=0; i < 3 ; i++) {
+                    m_daysIcons[i] = doc["days"][i+1]["icon"].as<String>();
+                    m_daysDegs[i] = doc["days"][i+1]["temp"].as<String>();
+                }
+                m_lastWeather = millis();
+            } else {
+                // Handle JSON deserialization error
+                Serial.println("deserializeJson() failed");
+            }
+        } else {
+            // Handle HTTP request error
+            Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
         http.end();
     }
 }
 
-void WeatherWidget::displayClock(int displayIndex, int color) {
+void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t color) {
     m_manager.selectScreen(displayIndex);
-    uint32_t background = TFT_BLACK;
 
     TFT_eSPI &display = m_manager.getDisplay();
 
@@ -97,7 +102,11 @@ void WeatherWidget::displayClock(int displayIndex, int color) {
     display.setTextColor(color);
     display.setTextSize(2);
     display.setTextDatum(MC_DATUM);
+#ifdef WEATHER_UNITS_METRIC
+    display.drawString(m_day + " " + m_monthName, centre, 151, 2);
+#else
     display.drawString(m_monthName + " " + m_day, centre, 151, 2);
+#endif
     display.setTextSize(3);
     display.drawString(m_weekday, centre, 178, 2);
     display.setTextColor(color);
@@ -171,11 +180,11 @@ void WeatherWidget::singleWeatherDeg(int displayIndex, uint32_t backgroundColor,
     display.setTextColor(textColor);
     display.setTextSize(1);
     display.setTextDatum(MC_DATUM);
-    currentWeatherDeg.remove(currentWeatherDeg.indexOf(".", 0));
-    display.drawString(currentWeatherDeg, centre, centre, 8);
+    m_currentWeatherDeg.remove(m_currentWeatherDeg.indexOf(".", 0));
+    display.drawString(m_currentWeatherDeg, centre, centre, 8);
     display.setTextFont(8);
-    display.fillCircle(display.textWidth(currentWeatherDeg) / 2 + centre + 10, centre - display.fontHeight(8) / 2, 15, textColor);
-    display.fillCircle(display.textWidth(currentWeatherDeg) / 2 + centre + 10, centre - display.fontHeight(8) / 2, 7, backgroundColor);
+    display.fillCircle(display.textWidth(m_currentWeatherDeg) / 2 + centre + 10, centre - display.fontHeight(8) / 2, 15, textColor);
+    display.fillCircle(display.textWidth(m_currentWeatherDeg) / 2 + centre + 10, centre - display.fontHeight(8) / 2, 7, backgroundColor);
 }
 
 // This displays the users current city and the text desctiption of the weather. Pass in display number, background color, text color
@@ -188,7 +197,7 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     // clearly as this should liekly eventually be turned into a fucntion. Before use the array size should be made to be dynamic.
     // In this case its used for the weather text description
 
-    String message = currentWeatherText + " ";
+    String message = m_currentWeatherText + " ";
     String messageArr[4];
     int variableRangeS = 0;
     int variableRangeE = 18;
@@ -206,15 +215,16 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     display.setTextColor(t);
     display.setTextSize(3);
     display.setTextDatum(MC_DATUM);
-    cityName.remove(cityName.indexOf(",", 0));
-    display.drawString(cityName, centre, 80, 2);
-    Serial.println(cityName);
-    Serial.println(currentWeatherText);
+    m_cityName.remove(m_cityName.indexOf(",", 0));
+    display.drawString(m_cityName, centre, 80, 2);
+    Serial.println(m_cityName);
+    Serial.println(m_currentWeatherText);
     display.setTextSize(2);
-    display.drawString(messageArr[0], centre, 120, displayIndex); // BUG? displayIndex is likely misused
-    display.drawString(messageArr[1], centre, 140, displayIndex); // BUG? displayIndex is likely misused
-    display.drawString(messageArr[2], centre, 160, displayIndex); // BUG? displayIndex is likely misused
-    display.drawString(messageArr[3], centre, 180, displayIndex); // BUG? displayIndex is likely misused
+    display.setTextFont(1);
+    display.drawString(messageArr[0], centre, 120);
+    display.drawString(messageArr[1], centre, 140);
+    display.drawString(messageArr[2], centre, 160);
+    display.drawString(messageArr[3], centre, 180);
 }
 
 // This displays the next 3 days weather forecast
@@ -226,9 +236,9 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
 
     display.fillScreen(TFT_WHITE);
     display.setTextSize(2);
-    drawWeatherIcon(daysIcons[0], displayIndex, 90 - 75, 47, 4);
-    drawWeatherIcon(daysIcons[1], displayIndex, 90, 47, 4);
-    drawWeatherIcon(daysIcons[2], displayIndex, 90 + 75, 47, 4);
+    drawWeatherIcon(m_daysIcons[0], displayIndex, 90 - 75, 47, 4);
+    drawWeatherIcon(m_daysIcons[1], displayIndex, 90, 47, 4);
+    drawWeatherIcon(m_daysIcons[2], displayIndex, 90 + 75, 47, 4);
 
     display.setTextColor(TFT_BLACK);
     display.drawLine(78, 0, 78, 240, TFT_BLACK);
@@ -237,8 +247,8 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     display.drawLine(157, 0, 157, 240, TFT_BLACK);
     display.drawLine(158, 0, 158, 240, TFT_BLACK);
     display.drawLine(159, 0, 159, 240, TFT_BLACK);
-    daysDegs[0].remove(daysDegs[0].indexOf(".", 0)); // remove decimal from deg, this dosent round just removes it, should probally fix this and also store as a different var type
-    display.drawString(daysDegs[0], centre - 75, 120, 2);
+    m_daysDegs[0].remove(m_daysDegs[0].indexOf(".", 0)); // remove decimal from deg, this dosent round just removes it, should probally fix this and also store as a different var type
+    display.drawString(m_daysDegs[0], centre - 75, centre, 2);
     display.drawCircle(60, centre - display.fontHeight(2) / 2, 4, TFT_BLACK);
 
     String weekUpdate = dayStr(weekday(time->getUnixEpoch() + 86400)); // Adds 1 day to time
@@ -246,16 +256,16 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     weekUpdate.toUpperCase();
     display.drawString(weekUpdate, centre - 75, 150, 2);
 
-    daysDegs[1].remove(daysDegs[1].indexOf(".", 0));
-    display.drawString(daysDegs[1], centre, 120, 2);
+    m_daysDegs[1].remove(m_daysDegs[1].indexOf(".", 0));
+    display.drawString(m_daysDegs[1], centre, centre, 2);
     display.drawCircle(132, centre - display.fontHeight(2) / 2, 4, TFT_BLACK);
     weekUpdate = dayStr(weekday(time->getUnixEpoch() + 172800));
     weekUpdate.remove(3);
     weekUpdate.toUpperCase();
     display.drawString(weekUpdate, centre, 150, 2);
 
-    daysDegs[2].remove(daysDegs[2].indexOf(".", 0));
-    display.drawString(daysDegs[2], centre + 75, 120, 2);
+    m_daysDegs[2].remove(m_daysDegs[2].indexOf(".", 0));
+    display.drawString(m_daysDegs[2], centre + 75, centre, 2);
     weekUpdate = dayStr(weekday(time->getUnixEpoch() + 259200));
     weekUpdate.remove(3);
     weekUpdate.toUpperCase();
@@ -271,5 +281,5 @@ int WeatherWidget::getClockStamp() {
 }
 
 int WeatherWidget::getWeatherStamp() {
-    return currentWeatherDeg.toInt() + daysDegs[0].toInt() * 100 + daysDegs[1].toInt() * 10000 + daysDegs[2].toInt() * 1000000;
+    return m_currentWeatherDeg.toInt() + m_daysDegs[0].toInt() * 100 + m_daysDegs[1].toInt() * 10000 + m_daysDegs[2].toInt() * 1000000;
 }

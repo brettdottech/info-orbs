@@ -19,7 +19,7 @@ public:
     void draw(bool force) override;
 private:
 
-    void displayClock(int displayIndex, int color);
+    void displayClock(int displayIndex, uint32_t background, uint32_t textColor);
 
     void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
     void drawWeatherIcon(String condition, int displayIndex, int x, int y, int scale);
@@ -49,16 +49,20 @@ private:
     int m_weatherStamp = 0;
 
     // Global Variables to track/store weather data
-    int timeZoneOffSet;
-    String cityName;
-    String currentWeatherText = ""; // Weather Description
+    int m_timeZoneOffSet;
+    String m_cityName;
+    String m_currentWeatherText = ""; // Weather Description
     String m_currentWeatherIcon = ""; // Text refrence for weather icon
-    String currentWeatherDeg = "";
-    String daysIcons[3]; // Icons/Temp For Next 3 days
-    String daysDegs[3];
+    String m_currentWeatherDeg = "";
+    String m_daysIcons[3]; // Icons/Temp For Next 3 days
+    String m_daysDegs[3];
 
     String weatherLocation = WEATHER_LOCAION;
-    String weatherUnits = WEATHER_UNITS;
+#ifdef WEATHER_UNITS_METRIC
+    String weatherUnits = "metric";
+#else
+    String weatherUnits = "metric";
+#endif
     String weatherApiKey = WEATHER_API_KEY;
 
     String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
