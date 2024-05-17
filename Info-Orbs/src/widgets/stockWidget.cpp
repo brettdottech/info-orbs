@@ -43,7 +43,7 @@ void StockWidget::getStockData() {
     
     if (httpCode > 0) { // Check for the returning code
         String payload = http.getString();
-        StaticJsonDocument<1024> doc;
+        JsonDocument doc;
         DeserializationError error = deserializeJson(doc, payload);
         
         if (!error) {
