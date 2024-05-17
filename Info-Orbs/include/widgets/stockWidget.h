@@ -1,7 +1,7 @@
 #ifndef STOCK_WIDGET_H
 #define STOCK_WIDGET_H
 
-#include "Widget.h"
+#include "widget.h"
 #include <vector>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
@@ -11,8 +11,10 @@ class StockWidget : public Widget {
 public:
     StockWidget(ScreenManager &manager);
     void setup() override;
-    void draw() override;
     void update() override;
+    void update(bool force) override;
+    void draw() override;
+    void draw(bool force) override;
 
 private:
     void getStockData();
