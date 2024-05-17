@@ -15,7 +15,7 @@ void StockWidget::setup() {
 }
 
 void StockWidget::draw() {
-    update(false);
+    draw(false);
 }
 
 void StockWidget::draw(bool force) {
@@ -85,7 +85,7 @@ void StockWidget::getStockData() {
     http.end();
 }
 
-void StockWidget::displayStock(int displayIndex, uint32_t backgroundColor, uint32_t textColor) {
+void StockWidget::displayStock(int displayIndex, uint32_t backgroundColor, uint32_t textColor){
     m_manager.selectScreen(displayIndex);
 
     TFT_eSPI &display = m_manager.getDisplay();
