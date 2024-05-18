@@ -1,15 +1,16 @@
 #ifndef WEAHTERWIDGET_H
 #define WEAHTERWIDGET_H
 
-#include <widget.h>
-#include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <HTTPClient.h>
 #include <TJpg_Decoder.h>
-#include "icons.h"
 #include <config.h>
+#include <widget.h>
+
+#include "icons.h"
 
 class WeatherWidget : public Widget {
-public:
+   public:
     WeatherWidget(ScreenManager& manager);
     ~WeatherWidget() override;
     void setup() override;
@@ -17,9 +18,9 @@ public:
     void update(bool force) override;
     void draw() override;
     void draw(bool force) override;
-private:
 
-    void displayClock(int displayIndex, int color);
+   private:
+    void displayClock(int displayIndex, uint32_t background, uint32_t textColor);
 
     void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
     void drawWeatherIcon(String condition, int displayIndex, int x, int y, int scale);
@@ -36,36 +37,37 @@ private:
     String m_weekday = "";
     String m_day = "";
 
-
-    const long m_weatherDelay = 600000; // weather refresh rate
+    const long m_weatherDelay = 600000;  // weather refresh rate
     unsigned long m_lastWeather = 600000;
 
-    const long m_timeDelay = 1000; // time refresh rate
+    const long m_timeDelay = 1000;  // time refresh rate
     unsigned long m_lastTime;
 
-    const int centre = 120; // centre location of the screen(240x240)
+    const int centre = 120;  // centre location of the screen(240x240)
 
     int m_clockStamp = 0;
     int m_weatherStamp = 0;
 
     // Global Variables to track/store weather data
-    int timeZoneOffSet;
-    String cityName;
-    String currentWeatherText = ""; // Weather Description
-    String m_currentWeatherIcon = ""; // Text refrence for weather icon
-    String currentWeatherDeg = "";
-    String daysIcons[3]; // Icons/Temp For Next 3 days
-    String daysDegs[3];
+    int m_timeZoneOffSet;
+    String m_cityName;
+    String m_currentWeatherText = "";  // Weather Description
+    String m_currentWeatherIcon = "";  // Text refrence for weather icon
+    String m_currentWeatherDeg = "";
+    String m_daysIcons[3];  // Icons/Temp For Next 3 days
+    String m_daysDegs[3];
 
     String weatherLocation = WEATHER_LOCAION;
-    String weatherUnits = WEATHER_UNITS;
+#ifdef WEATHER_UNITS_METRIC
+    String weatherUnits = "metric";
+#else
+    String weatherUnits = "us";
+#endif
     String weatherApiKey = WEATHER_API_KEY;
 
     String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
                                 weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
                                 "&include=days,current&iconSet=icons1";
-
 };
 
-
-#endif // WEAHTERWIDGET_H
+#endif  // WEAHTERWIDGET_H
