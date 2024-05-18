@@ -1,5 +1,6 @@
 
 #include "widgets/weatherWidget.h"
+
 #include <config.h>
 #include <globalTime.h>
 
@@ -48,7 +49,7 @@ void WeatherWidget::update() {
 }
 
 void WeatherWidget::update(bool force) {
-    GlobalTime* time = GlobalTime::getInstance();
+    GlobalTime *time = GlobalTime::getInstance();
     time->updateTime();
     m_hour = time->getHour();
     m_minute = time->getMinute();
@@ -61,7 +62,7 @@ void WeatherWidget::update(bool force) {
         http.begin(httpRequestAddress);
         int httpCode = http.GET();
 
-        if (httpCode > 0) { // Check for the returning code
+        if (httpCode > 0) {  // Check for the returning code
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
@@ -71,9 +72,9 @@ void WeatherWidget::update(bool force) {
                 m_currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
                 m_currentWeatherText = doc["days"][0]["description"].as<String>();
                 m_currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
-                for (int i=0; i < 3 ; i++) {
-                    m_daysIcons[i] = doc["days"][i+1]["icon"].as<String>();
-                    m_daysDegs[i] = doc["days"][i+1]["temp"].as<String>();
+                for (int i = 0; i < 3; i++) {
+                    m_daysIcons[i] = doc["days"][i + 1]["icon"].as<String>();
+                    m_daysDegs[i] = doc["days"][i + 1]["temp"].as<String>();
                 }
                 m_lastWeather = millis();
             } else {
@@ -247,11 +248,11 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     display.drawLine(157, 0, 157, 240, TFT_BLACK);
     display.drawLine(158, 0, 158, 240, TFT_BLACK);
     display.drawLine(159, 0, 159, 240, TFT_BLACK);
-    m_daysDegs[0].remove(m_daysDegs[0].indexOf(".", 0)); // remove decimal from deg, this dosent round just removes it, should probally fix this and also store as a different var type
+    m_daysDegs[0].remove(m_daysDegs[0].indexOf(".", 0));  // remove decimal from deg, this dosent round just removes it, should probally fix this and also store as a different var type
     display.drawString(m_daysDegs[0], centre - 75, centre, 2);
     display.drawCircle(60, centre - display.fontHeight(2) / 2, 4, TFT_BLACK);
 
-    String weekUpdate = dayStr(weekday(time->getUnixEpoch() + 86400)); // Adds 1 day to time
+    String weekUpdate = dayStr(weekday(time->getUnixEpoch() + 86400));  // Adds 1 day to time
     weekUpdate.remove(3);
     weekUpdate.toUpperCase();
     display.drawString(weekUpdate, centre - 75, 150, 2);
@@ -269,7 +270,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     weekUpdate = dayStr(weekday(time->getUnixEpoch() + 259200));
     weekUpdate.remove(3);
     weekUpdate.toUpperCase();
-    display.drawCircle(207, centre - display.fontHeight(2) / 2, 4, TFT_BLACK); // Had a variable offset on these but broke so I removed it
+    display.drawCircle(207, centre - display.fontHeight(2) / 2, 4, TFT_BLACK);  // Had a variable offset on these but broke so I removed it
     display.drawString(weekUpdate, centre + 75, 150, 2);
     display.fillRect(0, 180, 240, 70, TFT_RED);
     display.setTextColor(TFT_WHITE);
