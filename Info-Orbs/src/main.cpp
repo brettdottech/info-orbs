@@ -97,6 +97,7 @@ void loop() {
     }
     if (buttonOK.pressed()) {
       Serial.println("OK button pressed");
+      widgetSet->changeMode();
     }
     if (buttonRight.pressed()) {
       Serial.println("Right button pressed");

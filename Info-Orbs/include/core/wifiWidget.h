@@ -12,6 +12,7 @@ public:
     void update(bool force) override;
     void draw() override;
     void draw(bool force) override;
+    void changeMode() override;
 
     bool isConnected() { return m_isConnected; }
 

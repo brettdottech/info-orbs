@@ -18,6 +18,7 @@ class WeatherWidget : public Widget {
     void update(bool force) override;
     void draw() override;
     void draw(bool force) override;
+    void changeMode() override;
 
    private:
     void displayClock(int displayIndex, uint32_t background, uint32_t textColor);

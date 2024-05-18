@@ -12,6 +12,7 @@ public:
     virtual void update() = 0;
     virtual void draw(bool force) = 0;
     virtual void draw() = 0;
+    virtual void changeMode() = 0;
 
 protected:
     ScreenManager& m_manager;
