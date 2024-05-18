@@ -3,6 +3,7 @@
 #include "screenManager.h"
 #include "widgets/clockWidget.h"
 #include "widgets/weatherWidget.h"
+#include "widgets/webDataWidget.h"
 #include <Arduino.h>
 #include <Button.h>
 #include <globalTime.h>
@@ -81,6 +82,7 @@ void setup() {
   widgetSet->add(new ClockWidget(*sm));
   widgetSet->add(new StockWidget(*sm));
   widgetSet->add(new WeatherWidget(*sm));
+  widgetSet->add(new WebDataWidget(*sm));
 }
 
 void loop() {
