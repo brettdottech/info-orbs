@@ -13,6 +13,7 @@ public:
     void update(bool force) override;
     void draw() override;
     void draw(bool force) override;
+    void changeMode() override;
 private:
 
     void displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing);
