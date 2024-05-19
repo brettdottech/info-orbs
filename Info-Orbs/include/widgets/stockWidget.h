@@ -15,6 +15,7 @@ public:
     void update(bool force) override;
     void draw() override;
     void draw(bool force) override;
+    void changeMode() override;
 
 private:
     void getStockData();

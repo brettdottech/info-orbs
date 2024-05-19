@@ -35,6 +35,8 @@ void StockWidget::update() {
 void StockWidget::update(bool force) {
 }
 
+void StockWidget::changeMode() {}
+
 void StockWidget::getStockData() {
     if (stockTickers.size() == 0) {
         Serial.println("No stock tickers available");
