@@ -15,6 +15,10 @@ WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
 WeatherWidget::~WeatherWidget() {
 }
 
+void WeatherWidget::changeMode() {
+
+}
+
 void WeatherWidget::setup() {
     m_lastTime = 0;
     m_lastWeather = 0;

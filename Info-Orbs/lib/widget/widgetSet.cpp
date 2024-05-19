@@ -25,6 +25,10 @@ Widget *WidgetSet::getCurrent() {
   return m_widgets[m_currentWidget];
 }
 
+void WidgetSet::changeMode() {
+  m_widgets[m_currentWidget]->changeMode();
+}
+
 void WidgetSet::next() {
   m_currentWidget++;
   if (m_currentWidget >= m_widgetCount) {

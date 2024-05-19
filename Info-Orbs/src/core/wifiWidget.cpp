@@ -86,6 +86,8 @@ void WifiWidget::draw(bool force) {
 	}
 }
 
+void WifiWidget::changeMode() {}
+
 void WifiWidget::connectionTimedOut() {
   switch (WiFi.status()) {
   case WL_CONNECTED:

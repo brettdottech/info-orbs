@@ -15,6 +15,7 @@ public:
     Widget *getCurrent();
     void next();
     void prev();
+    void changeMode();
 
 private:
     ScreenManager *m_screenManager;
