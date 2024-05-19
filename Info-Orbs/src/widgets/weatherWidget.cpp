@@ -26,10 +26,6 @@ void WeatherWidget::setup() {
     m_clockStamp = 0;
 }
 
-void WeatherWidget::draw() {
-    draw(false);
-}
-
 void WeatherWidget::draw(bool force) {
     int clockStamp = getClockStamp();
     if ((clockStamp != m_clockStamp || force) && m_day.toInt() != 0) {
@@ -46,10 +42,6 @@ void WeatherWidget::draw(bool force) {
         threeDayWeather(4);
         m_weatherStamp = weatherStamp;
     }
-}
-
-void WeatherWidget::update() {
-    update(false);
 }
 
 void WeatherWidget::update(bool force) {

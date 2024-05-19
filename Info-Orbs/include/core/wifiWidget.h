@@ -8,10 +8,8 @@ public:
     WifiWidget(ScreenManager& manager);
     ~WifiWidget() override;
     void setup() override;
-    void update() override;
-    void update(bool force) override;
-    void draw() override;
-    void draw(bool force) override;
+    void update(bool force = false) override;
+    void draw(bool force = false) override;
     void changeMode() override;
 
     bool isConnected() { return m_isConnected; }

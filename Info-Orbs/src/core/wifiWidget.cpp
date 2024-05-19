@@ -31,10 +31,6 @@ void WifiWidget::setup() {
 
 }
 
-void WifiWidget::update() {
-  update(false);
-}
-
 void WifiWidget::update(bool force) {
   //force is currently an unhandled due to not knowing what behavior it would change
 
@@ -53,10 +49,6 @@ void WifiWidget::update(bool force) {
 			connectionTimedOut();
 		}
 	}
-}
-
-void WifiWidget::draw() {
-  draw(false);
 }
 
 void WifiWidget::draw(bool force) {

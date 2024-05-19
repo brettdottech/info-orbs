@@ -19,10 +19,6 @@ void ClockWidget::setup() {
 
 }
 
-void ClockWidget::draw() {
-    draw(false);
-}
-
 void ClockWidget::draw(bool force) {
     if(m_lastDisplay1Didget != m_display1Didget || force) {
         displayDidget(0, m_display1Didget, 7, 5, LIGHT_ORANGE);
@@ -51,10 +47,6 @@ void ClockWidget::draw(bool force) {
         m_lastSecondSingle = m_secondSingle;
     }
     
-}
-
-void ClockWidget::update() {
-    update(false);
 }
 
 void ClockWidget::update(bool force) {

@@ -14,10 +14,6 @@ void StockWidget::setup() {
     stockTickers = STOCK_TICKERS;
 }
 
-void StockWidget::draw() {
-    draw(false);
-}
-
 void StockWidget::draw(bool force) {
     // Get initial stock then every m_stockDelay milliseconds
     if (m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
@@ -26,10 +22,6 @@ void StockWidget::draw(bool force) {
         m_stockDelayPrev = millis();
         currentStockIndex = (currentStockIndex + 1) % stockTickers.size();
     }
-}
-
-void StockWidget::update() {
-    update(false);
 }
 
 void StockWidget::update(bool force) {
