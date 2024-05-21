@@ -91,6 +91,8 @@
 
 #define STOCK_TICKERS {"ABNB", "BRCC", "GOOG", "TSLA", "GME"}
 
+#define WEB_DATA_WIDGET_URL "http://192.168.10.242/temp.php"
+
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define LIGHT_ORANGE 0xfc80  // orange for clock
 
