@@ -14,16 +14,8 @@ WebDataWidget::~WebDataWidget() {
 void WebDataWidget::setup() {
 }
 
-void WebDataWidget::draw() {
-    draw(false);
-}
-
 void WebDataWidget::draw(bool force) {
-    uint32_t background = TFT_BLACK;
-    uint32_t color = TFT_CYAN;
-
-    // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
-    for (int i=0 ; i<5; i++) {
+    for (int i = 0; i < 5; i++) {
         String fingerprint = getFingerprint(i);
         if (fingerprint != m_fingerprint[i]) {
             m_manager.selectScreen(i);
@@ -36,7 +28,7 @@ void WebDataWidget::draw(bool force) {
             display.drawString(m_label[i], 120, 75, 2);
             display.setTextColor(m_color[i]);
             display.setTextDatum(MC_DATUM);
-            if (m_data[i].length()>10) {
+            if (m_data[i].length() > 10) {
                 display.setTextSize(2);
             } else {
                 display.setTextSize(3);
@@ -44,12 +36,7 @@ void WebDataWidget::draw(bool force) {
             display.drawString(m_data[i], 120, 120, 2);
             m_fingerprint[i] = fingerprint;
         }
-
     }
-}
-
-void WebDataWidget::update() {
-    update(false);
 }
 
 void WebDataWidget::update(bool force) {
@@ -62,7 +49,7 @@ void WebDataWidget::update(bool force) {
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
-                for(int8_t i=0;i<5;i++) {
+                for (int8_t i = 0; i < 5; i++) {
                     m_label[i] = doc[i]["label"].as<String>();
                     m_data[i] = doc[i]["data"].as<String>();
                     if (doc[i].containsKey("color")) {
@@ -76,12 +63,12 @@ void WebDataWidget::update(bool force) {
                         m_labelColor[i] = m_color[i];
                     }
                     if (doc[i].containsKey("background")) {
-                    m_background[i] = stringToColor(doc[i]["background"].as<String>());
+                        m_background[i] = stringToColor(doc[i]["background"].as<String>());
                     } else {
                         m_background[i] = m_defaultBackground;
                     }
                 }
-                
+
                 m_lastUpdate = millis();
             } else {
                 // Handle JSON deserialization error
@@ -154,5 +141,5 @@ int32_t WebDataWidget::stringToColor(String color) {
 }
 
 String WebDataWidget::getFingerprint(int8_t display) {
-    return m_label[display]+ "~" + m_data[display]+ "~" + m_color[display]+ "~" + m_background[display];
+    return m_label[display] + "~" + m_data[display] + "~" + m_color[display] + "~" + m_background[display];
 }

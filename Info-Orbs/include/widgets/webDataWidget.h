@@ -12,10 +12,8 @@ public:
     WebDataWidget(ScreenManager &manager);
     ~WebDataWidget() override;
     void setup() override;
-    void update() override;
-    void update(bool force) override;
-    void draw() override;
-    void draw(bool force) override;
+    void update(bool force = false) override;
+    void draw(bool force = false) override;
 
 private:
     String getFingerprint(int8_t display);
