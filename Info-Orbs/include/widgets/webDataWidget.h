@@ -14,6 +14,7 @@ public:
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
+    void changeMode() override;
 
 private:
     String getFingerprint(int8_t display);

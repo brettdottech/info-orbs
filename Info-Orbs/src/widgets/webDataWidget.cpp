@@ -14,6 +14,9 @@ WebDataWidget::~WebDataWidget() {
 void WebDataWidget::setup() {
 }
 
+void WebDataWidget::changeMode() {
+}
+
 void WebDataWidget::draw(bool force) {
     for (int i = 0; i < 5; i++) {
         String fingerprint = getFingerprint(i);
