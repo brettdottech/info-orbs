@@ -21,9 +21,6 @@ class WebDataModel {
     void setBackgroundColor(String background);
     bool isChanged();
     void setChangedStatus(bool changed);
-
-
-    String getFingerprint();
     
    private:
     String m_label;
@@ -34,7 +31,6 @@ class WebDataModel {
     String m_fingerprint;
     bool m_changed = false;
     
-    void updateFingerprint();
     int32_t stringToColor(String color);
 };
 #endif

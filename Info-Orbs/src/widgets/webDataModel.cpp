@@ -7,7 +7,6 @@ String WebDataModel::getLabel() {
 void WebDataModel::setLabel(String label) {
     if (m_label != label) {
         m_label = label;
-        updateFingerprint();
         m_changed = true;
     }
 }
@@ -19,7 +18,6 @@ String WebDataModel::getData() {
 void WebDataModel::setData(String data) {
     if (m_data != data) {
         m_data = data;
-        updateFingerprint();
         m_changed = true;
     }
 }
@@ -31,7 +29,6 @@ int32_t WebDataModel::getLabelColor() {
 void WebDataModel::setLabelColor(int32_t color) {
     if (m_labelColor != color) {
         m_labelColor = color;
-        updateFingerprint();
         m_changed = true;
     }
 }
@@ -47,7 +44,6 @@ int32_t WebDataModel::getDataColor() {
 void WebDataModel::setDataColor(int32_t color) {
     if (m_color != color) {
         m_color = color;
-        updateFingerprint();
         m_changed = true;
     }
 }
@@ -63,7 +59,6 @@ int32_t WebDataModel::getBackgroundColor() {
 void WebDataModel::setBackgroundColor(int32_t background) {
     if (m_background != background) {
         m_background = background;
-        updateFingerprint();
         m_changed = true;
     }
 }
@@ -77,15 +72,6 @@ bool WebDataModel::isChanged() {
 }
 void WebDataModel::setChangedStatus(bool changed) {
     m_changed = changed;
-}
-
-String WebDataModel::getFingerprint() {
-    return m_fingerprint;
-}
-
-void WebDataModel::updateFingerprint() {
-    m_fingerprint = m_label + "~" + m_data + "~" + String(m_labelColor) + "~" +
-                    String(m_color) + String(m_background);
 }
 
 int32_t WebDataModel::stringToColor(String color) {
