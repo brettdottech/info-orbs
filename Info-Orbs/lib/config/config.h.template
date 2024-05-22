@@ -1,9 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define WOKWI false
-
-#if WOKWI != true // If not Wokwi
+// #define HARDWARE WOKWI
+#define HARDWARE PCB_0_1
+// #define HARDWARE DIY
 
 #undef TFT_MOSI
 #undef TFT_MISO
@@ -11,33 +11,38 @@
 #undef TFT_CS
 #undef TFT_DC
 
+#if HARDWARE == PCB_0_1
+
 #undef ILI9341_DRIVER
 #define GC9A01_DRIVER
+
 #define TFT_SDA_READ
 
 #define WIFI_SSID "WIFI_SSID"
 #define WIFI_PASS "WIFI_PASS"
 
-#define BUTTON_OK 26
-#define BUTTON_LEFT 25
-#define BUTTON_RIGHT 22
+#define BUTTON_OK 27
+#define BUTTON_LEFT 26
+#define BUTTON_RIGHT 14
 
-#define TFT_MOSI 15
+#define TFT_MOSI 17
 #define TFT_MISO -1
-#define TFT_SCLK 14
-#define TFT_CS 5
-#define TFT_DC 27
-#define TFT_RST 33
+#define TFT_SCLK 23
+#define TFT_CS 15
+#define TFT_DC 19
+#define TFT_RST 18
 
-#define SCREEN_1_CS 9
-#define SCREEN_2_CS 10
-#define SCREEN_3_CS 21
-#define SCREEN_4_CS 18
-#define SCREEN_5_CS 23
+#define SCREEN_1_CS 13
+#define SCREEN_2_CS 33
+#define SCREEN_3_CS 32
+#define SCREEN_4_CS 25
+#define SCREEN_5_CS 21
 
-#define DISPLAY_ROTATION 2
+#define DISPLAY_ROTATION 0
 
-#else
+#define BUTTON_MODE INPUT_PULLDOWN
+
+#elif HARDWARE = WOKWI
 
 #undef GC9A01_DRIVER
 #define ILI9341_DRIVER
@@ -62,6 +67,44 @@
 #define SCREEN_5_CS 21
 
 #define DISPLAY_ROTATION 2
+
+#define BUTTON_MODE INPUT_PULLUP
+
+#else
+
+#undef TFT_MOSI
+#undef TFT_MISO
+#undef TFT_SCLK
+#undef TFT_CS
+#undef TFT_DC
+
+#undef ILI9341_DRIVER
+#define GC9A01_DRIVER
+#define TFT_SDA_READ
+
+#define WIFI_SSID "WIFI_SSID"
+#define WIFI_PASS "WIFI_PASS"
+
+#define BUTTON_OK 14
+#define BUTTON_LEFT 12
+#define BUTTON_RIGHT 27
+
+#define TFT_MOSI 17
+#define TFT_MISO -1
+#define TFT_SCLK 23
+#define TFT_CS 15
+#define TFT_DC 19
+#define TFT_RST 18
+
+#define SCREEN_1_CS 13
+#define SCREEN_2_CS 33
+#define SCREEN_3_CS 32
+#define SCREEN_4_CS 25
+#define SCREEN_5_CS 21
+
+#define DISPLAY_ROTATION 0
+
+#define BUTTON_MODE INPUT_PULLUP
 
 #endif
 
@@ -89,7 +132,7 @@
 #define WEATHER_UNITS_METRIC
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
 
-#define STOCK_TICKERS {"ABNB", "BRCC", "GOOG", "TSLA", "GME"}
+#define STOCK_TICKERS { "ABNB", "BRCC", "GOOG", "TSLA", "GME" }
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define LIGHT_ORANGE 0xfc80  // orange for clock
