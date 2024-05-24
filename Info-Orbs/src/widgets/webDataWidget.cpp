@@ -32,17 +32,12 @@ void WebDataWidget::draw(bool force) {
             display.drawString(data->getLabel(), 120, 70, 2);
             display.setTextColor(data->getDataColor());
             display.setTextDatum(MC_DATUM);
-            if (data->getData().length() > 10) {
-                display.setTextSize(2);
-            } else {
-                display.setTextSize(3);
-            }
             int yOffset = 110;
 
             String wrappedLines[MAX_WRAPPED_LINES];
             String dataValues = data->getData();
             int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
-            int height = display.fontHeight() + 8;
+            int height = display.fontHeight() + 10;
             for (int i = 0; i < lineCount; i++) {
                 display.drawString(wrappedLines[i], 120, yOffset + (height*i), 2);
             }
