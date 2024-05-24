@@ -29,7 +29,7 @@ void WebDataWidget::draw(bool force) {
             display.setTextColor(data->getLabelColor());
             display.setTextSize(2);
             display.setTextDatum(MC_DATUM);
-            display.drawString(data->getLabel(), 120, 75, 2);
+            display.drawString(data->getLabel(), 120, 70, 2);
             display.setTextColor(data->getDataColor());
             display.setTextDatum(MC_DATUM);
             if (data->getData().length() > 10) {
@@ -37,7 +37,15 @@ void WebDataWidget::draw(bool force) {
             } else {
                 display.setTextSize(3);
             }
-            display.drawString(data->getData(), 120, 120, 2);
+            int yOffset = 110;
+
+            String wrappedLines[MAX_WRAPPED_LINES];
+            String dataValues = data->getData();
+            int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
+            int height = display.fontHeight() + 8;
+            for (int i = 0; i < lineCount; i++) {
+                display.drawString(wrappedLines[i], 120, yOffset + (height*i), 2);
+            }
             data->setChangedStatus(false);
         }
     }

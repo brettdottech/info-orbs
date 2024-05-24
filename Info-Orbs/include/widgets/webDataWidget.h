@@ -6,6 +6,7 @@
 #include <HTTPClient.h>
 #include <widget.h>
 #include "webDataModel.h"
+#include "utils.h"
 
 class WebDataWidget : public Widget {
 public:

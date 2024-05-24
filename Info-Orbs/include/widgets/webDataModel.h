@@ -3,6 +3,7 @@
 
 #include <ArduinoJson.h>
 #include <TFT_eSPI.h>
+#include "utils.h"
 
 class WebDataModel {
    public:
@@ -30,7 +31,5 @@ class WebDataModel {
     int32_t m_background;
     String m_fingerprint;
     bool m_changed = false;
-    
-    int32_t stringToColor(String color);
 };
 #endif

@@ -34,7 +34,7 @@ void WebDataModel::setLabelColor(int32_t color) {
 }
 
 void WebDataModel::setLabelColor(String color) {
-    setLabelColor(stringToColor(color));
+    setLabelColor(Utils::stringToColor(color));
 }
 
 int32_t WebDataModel::getDataColor() {
@@ -49,7 +49,7 @@ void WebDataModel::setDataColor(int32_t color) {
 }
 
 void WebDataModel::setDataColor(String color) {
-    setDataColor(stringToColor(color));
+    setDataColor(Utils::stringToColor(color));
 }
 
 int32_t WebDataModel::getBackgroundColor() {
@@ -64,7 +64,7 @@ void WebDataModel::setBackgroundColor(int32_t background) {
 }
 
 void WebDataModel::setBackgroundColor(String background) {
-    setBackgroundColor(stringToColor(background));
+    setBackgroundColor(Utils::stringToColor(background));
 }
 
 bool WebDataModel::isChanged() {
@@ -72,62 +72,4 @@ bool WebDataModel::isChanged() {
 }
 void WebDataModel::setChangedStatus(bool changed) {
     m_changed = changed;
-}
-
-int32_t WebDataModel::stringToColor(String color) {
-    color.toLowerCase();
-    color.replace(" ", "");
-    if (color == "black") {
-        return TFT_BLACK;
-    } else if (color == "navy") {
-        return TFT_NAVY;
-    } else if (color == "darkgreen") {
-        return TFT_DARKGREEN;
-    } else if (color == "darkcyan") {
-        return TFT_DARKCYAN;
-    } else if (color == "maroon") {
-        return TFT_MAROON;
-    } else if (color == "purple") {
-        return TFT_PURPLE;
-    } else if (color == "olive") {
-        return TFT_OLIVE;
-    } else if (color == "lightgrey") {
-        return TFT_LIGHTGREY;
-    } else if (color == "darkgrey") {
-        return TFT_DARKGREY;
-    } else if (color == "blue") {
-        return TFT_BLUE;
-    } else if (color == "green") {
-        return TFT_GREEN;
-    } else if (color == "cyan") {
-        return TFT_CYAN;
-    } else if (color == "red") {
-        return TFT_RED;
-    } else if (color == "magenta") {
-        return TFT_MAGENTA;
-    } else if (color == "yellow") {
-        return TFT_YELLOW;
-    } else if (color == "white") {
-        return TFT_WHITE;
-    } else if (color == "orange") {
-        return TFT_ORANGE;
-    } else if (color == "greenyellow") {
-        return TFT_GREENYELLOW;
-    } else if (color == "pink") {
-        return TFT_PINK;
-    } else if (color == "brown") {
-        return TFT_BROWN;
-    } else if (color == "gold") {
-        return TFT_GOLD;
-    } else if (color == "silver") {
-        return TFT_SILVER;
-    } else if (color == "skyblue") {
-        return TFT_SKYBLUE;
-    } else if (color == "vilolet") {
-        return TFT_VIOLET;
-    } else {
-        Serial.print("Invalid color: ");
-        Serial.println(color);
-        return TFT_BLACK;
-    }
 }
