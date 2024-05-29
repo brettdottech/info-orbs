@@ -41,7 +41,7 @@ void ClockWidget::draw(bool force) {
         if(m_secondSingle % 2 == 0) {
             displayDidget(2, ":", 7, 5, LIGHT_ORANGE, false);
         } else {
-            displayDidget(2, " ", 7, 5, LIGHT_ORANGE, false);
+            displayDidget(2, ":", 7, 5, BG_COLOR, false);
         }
         //displaySeconds(2, m_secondSingle, m_minuteSingle % 2 == 0 ? LIGHT_ORANGE : BG_COLOR);
         m_lastSecondSingle = m_secondSingle;
@@ -61,9 +61,8 @@ void ClockWidget::update(bool force) {
     m_minuteSingle = time->getMinute();
     m_secondSingle = time->getSecond();
 
-
     if(m_lastHourSingle != m_hourSingle || force) {
-        String currentHourPadded = String(m_hourSingle).length() == 1 ? "0" + String(m_hourSingle) : String(m_hourSingle);
+        String currentHourPadded = String(m_hourSingle).length() == 1 ? " " + String(m_hourSingle) : String(m_hourSingle);
 
         m_display1Didget = currentHourPadded.substring(0, 1);
         m_display2Didget = currentHourPadded.substring(1, 2);

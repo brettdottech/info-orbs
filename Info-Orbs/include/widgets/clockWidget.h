@@ -32,9 +32,9 @@ private:
     int m_hourSingle;
     int m_secondSingle;
 
-    int m_lastMinuteSingle;
-    int m_lastHourSingle;
-    int m_lastSecondSingle;
+    int m_lastMinuteSingle { -1 };
+    int m_lastHourSingle { -1 };
+    int m_lastSecondSingle { -1 };
 
     // Didgets
     String m_display1Didget;
