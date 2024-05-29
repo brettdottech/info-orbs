@@ -135,6 +135,6 @@
 #define STOCK_TICKERS { "ABNB", "BRCC", "GOOG", "TSLA", "GME" }
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
-#define LIGHT_ORANGE 0xfc80  // orange for clock
+#define FOREGROUND_COLOR 0xfc80  // orange for clock
 
 #endif
