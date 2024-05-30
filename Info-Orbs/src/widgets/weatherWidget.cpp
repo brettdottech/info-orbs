@@ -54,6 +54,8 @@ void WeatherWidget::update(bool force) {
     m_weekday = time->getWeekday();
 
     if (m_lastWeather == 0 || (millis() - m_lastWeather) >= m_weatherDelay) {
+        setBusy(true);
+
         HTTPClient http;
         http.begin(httpRequestAddress);
         int httpCode = http.GET();
@@ -82,6 +84,7 @@ void WeatherWidget::update(bool force) {
             Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
         http.end();
+        setBusy(false);
     }
 }
 
