@@ -23,7 +23,7 @@ class StockWidget : public Widget {
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
     String m_apiKey = "c1tjb52ad3ia4h4uee9g";
-    unsigned long m_stockDelay = 60000;  //default to 60s between updates
+    unsigned long m_stockDelay = 300000;  //default to 5m between updates
     unsigned long m_stockDelayPrev = 0;
 
     StockDataModel m_stocks[MAX_STOCKS];
