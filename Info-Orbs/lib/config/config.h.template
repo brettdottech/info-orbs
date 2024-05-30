@@ -139,6 +139,6 @@
 #define STOCK_TICKER_API_KEY "c1tjb52ad3ia4h4uee9g"
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
-#define LIGHT_ORANGE 0xfc80  // orange for clock
+#define FOREGROUND_COLOR 0xfc80  // orange for clock
 
 #endif
