@@ -8,7 +8,6 @@
 
 class StockDataModel {
    public:
-    // StockDataModel(char *symbol);
     StockDataModel();
     StockDataModel &setSymbol(String symbol);
     String getSymbol();
