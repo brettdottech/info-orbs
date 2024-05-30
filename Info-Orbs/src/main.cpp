@@ -89,6 +89,9 @@ void loop() {
     wifiWidget->draw();
     delay(100);
   } else {
+    if (!widgetSet->initialUpdateDone()) {
+      widgetSet->initializeAllWidgets();
+    }
     globalTime->updateTime();
 
     if (buttonLeft.pressed()) {
@@ -107,7 +110,5 @@ void loop() {
     
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
-
-    delay(100);
   }
 }

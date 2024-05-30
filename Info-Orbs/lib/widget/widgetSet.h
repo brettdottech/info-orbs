@@ -16,12 +16,18 @@ public:
     void next();
     void prev();
     void changeMode();
+    void showLoading();
+    void updateAll();
+    bool initialUpdateDone();
+    void initializeAllWidgets();
 
-private:
+   private:
     ScreenManager *m_screenManager;
     Widget *m_widgets[MAX_WIDGETS];
     int8_t m_widgetCount = 0;
     int8_t m_currentWidget = 0;
+
+    bool m_initialized = false;
 
     void switchWidget();
 };
