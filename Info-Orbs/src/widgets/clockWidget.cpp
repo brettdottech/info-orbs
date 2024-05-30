@@ -17,7 +17,8 @@ void ClockWidget::setup() {
 }
 
 void ClockWidget::draw(bool force) {
-    if ((FORMAT_24_HOUR && m_lastDisplay1Didget != m_display1Didget) || force) {
+    bool showFirstDigit = FORMAT_24_HOUR || (!FORMAT_24_HOUR && m_hourSingle >= 10);
+    if ((showFirstDigit && m_lastDisplay1Didget != m_display1Didget) || force) {
         displayDidget(0, m_display1Didget, 7, 5, FOREGROUND_COLOR);
         m_lastDisplay1Didget = m_display1Didget;
     }
