@@ -41,6 +41,7 @@
 #define DISPLAY_ROTATION 0
 
 #define BUTTON_MODE INPUT_PULLDOWN
+#define BUSY_PIN 2
 
 #elif HARDWARE = WOKWI
 
@@ -67,6 +68,7 @@
 #define SCREEN_5_CS 21
 
 #define DISPLAY_ROTATION 2
+#define BUSY_PIN 2
 
 #define BUTTON_MODE INPUT_PULLUP
 
@@ -105,6 +107,7 @@
 #define DISPLAY_ROTATION 0
 
 #define BUTTON_MODE INPUT_PULLUP
+#define BUSY_PIN 2
 
 #endif
 
