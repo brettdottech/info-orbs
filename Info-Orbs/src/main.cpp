@@ -70,7 +70,7 @@ void setup() {
   Serial.println("Wokwi Build");
 #endif
 
-
+  pinMode(BUSY_PIN, OUTPUT);
   Serial.println("Connecting to: " + String(WIFI_SSID));
 
   wifiWidget = new WifiWidget(*sm);
