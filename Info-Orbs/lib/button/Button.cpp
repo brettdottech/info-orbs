@@ -3,10 +3,17 @@
 
 
 Button::Button(uint8_t pin)
-    : m_pin(pin), m_delay(100), m_state(HIGH), m_ignoreUntil(0),
+    : m_pin(pin), m_delay(100), m_ignoreUntil(0),
       m_hasChanged(false) {}
 
-void Button::begin() { pinMode(m_pin, BUTTON_MODE); }
+void Button::begin() {
+#if BUTTON_MODE == INPUT_PULLDOWN
+    m_state = LOW;
+#else
+    m_state = HIGH;
+#endif
+    pinMode(m_pin, BUTTON_MODE);
+}
 
 bool Button::read() {
   if (m_ignoreUntil > millis()) {
