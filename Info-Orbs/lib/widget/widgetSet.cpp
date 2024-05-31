@@ -15,6 +15,10 @@ void WidgetSet::add(Widget *widget) {
 }
 
 void WidgetSet::drawCurrent() {
+  if (m_shouldInit) {
+    m_screenManager->clearAllScreens();
+    m_shouldInit = false;
+  }
   m_widgets[m_currentWidget]->draw();
 }
 void WidgetSet::updateCurrent() {
@@ -27,6 +31,10 @@ Widget *WidgetSet::getCurrent() {
 
 void WidgetSet::changeMode() {
   m_widgets[m_currentWidget]->changeMode();
+}
+
+void WidgetSet::shouldInit(bool init) {
+  m_shouldInit = init;
 }
 
 void WidgetSet::next() {
