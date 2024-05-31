@@ -91,7 +91,6 @@ void ClockWidget::changeMode() {}
 void ClockWidget::displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();
-    display.fillScreen(TFT_BLACK);
     display.setTextSize(fontSize);
     if (shadowing && font == 7) {
         display.setTextColor(BG_COLOR, TFT_BLACK);
