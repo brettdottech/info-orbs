@@ -127,6 +127,7 @@
 
 #define TIME_ZONE_OFFSET -4
 #define FORMAT_24_HOUR true
+#define SHOW_AM_PM_INDICATOR false
 
 #define WEATHER_LOCAION "Aberdeen,ID"
 #define WEATHER_UNITS_METRIC

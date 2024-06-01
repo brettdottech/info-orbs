@@ -42,18 +42,19 @@ void ClockWidget::draw(bool force) {
             displayDidget(2, ":", 7, 5, BG_COLOR, false);
         }
         m_lastSecondSingle = m_secondSingle;
-        if (!FORMAT_24_HOUR) {
+        if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR) {
             displayAmPm(FOREGROUND_COLOR);
         }
     }
 }
 
 void ClockWidget::displayAmPm(uint32_t color) {
+    GlobalTime* time = GlobalTime::getInstance();
     m_manager.selectScreen(2);
     TFT_eSPI& display = m_manager.getDisplay();
     display.setTextSize(4);
     display.setTextColor(color, TFT_BLACK, true);
-    const String& am_pm = m_hourSingle >= 12 ? "AM" : "PM";
+    String am_pm = time->isPM() ? "PM" : "AM";
     display.drawString(am_pm, SCREEN_SIZE - 50, SCREEN_SIZE / 2, 1);
 }
 
