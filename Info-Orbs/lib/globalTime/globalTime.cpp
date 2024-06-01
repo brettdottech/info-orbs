@@ -45,7 +45,6 @@ void GlobalTime::updateTime() {
         m_year = year(m_unixEpoch);
         m_weekday = dayStr(weekday(m_unixEpoch));
         m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
-        m_isAM = !bool(isPM(m_unixEpoch));  // invert to avoid weird name conflict
     }
 }
 
@@ -94,8 +93,8 @@ String GlobalTime::getWeekday() {
     return m_weekday;
 }
 
-bool GlobalTime::isAM() {
-    return m_isAM;
+bool GlobalTime::isPM() {
+    return hour(m_unixEpoch) >= 12;
 }
 
 void GlobalTime::setTimeZoneOffset(int tz) {

@@ -18,7 +18,7 @@ void ClockWidget::setup() {
 
 void ClockWidget::draw(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
-    bool showFirstDigit = FORMAT_24_HOUR || (!FORMAT_24_HOUR && !time->isAM());
+    bool showFirstDigit = FORMAT_24_HOUR || (!FORMAT_24_HOUR && time->isPM());
     if ((showFirstDigit && m_lastDisplay1Didget != m_display1Didget) || force) {
         displayDidget(0, m_display1Didget, 7, 5, FOREGROUND_COLOR);
         m_lastDisplay1Didget = m_display1Didget;
@@ -55,7 +55,7 @@ void ClockWidget::displayAmPm(uint32_t color) {
     TFT_eSPI& display = m_manager.getDisplay();
     display.setTextSize(4);
     display.setTextColor(color, TFT_BLACK, true);
-    const String& am_pm = time->isAM() ? "AM" : "PM";
+    const String& am_pm = time->isPM() ? "PM" : "AM";
     display.drawString(am_pm, SCREEN_SIZE - 50, SCREEN_SIZE / 2, 1);
 }
 
