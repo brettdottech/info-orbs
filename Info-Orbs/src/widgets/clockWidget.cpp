@@ -18,7 +18,7 @@ void ClockWidget::setup() {
 
 void ClockWidget::draw(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
-    bool showFirstDigit = FORMAT_24_HOUR || (!FORMAT_24_HOUR && time->isPM());
+    bool showFirstDigit = FORMAT_24_HOUR || (!FORMAT_24_HOUR && m_hourSingle >= 10);
     if ((showFirstDigit && m_lastDisplay1Didget != m_display1Didget) || force) {
         displayDidget(0, m_display1Didget, 7, 5, FOREGROUND_COLOR);
         m_lastDisplay1Didget = m_display1Didget;
@@ -43,7 +43,7 @@ void ClockWidget::draw(bool force) {
             displayDidget(2, ":", 7, 5, BG_COLOR, false);
         }
         m_lastSecondSingle = m_secondSingle;
-        if (!FORMAT_24_HOUR) {
+        if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR) {
             displayAmPm(FOREGROUND_COLOR);
         }
     }
