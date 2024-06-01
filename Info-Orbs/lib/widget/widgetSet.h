@@ -16,9 +16,11 @@ public:
     void next();
     void prev();
     void changeMode();
+    void shouldInit(bool init);
 
 private:
     ScreenManager *m_screenManager;
+    bool m_shouldInit = true;
     Widget *m_widgets[MAX_WIDGETS];
     int8_t m_widgetCount = 0;
     int8_t m_currentWidget = 0;
