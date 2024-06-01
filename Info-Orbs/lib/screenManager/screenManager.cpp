@@ -46,9 +46,15 @@ void ScreenManager::fillAllScreens(uint32_t color) {
   reset();
 }
 
-// clears all screens but resetting them to black
+// clears all screens by resetting them to black
 void ScreenManager::clearAllScreens() {
   fillAllScreens(TFT_BLACK);
+}
+
+// clears one screens by resetting it to black
+void ScreenManager::clearScreen(int screen) {
+  selectScreen(screen);
+  m_tft.fillScreen(TFT_BLACK);
 }
 
 // Selects all screens
