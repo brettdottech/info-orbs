@@ -23,7 +23,7 @@ class GlobalTime {
     String getTime();
     String getWeekday();
     void setTimeZoneOffset(int tz);
-    bool isAM();
+    bool isPM();
 
    private:
     GlobalTime();
@@ -42,7 +42,6 @@ class GlobalTime {
     String m_time;
     String m_weekday;
     int m_timeZoneOffset = TIME_ZONE_OFFSET;
-    bool m_isAM = false;
 
     WiFiUDP m_udp;
     NTPClient *m_timeClient{nullptr};
