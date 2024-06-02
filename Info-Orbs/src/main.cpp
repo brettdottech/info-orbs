@@ -85,7 +85,7 @@ void setup() {
 
 void loop() {
   if (wifiWidget->isConnected() == false) {
-    widgetSet->shouldInit(true);
+    widgetSet->shouldInitScreens(true);
     wifiWidget->update();
     wifiWidget->draw();
     delay(100);

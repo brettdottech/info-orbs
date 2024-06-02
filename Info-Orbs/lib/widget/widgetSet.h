@@ -20,11 +20,11 @@ public:
     void updateAll();
     bool initialUpdateDone();
     void initializeAllWidgets();
-    void shouldInit(bool init);
+    void shouldInitScreens(bool init);
 
    private:
     ScreenManager *m_screenManager;
-    bool m_shouldInit = true;
+    bool m_shouldInitScreens = true;
     Widget *m_widgets[MAX_WIDGETS];
     int8_t m_widgetCount = 0;
     int8_t m_currentWidget = 0;
