@@ -75,7 +75,7 @@ void ClockWidget::update(bool force) {
         if (m_hourSingle < 10) {
             m_display1Didget = " ";
         } else {
-            m_display1Didget = "1";
+            m_display1Didget = int(m_hourSingle/10);
         }
         m_display2Didget = m_hourSingle % 10;
 
