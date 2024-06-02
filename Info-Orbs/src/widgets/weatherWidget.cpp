@@ -10,6 +10,9 @@ WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
     m_daysDegs[2] = "0";
     m_hour = "0";
     m_minute = "0";
+
+    m_lastTime = 0;
+    m_lastWeather = 0;
 }
 
 WeatherWidget::~WeatherWidget() {
@@ -20,8 +23,6 @@ void WeatherWidget::changeMode() {
 }
 
 void WeatherWidget::setup() {
-    m_lastTime = 0;
-    m_lastWeather = 0;
     m_weatherStamp = 0;
     m_clockStamp = 0;
 }
