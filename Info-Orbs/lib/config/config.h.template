@@ -1,6 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define WOKWI 1
+#define PCB_0_1 2
+#define DIY 3
+
 // #define HARDWARE WOKWI
 #define HARDWARE PCB_0_1
 // #define HARDWARE DIY
@@ -42,7 +46,7 @@
 
 #define BUTTON_MODE INPUT_PULLDOWN
 
-#elif HARDWARE = WOKWI
+#elif HARDWARE == WOKWI
 
 #undef GC9A01_DRIVER
 #define ILI9341_DRIVER
@@ -71,12 +75,6 @@
 #define BUTTON_MODE INPUT_PULLUP
 
 #else
-
-#undef TFT_MOSI
-#undef TFT_MISO
-#undef TFT_SCLK
-#undef TFT_CS
-#undef TFT_DC
 
 #undef ILI9341_DRIVER
 #define GC9A01_DRIVER
@@ -128,6 +126,10 @@
 #define TIME_ZONE_OFFSET -4
 #define FORMAT_24_HOUR true
 #define SHOW_AM_PM_INDICATOR false
+
+#define TIMEZONE_API_KEY "97R9WKDPBLIO"
+#define TIMEZONE_API_URL "http://api.timezonedb.com/v2.1/get-time-zone"
+#define TIMEZONE_API_LOCATION "Europe/Zurich" // Use timezone from this list: https://timezonedb.com/time-zones
 
 #define WEATHER_LOCAION "Aberdeen,ID"
 #define WEATHER_UNITS_METRIC

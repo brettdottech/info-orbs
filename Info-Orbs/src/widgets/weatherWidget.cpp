@@ -62,8 +62,6 @@ void WeatherWidget::update(bool force) {
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
-                m_timeZoneOffSet = doc["tzoffset"].as<int>();
-                time->setTimeZoneOffset(m_timeZoneOffSet);
                 m_cityName = doc["resolvedAddress"].as<String>();
                 m_currentWeatherDeg = doc["currentConditions"]["temp"].as<String>();
                 m_currentWeatherText = doc["days"][0]["description"].as<String>();
