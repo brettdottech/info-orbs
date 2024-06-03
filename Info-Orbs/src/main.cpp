@@ -85,13 +85,13 @@ void setup() {
 
 void loop() {
   if (wifiWidget->isConnected() == false) {
-    widgetSet->shouldInitScreens(true);
     wifiWidget->update();
     wifiWidget->draw();
+    widgetSet->setClearScreensOnDrawCurrent(); //clear screen after wifiWidget
     delay(100);
   } else {
     if (!widgetSet->initialUpdateDone()) {
-      widgetSet->initializeAllWidgets();
+      widgetSet->initializeAllWidgetsData();
     }
     globalTime->updateTime();
 

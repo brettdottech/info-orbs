@@ -19,12 +19,12 @@ public:
     void showLoading();
     void updateAll();
     bool initialUpdateDone();
-    void initializeAllWidgets();
-    void shouldInitScreens(bool init);
+    void initializeAllWidgetsData();
+    void setClearScreensOnDrawCurrent();
 
    private:
     ScreenManager *m_screenManager;
-    bool m_shouldInitScreens = true;
+    bool m_clearScreensOnDrawCurrent = true;
     Widget *m_widgets[MAX_WIDGETS];
     int8_t m_widgetCount = 0;
     int8_t m_currentWidget = 0;

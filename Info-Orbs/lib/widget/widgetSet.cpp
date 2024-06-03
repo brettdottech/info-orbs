@@ -15,9 +15,9 @@ void WidgetSet::add(Widget *widget) {
 }
 
 void WidgetSet::drawCurrent() {
-  if (m_shouldInitScreens) {
+  if (m_clearScreensOnDrawCurrent) {
     m_screenManager->clearAllScreens();
-    m_shouldInitScreens = false;
+    m_clearScreensOnDrawCurrent = false;
   }
   m_widgets[m_currentWidget]->draw();
 }
@@ -33,8 +33,8 @@ void WidgetSet::changeMode() {
   m_widgets[m_currentWidget]->changeMode();
 }
 
-void WidgetSet::shouldInitScreens(bool init) {
-  m_shouldInitScreens = init;
+void WidgetSet::setClearScreensOnDrawCurrent() {
+  m_clearScreensOnDrawCurrent = true;
 }
 
 void WidgetSet::next() {
@@ -86,7 +86,7 @@ bool WidgetSet::initialUpdateDone() {
   return m_initialized;
 }
 
-void WidgetSet::initializeAllWidgets() {
+void WidgetSet::initializeAllWidgetsData() {
   showLoading();
   updateAll();
   m_initialized = true;
