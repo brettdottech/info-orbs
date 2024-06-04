@@ -1,38 +1,32 @@
 #ifndef STOCK_WIDGET_H
 #define STOCK_WIDGET_H
 
-#include "widget.h"
-#include <vector>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <TFT_eSPI.h>
 
+#include "stockDataModel.h"
+#include "widget.h"
+
+#define MAX_STOCKS 5
+
 class StockWidget : public Widget {
-public:
+   public:
     StockWidget(ScreenManager &manager);
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
     void changeMode() override;
 
-private:
-    void getStockData();
-    void displayStock(int displayIndex, uint32_t backgroundColor, uint32_t textColor);
+   private:
+    void getStockData(StockDataModel &stock);
+    void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
-    unsigned long m_stockDelay;
-    unsigned long m_stockDelayPrev;
-    int currentStockIndex;
-    std::vector<String> stockTickers;
+    String m_apiKey = STOCK_TICKER_API_KEY;
+    unsigned long m_stockDelay = 300000;  //default to 5m between updates
+    unsigned long m_stockDelayPrev = 0;
 
-    // Stock data variables
-    String m_trackingStock;
-    String m_currentPrice;
-    String m_change;
-    String m_percentChange;
-    String m_highPrice;
-    String m_lowPrice;
-    String m_openPrice;
-    String m_previousClosePrice;
+    StockDataModel m_stocks[MAX_STOCKS];
+    int8_t m_stockCount;
 };
-
-#endif // STOCK_WIDGET_H
+#endif  // STOCK_WIDGET_H

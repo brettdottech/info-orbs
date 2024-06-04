@@ -15,9 +15,9 @@ void WidgetSet::add(Widget *widget) {
 }
 
 void WidgetSet::drawCurrent() {
-  if (m_shouldInit) {
+  if (m_clearScreensOnDrawCurrent) {
     m_screenManager->clearAllScreens();
-    m_shouldInit = false;
+    m_clearScreensOnDrawCurrent = false;
   }
   m_widgets[m_currentWidget]->draw();
 }
@@ -33,8 +33,8 @@ void WidgetSet::changeMode() {
   m_widgets[m_currentWidget]->changeMode();
 }
 
-void WidgetSet::shouldInit(bool init) {
-  m_shouldInit = init;
+void WidgetSet::setClearScreensOnDrawCurrent() {
+  m_clearScreensOnDrawCurrent = true;
 }
 
 void WidgetSet::next() {
@@ -57,4 +57,37 @@ void WidgetSet::switchWidget() {
   m_screenManager->clearAllScreens();
   getCurrent()->setup();
   getCurrent()->draw(true);
+}
+
+void WidgetSet::showLoading() {
+  // display loading screen here
+    m_screenManager->fillAllScreens(TFT_BLACK);
+    m_screenManager->selectScreen(2);
+
+    TFT_eSPI &display = m_screenManager->getDisplay();
+
+    display.fillScreen(TFT_BLACK);
+    display.setTextColor(TFT_WHITE);
+    display.setTextSize(3);  // Set text size
+
+    // Calculate center positions
+    int centre = display.width() / 2;
+    display.drawString("Loading Data", centre, centre, 1);
+}
+
+void WidgetSet::updateAll() {
+  for (int8_t i; i<m_widgetCount; i++) {
+    Serial.println("updating widget #" + String(i));
+    m_widgets[i]->update();
+  }
+}
+
+bool WidgetSet::initialUpdateDone() {
+  return m_initialized;
+}
+
+void WidgetSet::initializeAllWidgetsData() {
+  showLoading();
+  updateAll();
+  m_initialized = true;
 }

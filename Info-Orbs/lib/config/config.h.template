@@ -45,6 +45,7 @@
 #define DISPLAY_ROTATION 0
 
 #define BUTTON_MODE INPUT_PULLDOWN
+#define BUSY_PIN 2
 
 #elif HARDWARE == WOKWI
 
@@ -71,6 +72,7 @@
 #define SCREEN_5_CS 21
 
 #define DISPLAY_ROTATION 2
+#define BUSY_PIN 2
 
 #define BUTTON_MODE INPUT_PULLUP
 
@@ -103,6 +105,7 @@
 #define DISPLAY_ROTATION 0
 
 #define BUTTON_MODE INPUT_PULLUP
+#define BUSY_PIN 2
 
 #endif
 
@@ -135,7 +138,8 @@
 #define WEATHER_UNITS_METRIC
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
 
-#define STOCK_TICKERS { "ABNB", "BRCC", "GOOG", "TSLA", "GME" }
+#define STOCK_TICKER_LIST "ABNB,BRCC,GOOG,TSLA,GME"
+#define STOCK_TICKER_API_KEY "c1tjb52ad3ia4h4uee9g"
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define FOREGROUND_COLOR 0xfc80  // orange for clock
