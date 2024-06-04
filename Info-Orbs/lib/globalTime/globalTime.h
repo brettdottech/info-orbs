@@ -3,7 +3,8 @@
 
 #include <NTPClient.h>
 #include <TimeLib.h>
-#include <WiFiUdp.h>
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
 #include <config.h>
 
 class GlobalTime {
@@ -22,7 +23,6 @@ class GlobalTime {
     int getYear();
     String getTime();
     String getWeekday();
-    void setTimeZoneOffset(int tz);
     bool isPM();
 
    private:
@@ -41,13 +41,15 @@ class GlobalTime {
     int m_year = 0;
     String m_time;
     String m_weekday;
-    int m_timeZoneOffset = TIME_ZONE_OFFSET;
+    int m_timeZoneOffset = -1; // a value that will be overwritten by the API
 
     WiFiUDP m_udp;
     NTPClient *m_timeClient{nullptr};
 
     const int m_oneSecond{1000};
     int m_updateTimer{0};
+
+    void getTimeZoneOffsetFromAPI();
 };
 
 #endif

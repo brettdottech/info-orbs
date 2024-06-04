@@ -9,7 +9,6 @@ GlobalTime::GlobalTime() {
     m_timeClient = new NTPClient(m_udp);
     m_timeClient->begin();
     m_timeClient->setPoolServerName(NTP_SERVER);
-    m_timeClient->setTimeOffset(3600 * (TIME_ZONE_OFFSET));
 }
 
 GlobalTime::~GlobalTime() {
@@ -25,8 +24,8 @@ GlobalTime *GlobalTime::getInstance() {
 
 void GlobalTime::updateTime() {
     if (millis() - m_updateTimer > m_oneSecond) {
-        if (m_timeZoneOffset != 0) {
-            m_timeClient->setTimeOffset(3600 * m_timeZoneOffset);
+        if (m_timeZoneOffset == -1) {
+            getTimeZoneOffsetFromAPI();
         }
         m_timeClient->update();
         m_unixEpoch = m_timeClient->getEpochTime();
@@ -93,12 +92,29 @@ String GlobalTime::getWeekday() {
     return m_weekday;
 }
 
+#include <HTTPClient.h> // Include the necessary header file
+
 bool GlobalTime::isPM() {
     return hour(m_unixEpoch) >= 12;
 }
 
-void GlobalTime::setTimeZoneOffset(int tz) {
-    Serial.print("Timezone Offset: ");
-    Serial.println(tz);
-    m_timeZoneOffset = tz;
+void GlobalTime::getTimeZoneOffsetFromAPI() {
+    HTTPClient http;
+    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset&by=zone&zone=" + String(TIMEZONE_API_LOCATION));
+    int httpCode = http.GET();
+
+    if (httpCode > 0) {
+        JsonDocument doc;
+        DeserializationError error = deserializeJson(doc, http.getString());
+        if (!error) {
+            m_timeZoneOffset = doc["gmtOffset"].as<int>();
+            Serial.print("Timezone Offset from API: ");
+            Serial.println(m_timeZoneOffset);
+            m_timeClient->setTimeOffset(m_timeZoneOffset);
+        } else {
+            Serial.println("Deserialization error on timezone offset API response");
+        }
+    } else {
+        Serial.println("Failed to get timezone offset from API");
+    }
 }

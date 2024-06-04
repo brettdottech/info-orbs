@@ -48,7 +48,6 @@ class WeatherWidget : public Widget {
     int m_weatherStamp = 0;
 
     // Global Variables to track/store weather data
-    int m_timeZoneOffSet;
     String m_cityName;
     String m_currentWeatherText = "";  // Weather Description
     String m_currentWeatherIcon = "";  // Text refrence for weather icon
