@@ -9,7 +9,6 @@ GlobalTime::GlobalTime() {
     m_timeClient = new NTPClient(m_udp);
     m_timeClient->begin();
     m_timeClient->setPoolServerName(NTP_SERVER);
-    //m_timeClient->setTimeOffset(3600 * (TIME_ZONE_OFFSET));
 }
 
 GlobalTime::~GlobalTime() {
@@ -25,8 +24,7 @@ GlobalTime *GlobalTime::getInstance() {
 
 void GlobalTime::updateTime() {
     if (millis() - m_updateTimer > m_oneSecond) {
-        if (m_timeZoneOffset == 1000) {
-            //m_timeClient->setTimeOffset(3600 * m_timeZoneOffset);
+        if (m_timeZoneOffset == -1) {
             getTimeZoneOffsetFromAPI();
         }
         m_timeClient->update();
@@ -114,7 +112,7 @@ void GlobalTime::getTimeZoneOffsetFromAPI() {
             Serial.println(m_timeZoneOffset);
             m_timeClient->setTimeOffset(m_timeZoneOffset);
         } else {
-            Serial.println("Failed to get timezone offset from API");
+            Serial.println("Deserialization error on timezone offset API response");
         }
     } else {
         Serial.println("Failed to get timezone offset from API");
