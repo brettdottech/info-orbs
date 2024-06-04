@@ -70,7 +70,7 @@ void setup() {
   Serial.println("Wokwi Build");
 #endif
 
-
+  pinMode(BUSY_PIN, OUTPUT);
   Serial.println("Connecting to: " + String(WIFI_SSID));
 
   wifiWidget = new WifiWidget(*sm);
@@ -85,11 +85,14 @@ void setup() {
 
 void loop() {
   if (wifiWidget->isConnected() == false) {
-    widgetSet->shouldInit(true);
     wifiWidget->update();
     wifiWidget->draw();
+    widgetSet->setClearScreensOnDrawCurrent(); //clear screen after wifiWidget
     delay(100);
   } else {
+    if (!widgetSet->initialUpdateDone()) {
+      widgetSet->initializeAllWidgetsData();
+    }
     globalTime->updateTime();
 
     if (buttonLeft.pressed()) {
@@ -108,7 +111,5 @@ void loop() {
     
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
-
-    delay(100);
   }
 }
