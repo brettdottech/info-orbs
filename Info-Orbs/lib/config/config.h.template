@@ -126,7 +126,6 @@
 
 #define SHADOWING 1
 
-#define TIME_ZONE_OFFSET -4
 #define FORMAT_24_HOUR true
 #define SHOW_AM_PM_INDICATOR false
 
