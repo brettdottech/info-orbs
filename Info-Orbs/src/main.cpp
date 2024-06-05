@@ -66,7 +66,7 @@ void setup() {
 #ifdef ILI9341_DRIVER
   Serial.println("ILI9341 Driver");
 #endif
-#ifdef WOKWI
+#if HARDWARE == WOKWI
   Serial.println("Wokwi Build");
 #endif
 
