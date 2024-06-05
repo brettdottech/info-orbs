@@ -5,7 +5,6 @@
 
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
     for (int i = 0; i < 3; i++) {
-        m_daysDegs[i] = 0.0;
         m_daysHigh[i] = 0.0;
         m_daysLow[i] = 0.0;
     }
