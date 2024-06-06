@@ -281,7 +281,7 @@ int WeatherWidget::drawDegrees(String number, int x, int y, uint8_t font, uint8_
 
     int16_t textWidth = display.textWidth(number);
     int16_t fontHeight = display.fontHeight(font);
-    int offset = ceil(fontHeight * 0.1);
+    int offset = ceil(fontHeight * 0.15);
     int circleX = textWidth / 2 + x + offset;
     int circleY = y - fontHeight / 2 + floor(fontHeight/10);
 
