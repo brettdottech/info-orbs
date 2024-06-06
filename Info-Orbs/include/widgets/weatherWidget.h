@@ -30,6 +30,8 @@ class WeatherWidget : public Widget {
     void threeDayWeather(int displayIndex);
     int getClockStamp();
     int getWeatherStamp();
+    int drawDegrees(String number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor);
+
 
     GlobalTime* m_time;
     int8_t m_mode;
@@ -50,6 +52,9 @@ class WeatherWidget : public Widget {
     String m_currentWeatherText = "";  // Weather Description
     String m_currentWeatherIcon = "";  // Text refrence for weather icon
     String m_currentWeatherDeg = "";
+    float m_todayHigh = 0.0;
+    float m_todayLow = 0.0;
+
     String m_daysIcons[3];  // Icons/Temp For Next 3 days
     float m_daysHigh[3];
     float m_daysLow[3];
@@ -66,8 +71,8 @@ class WeatherWidget : public Widget {
                                 weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
                                 "&include=days,current&iconSet=icons1";
 
-    const int MODE_HIGH = 0;
-    const int MODE_LOW = 1;
+    const int MODE_HIGHS = 0;
+    const int MODE_LOWS = 1;
 };
 
 #endif  // WEAHTERWIDGET_H

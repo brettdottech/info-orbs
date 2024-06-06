@@ -8,7 +8,7 @@ WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
         m_daysHigh[i] = 0.0;
         m_daysLow[i] = 0.0;
     }
-    m_mode = MODE_HIGH;
+    m_mode = MODE_HIGHS;
 }
 
 WeatherWidget::~WeatherWidget() {
@@ -16,10 +16,9 @@ WeatherWidget::~WeatherWidget() {
 
 void WeatherWidget::changeMode() {
     m_mode++;
-    if (m_mode > MODE_LOW) {
-        m_mode = MODE_HIGH;
+    if (m_mode > MODE_LOWS) {
+        m_mode = MODE_HIGHS;
     }
-    Serial.println("Mode: " + String(m_mode));
     draw(true);
 }
 
@@ -64,6 +63,8 @@ void WeatherWidget::update(bool force) {
                 m_currentWeatherDeg = String((int) round(doc["currentConditions"]["temp"].as<float>()));
                 m_currentWeatherText = doc["days"][0]["description"].as<String>();
                 m_currentWeatherIcon = doc["currentConditions"]["icon"].as<String>();
+                m_todayHigh = doc["days"][0]["tempmax"].as<float>();
+                m_todayLow = doc["days"][0]["tempmin"].as<float>();
                 for (int i = 0; i < 3; i++) {
                     m_daysIcons[i] = doc["days"][i + 1]["icon"].as<String>();
                     m_daysHigh[i] = doc["days"][i + 1]["tempmax"].as<float>();
@@ -119,7 +120,7 @@ void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t
     display.drawString(":", centre, clky, 8);
 }
 
-// This will wrie an image to the screen when called from a hex array. Pass in:
+// This will write an image to the screen when called from a hex array. Pass in:
 // Screen #, X, Y coords, Bye Array To Pass, the sizeof that array, scale of the image(1= full size, then multiples of 2 to scale down)
 // getting the byte array size is very annoying as its computed on compile so you cant do it dynamicly.
 void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[], int jpgDataSize, int scale) {
@@ -176,15 +177,22 @@ void WeatherWidget::singleWeatherDeg(int displayIndex, uint32_t backgroundColor,
     m_manager.selectScreen(displayIndex);
 
     TFT_eSPI &display = m_manager.getDisplay();
-
     display.fillScreen(backgroundColor);
-    display.setTextColor(textColor);
-    display.setTextSize(1);
+
+    drawDegrees(m_currentWeatherDeg, centre, 100, 8, 1, 15, 8, textColor, backgroundColor);
+
+
+    display.fillRect(0, 170, 240, 70, TFT_BLACK);
+
+    display.fillRect(centre-1, 170, 2, 240, TFT_WHITE);
+
     display.setTextDatum(MC_DATUM);
-    display.drawString(m_currentWeatherDeg, centre, centre, 8);
-    display.setTextFont(8);
-    display.fillCircle(display.textWidth(m_currentWeatherDeg) / 2 + centre + 10, centre - display.fontHeight(8) / 2, 15, textColor);
-    display.fillCircle(display.textWidth(m_currentWeatherDeg) / 2 + centre + 10, centre - display.fontHeight(8) / 2, 7, backgroundColor);
+    display.setTextColor(TFT_WHITE);
+    display.setTextSize(2);
+    display.drawString("High", 80, 190, 1);
+    drawDegrees(String((int)round(m_todayHigh)), 80, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
+    display.drawString("Low", 160, 190, 1);
+    drawDegrees(String((int)round(m_todayLow)), 160, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
 }
 
 // This displays the users current city and the text desctiption of the weather. Pass in display number, background color, text color
@@ -217,8 +225,6 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     display.setTextDatum(MC_DATUM);
     m_cityName.remove(m_cityName.indexOf(",", 0));
     display.drawString(m_cityName, centre, 80, 2);
-    Serial.println(m_cityName);
-    Serial.println(m_currentWeatherText);
     display.setTextSize(2);
     display.setTextFont(1);
     display.drawString(messageArr[0], centre, 120);
@@ -232,36 +238,58 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
 
+    display.setTextDatum(MC_DATUM);
     display.fillScreen(TFT_WHITE);
     display.setTextSize(2);
 
     display.fillRect(78, 0, 3, 240, TFT_BLACK);
     display.fillRect(157, 0, 3, 240, TFT_BLACK);
 
-    display.fillRect(0, 180, 240, 70, TFT_RED);
+    display.fillRect(0, 170, 240, 70, TFT_BLACK);
     display.setTextColor(TFT_WHITE);
-    display.drawString("Next 3 Days..", centre, 201, 1);
+    display.drawString("Next 3 Days", centre, 191, 1);
 
     for (int i = 0; i < 3; i++) {
         int xOffset = (centre - 75) + i * 75;
         String temperature;
         display.setTextColor(TFT_WHITE);
-        if (m_mode == MODE_HIGH) {
+        if (m_mode == MODE_HIGHS) {
             temperature = String((int) round(m_daysHigh[i]));
-            display.drawString("Highs", centre, 219, 1);
-        } else if (m_mode == MODE_LOW) {
+            display.drawString("Highs", centre, 215, 1);
+        } else if (m_mode == MODE_LOWS) {
             temperature = String((int) round(m_daysLow[i]));
-            display.drawString("Lows", centre, 219, 1);
+            display.drawString("Lows", centre, 215, 1);
         }
         drawWeatherIcon(m_daysIcons[i], displayIndex, xOffset - 30, 47, 4);
         display.setTextColor(TFT_BLACK);
-        display.drawString(temperature, xOffset, centre, 2);
-        display.drawCircle(xOffset + 15, centre - display.fontHeight(2) / 2, 4, TFT_BLACK);
+        drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
+
         String weekUpdate = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
         weekUpdate.remove(3);
         weekUpdate.toUpperCase();
         display.drawString(weekUpdate, xOffset, 150, 2);
     }
+}
+
+int WeatherWidget::drawDegrees(String number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {
+    TFT_eSPI &display = m_manager.getDisplay();
+
+    display.setTextColor(textColor);
+    display.setTextFont(font);
+    display.setTextSize(size);
+    display.setTextDatum(MC_DATUM);
+
+    int16_t textWidth = display.textWidth(number);
+    int16_t fontHeight = display.fontHeight(font);
+    int offset = ceil(fontHeight * 0.1);
+    int circleX = textWidth / 2 + x + offset;
+    int circleY = y - fontHeight / 2 + floor(fontHeight/10);
+
+    display.drawString(number, x, y, font);
+    display.fillCircle(circleX, circleY, outerRadius, textColor);
+    display.fillCircle(circleX, circleY, innerRadius, backgroundColor);
+
+    return textWidth+offset;
 }
 
 int WeatherWidget::getClockStamp() {
