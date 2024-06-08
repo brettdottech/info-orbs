@@ -56,8 +56,24 @@ int GlobalTime::getHour() {
     return m_hour;
 }
 
+String GlobalTime::getHourPadded() {
+    if (m_hour < 10) {
+        return "0" + String(m_hour);
+    } else {
+        return String(m_hour);
+    }
+}
+
 int GlobalTime::getMinute() {
     return m_minute;
+}
+
+String GlobalTime::getMinutePadded() {
+    if (m_minute < 10) {
+        return "0" + String(m_minute);
+    } else {
+        return String(m_minute);
+    }
 }
 
 int GlobalTime::getSecond() {

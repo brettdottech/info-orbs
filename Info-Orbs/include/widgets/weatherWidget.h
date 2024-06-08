@@ -5,6 +5,8 @@
 #include <HTTPClient.h>
 #include <TJpg_Decoder.h>
 #include <config.h>
+#include <globalTime.h>
+#include <math.h>
 #include <widget.h>
 
 #include "icons.h"
@@ -28,13 +30,11 @@ class WeatherWidget : public Widget {
     void threeDayWeather(int displayIndex);
     int getClockStamp();
     int getWeatherStamp();
+    int drawDegrees(String number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor);
 
-    String m_hour = "";
-    String m_minute = "";
-    String m_month = "";
-    String m_monthName = "";
-    String m_weekday = "";
-    String m_day = "";
+
+    GlobalTime* m_time;
+    int8_t m_mode;
 
     const long m_weatherDelay = 600000;  // weather refresh rate
     unsigned long m_lastWeather = 600000;
@@ -52,8 +52,12 @@ class WeatherWidget : public Widget {
     String m_currentWeatherText = "";  // Weather Description
     String m_currentWeatherIcon = "";  // Text refrence for weather icon
     String m_currentWeatherDeg = "";
+    float m_todayHigh = 0.0;
+    float m_todayLow = 0.0;
+
     String m_daysIcons[3];  // Icons/Temp For Next 3 days
-    String m_daysDegs[3];
+    float m_daysHigh[3];
+    float m_daysLow[3];
 
     String weatherLocation = WEATHER_LOCAION;
 #ifdef WEATHER_UNITS_METRIC
@@ -66,6 +70,9 @@ class WeatherWidget : public Widget {
     String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
                                 weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
                                 "&include=days,current&iconSet=icons1";
+
+    const int MODE_HIGHS = 0;
+    const int MODE_LOWS = 1;
 };
 
 #endif  // WEAHTERWIDGET_H

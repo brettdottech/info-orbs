@@ -14,7 +14,9 @@ class GlobalTime {
     void updateTime();
     void getHourAndMinute(int &hour, int &minute);
     int getHour();
+    String getHourPadded();
     int getMinute();
+    String getMinutePadded();
     time_t getUnixEpoch();
     int getSecond();
     int getDay();
