@@ -101,7 +101,7 @@ void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t
 #ifdef WEATHER_UNITS_METRIC
     display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, 151, 2);
 #else
-    display.drawString(m_time->getMonthName() + " " + m_time->getDay(), centre, 151, 2);
+    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, 151, 2);
 #endif
     display.setTextSize(3);
     display.drawString(m_time->getWeekday(), centre, 178, 2);
