@@ -77,9 +77,8 @@ void setup() {
     wifiWidget = new WifiWidget(*sm);
     // wifiWidget->setup();
 
-    wifiManager = new WifiManager();
-    wifiManager->setup(*sm);
-    wifiManager->setupWifiManagement();
+    wifiManager = new WifiManager(*sm);
+    wifiManager->setup();
 
     globalTime = GlobalTime::getInstance();
 
@@ -90,7 +89,7 @@ void setup() {
 
 void loop() {
     if (!wifiManager->isConnected()) {
-        wifiManager->draw(*sm);
+        wifiManager->draw();
         delay(100);
     } else {
         if (!widgetSet->initialUpdateDone()) {

@@ -9,9 +9,8 @@
 #include "SPIFFS.h"
 #include "screenManager.h"
 
-WifiManager::WifiManager() {}
+WifiManager::WifiManager(ScreenManager& m_manager) : m_manager(m_manager){};
 
-// Initialize SPIFFS
 void WifiManager::initSPIFFS() {
     if (!SPIFFS.begin(true)) {
         Serial.println("An error has occurred while mounting SPIFFS");
@@ -19,24 +18,6 @@ void WifiManager::initSPIFFS() {
     Serial.println("SPIFFS mounted successfully");
 }
 
-void WifiManager::setup(ScreenManager& manager) {
-    TFT_eSPI& display = manager.getDisplay();
-    manager.selectAllScreens();
-    display.fillScreen(TFT_BLACK);
-    display.setTextSize(2);
-    display.setTextColor(TFT_WHITE);
-
-    manager.selectScreen(0);
-    display.drawCentreString("Connect to the", 120, 80, 1);
-
-    manager.selectScreen(1);
-    display.fillScreen(TFT_BLACK);
-    display.setTextSize(2);
-    display.setTextColor(TFT_WHITE);
-    display.drawCentreString("InfoOrbs-WiFi-Manager", 0, 80, 1);
-}
-
-// Read File from SPIFFS
 String WifiManager::readFile(fs::FS& fs, const char* path) {
     Serial.printf("Reading file: %s\r\n", path);
 
@@ -54,7 +35,6 @@ String WifiManager::readFile(fs::FS& fs, const char* path) {
     return fileContent;
 }
 
-// Write file to SPIFFS
 void WifiManager::writeFile(fs::FS& fs, const char* path, const char* message) {
     Serial.printf("Writing file: %s\r\n", path);
 
@@ -70,8 +50,7 @@ void WifiManager::writeFile(fs::FS& fs, const char* path, const char* message) {
     }
 }
 
-// Initialize WiFi
-bool WifiManager::initialize() {
+bool WifiManager::initWifi() {
     if (m_ssid == "" || m_ip == "") {
         Serial.println("Undefined SSID or IP address.");
         return false;
@@ -81,7 +60,7 @@ bool WifiManager::initialize() {
     m_localIP.fromString(m_ip.c_str());
     m_localGateway.fromString(m_gateway.c_str());
 
-    if (!WiFi.config(m_localIP, m_localGateway, m_subnet)) {
+    if (!WiFi.config(m_localIP, m_localGateway, m_subnet, IPAddress(8, 8, 8, 8))) {
         Serial.println("STA Failed to configure");
         return false;
     }
@@ -103,21 +82,16 @@ bool WifiManager::initialize() {
     return true;
 }
 
-// Replaces placeholder with LED state value
-String processor(const String& var) {
-    return String("");
-}
-
 bool WifiManager::isConnected() {
     return WiFi.status() == WL_CONNECTED;
 }
 
-void WifiManager::draw(ScreenManager& manager) {
-    TFT_eSPI& display = manager.getDisplay();
-    manager.selectScreen(0);
+void WifiManager::draw() {
+    TFT_eSPI& display = m_manager.getDisplay();
+    m_manager.selectScreen(0);
     if (!this->isConnected()) {
         display.fillRect(0, 100, 240, 100, TFT_BLACK);
-        display.drawCentreString(m_dotsString, 120, 100, 1);
+        display.drawCentreString(m_dotsString, 120, 120, 1);
         m_dotsString += ".";
         if (m_dotsString.length() > 3) {
             m_dotsString = "";
@@ -125,7 +99,97 @@ void WifiManager::draw(ScreenManager& manager) {
     }
 }
 
-void WifiManager::setupWifiManagement() {
+// Replaces placeholder with LED state value
+String processor(const String& var) {
+    return String("");
+}
+
+void WifiManager::configureWebServer() {
+    m_server.on("/", HTTP_GET, [this](AsyncWebServerRequest* request) {
+        request->send(SPIFFS, "/index.html", "text/html", false, processor);
+    });
+    m_server.serveStatic("/", SPIFFS, "/");
+
+    // Route to set GPIO state to HIGH
+    m_server.on("/on", HTTP_GET, [this](AsyncWebServerRequest* request) {
+        request->send(SPIFFS, "/index.html", "text/html", false, processor);
+    });
+
+    // Route to set GPIO state to LOW
+    m_server.on("/off", HTTP_GET, [this](AsyncWebServerRequest* request) {
+        request->send(SPIFFS, "/index.html", "text/html", false, processor);
+    });
+    m_server.begin();
+}
+
+void WifiManager::configureAccessPoint() {
+    // Connect to Wi-Fi network with SSID and password
+    Serial.println("Setting AP (Access Point)");
+    // NULL sets an open Access Point
+    WiFi.softAP("InfoOrbs-WiFi-Manager", NULL);
+
+    IPAddress IP = WiFi.softAPIP();
+    Serial.print("AP IP address: ");
+    Serial.println(IP.toString());
+
+    TFT_eSPI& display = m_manager.getDisplay();
+    m_manager.selectAllScreens();
+
+    m_manager.selectScreen(2);
+    display.drawCentreString(IP.toString(), 120, 100, 1);
+
+    // Web Server Root URL
+    m_server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+        request->send(SPIFFS, "/wifiManager.html", "text/html");
+        Serial.println("Request in");
+    });
+
+    m_server.serveStatic("/", SPIFFS, "/");
+
+    m_server.on("/", HTTP_POST, [this](AsyncWebServerRequest* request) {
+        int params = request->params();
+        for (int i = 0; i < params; i++) {
+            AsyncWebParameter* p = request->getParam(i);
+            if (p->isPost()) {
+                if (p->name() == SSID_INPUT_NAME) {
+                    m_ssid = p->value().c_str();
+                    writeFile(SPIFFS, m_ssidPath, m_ssid.c_str());
+                }
+                if (p->name() == PASS_INPUT_NAME) {
+                    m_pass = p->value().c_str();
+                    writeFile(SPIFFS, m_passPath, m_pass.c_str());
+                }
+                if (p->name() == IP_INPUT_NAME) {
+                    m_ip = p->value().c_str();
+                    writeFile(SPIFFS, m_ipPath, m_ip.c_str());
+                }
+                if (p->name() == GATEWAY_INPUT_NAME) {
+                    m_gateway = p->value().c_str();
+                    writeFile(SPIFFS, m_gatewayPath, m_gateway.c_str());
+                }
+            }
+        }
+        request->send(200, "text/plain", "Done. InfoOrbs will restart, connect to your router and go to IP address: " + m_ip);
+        delay(3000);
+        ESP.restart();
+    });
+    m_server.begin();
+}
+
+void WifiManager::setup() {
+    TFT_eSPI& display = m_manager.getDisplay();
+    m_manager.selectAllScreens();
+    display.fillScreen(TFT_BLACK);
+    display.setTextSize(2);
+    display.setTextColor(TFT_WHITE);
+
+    m_manager.selectScreen(0);
+    display.drawCentreString("Connect to the", 120, 80, 1);
+
+    m_manager.selectScreen(1);
+    display.drawCentreString("InfoOrbs", 120, 80, 1);
+    display.drawCentreString("WiFi Manager", 120, 130, 1);
+
     this->initSPIFFS();
 
     // Load values saved in SPIFFS
@@ -138,85 +202,9 @@ void WifiManager::setupWifiManagement() {
     Serial.println(m_ip);
     Serial.println(m_gateway);
 
-    if (this->initialize()) {
-        // Route for root / web page
-        m_server.on("/", HTTP_GET, [this](AsyncWebServerRequest* request) {
-            request->send(SPIFFS, "/index.html", "text/html", false, processor);
-        });
-        m_server.serveStatic("/", SPIFFS, "/");
-
-        // Route to set GPIO state to HIGH
-        m_server.on("/on", HTTP_GET, [this](AsyncWebServerRequest* request) {
-            request->send(SPIFFS, "/index.html", "text/html", false, processor);
-        });
-
-        // Route to set GPIO state to LOW
-        m_server.on("/off", HTTP_GET, [this](AsyncWebServerRequest* request) {
-            request->send(SPIFFS, "/index.html", "text/html", false, processor);
-        });
-        m_server.begin();
+    if (this->initWifi()) {
+        this->configureWebServer();
     } else {
-        // Connect to Wi-Fi network with SSID and password
-        Serial.println("Setting AP (Access Point)");
-        // NULL sets an open Access Point
-        WiFi.softAP("InfoOrbs-WiFi-Manager", NULL);
-
-        IPAddress IP = WiFi.softAPIP();
-        Serial.print("AP IP address: ");
-        Serial.println(IP);
-
-        // Web Server Root URL
-        m_server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
-            request->send(SPIFFS, "/wifiManager.html", "text/html");
-            Serial.println("Request in");
-        });
-
-        m_server.serveStatic("/", SPIFFS, "/");
-
-        m_server.on("/", HTTP_POST, [this](AsyncWebServerRequest* request) {
-            int params = request->params();
-            for (int i = 0; i < params; i++) {
-                AsyncWebParameter* p = request->getParam(i);
-                if (p->isPost()) {
-                    // HTTP POST m_ssid value
-                    if (p->name() == PARAM_INPUT_1) {
-                        m_ssid = p->value().c_str();
-                        Serial.print("SSID set to: ");
-                        Serial.println(m_ssid);
-                        // Write file to save value
-                        writeFile(SPIFFS, m_ssidPath, m_ssid.c_str());
-                    }
-                    // HTTP POST pass value
-                    if (p->name() == PARAM_INPUT_2) {
-                        m_pass = p->value().c_str();
-                        Serial.print("Password set to: ");
-                        Serial.println(m_pass);
-                        // Write file to save value
-                        writeFile(SPIFFS, m_passPath, m_pass.c_str());
-                    }
-                    // HTTP POST ip value
-                    if (p->name() == PARAM_INPUT_3) {
-                        m_ip = p->value().c_str();
-                        Serial.print("IP Address set to: ");
-                        Serial.println(m_ip);
-                        // Write file to save value
-                        writeFile(SPIFFS, m_ipPath, m_ip.c_str());
-                    }
-                    // HTTP POST gateway value
-                    if (p->name() == PARAM_INPUT_4) {
-                        m_gateway = p->value().c_str();
-                        Serial.print("Gateway set to: ");
-                        Serial.println(m_gateway);
-                        // Write file to save value
-                        writeFile(SPIFFS, m_gatewayPath, m_gateway.c_str());
-                    }
-                    // Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-                }
-            }
-            request->send(200, "text/plain", "Done. InfoOrbs will restart, connect to your router and go to IP address: " + m_ip);
-            delay(3000);
-            ESP.restart();
-        });
-        m_server.begin();
+        this->configureAccessPoint();
     }
-};
+}

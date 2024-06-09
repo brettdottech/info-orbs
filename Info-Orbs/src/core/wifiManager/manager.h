@@ -8,24 +8,25 @@
 
 class WifiManager {
    public:
-    WifiManager();
-    void setupWifiManagement();
+    WifiManager(ScreenManager& manager);
+
     bool isConnected();
-    void setup(ScreenManager& manager);
-    void draw(ScreenManager& manager);
+    void setup();
+    void draw();
 
    private:
     AsyncWebServer m_server{80};
+    ScreenManager& m_manager;
 
     IPAddress m_localIP;
     IPAddress m_localGateway;
     IPAddress m_subnet{255, 255, 0, 0};
 
     // Search for parameter in HTTP POST request
-    const char* PARAM_INPUT_1 = "ssid";
-    const char* PARAM_INPUT_2 = "pass";
-    const char* PARAM_INPUT_3 = "ip";
-    const char* PARAM_INPUT_4 = "gateway";
+    const char* SSID_INPUT_NAME = "ssid";
+    const char* PASS_INPUT_NAME = "pass";
+    const char* IP_INPUT_NAME = "ip";
+    const char* GATEWAY_INPUT_NAME = "gateway";
 
     // Variables to save values from HTML form
     String m_ssid;
@@ -45,8 +46,9 @@ class WifiManager {
     const long m_interval = 10000;  // interval to wait for Wi-Fi connection (milliseconds)
 
     void initSPIFFS();
-    String readFile(fs::FS& fs, const char* path);
+    bool initWifi();
     void writeFile(fs::FS& fs, const char* path, const char* message);
-    // String processor(const String& var);
-    bool initialize();
+    String readFile(fs::FS& fs, const char* path);
+    void configureAccessPoint();
+    void configureWebServer();
 };
