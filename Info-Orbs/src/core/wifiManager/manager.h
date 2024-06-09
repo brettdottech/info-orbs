@@ -12,6 +12,7 @@ class WifiManager {
     void setupWifiManagement();
     bool isConnected();
     void setup(ScreenManager& manager);
+    void draw(ScreenManager& manager);
 
    private:
     AsyncWebServer m_server{80};
@@ -31,6 +32,8 @@ class WifiManager {
     String m_pass;
     String m_ip;
     String m_gateway;
+
+    String m_dotsString{"."};
 
     // File paths to save input values permanently
     const char* m_ssidPath = "/ssid.txt";

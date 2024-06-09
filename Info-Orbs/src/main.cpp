@@ -90,6 +90,7 @@ void setup() {
 
 void loop() {
     if (!wifiManager->isConnected()) {
+        wifiManager->draw(*sm);
         delay(100);
     } else {
         if (!widgetSet->initialUpdateDone()) {

@@ -112,7 +112,22 @@ bool WifiManager::isConnected() {
     return WiFi.status() == WL_CONNECTED;
 }
 
+void WifiManager::draw(ScreenManager& manager) {
+    TFT_eSPI& display = manager.getDisplay();
+    manager.selectScreen(0);
+    if (!this->isConnected()) {
+        display.fillRect(0, 100, 240, 100, TFT_BLACK);
+        display.drawCentreString(m_dotsString, 120, 100, 1);
+        m_dotsString += ".";
+        if (m_dotsString.length() > 3) {
+            m_dotsString = "";
+        }
+    }
+}
+
 void WifiManager::setupWifiManagement() {
+    this->initSPIFFS();
+
     // Load values saved in SPIFFS
     m_ssid = readFile(SPIFFS, m_ssidPath);
     m_pass = readFile(SPIFFS, m_passPath);
@@ -152,7 +167,8 @@ void WifiManager::setupWifiManagement() {
 
         // Web Server Root URL
         m_server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
-            request->send(SPIFFS, "/wifimanager.html", "text/html");
+            request->send(SPIFFS, "/wifiManager.html", "text/html");
+            Serial.println("Request in");
         });
 
         m_server.serveStatic("/", SPIFFS, "/");

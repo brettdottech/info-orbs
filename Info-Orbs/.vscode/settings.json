@@ -18,7 +18,8 @@
     "string_view": "cpp",
     "initializer_list": "cpp",
     "regex": "cpp",
-    "optional": "cpp"
+    "optional": "cpp",
+    "list": "cpp"
   },
   "editor.tabSize": 4,
   "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}"
