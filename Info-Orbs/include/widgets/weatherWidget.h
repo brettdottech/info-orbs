@@ -39,9 +39,6 @@ class WeatherWidget : public Widget {
     const long m_weatherDelay = 600000;  // weather refresh rate
     unsigned long m_lastWeather = 600000;
 
-    const long m_timeDelay = 1000;  // time refresh rate
-    unsigned long m_lastTime;
-
     const int centre = 120;  // centre location of the screen(240x240)
 
     int m_clockStamp = 0;
