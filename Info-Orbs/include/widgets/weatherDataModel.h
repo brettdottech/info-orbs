@@ -54,8 +54,8 @@ class WeatherDataModel {
     float m_todayLow = 0.0;
 
     String m_daysIcons[3] = { "", "", "" };
-    float m_daysHigh[3] = { 0.0, 0.0, 0.0 };
-    float m_daysLow[3] = { 0.0, 0.0, 0.0 };
+    float m_daysHigh[3] = { NaN, NaN, NaN };
+    float m_daysLow[3] = { NaN, NaN, NaN };
 
     bool m_changed = false;
 };

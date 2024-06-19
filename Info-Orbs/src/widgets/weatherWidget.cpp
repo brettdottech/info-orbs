@@ -27,22 +27,16 @@ void WeatherWidget::draw(bool force) {
     m_time->updateTime();
     int clockStamp = getClockStamp();
     if (clockStamp != m_clockStamp || force) {
-    Serial.println("draw clock");
         displayClock(0, TFT_WHITE, TFT_BLACK);
         m_clockStamp = clockStamp;
     }
 
     // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
     if (force || model.isChanged()) {
-    Serial.println("draw weather text");
         weatherText(1, TFT_WHITE, TFT_BLACK);
-    Serial.println("draw weather icon");
         drawWeatherIcon(model.getCurrentIcon(), 2, 0, 0, 1);
-    Serial.println("draw single digit");
         singleWeatherDeg(3, TFT_WHITE, TFT_BLACK);
-    Serial.println("draw three days");
         threeDayWeather(4);
-    Serial.println("draw set changed");
         model.setChangedStatus(false);
     }
 }
@@ -51,16 +45,13 @@ void WeatherWidget::update(bool force) {
     if (force || m_lastUpdate == 0 || (millis() - m_lastUpdate) >= m_updateDelay) {
         setBusy(true);
         if (force) {
-    Serial.println("update force pre");
             int retry = 0;
             while (!getWeatherData() && retry++ < MAX_RETRIES);
-    Serial.println("update force POST");
         } else {
-    Serial.println("update normal pre");
             getWeatherData();
-    Serial.println("update normal post");
         }
         setBusy(false);
+        m_lastUpdate = millis();
     }
 }
 
@@ -284,18 +275,18 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         display.setTextColor(TFT_WHITE);
         if (m_mode == MODE_HIGHS) {
             temperature = model.getDayHigh(i, 0);
-            if (temperature != NaN) {
+            if (temperature != "") {
                 display.drawString("Highs", centre, 215, 1);
             }
         } else if (m_mode == MODE_LOWS) {
             temperature = model.getDayLow(i, 0);
-            if (temperature != NaN) {
+            if (temperature != "") {
                 display.drawString("Lows", centre, 215, 1);
             }
         }
         drawWeatherIcon(model.getDayIcon(i), displayIndex, xOffset - 30, 47, 4);
         display.setTextColor(TFT_BLACK);
-        if (temperature != NaN) {
+        if (temperature != "") {
             drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
         }
 

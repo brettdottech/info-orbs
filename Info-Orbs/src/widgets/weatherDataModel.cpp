@@ -3,10 +3,8 @@
 WeatherDataModel::WeatherDataModel() {
 }
 
-WeatherDataModel& WeatherDataModel::setCityName(String city) {
-    Serial.println("setCityName: " + city);
+WeatherDataModel &WeatherDataModel::setCityName(String city) {
     if (m_cityName != city) {
-    Serial.println("setCityName: " + city + " Old: " + m_cityName);
         m_cityName = city;
         m_changed = true;
     }
@@ -17,7 +15,7 @@ String WeatherDataModel::getCityName() {
     return m_cityName;
 }
 
-WeatherDataModel& WeatherDataModel::setCurrentText(String text) {
+WeatherDataModel &WeatherDataModel::setCurrentText(String text) {
     if (m_currentWeatherText != text) {
         m_currentWeatherText = text;
         m_changed = true;
@@ -29,7 +27,7 @@ String WeatherDataModel::getCurrentText() {
     return m_currentWeatherText;
 }
 
-WeatherDataModel& WeatherDataModel::setCurrentIcon(String icon) {
+WeatherDataModel &WeatherDataModel::setCurrentIcon(String icon) {
     if (m_currentWeatherIcon != icon) {
         m_currentWeatherIcon = icon;
         m_changed = true;
@@ -41,7 +39,7 @@ String WeatherDataModel::getCurrentIcon() {
     return m_currentWeatherIcon;
 }
 
-WeatherDataModel& WeatherDataModel::setCurrentTemperature(float degrees) {
+WeatherDataModel &WeatherDataModel::setCurrentTemperature(float degrees) {
     if (m_currentWeatherDeg != degrees) {
         m_currentWeatherDeg = degrees;
         m_changed = true;
@@ -59,7 +57,7 @@ String WeatherDataModel::getCurrentTemperature(int8_t digits) {
     return String(stream.str().c_str());
 }
 
-WeatherDataModel& WeatherDataModel::setTodayHigh(float high) {
+WeatherDataModel &WeatherDataModel::setTodayHigh(float high) {
     if (m_todayHigh != high) {
         m_todayHigh = high;
         m_changed = true;
@@ -77,7 +75,7 @@ String WeatherDataModel::getTodayHigh(int8_t digits) {
     return String(stream.str().c_str());
 }
 
-WeatherDataModel& WeatherDataModel::setTodayLow(float low) {
+WeatherDataModel &WeatherDataModel::setTodayLow(float low) {
     if (m_todayLow != low) {
         m_todayLow = low;
         m_changed = true;
@@ -106,7 +104,7 @@ String &WeatherDataModel::getDaysIcons() {
     return *m_daysIcons;
 }
 
-WeatherDataModel& WeatherDataModel::setDayIcon(int num, String icon) {
+WeatherDataModel &WeatherDataModel::setDayIcon(int num, String icon) {
     if (num < 3 && m_daysIcons[num] != icon) {
         m_daysIcons[num] = icon;
         m_changed = true;
@@ -121,14 +119,14 @@ String WeatherDataModel::getDayIcon(int num) {
     return m_daysIcons[num];
 }
 
-WeatherDataModel & WeatherDataModel::setDaysLows(float *lows) {
+WeatherDataModel &WeatherDataModel::setDaysLows(float *lows) {
     for (int i; i < 3; i++) {
         setDayLow(i, lows[i]);
     }
     return *this;
 }
 
-WeatherDataModel & WeatherDataModel::setDayLow(int num, float low) {
+WeatherDataModel &WeatherDataModel::setDayLow(int num, float low) {
     if (num < 3 && m_daysLow[num] != low) {
         m_daysLow[num] = low;
         m_changed = true;
@@ -148,6 +146,9 @@ float WeatherDataModel::getDayLow(int num) {
 }
 
 String WeatherDataModel::getDayLow(int8_t num, int8_t digits) {
+    if (m_daysHigh[num] == NaN) {
+        return "";
+    }
     std::ostringstream stream;
     stream << std::fixed << std::setprecision(digits) << m_daysLow[num];
     return String(stream.str().c_str());
@@ -172,11 +173,13 @@ float WeatherDataModel::getDayHigh(int num) {
 }
 
 String WeatherDataModel::getDayHigh(int8_t num, int8_t digits) {
+    if (m_daysHigh[num] == NaN) {
+        return "";
+    }
     std::ostringstream stream;
     stream << std::fixed << std::setprecision(digits) << m_daysHigh[num];
     return String(stream.str().c_str());
 }
-
 
 WeatherDataModel &WeatherDataModel::setDayHigh(int num, float high) {
     if (num < 3 && m_daysHigh[num] != high) {
