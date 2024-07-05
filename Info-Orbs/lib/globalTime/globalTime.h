@@ -26,6 +26,8 @@ class GlobalTime {
     String getTime();
     String getWeekday();
     bool isPM();
+    bool getFormat24Hour();
+    bool setFormat24Hour(bool format24hour);
 
    private:
     GlobalTime();
@@ -50,6 +52,8 @@ class GlobalTime {
 
     const int m_oneSecond{1000};
     int m_updateTimer{0};
+
+    bool m_format24hour{FORMAT_24_HOUR};
 
     void getTimeZoneOffsetFromAPI();
 };
