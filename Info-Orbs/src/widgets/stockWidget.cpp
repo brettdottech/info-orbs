@@ -26,7 +26,7 @@ StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
 }
 
 void StockWidget::setup() {
-    m_lastStock = millis() - m_stockDelay + 1000;
+    m_lastUpdate = millis() - m_updateDelay + 1000;
     if (m_stockCount == 0) {
         Serial.println("No stock tickers available");
         return;
@@ -43,13 +43,13 @@ void StockWidget::draw(bool force) {
 }
 
 void StockWidget::update(bool force) {
-    if (force || m_lastStock == 0 || (millis() - m_lastStock) >= m_stockDelay) {
+    if (force || m_lastUpdate == 0 || (millis() - m_lastUpdate) >= m_updateDelay) {
         setBusy(true);
         for (int8_t i = 0; i < m_stockCount; i++) {
             getStockData(m_stocks[i]);
         }
         setBusy(false);
-        m_lastStock = millis();
+        m_lastUpdate = millis();
     }
 }
 
