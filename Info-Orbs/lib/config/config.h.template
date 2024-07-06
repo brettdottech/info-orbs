@@ -144,4 +144,6 @@
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define FOREGROUND_COLOR 0xfc80  // orange for clock
 
+#define MAX_RETRIES 3
+
 #endif

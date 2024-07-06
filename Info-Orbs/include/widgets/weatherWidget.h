@@ -10,6 +10,7 @@
 #include <widget.h>
 
 #include "icons.h"
+#include "weatherDataModel.h"
 
 class WeatherWidget : public Widget {
    public:
@@ -28,16 +29,15 @@ class WeatherWidget : public Widget {
     void singleWeatherDeg(int displayIndex, uint32_t background, uint32_t textColor);
     void weatherText(int displayIndex, int16_t background, int16_t textColor);
     void threeDayWeather(int displayIndex);
+    bool getWeatherData();
     int getClockStamp();
-    int getWeatherStamp();
     int drawDegrees(String number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor);
-
 
     GlobalTime* m_time;
     int8_t m_mode;
 
-    const long m_weatherDelay = 600000;  // weather refresh rate
-    unsigned long m_lastWeather = 600000;
+    const long m_updateDelay = 600000;  // weather refresh rate
+    unsigned long m_lastUpdate = 0;
 
     const long m_timeDelay = 1000;  // time refresh rate
     unsigned long m_lastTime;
@@ -45,19 +45,8 @@ class WeatherWidget : public Widget {
     const int centre = 120;  // centre location of the screen(240x240)
 
     int m_clockStamp = 0;
-    int m_weatherStamp = 0;
 
-    // Global Variables to track/store weather data
-    String m_cityName;
-    String m_currentWeatherText = "";  // Weather Description
-    String m_currentWeatherIcon = "";  // Text refrence for weather icon
-    String m_currentWeatherDeg = "";
-    float m_todayHigh = 0.0;
-    float m_todayLow = 0.0;
-
-    String m_daysIcons[3];  // Icons/Temp For Next 3 days
-    float m_daysHigh[3];
-    float m_daysLow[3];
+    WeatherDataModel model;
 
     String weatherLocation = WEATHER_LOCAION;
 #ifdef WEATHER_UNITS_METRIC
@@ -74,5 +63,4 @@ class WeatherWidget : public Widget {
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 };
-
 #endif  // WEAHTERWIDGET_H
