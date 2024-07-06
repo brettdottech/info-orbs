@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>InfoOrbs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+  <script src="script.js"></script>
+</head>
+
+<body>
+  <div class="topnav">
+    <h1>InfoOrbs</h1>
+  </div>
+  <div class="content">
+    <div class="card-grid">
+      <div class="card">
+        <p class="card-title"><i class="fas fa-cog"></i> Settings</p>
+        <div class="settings-container">
+          <h2>Currency</h2>
+          <span class="setting">
+            <select id="currency" class="currency">
+              <option value="usd">USD</option>
+              <option value="euro">Euro</option>
+            </select>
+          </span>
+          <h2>Widgets</h2>
+          <span class="widget-warning hidden" id="widget-warning">
+            <i class="fas fa-exclamation-triangle"></i> <span>At least one widget must be enabled.</span>
+          </span>
+          <span class="setting">
+            <input type="checkbox" class="widget" id="time" name="time" onclick="onWidgetSettingChanged(this)" checked/>
+            <span> <i class="fas fa-clock"></i> Time</span>
+          </span>
+          <span class="setting">
+            <input type="checkbox" class="widget" id="stock" name="stock" onclick="onWidgetSettingChanged(this)" checked/>
+            <span> <i class="fas fa-hand-holding-usd"></i> Stocks</span>
+          </span>
+          <span class="setting">
+            <input type="checkbox" class="widget" id="weather" name="weather" onclick="onWidgetSettingChanged(this)" checked/>
+            <span> <i class="fas fa-sun"></i> Weather</span>
+          </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

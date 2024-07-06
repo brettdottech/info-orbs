@@ -1,0 +1,206 @@
+html {
+  font-family: Arial, Helvetica, sans-serif;
+  display: inline-block;
+  text-align: center;
+}
+
+body {
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-size: 1.8rem;
+  color: white;
+}
+
+p {
+  font-size: 1.4rem;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #0a1128;
+}
+
+.content {
+  padding: 5%;
+}
+
+.card-grid {
+  max-width: 800px;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.card {
+  background-color: white;
+  box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, 0.5);
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #034078;
+}
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.currency {
+  padding: .5rem;
+  margin: 0;
+}
+
+.settings-container i {
+  margin-left: 0.5rem;
+}
+
+.currency {
+  max-width: 150px;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.widget-warning {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1rem 0;
+  max-width: 600px;
+  align-self: center;
+}
+
+input[type="submit"] {
+  border: none;
+  color: #fefcfb;
+  background-color: #034078;
+  padding: 15px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  width: 100px;
+  margin-right: 10px;
+  border-radius: 4px;
+  transition-duration: 0.4s;
+}
+
+input[type="submit"]:hover {
+  background-color: #1282a2;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 18px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+label {
+  font-size: 1.2rem;
+}
+.value {
+  font-size: 1.2rem;
+  color: #1282a2;
+}
+.state {
+  font-size: 1.2rem;
+  color: #1282a2;
+}
+button {
+  border: none;
+  color: #fefcfb;
+  padding: 15px 32px;
+  text-align: center;
+  font-size: 16px;
+  width: 100px;
+  border-radius: 4px;
+  transition-duration: 0.4s;
+}
+.button-on {
+  background-color: #034078;
+}
+.button-on:hover {
+  background-color: #1282a2;
+}
+.button-off {
+  background-color: #858585;
+}
+.button-off:hover {
+  background-color: #252524;
+}
+
+/**
+ * Reset CSS
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+/*
+  6. Remove built-in form typography styles
+*/
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+/*
+  7. Avoid text overflows
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+/*
+  8. Create a root stacking context
+*/
+#root,
+#__next {
+  isolation: isolate;
+}

@@ -1,14 +1,26 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#063334",
-        "titleBar.activeBackground": "#094849",
-        "titleBar.activeForeground": "#EFFDFD"
-    },
-    "files.associations": {
-        "*.ejs": "html",
-        "*.tcc": "cpp",
-        "new": "cpp"
-    },
-    "editor.tabSize": 4,
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}"
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#063334",
+    "titleBar.activeBackground": "#094849",
+    "titleBar.activeForeground": "#EFFDFD"
+  },
+  "files.associations": {
+    "*.ejs": "html",
+    "*.tcc": "cpp",
+    "new": "cpp",
+    "string": "cpp",
+    "system_error": "cpp",
+    "array": "cpp",
+    "deque": "cpp",
+    "unordered_map": "cpp",
+    "unordered_set": "cpp",
+    "vector": "cpp",
+    "string_view": "cpp",
+    "initializer_list": "cpp",
+    "regex": "cpp",
+    "optional": "cpp",
+    "list": "cpp"
+  },
+  "editor.tabSize": 4,
+  "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}"
 }
