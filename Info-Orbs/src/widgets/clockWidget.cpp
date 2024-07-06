@@ -17,6 +17,8 @@ void ClockWidget::setup() {
 }
 
 void ClockWidget::draw(bool force) {
+    GlobalTime* time = GlobalTime::getInstance();
+    
     if (m_lastDisplay1Didget != m_display1Didget || force) {
         displayDidget(0, m_display1Didget, 7, 5, FOREGROUND_COLOR);
         m_lastDisplay1Didget = m_display1Didget;
@@ -43,6 +45,10 @@ void ClockWidget::draw(bool force) {
         } else {
             displayDidget(2, ":", 7, 5, BG_COLOR, false);
         }
+#if SHOW_SECOND_TICKS == true        
+        displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
+        displaySeconds(2, m_secondSingle, FOREGROUND_COLOR);
+#endif
         m_lastSecondSingle = m_secondSingle;
         if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR) {
             displayAmPm(FOREGROUND_COLOR);
@@ -96,7 +102,11 @@ void ClockWidget::update(bool force) {
     }
 }
 
-void ClockWidget::changeMode() {}
+void ClockWidget::changeMode() {
+    GlobalTime* time = GlobalTime::getInstance();
+    time->setFormat24Hour( !time->getFormat24Hour() );
+    draw(true);
+}
 
 void ClockWidget::displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.selectScreen(displayIndex);
