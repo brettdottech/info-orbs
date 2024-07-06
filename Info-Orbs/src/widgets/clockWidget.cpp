@@ -73,7 +73,11 @@ void ClockWidget::update(bool force) {
 
     if (m_lastHourSingle != m_hourSingle || force) {
         if (m_hourSingle < 10) {
-            m_display1Didget = " ";
+            if (FORMAT_24_HOUR) {
+                m_display1Didget = "0";
+            } else {
+                m_display1Didget = " ";
+            }
         } else {
             m_display1Didget = int(m_hourSingle/10);
         }
