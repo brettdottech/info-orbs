@@ -75,7 +75,7 @@ bool WeatherWidget::getWeatherData() {
             for (int i = 0; i < 3; i++) {
                 model.setDayIcon(i, doc["days"][i + 1]["icon"].as<String>());
                 model.setDayHigh(i, doc["days"][i + 1]["tempmax"].as<float>());
-                model.setDayLow(i, doc["days"][i + 1]["tempmax"].as<float>());
+                model.setDayLow(i, doc["days"][i + 1]["tempmin"].as<float>());
             }
         } else {
             // Handle JSON deserialization error
