@@ -128,6 +128,7 @@
 
 #define FORMAT_24_HOUR true
 #define SHOW_AM_PM_INDICATOR false
+#define SHOW_SECOND_TICKS true
 
 #define TIMEZONE_API_KEY "97R9WKDPBLIO"
 #define TIMEZONE_API_URL "http://api.timezonedb.com/v2.1/get-time-zone"
@@ -142,5 +143,7 @@
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define FOREGROUND_COLOR 0xfc80  // orange for clock
+
+#define MAX_RETRIES 3
 
 #endif

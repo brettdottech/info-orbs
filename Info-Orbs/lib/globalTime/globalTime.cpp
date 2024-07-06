@@ -31,11 +31,11 @@ void GlobalTime::updateTime() {
         m_unixEpoch = m_timeClient->getEpochTime();
         m_updateTimer = millis();
         m_minute = minute(m_unixEpoch);
-#if FORMAT_24_HOUR == true
-        m_hour = hour(m_unixEpoch);
-#else
-        m_hour = hourFormat12(m_unixEpoch);
-#endif
+        if (m_format24hour) {
+            m_hour = hour(m_unixEpoch);
+        } else {
+            m_hour = hourFormat12(m_unixEpoch);
+        }
         m_second = second(m_unixEpoch);
 
         m_day = day(m_unixEpoch);
@@ -133,4 +133,13 @@ void GlobalTime::getTimeZoneOffsetFromAPI() {
     } else {
         Serial.println("Failed to get timezone offset from API");
     }
+}
+
+bool GlobalTime::getFormat24Hour() {
+    return m_format24hour;
+}
+
+bool GlobalTime::setFormat24Hour(bool format24hour) {
+    m_format24hour = format24hour;
+    return m_format24hour;
 }
