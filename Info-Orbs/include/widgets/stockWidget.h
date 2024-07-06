@@ -24,7 +24,7 @@ class StockWidget : public Widget {
 
     String m_apiKey = STOCK_TICKER_API_KEY;
     unsigned long m_stockDelay = 300000;  //default to 5m between updates
-    unsigned long m_stockDelayPrev = 0;
+    unsigned long m_lastStock = 0;
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
