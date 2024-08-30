@@ -1,9 +1,9 @@
 
 # Welcome to Info Orbs!
 
-Info Orbs is a desk display widget built ontop of an ESP32 with the intention of creating a large library of widgets/functionality!
+Info Orbs is a desk display widget built on top of an ESP32 with the intention of creating a large library of widgets/functionality!
 
-Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://discord.gg/xZhYuQ9y64) | [Youtube Assmebly/Flashing Video](https://link.brett.tech/orbsYT) 
+Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://discord.gg/xZhYuQ9y64) | [Youtube Assembly/Flashing Video](https://link.brett.tech/orbsYT) 
 <p>
     <img src="references/weather.png" alt="Weather Widget" style="width:30%;">
     <img src="references/time.png" alt="Clock Widget" style="width: 30%;">
@@ -12,11 +12,11 @@ Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-pro
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
 
-- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://discord.gg/xZhYuQ9y64). Make sure to select you're there for info orbs when filling out the onboarding questionare in order to get placed in the right channels 
+- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://discord.gg/xZhYuQ9y64). Make sure to select you're there for info orbs when filling out the onboarding questionnaire in order to get placed in the right channels 
 
-- I've put toegther dev kits consisting of all the parts you need to build this project [you can buy them here.](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit)  They're $55 and will save you a bunch of time and hassle, and are a great way to support the project (:
+- I've put together dev kits consisting of all the parts you need to build this project [you can buy them here.](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit)  They're $55 and will save you a bunch of time and hassle, and are a great way to support the project (:
 
-- I've put togther a brief [Youtube Video](https://link.brett.tech/orbsYT) walking thorugh the soldeirng and flashing for anyone thats needs a hand assembling.
+- I've put together a brief [Youtube Video](https://link.brett.tech/orbsYT) walking through the soldering and flashing for anyone that needs a hand assembling.
 ## Getting Up And Running
 
 ### 1. Hardware/Wiring 
@@ -42,14 +42,14 @@ Diagram can be seen below:
 
 ### 2. Dev Environment Setup/Project Config
 **IDE Setup**
-Start by donwloading the most recent codebase from the `main` branch.
+Start by downloading the most recent codebase from the `main` branch.
 While built on Arduino, the codebase for this project has been built using the  [Platform IO IDE](https://platformio.org/), which allows you to compile/run Arduino code in VSC as well as quite a few other creature comfort items.
-Once you have platform.io installed and configured in VSC, you'll want to select "Open Project", and select & open the main "Info-Orbs" directory from the codebase you downlaoded.
+Once you have platform.io installed and configured in VSC, you'll want to select "Open Project", and select & open the main "Info-Orbs" directory from the codebase you downloaded.
 
 **Project Configuration**
-Before compiling/flashing, you'll need to naviagte into `Info-Orbs` >>` lib `>> `config` directory and make a copy of the file `config.h.template` in the same folder and rename that copy to `config.h` **THIS STEP IS CRITICAL AND YOUR CODE WILL NOT COMPILE IF YOU DONT COPY THIS FILE AND CHNAGE THE NAME**
+Before compiling/flashing, you'll need to navigate into `Info-Orbs` >>` lib `>> `config` directory and make a copy of the file `config.h.template` in the same folder and rename that copy to `config.h` **THIS STEP IS CRITICAL AND YOUR CODE WILL NOT COMPILE IF YOU DONT COPY THIS FILE AND CHANGE THE NAME**
 
-Lastly, open up the `config.h` file you just copied/renamed and adjust the below paramters in the code to fit your needs.
+Lastly, open up the `config.h` file you just copied/renamed and adjust the below parameters in the code to fit your needs.
 ```
 // ============= CONFIGURE THESE FIELDS BEFORE FLASHING ====================================================
 #define WIFI_SSID "WIFINAME" // wifi name (please use 2.4gz network)
@@ -78,4 +78,5 @@ A massive thank you to the community that has helped, this is my first open sour
 <a href="https://github.com/brett-dot-tech/info-orbs/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=brett-dot-tech/info-orbs" />
 </a>
+
 
