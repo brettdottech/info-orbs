@@ -42,13 +42,11 @@ Diagram can be seen below:
 
 ### 2. Dev Environment Setup/Project Config
 **IDE Setup**
-
-While built on Arduino, the codebase for this project has been built using the  [Platform IO IDE](https://platformio.org/), which allows you to compile/run Arduino code in VS as well as quite a few other creature comfort items.
-Once you have platform.io installed and configured in VSC, you'll want to select "Open Project", and select & open the main "Info-Orbs" directory.
+Start by donwloading the most recent codebase from the `main` branch.
+While built on Arduino, the codebase for this project has been built using the  [Platform IO IDE](https://platformio.org/), which allows you to compile/run Arduino code in VSC as well as quite a few other creature comfort items.
+Once you have platform.io installed and configured in VSC, you'll want to select "Open Project", and select & open the main "Info-Orbs" directory from the codebase you downlaoded.
 
 **Project Configuration**
-(all of these items apply only to bretts code on the main branch, the nightly config is slightly different)
-
 Before compiling/flashing, you'll need to naviagte into `Info-Orbs` >>` lib `>> `config` directory and make a copy of the file `config.h.template` in the same folder and rename that copy to `config.h` **THIS STEP IS CRITICAL AND YOUR CODE WILL NOT COMPILE IF YOU DONT COPY THIS FILE AND CHNAGE THE NAME**
 
 Lastly, open up the `config.h` file you just copied/renamed and adjust the below paramters in the code to fit your needs.
