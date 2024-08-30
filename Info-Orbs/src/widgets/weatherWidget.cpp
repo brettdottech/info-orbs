@@ -19,7 +19,7 @@ void WeatherWidget::changeMode() {
 }
 
 void WeatherWidget::setup() {
-    m_lastUpdate = 0;
+    m_lastUpdate = millis() - m_updateDelay + 1000;
     m_time = GlobalTime::getInstance();
 }
 
