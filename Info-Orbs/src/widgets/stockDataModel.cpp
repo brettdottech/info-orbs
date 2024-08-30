@@ -31,74 +31,21 @@ String StockDataModel::getCurrentPrice(int8_t digits) {
     return String(stream.str().c_str());
 }
 
-StockDataModel &StockDataModel::setLowPrice(float lowPrice) {
-    if (m_lowPrice != lowPrice) {
-        m_lowPrice = lowPrice;
+StockDataModel &StockDataModel::setVolume(float volume) {
+    if (m_volume != volume) {
+        m_volume = volume;
         m_changed = true;
     }
     return *this;
 }
 
-float StockDataModel::getLowPrice() {
-    return m_lowPrice;
+float StockDataModel::getVolume() {
+    return m_volume;
 }
 
-String StockDataModel::getLowPrice(int8_t digits) {
+String StockDataModel::getVolume(int8_t digits) {
     std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_lowPrice;
-    return String(stream.str().c_str());
-}
-
-StockDataModel &StockDataModel::setHighPrice(float highPrice) {
-    if (m_highPrice != highPrice) {
-        m_highPrice = highPrice;
-        m_changed = true;
-    }
-    return *this;
-}
-
-float StockDataModel::getHighPrice() {
-    return m_highPrice;
-}
-
-String StockDataModel::getHighPrice(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_highPrice;
-    return String(stream.str().c_str());
-}
-
-StockDataModel &StockDataModel::setOpenPrice(float openPrice) {
-    if (m_openPrice != openPrice) {
-        m_openPrice = openPrice;
-        m_changed = true;
-    }
-    return *this;
-}
-float StockDataModel::getOpenPrice() {
-    return m_openPrice;
-}
-
-String StockDataModel::getOpenPrice(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_openPrice;
-    return String(stream.str().c_str());
-}
-
-StockDataModel &StockDataModel::setPreviousClosePrice(float previousClosePrice) {
-    if (m_previousClosePrice != previousClosePrice) {
-        m_previousClosePrice = previousClosePrice;
-        m_changed = true;
-    }
-    return *this;
-}
-
-float StockDataModel::getPreviousClosePrice() {
-    return m_previousClosePrice;
-}
-
-String StockDataModel::getPreviousClosePrice(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_previousClosePrice;
+    stream << std::fixed << std::setprecision(digits) << m_volume;
     return String(stream.str().c_str());
 }
 
@@ -131,7 +78,7 @@ float StockDataModel::getPercentChange() {
 
 String StockDataModel::getPercentChange(int8_t digits) {
     std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_percentChange;
+    stream << std::fixed << std::setprecision(digits) << m_percentChange*100;
     return String(stream.str().c_str());
 }
 
