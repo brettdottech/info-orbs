@@ -3,8 +3,7 @@
 
 Info Orbs is a desk display widget built ontop of an ESP32 with the intention of creating a large library of widgets/functionality!
 
-Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Discord](https://discord.gg/xZhYuQ9y64) | [Brett (:](https://bturner.tech/links)
-
+Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://discord.gg/xZhYuQ9y64) | [Youtube Assmebly/Flashing Video](https://link.brett.tech/orbsYT) 
 <p>
     <img src="references/weather.png" alt="Weather Widget" style="width:30%;">
     <img src="references/time.png" alt="Clock Widget" style="width: 30%;">
@@ -13,29 +12,15 @@ Quick Links: [Trello](https://trello.com/b/R8soU39O) | [Discord](https://discord
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
 
-- If you want to contribute and or need a hand with setup, please pop over to the  [Discord](https://discord.gg/xZhYuQ9y64).  Come say hi in the "io-general" channel and you'll be given access to all of the info orbs channels (:.
-- The soldering/wiring on this is tricky, I'm currently in the process of building out dev kits that will a custom PCB and all needed parts. Those will be available in the next 1-2 weeks.
-- The code base currently consists of two branches:
-	- The main branch, which is written using very elementary/inefficient code. This code is entirely functional and will display 	 3 widgets; A clock, a weather widget, and a stock price tracker widget.
-	- A nightly branch, so far written primarily by [@brammie15](https://www.github.com/brammie15), this branch is written in a much more efficient object oriented codebase. While still a work in progress, the goal is to eventually get this code base caught up with the functionality of the main codebase and use this as the basis to develop the orbs moving forward assuming everyone likes the layout/structure.
+- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://discord.gg/xZhYuQ9y64). Make sure to select your there for info orbs when filling out the onboarding questionare in order to get placed in the right channels 
 
+- I've put toegther dev kits consisting of all the parts you need to build this project [you can buy them here.](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit)  They're $55 and will save you a bunch of time and hassle, and are a great way to support the project (:
 
-Lastly, some little things things that will make development allot easier:
-
-1. [A Trello Board](https://trello.com/invite/b/R8soU39O/ATTIeb8e4050b33b9b350e3a622ce4c54ee4E407E48C/info-orbs-mega-board), where current projects/tasks are tracked as well as a large list of potential ideas.
-2. A simulated dev environment so that will allow you to simulate/test your code without needing hardware. (See below for setup)
-
+- I've put togther a brief [Youtube Video](https://link.brett.tech/orbsYT) walking thorugh the soldeirng and flashing for anyone thats needs a hand assembling.
 ## Getting Up And Running
 
 ### 1. Hardware/Wiring 
-**Component List:**
-_once again full dev kits with all needed components & a custom PCB are coming very soon, I advise waiting for these_
-- [240x240 TFT displays](https://s.click.aliexpress.com/e/_DmZVAIL) x 5
-- ESP32 x1 - I use [this 38 pin dev board](https://s.click.aliexpress.com/e/_DdEtAHN) for this project, however any ESP32 _should_ work. 
-- Any momentary button x1
-
-**Pinouts/Wiring Diagram** 
-Each display will have have 5 pins that will all go to/share the same output pins on the ESP, effectively wired in series. Those pins are as follows
+If you use the PCB soldering should be straight forward, however if you want to wire thing up yourself the pinouts are below:
 
     DSP-----ESP
     SDA -> G17 
@@ -44,17 +29,13 @@ Each display will have have 5 pins that will all go to/share the same output pin
     RST -> G18
     VCC - >5V/VCC 
     GND -> GND
-
-Each screen will have its own unique `CS` pin on the ESP32. The CS pin numbers for each screen, from left to right are
-
     Screen1 CS -> G13
     Screen2 CS -> G33
     Screen3 CS -> G32 
     Screen4 CS -> G25
     Screen5 CS -> G21
    
-   Lastly, wiring up a single pushbutton between `VCC/5V` and `G26`
-
+   Lastly, three pushbuttons between `VCC/5V` and `G14,G26,G27.`
 Diagram can be seen below: 
 <img src="references/wiringDiag.png" alt="Wiring Diagram">
 
@@ -68,49 +49,26 @@ Once you have platform.io installed and configured in VSC, you'll want to select
 **Project Configuration**
 (all of these items apply only to bretts code on the main branch, the nightly config is slightly different)
 
-Before compiling/flashing, you'll want to adjust a few parameters in src/main.cpp:
+Before compiling/flashing, you'll need to naviagte into Info-Orbs >> lib >> config directory and change the file name from config.h.template to config.h THIS STEP IS CRITICAL AND YOUR CODE WILL NOT COMPILE IF YOU DONT CHNAGE THIS FILE NAME
 
-    String weatherLocation = "[CITY,STATECODE]" <- ex. Victoria,BC
-    String weatherUnits = "[UNITS]";         <-  Units for weather "us" for F,  "metric" for C
-    const char *ssid = "[YOUR WIFI USER NAME HERE]";
-    const char *password = "[YOUR WIFI USER NAME HERE]"
+// ============= CONFIGURE THESE FIELDS BEFORE FLASHING ====================================================
+#define WIFI_SSID "WIFINAME" // wifi name (please use 2.4gz network)
+#define WIFI_PASS "WIFIPASS" // wifi password
+#define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
+#define WEATHER_LOCAION "Victoria, BC" //city/state for the weather
+#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stokcs to display on the stock tracker
+#define WEATHER_UNITS_METRIC //Comment this line out(or delete it) if you want imperial units for the weather
+#define FORMAT_24_HOUR false // toggle 24 hour clock vs 12 hour clock, chnage between true/false
+#define SHOW_AM_PM_INDICATOR false // am/pm on the clock if using 12 hour
+#define SHOW_SECOND_TICKS true // ticking indeicator on the centre clock
+//#define WEB_DATA_WIDGET_URL "" // use this to make your own widgets using an API/Webdata source
+// ============= END CONFIG ==============================================================================
+
     
-The code should now compile and flash to your ESP if you used the pins/wiring as laid out in the diagram(or have a dev kit).
+The code should now compile and flash to your ESP by clicking the flash button at the bottom of your IDE (:
+The left and right buttons will change between widgets, and the middle button will toggle the widgets "mode"(24/48 hour clock, high/low for weather, etc)
 
-**If you need/want to use different pins they can be configured in two places:**
-For the main screen pins in Info_Orbs/platformio.ini (MOSI == SDA):
-
-    -D TFT_MOSI=17
-    -D TFT_SCLK=23
-    -D TFT_DC=19
-    -D TFT_RST=18
-
-For the CS pins in src/main.cpp(screens left to right:
-
-    int pins[]{13, 33, 32, 25, 21};    
-
-### 3. Virtual Hardware Simulation 
-<img src="references/simulator.png" alt="sim">
-
-Included in the GitHub is a preconfigured [Wokwi simulator](https://wokwi.com/) to help you quickly prototype your code. Setup requires a few brief steps:
-1. Set up a Wokwi account at wokwi.com.
-2. Install the Wokwi VSC extension. 
-3. Generate a free license key via the VSC extension as outlined here: https://docs.wokwi.com/vscode/getting-started
-
-Lastly, you will need to change two config settings in order to have your codebase work with the simulator:
-
-1. In  "Info_Orbs/platformio.ini", comment out `-D GC9A01_DRIVER` and uncomment `-D ILI9341_DRIVER` (the displays available in the Wokwi are slightly different than the live hardware
-2. In src/main.cpp, set your wifi credential to be: `u:"Wokwi-GUEST" p:""` (this is what they are by default in the sketch).
-
-You will now be able to run simulation hardware by opening the "diagram.json" in VSC!! Wooo!!!
-## Codebase Nice-To-Knows
-I wont spend to much time writing this as it will likely entirely chance once we roll out the new codebase, but a few notes on how the screens work:
-
-Screen are driven primarily using the [TFT_eSPI library](https://github.com/Bodmer/TFT_eSPI).
-
-It might seem odd how the displays are wired together in parallel; you'd thin they would show same things as they are getting the same data right? Well....kind of....this is where the CS pin comes in. Each screen has its own unique CS pin.
-
-The CS pin stands for "Chip Select" and it effectively turns the screen's data lines on and off whether it's pulled low (on) or high(off). This means that even if all of the screens are receiving a stream of data, we can set all but one of the screens CS pins to low, which will only allow that screen to have data written into it. We are able to display images on multiple screens by manually managing this CS pin.
+Goodluck & happy orb-in
 
 
 ## Contributors
