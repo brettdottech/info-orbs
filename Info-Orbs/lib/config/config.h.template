@@ -141,6 +141,8 @@
 #define STOCK_TICKER_LIST "ABNB,BRCC,GOOG,TSLA,GME"
 #define STOCK_TICKER_API_KEY "c1tjb52ad3ia4h4uee9g"
 
+#define WEB_DATA_WIDGET_URL "http://192.168.10.242/temp.php"
+
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
 #define FOREGROUND_COLOR 0xfc80  // orange for clock
 
