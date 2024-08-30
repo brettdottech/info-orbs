@@ -49,8 +49,10 @@ Once you have platform.io installed and configured in VSC, you'll want to select
 **Project Configuration**
 (all of these items apply only to bretts code on the main branch, the nightly config is slightly different)
 
-Before compiling/flashing, you'll need to naviagte into Info-Orbs >> lib >> config directory and change the file name from config.h.template to config.h THIS STEP IS CRITICAL AND YOUR CODE WILL NOT COMPILE IF YOU DONT CHNAGE THIS FILE NAME
+Before compiling/flashing, you'll need to naviagte into `Info-Orbs` >>` lib `>> `config` directory and change the file name from `config.h.template` to `config.h` **THIS STEP IS CRITICAL AND YOUR CODE WILL NOT COMPILE IF YOU DONT CHNAGE THIS FILE NAME**
 
+Lastly, open up the `config.h` file you just renamed and adjust the below paramters in the code to fit your needs.
+```
 // ============= CONFIGURE THESE FIELDS BEFORE FLASHING ====================================================
 #define WIFI_SSID "WIFINAME" // wifi name (please use 2.4gz network)
 #define WIFI_PASS "WIFIPASS" // wifi password
@@ -63,6 +65,7 @@ Before compiling/flashing, you'll need to naviagte into Info-Orbs >> lib >> conf
 #define SHOW_SECOND_TICKS true // ticking indeicator on the centre clock
 //#define WEB_DATA_WIDGET_URL "" // use this to make your own widgets using an API/Webdata source
 // ============= END CONFIG ==============================================================================
+```
 
     
 The code should now compile and flash to your ESP by clicking the flash button at the bottom of your IDE (:
