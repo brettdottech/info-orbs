@@ -12,7 +12,7 @@ Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-pro
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
 
-- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://discord.gg/xZhYuQ9y64). Make sure to select your there for info orbs when filling out the onboarding questionare in order to get placed in the right channels 
+- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://discord.gg/xZhYuQ9y64). Make sure to select you're there for info orbs when filling out the onboarding questionare in order to get placed in the right channels 
 
 - I've put toegther dev kits consisting of all the parts you need to build this project [you can buy them here.](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit)  They're $55 and will save you a bunch of time and hassle, and are a great way to support the project (:
 
