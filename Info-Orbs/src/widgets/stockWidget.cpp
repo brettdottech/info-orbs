@@ -26,7 +26,6 @@ StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
 }
 
 void StockWidget::setup() {
-    m_lastUpdate = millis() - m_updateDelay + 1000;
     if (m_stockCount == 0) {
         Serial.println("No stock tickers available");
         return;
@@ -43,13 +42,13 @@ void StockWidget::draw(bool force) {
 }
 
 void StockWidget::update(bool force) {
-    if (force || m_lastUpdate == 0 || (millis() - m_lastUpdate) >= m_updateDelay) {
+    if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
         setBusy(true);
         for (int8_t i = 0; i < m_stockCount; i++) {
             getStockData(m_stocks[i]);
         }
         setBusy(false);
-        m_lastUpdate = millis();
+        m_stockDelayPrev = millis();
     }
 }
 
@@ -58,7 +57,7 @@ void StockWidget::changeMode() {
 }
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://finnhub.io/api/v1/quote?symbol=" + stock.getSymbol() + "&token=" + m_apiKey;
+    String httpRequestAddress = "https://api.marketdata.app/v1/stocks/quotes/" + stock.getSymbol() + "/?token=aVhwT1NWWkhIZVBRZlIwOUlHb01keWFrMEI5Ql9QM1ZIZndtay1ub0V3OD0";
 
     HTTPClient http;
     http.begin(httpRequestAddress);
@@ -70,15 +69,12 @@ void StockWidget::getStockData(StockDataModel &stock) {
         DeserializationError error = deserializeJson(doc, payload);
 
         if (!error) {
-            float currentPrice = doc["c"].as<float>();
+            float currentPrice = doc["last"][0].as<float>();
             if (currentPrice > 0.0) {
-                stock.setCurrentPrice(doc["c"].as<float>());
-                stock.setPercentChange(doc["dp"].as<float>());
-                stock.setPriceChange(doc["d"].as<float>());
-                stock.setHighPrice(doc["h"].as<float>());
-                stock.setLowPrice(doc["l"].as<float>());
-                stock.setOpenPrice(doc["o"].as<float>());
-                stock.setPreviousClosePrice(doc["pc"].as<float>());
+                stock.setCurrentPrice(doc["last"][0].as<float>());
+                stock.setPercentChange(doc["changepct"][0].as<float>());
+                stock.setPriceChange(doc["change"][0].as<float>());
+                stock.setVolume(doc["volume"][0].as<float>());
             } else {
                 Serial.println("skipping invalid data for: " + stock.getSymbol());
             }
