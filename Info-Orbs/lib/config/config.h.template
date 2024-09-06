@@ -12,6 +12,7 @@
 #define FORMAT_24_HOUR false // toggle 24 hour clock vs 12 hour clock, chnage between true/false
 #define SHOW_AM_PM_INDICATOR false // am/pm on the clock if using 12 hour
 #define SHOW_SECOND_TICKS true // ticking indeicator on the centre clock
+#define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
 //#define WEB_DATA_WIDGET_URL "" // use this to make your own widgets using an API/Webdata source
 // ============= END CONFIG ==============================================================================
 
@@ -28,11 +29,6 @@
 
 #define TFT_SDA_READ
 
-
-#define BUTTON_OK 27
-#define BUTTON_LEFT 26
-#define BUTTON_RIGHT 14
-
 #define TFT_MOSI 17
 #define TFT_MISO -1
 #define TFT_SCLK 23
@@ -40,13 +36,31 @@
 #define TFT_DC 19
 #define TFT_RST 18
 
-#define SCREEN_1_CS 13
-#define SCREEN_2_CS 33
-#define SCREEN_3_CS 32
-#define SCREEN_4_CS 25
-#define SCREEN_5_CS 21
+#if INVERTED_ORBS
+    #define BUTTON_OK 27
+    #define BUTTON_LEFT 14
+    #define BUTTON_RIGHT 26
 
-#define DISPLAY_ROTATION 0
+    #define SCREEN_1_CS 21
+    #define SCREEN_2_CS 25
+    #define SCREEN_3_CS 32
+    #define SCREEN_4_CS 33
+    #define SCREEN_5_CS 13
+
+    #define DISPLAY_ROTATION 2
+#else
+    #define BUTTON_OK 27
+    #define BUTTON_LEFT 26
+    #define BUTTON_RIGHT 14
+
+    #define SCREEN_1_CS 13
+    #define SCREEN_2_CS 33
+    #define SCREEN_3_CS 32
+    #define SCREEN_4_CS 25
+    #define SCREEN_5_CS 21
+
+    #define DISPLAY_ROTATION 0
+#endif
 
 #define BUTTON_MODE INPUT_PULLDOWN
 #define BUSY_PIN 2
