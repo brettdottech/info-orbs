@@ -36,30 +36,20 @@
 #define TFT_DC 19
 #define TFT_RST 18
 
+#define SCREEN_1_CS 13
+#define SCREEN_2_CS 33
+#define SCREEN_3_CS 32
+#define SCREEN_4_CS 25
+#define SCREEN_5_CS 21
+
 #if INVERTED_ORBS
     #define BUTTON_OK 27
     #define BUTTON_LEFT 14
     #define BUTTON_RIGHT 26
-
-    #define SCREEN_1_CS 21
-    #define SCREEN_2_CS 25
-    #define SCREEN_3_CS 32
-    #define SCREEN_4_CS 33
-    #define SCREEN_5_CS 13
-
-    #define DISPLAY_ROTATION 2
 #else
     #define BUTTON_OK 27
     #define BUTTON_LEFT 26
     #define BUTTON_RIGHT 14
-
-    #define SCREEN_1_CS 13
-    #define SCREEN_2_CS 33
-    #define SCREEN_3_CS 32
-    #define SCREEN_4_CS 25
-    #define SCREEN_5_CS 21
-
-    #define DISPLAY_ROTATION 0
 #endif
 
 #define BUTTON_MODE INPUT_PULLDOWN
@@ -86,7 +76,6 @@
 #define TIMEZONE_API_KEY "97R9WKDPBLIO"
 #define TIMEZONE_API_URL "http://api.timezonedb.com/v2.1/get-time-zone"
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
-
 
 
 #define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
