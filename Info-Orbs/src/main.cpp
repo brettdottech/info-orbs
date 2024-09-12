@@ -78,10 +78,16 @@ void setup() {
   wifiWidget->setup();
 
   globalTime = GlobalTime::getInstance();
-
-  widgetSet->add(new ClockWidget(*sm));
-  widgetSet->add(new StockWidget(*sm));
-  widgetSet->add(new WeatherWidget(*sm));
+  
+  #if CLOCK == true
+    widgetSet->add(new ClockWidget(*sm));
+  #endif
+  #if STOCK == true
+    widgetSet->add(new StockWidget(*sm));
+  #endif
+  #if WEATHER == true
+    widgetSet->add(new WeatherWidget(*sm));
+  #endif
 #ifdef WEB_DATA_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
 #endif
