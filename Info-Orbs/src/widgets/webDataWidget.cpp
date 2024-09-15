@@ -34,12 +34,56 @@ void WebDataWidget::draw(bool force) {
             display.setTextDatum(MC_DATUM);
             int yOffset = 110;
 
-            String wrappedLines[MAX_WRAPPED_LINES];
-            String dataValues = data->getData();
-            int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
-            int height = display.fontHeight() + 10;
-            for (int i = 0; i < lineCount; i++) {
-                display.drawString(wrappedLines[i], 120, yOffset + (height*i), 2);
+            if (data->getElementsCount() > 0) {
+                for (int i = 0; i < data->getElementsCount(); i++) {
+                    WebDataElementModel element = data->getElement(i);
+                    switch (element.getTypeEnum()) {
+                        case TEXT:
+                            display.drawString(element.getText(), element.getX(), element.getY(), element.getFont());
+                            break;
+                        case CHARACTER:
+                            display.drawChar(element.getX(), element.getY(), element.getText().c_str()[0], element.getColor(), element.getBackgroundColor(), element.getFont());
+                            break;
+                        case LINE:
+                            display.drawLine(element.getX(), element.getY(), element.getX2(), element.getY2(), element.getColor());
+                            break;
+                        case RECTANGLE:
+                            display.drawRect(element.getX(), element.getY(), element.getWidth(), element.getHeight(), element.getColor());
+                            break;
+                        case TRIANGLE:
+                            display.drawTriangle(element.getX(), element.getY(), element.getX2(), element.getY2(), element.getX3(), element.getY3(), element.getColor());
+                        case CIRCLE:
+                            display.drawCircle(element.getX(), element.getY(), element.getRadius(), element.getColor());
+                            break;
+                        case ARC:
+                            display.drawArc(
+                                element.getX(),
+                                element.getY(),
+                                element.getRadius(),
+                                element.getWidth(),
+                                element.getArcAngle1(),
+                                element.getArcAngle2(),
+                                element.getColor(),
+                                element.getBackgroundColor(),
+                                true);
+                            break;
+                        case IMAGE:
+                            // TBD
+                            // display.drawXBitmap(element.getX(), element.getY(), element.getImage(), element.getWidth(), element.getHeight(), element.getColor());
+                            break;
+                        case OTHER:
+                            Serial.println("WebDataWidget::draw: Other type not supported");
+                            break;
+                    }
+                }
+            } else {
+                String wrappedLines[MAX_WRAPPED_LINES];
+                String dataValues = data->getData();
+                int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
+                int height = display.fontHeight() + 10;
+                for (int i = 0; i < lineCount; i++) {
+                    display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
+                }
             }
             data->setChangedStatus(false);
         }
@@ -56,27 +100,10 @@ void WebDataWidget::update(bool force) {
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
-                for (int8_t i = 0; i < 5; i++) {
-                    WebDataModel *data = &m_obj[i];
-                    data->setLabel(doc[i]["label"].as<String>());
-                    data->setData(doc[i]["data"].as<String>());
-                    if (doc[i].containsKey("color")) {
-                        data->setDataColor(doc[i]["color"].as<String>());
-                    } else {
-                        data->setDataColor(m_defaultColor);
-                    }
-                    if (doc[i].containsKey("labelColor")) {
-                        data->setLabelColor(doc[i]["labelColor"].as<String>());
-                    } else {
-                        data->setLabelColor(data->getDataColor());
-                    }
-                    if (doc[i].containsKey("background")) {
-                        data->setBackgroundColor(doc[i]["background"].as<String>());
-                    } else {
-                        data->setBackgroundColor(m_defaultBackground);
-                    }
+                JsonVariant array = doc.as<JsonArray>();
+                for (int i = 0; i < array.size(); i++) {
+                    m_obj[i].parseData(array[i].as<JsonObject>(), m_defaultColor, m_defaultBackground);
                 }
-
                 m_lastUpdate = millis();
             } else {
                 // Handle JSON deserialization error

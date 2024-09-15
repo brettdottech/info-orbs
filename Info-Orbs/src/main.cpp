@@ -80,8 +80,8 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
-  widgetSet->add(new StockWidget(*sm));
-  widgetSet->add(new WeatherWidget(*sm));
+  // widgetSet->add(new StockWidget(*sm));
+  // widgetSet->add(new WeatherWidget(*sm));
 #ifdef WEB_DATA_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
 #endif
@@ -112,7 +112,7 @@ void loop() {
       widgetSet->next();
     }
 
-    
+
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
   }
