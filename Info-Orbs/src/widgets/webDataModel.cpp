@@ -53,11 +53,7 @@ void WebDataModel::setData(String data) {
     }
 }
 
-WebDataElementModel& WebDataModel::getElements() {
-    return *m_elements;
-}
-
-WebDataElementModel WebDataModel::getElement(int index) {
+const WebDataElementModel& WebDataModel::getElement(int index) {
     return m_elements[index];
 }
 
@@ -65,9 +61,15 @@ int32_t WebDataModel::getElementsCount() {
     return m_elementsCount;
 }
 
+void WebDataModel::initElements(int32_t count) {
+    if (m_elementsCount > 0) {
+        delete[] m_elements;
+    }
+    m_elements = new WebDataElementModel[count];
+}
 void WebDataModel::setElementsCount(int32_t count) {
     if (m_elementsCount != count) {
-        m_elements = (WebDataElementModel *)malloc(sizeof(WebDataElementModel) * count);
+        initElements(count);
         m_elementsCount = count;
         m_changed = true;
     }

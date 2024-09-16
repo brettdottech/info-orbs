@@ -12,10 +12,10 @@ class WebDataModel {
     void setLabel(String label);
     String getData();
     void setData(String data);
-    WebDataElementModel& getElements();
-    WebDataElementModel getElement(int index);
+    const WebDataElementModel& getElement(int index);
     int32_t getElementsCount();
     void setElementsCount(int32_t elementsCount);
+    void initElements(int32_t count);
     // void setElements(WebDataElementModel *element);
     int32_t getLabelColor();
     void setLabelColor(int32_t color);
