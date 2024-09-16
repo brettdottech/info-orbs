@@ -21,7 +21,7 @@ void WebDataElementModel::setType(String type) {
         } else if (m_type == "image") {
             m_typeEnum = IMAGE;
         } else {
-            m_typeEnum = TEXT;
+            m_typeEnum = OTHER;
         }
         m_changed = true;
     }
@@ -291,9 +291,7 @@ void WebDataElementModel::parseData(JsonObject doc) {
         setArcAngle2(doc["arcAngle2"].as<int32_t>());
     }
     if (doc.containsKey("text")) {
-        Serial.print("Text: " + doc["text"].as<String>());
         setText(doc["text"].as<String>());
-        Serial.println(" -- " + getText());
     }
     if (doc.containsKey("font")) {
         setFont(doc["font"].as<int32_t>());
