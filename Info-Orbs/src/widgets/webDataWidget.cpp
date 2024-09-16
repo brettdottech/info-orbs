@@ -39,21 +39,49 @@ void WebDataWidget::draw(bool force) {
                     WebDataElementModel element = data->getElement(i);
                     switch (element.getTypeEnum()) {
                         case TEXT:
+                            display.setTextColor(element.getColor(), element.getBackgroundColor());
                             display.drawString(element.getText(), element.getX(), element.getY(), element.getFont());
                             break;
                         case CHARACTER:
+                            display.setTextColor(element.getColor(), element.getBackgroundColor());
                             display.drawChar(element.getX(), element.getY(), element.getText().c_str()[0], element.getColor(), element.getBackgroundColor(), element.getFont());
                             break;
                         case LINE:
                             display.drawLine(element.getX(), element.getY(), element.getX2(), element.getY2(), element.getColor());
                             break;
                         case RECTANGLE:
-                            display.drawRect(element.getX(), element.getY(), element.getWidth(), element.getHeight(), element.getColor());
+                            if (element.getFilled()) {
+                                display.fillRect(element.getX(), element.getY(), element.getWidth(), element.getHeight(), element.getColor());
+                            } else {
+                                display.drawRect(element.getX(), element.getY(), element.getWidth(), element.getHeight(), element.getColor());
+                            }
                             break;
                         case TRIANGLE:
-                            display.drawTriangle(element.getX(), element.getY(), element.getX2(), element.getY2(), element.getX3(), element.getY3(), element.getColor());
+                            if (element.getFilled()) {
+                                display.fillTriangle(
+                                    element.getX(),
+                                    element.getY(),
+                                    element.getX2(),
+                                    element.getY2(),
+                                    element.getX3(),
+                                    element.getY3(),
+                                    element.getColor());
+                            } else {
+                                display.drawTriangle(
+                                    element.getX(),
+                                    element.getY(),
+                                    element.getX2(),
+                                    element.getY2(),
+                                    element.getX3(),
+                                    element.getY3(),
+                                    element.getColor());
+                            }
                         case CIRCLE:
-                            display.drawCircle(element.getX(), element.getY(), element.getRadius(), element.getColor());
+                            if (element.getFilled()) {
+                                display.fillCircle(element.getX(), element.getY(), element.getRadius(), element.getColor());
+                            } else {
+                                display.drawCircle(element.getX(), element.getY(), element.getRadius(), element.getColor());
+                            }
                             break;
                         case ARC:
                             display.drawArc(

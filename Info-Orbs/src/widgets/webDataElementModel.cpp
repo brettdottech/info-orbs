@@ -300,10 +300,10 @@ void WebDataElementModel::parseData(JsonObject doc) {
         setFilled(doc["filled"].as<bool>());
     }
     if (doc.containsKey("background")) {
-        setBackgroundColor(doc["background"].as<int32_t>());
+        setBackgroundColor(doc["background"].as<String>());
     }
     if (doc.containsKey("color")) {
-        setColor(doc["color"].as<int32_t>());
+        setColor(doc["color"].as<String>());
     }
     if (doc.containsKey("imageUrl")) {
         setImageUrl(doc["imageUrl"].as<String>());
