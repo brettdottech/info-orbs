@@ -96,6 +96,7 @@ void WebDataWidget::draw(bool force) {
                                 true);
                             break;
                         case IMAGE:
+                            Serial.println("Image Drawing is TBD");
                             // TBD
                             // display.drawXBitmap(element.getX(), element.getY(), element.getImage(), element.getWidth(), element.getHeight(), element.getColor());
                             break;
