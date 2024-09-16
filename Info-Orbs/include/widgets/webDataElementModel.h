@@ -79,6 +79,7 @@ class WebDataElementModel {
     void setChangedStatus(bool changed);
 
     void parseData(JsonObject doc);
+    void draw(TFT_eSPI& display);
 
    private:
     String m_type = "other";

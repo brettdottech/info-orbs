@@ -90,7 +90,6 @@ void WebDataElementModel::setY3(int32_t y3) {
     }
 }
 
-
 int32_t WebDataElementModel::getWidth() {
     return m_width;
 }
@@ -310,5 +309,52 @@ void WebDataElementModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("imageBytes")) {
         setImageBytes(doc["imageBytes"].as<String>());
+    }
+}
+
+void WebDataElementModel::draw(TFT_eSPI& display) {
+    switch (getTypeEnum()) {
+        case TEXT:
+            display.setTextColor(getColor(), getBackgroundColor());
+            display.drawString(getText(), getX(), getY(), getFont());
+            break;
+        case CHARACTER:
+            display.setTextColor(getColor(), getBackgroundColor());
+            display.drawChar(getX(), getY(), getText().c_str()[0], getColor(), getBackgroundColor(), getFont());
+            break;
+        case LINE:
+            display.drawLine(getX(), getY(), getX2(), getY2(), getColor());
+            break;
+        case RECTANGLE:
+            if (getFilled()) {
+                display.fillRect(getX(), getY(), getWidth(), getHeight(), getColor());
+            } else {
+                display.drawRect(getX(), getY(), getWidth(), getHeight(), getColor());
+            }
+            break;
+        case TRIANGLE:
+            if (getFilled()) {
+                display.fillTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), getColor());
+            } else {
+                display.drawTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), getColor());
+            }
+        case CIRCLE:
+            if (getFilled()) {
+                display.fillCircle(getX(), getY(), getRadius(), getColor());
+            } else {
+                display.drawCircle(getX(), getY(), getRadius(), getColor());
+            }
+            break;
+        case ARC:
+            display.drawArc(getX(), getY(), getRadius(), getWidth(), getArcAngle1(), getArcAngle2(), getColor(), getBackgroundColor(), true);
+            break;
+        case IMAGE:
+            Serial.println("Image Drawing is TBD");
+            // TBD
+            // display.drawXBitmap(getX(), getY(), getImage(), getWidth(), getHeight(), getColor());
+            break;
+        case OTHER:
+            Serial.println("WebDataWidget::draw: Other type not supported");
+            break;
     }
 }

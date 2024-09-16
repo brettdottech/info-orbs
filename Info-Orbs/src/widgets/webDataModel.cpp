@@ -18,35 +18,15 @@ String WebDataModel::getData() {
 void WebDataModel::setData(String data) {
     if (m_data != data) {
         m_data = data;
-        Serial.print(m_label);
-        Serial.print(": ");
-        Serial.print(m_data[0]);
-        Serial.print(" - ");
-        Serial.println(m_data);
         if (data[0] == '[') {
             Serial.println("JSON");
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, data);
             setElementsCount(doc.size());
-            Serial.print("Count: " + String(m_elementsCount));
             for (int i = 0; i < doc.size(); i++) {
-            // Serial.print(i);
-            Serial.print(" i: " + String(i));
                 WebDataElementModel element = WebDataElementModel();
-            Serial.print("  ");
-            Serial.print(i);
                 element.parseData(doc[i].as<JsonObject>());
-            Serial.print(" X: ");
-            Serial.print(element.getX());
-            Serial.print(" Y: ");
-            Serial.print(element.getY());
-            Serial.print(" Text: ");
-            Serial.print(element.getText());
-
-            Serial.print(" Type: ");
-            Serial.print(element.getType());
-            Serial.println("");
-            m_elements[i] = element;
+                m_elements[i] = element;
             }
         }
         m_changed = true;
@@ -74,13 +54,6 @@ void WebDataModel::setElementsCount(int32_t count) {
         m_changed = true;
     }
 }
-
-// void WebDataModel::setElements(WebDataElementModel *element) {
-//     if (m_element != element) {
-//         m_element = element;
-//         m_changed = true;
-//     }
-// }
 
 int32_t WebDataModel::getLabelColor() {
     return m_labelColor;
@@ -156,5 +129,35 @@ void WebDataModel::parseData(JsonObject doc, int32_t defaultColor, int32_t defau
         setBackgroundColor(doc["background"].as<String>());
     } else {
         setBackgroundColor(defaultBackground);
+    }
+}
+
+void WebDataModel::draw(TFT_eSPI& display) {
+    display.fillScreen(getBackgroundColor());
+    if (getLabel()) {
+        if (getLabelColor() != 0) {
+        display.setTextColor(getLabelColor());
+        }
+        display.setTextSize(2);
+        display.setTextDatum(MC_DATUM);
+        display.drawString(getLabel(), 120, 70, 2);
+        display.setTextColor(getDataColor());
+    }
+    display.setTextDatum(MC_DATUM);
+
+    if (getElementsCount() > 0) {
+        for (int i = 0; i < getElementsCount(); i++) {
+            WebDataElementModel element = getElement(i);
+            element.draw(display);
+        }
+    } else {
+        String wrappedLines[MAX_WRAPPED_LINES];
+        String dataValues = getData();
+        int yOffset = 110;
+        int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
+        int height = display.fontHeight() + 10;
+        for (int i = 0; i < lineCount; i++) {
+            display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
+        }
     }
 }
