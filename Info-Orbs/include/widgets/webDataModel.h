@@ -29,18 +29,17 @@ class WebDataModel {
     bool isChanged();
     void setChangedStatus(bool changed);
 
-    void parseData(JsonObject doc, int32_t defaultColor, int32_t defaultBackground);
-    void draw(TFT_eSPI& display);
+    void parseData(JsonObject doc);
+    void draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground);
 
    private:
     String m_label;
     String m_data;
     WebDataElementModel *m_elements;
     int m_elementsCount;
-    int32_t m_labelColor;
-    int32_t m_color;
-    int32_t m_background;
-    String m_fingerprint;
+    int32_t m_labelColor = -1;
+    int32_t m_color = -1;
+    int32_t m_background = -1;
     bool m_changed = false;
 };
 #endif

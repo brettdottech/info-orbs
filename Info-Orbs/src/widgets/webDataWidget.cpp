@@ -24,7 +24,7 @@ void WebDataWidget::draw(bool force) {
         WebDataModel *data = &m_obj[i];
         if (data->isChanged() || force) {
             m_manager.selectScreen(i);
-            data->draw(m_manager.getDisplay());
+            data->draw(m_manager.getDisplay(), m_defaultColor, m_defaultBackground);
 
             data->setChangedStatus(false);
         }
@@ -43,7 +43,7 @@ void WebDataWidget::update(bool force) {
             if (!error) {
                 JsonVariant array = doc.as<JsonArray>();
                 for (int i = 0; i < array.size(); i++) {
-                    m_obj[i].parseData(array[i].as<JsonObject>(), m_defaultColor, m_defaultBackground);
+                    m_obj[i].parseData(array[i].as<JsonObject>());
                 }
                 m_lastUpdate = millis();
             } else {

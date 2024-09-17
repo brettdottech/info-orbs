@@ -108,7 +108,7 @@ void WebDataModel::setChangedStatus(bool changed) {
     m_changed = changed;
 }
 
-void WebDataModel::parseData(JsonObject doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataModel::parseData(JsonObject doc) {
     if (doc.containsKey("label")) {
         setLabel(doc["label"].as<String>());
     }
@@ -117,38 +117,42 @@ void WebDataModel::parseData(JsonObject doc, int32_t defaultColor, int32_t defau
     }
     if (doc.containsKey("color")) {
         setDataColor(doc["color"].as<String>());
-    } else {
-        setDataColor(defaultColor);
     }
     if (doc.containsKey("labelColor")) {
         setLabelColor(doc["labelColor"].as<String>());
-    } else {
-        setLabelColor(getDataColor());
     }
     if (doc.containsKey("background")) {
         setBackgroundColor(doc["background"].as<String>());
-    } else {
-        setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataModel::draw(TFT_eSPI& display) {
-    display.fillScreen(getBackgroundColor());
+void WebDataModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
+    int32_t background = getBackgroundColor();
+    if (background < 0) {
+        background = defaultBackground;
+    }
+    display.fillScreen(background);
     if (getLabel()) {
-        if (getLabelColor() != 0) {
-        display.setTextColor(getLabelColor());
+        int32_t dataColor = getDataColor();
+        if (dataColor < 0) {
+            dataColor = defaultColor;
         }
+        int32_t labelColor = getLabelColor();
+        if (labelColor < 0) {
+            labelColor = dataColor;
+        }
+        display.setTextColor(labelColor);
         display.setTextSize(2);
         display.setTextDatum(MC_DATUM);
         display.drawString(getLabel(), 120, 70, 2);
-        display.setTextColor(getDataColor());
+        display.setTextColor(dataColor);
     }
     display.setTextDatum(MC_DATUM);
 
     if (getElementsCount() > 0) {
         for (int i = 0; i < getElementsCount(); i++) {
             WebDataElementModel element = getElement(i);
-            element.draw(display);
+            element.draw(display, defaultColor, defaultBackground);
         }
     } else {
         String wrappedLines[MAX_WRAPPED_LINES];
