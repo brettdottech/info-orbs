@@ -71,11 +71,16 @@ int32_t WebDataElementRectangleModel::getColor() {
 }
 
 void WebDataElementRectangleModel::parseData(JsonObject doc) {
+    // Serial.println("Parsing Data rectangle");
 
-    if (doc.containsKey("x")) {
+    if (doc.containsKey("x1")) {
+        setX(doc["x1"].as<int32_t>());
+    } else if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc.containsKey("y1")) {
+        setY(doc["y1"].as<int32_t>());
+    } else if (doc.containsKey("y")) {
         setY(doc["y"].as<int32_t>());
     }
     if (doc.containsKey("height")) {

@@ -34,7 +34,7 @@ class WebDataElementCharacterModel: public WebDataElement {
     int32_t m_x = 0;
     int32_t m_y = 0;
     String m_character;
-    int32_t m_font;
+    int32_t m_font = 2;
     int32_t m_color = -1;
     int32_t m_background = -1;
 };

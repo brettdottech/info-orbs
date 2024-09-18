@@ -73,7 +73,6 @@ void WebDataElementTriangleModel::setColor(int32_t color) {
     }
 }
 
-
 bool WebDataElementTriangleModel::getFilled() {
     return m_filled;
 }
@@ -85,7 +84,6 @@ void WebDataElementTriangleModel::setFilled(bool filled) {
     }
 }
 
-
 void WebDataElementTriangleModel::setColor(String color) {
     setColor(Utils::stringToColor(color));
 }
@@ -95,11 +93,16 @@ int32_t WebDataElementTriangleModel::getColor() {
 }
 
 void WebDataElementTriangleModel::parseData(JsonObject doc) {
+    // Serial.println("Parsing Data Triangle");
 
-    if (doc.containsKey("x")) {
+    if (doc.containsKey("x1")) {
+        setX(doc["x1"].as<int32_t>());
+    } else if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc.containsKey("y1")) {
+        setY(doc["y1"].as<int32_t>());
+    } else if (doc.containsKey("y")) {
         setY(doc["y"].as<int32_t>());
     }
     if (doc.containsKey("x2")) {
