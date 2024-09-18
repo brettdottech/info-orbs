@@ -27,13 +27,13 @@ class WebDataElementCharacterModel: public WebDataElement {
     void setColor(String color);
     int32_t getColor();
 
-    void parseData(JsonObject doc);
-    void draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground);
+    void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) override;
+    void draw(TFT_eSPI& display) override;
 
    private:
     int32_t m_x = 0;
     int32_t m_y = 0;
-    String m_character;
+    String m_character = "";
     int32_t m_font = 2;
     int32_t m_color = -1;
     int32_t m_background = -1;

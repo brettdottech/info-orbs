@@ -9,39 +9,30 @@
 #include "widgets/webDataElementTextModel.h"
 #include "widgets/webDataElementTriangleModel.h"
 
-String WebDataElementModel::getType() {
-    return m_type;
-}
-
-void WebDataElementModel::setType(String type) {
-    if (m_type != type) {
-        m_type = type;
-
-        if (m_type == "text") {
-            m_typeEnum = TEXT;
-        } else if (m_type == "rectangle") {
-            m_typeEnum = RECTANGLE;
-        } else if (m_type == "character") {
-            m_typeEnum = CHARACTER;
-        } else if (m_type == "triangle") {
-            m_typeEnum = TRIANGLE;
-        } else if (m_type == "circle") {
-            m_typeEnum = CIRCLE;
-        } else if (m_type == "arc") {
-            m_typeEnum = ARC;
-        } else if (m_type == "line") {
-            m_typeEnum = LINE;
-        } else if (m_type == "image") {
-            m_typeEnum = IMAGE;
-        } else {
-            m_typeEnum = OTHER;
-        }
-        m_changed = true;
+void WebDataElementModel::setType(const String& type) {
+    if (type == "text") {
+        m_type = TEXT;
+    } else if (type == "rectangle") {
+        m_type = RECTANGLE;
+    } else if (type == "character") {
+        m_type = CHARACTER;
+    } else if (type == "triangle") {
+        m_type = TRIANGLE;
+    } else if (type == "circle") {
+        m_type = CIRCLE;
+    } else if (type == "arc") {
+        m_type = ARC;
+    } else if (type == "line") {
+        m_type = LINE;
+    } else if (type == "image") {
+        m_type = IMAGE;
+    } else {
+        m_type = OTHER;
     }
 }
 
-WebDataElementModelTypes WebDataElementModel::getTypeEnum() {
-    return m_typeEnum;
+WebDataElementModelTypes WebDataElementModel::getType() {
+    return m_type;
 }
 
 bool WebDataElementModel::isChanged() {
@@ -51,15 +42,14 @@ void WebDataElementModel::setChangedStatus(bool changed) {
     m_changed = changed;
 }
 
-void WebDataElementModel::parseData(JsonObject doc) {
-    Serial.println("Parsing Data");
-    m_element = NULL;
+void WebDataElementModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+    // Serial.println("Parsing Data");
+    delete m_element;
+    m_element = nullptr;
 
     if (doc.containsKey("type")) {
         setType(doc["type"].as<String>());
-        Serial.println("Type: " + getType());
-        Serial.print("Type Enum: ");Serial.println(getTypeEnum());
-        switch (getTypeEnum()) {
+        switch (getType()) {
             case TEXT:
                 m_element = new WebDataElementTextModel();
                 break;
@@ -86,13 +76,13 @@ void WebDataElementModel::parseData(JsonObject doc) {
                 break;
         }
     }
-    if (m_element != NULL) {
-        m_element->parseData(doc);
+    if (m_element != nullptr) {
+        m_element->parseData(doc, defaultColor, defaultBackground);
     }
 }
 
-void WebDataElementModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    if (m_element != NULL && getTypeEnum() != OTHER) {
-        m_element->draw(display, defaultColor, defaultBackground);
+void WebDataElementModel::draw(TFT_eSPI& display) {
+    if (m_element != nullptr && getType() != OTHER) {
+        m_element->draw(display);
     }
 }

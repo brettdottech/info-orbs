@@ -67,10 +67,6 @@ void WebDataElementTextModel::setColor(int32_t color) {
 }
 
 void WebDataElementTextModel::setColor(String color) {
-    Serial.print("Setting Color: ");
-    Serial.print(color);
-    Serial.print(" %% ");
-    Serial.println(Utils::stringToColor(color));
     setColor(Utils::stringToColor(color));
 }
 
@@ -78,8 +74,8 @@ int32_t WebDataElementTextModel::getColor() {
     return m_color;
 }
 
-void WebDataElementTextModel::parseData(JsonObject doc) {
-    Serial.print("Parsing Data Text");
+void WebDataElementTextModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+    // Serial.print("Parsing Data Text");
 
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
@@ -95,22 +91,17 @@ void WebDataElementTextModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
     if (doc.containsKey("background")) {
         setBackgroundColor(doc["background"].as<String>());
+    } else {
+        setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataElementTextModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
-    int32_t background = getBackgroundColor();
-    if (background < 0) {
-        background = defaultBackground;
-    }
-
-    display.setTextColor(color, background);
+void WebDataElementTextModel::draw(TFT_eSPI& display) {
+    display.setTextColor(getColor(), getBackgroundColor());
     display.drawString(getText(), getX(), getY(), getFont());
 }

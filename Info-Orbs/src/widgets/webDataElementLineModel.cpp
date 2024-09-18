@@ -59,7 +59,8 @@ int32_t WebDataElementLineModel::getColor() {
     return m_color;
 }
 
-void WebDataElementLineModel::parseData(JsonObject doc) {
+void WebDataElementLineModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+    // Serial.println("Parsing Data (line)");
 
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
@@ -75,13 +76,12 @@ void WebDataElementLineModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
 }
 
-void WebDataElementLineModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
-    display.drawLine(getX(), getY(), getX2(), getY2(), color);
+void WebDataElementLineModel::draw(TFT_eSPI& display) {
+    // Serial.print("Drawing Line ~ X:");Serial.print(getX());Serial.print(" Y:");Serial.print(getY());Serial.print(" X2:");Serial.print(getX2());Serial.print(" Y2:");Serial.print(getY2());Serial.print(" Color:");Serial.println(getColor());
+    display.drawLine(getX(), getY(), getX2(), getY2(), getColor());
 }

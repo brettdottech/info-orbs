@@ -20,20 +20,18 @@ enum WebDataElementModelTypes {
 
 class WebDataElementModel {
    public:
-    String getType();
-    void setType(String type);
-    WebDataElementModelTypes getTypeEnum();
+    void setType(const String& type);
+    WebDataElementModelTypes getType();
 
     bool isChanged();
     void setChangedStatus(bool changed);
 
-    void parseData(JsonObject doc);
-    void draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground);
+    void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground);
+    void draw(TFT_eSPI& display);
 
    private:
-    String m_type = "other";
-    WebDataElementModelTypes m_typeEnum = OTHER;
-    WebDataElement *m_element;
+    WebDataElementModelTypes m_type = OTHER;
+    WebDataElement *m_element = nullptr;
 
     bool m_changed = false;
 };

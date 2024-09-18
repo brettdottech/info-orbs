@@ -96,8 +96,8 @@ int32_t WebDataElementArcModel::getColor() {
     return m_color;
 }
 
-void WebDataElementArcModel::parseData(JsonObject doc) {
-    Serial.println("Parsing Data");
+void WebDataElementArcModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+    // Serial.println("Parsing Data");
 
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
@@ -119,20 +119,16 @@ void WebDataElementArcModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
     if (doc.containsKey("background")) {
-        setColor(doc["background"].as<String>());
+        setBackgroundColor(doc["background"].as<String>());
+    } else {
+        setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataElementArcModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
-    int32_t background = getBackgroundColor();
-    if (background < 0) {
-        background = defaultBackground;
-    }
+void WebDataElementArcModel::draw(TFT_eSPI& display) {
     display.drawArc(getX(), getY(), getRadius(), getInnerRadius(), getAngleStart(), getAngleEnd(), getColor(), getBackgroundColor(), true);
 }

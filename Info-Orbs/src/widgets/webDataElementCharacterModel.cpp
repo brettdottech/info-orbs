@@ -74,8 +74,8 @@ int32_t WebDataElementCharacterModel::getColor() {
     return m_color;
 }
 
-void WebDataElementCharacterModel::parseData(JsonObject doc) {
-    Serial.println("Parsing Data");
+void WebDataElementCharacterModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+    // Serial.println("Parsing Data");
 
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
@@ -91,21 +91,17 @@ void WebDataElementCharacterModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
     if (doc.containsKey("background")) {
         setBackgroundColor(doc["background"].as<String>());
+    } else {
+        setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataElementCharacterModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
-    int32_t background = getBackgroundColor();
-    if (background < 0) {
-        background = defaultBackground;
-    }
-    display.setTextColor(color, background);
+void WebDataElementCharacterModel::draw(TFT_eSPI& display) {
+    display.setTextColor(getColor(), getBackgroundColor());
     display.drawChar(getCharacter()[0], getX(), getY(), getFont());
 }

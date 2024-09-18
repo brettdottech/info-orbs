@@ -92,7 +92,7 @@ int32_t WebDataElementTriangleModel::getColor() {
     return m_color;
 }
 
-void WebDataElementTriangleModel::parseData(JsonObject doc) {
+void WebDataElementTriangleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     // Serial.println("Parsing Data Triangle");
 
     if (doc.containsKey("x1")) {
@@ -122,18 +122,15 @@ void WebDataElementTriangleModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
 }
 
-void WebDataElementTriangleModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
-
+void WebDataElementTriangleModel::draw(TFT_eSPI& display) {
     if (getFilled()) {
-        display.fillTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), color);
+        display.fillTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), getColor());
     } else {
-        display.drawTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), color);
+        display.drawTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), getColor());
     }
 }

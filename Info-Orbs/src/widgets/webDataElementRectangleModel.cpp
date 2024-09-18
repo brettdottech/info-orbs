@@ -70,7 +70,7 @@ int32_t WebDataElementRectangleModel::getColor() {
     return m_color;
 }
 
-void WebDataElementRectangleModel::parseData(JsonObject doc) {
+void WebDataElementRectangleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     // Serial.println("Parsing Data rectangle");
 
     if (doc.containsKey("x1")) {
@@ -94,17 +94,15 @@ void WebDataElementRectangleModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
 }
 
-void WebDataElementRectangleModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
+void WebDataElementRectangleModel::draw(TFT_eSPI& display) {
     if (getFilled()) {
-        display.fillRect(getX(), getY(), getWidth(), getHeight(), color);
+        display.fillRect(getX(), getY(), getWidth(), getHeight(), getColor());
     } else {
-        display.drawRect(getX(), getY(), getWidth(), getHeight(), color);
+        display.drawRect(getX(), getY(), getWidth(), getHeight(), getColor());
     }
 }

@@ -33,7 +33,7 @@ void WebDataElementImageModel::setImage(String image) {
     }
 }
 
-void WebDataElementImageModel::parseData(JsonObject doc) {
+void WebDataElementImageModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     Serial.println("Parsing Data");
 
     if (doc.containsKey("x")) {
@@ -53,7 +53,7 @@ void WebDataElementImageModel::parseData(JsonObject doc) {
     // }
 }
 
-void WebDataElementImageModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    Serial.println("TBD");
+void WebDataElementImageModel::draw(TFT_eSPI& display) {
+    //TODO implement displaying an image
     // display.drawImage(getImage(), getX(), getY());
 }

@@ -25,15 +25,15 @@ class WebDataElementRectangleModel: public WebDataElement {
     void setColor(String color);
     int32_t getColor();
 
-    void parseData(JsonObject doc);
-    void draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground);
+    void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) override;
+    void draw(TFT_eSPI& display) override;
 
    private:
     int32_t m_x = 0;
     int32_t m_y = 0;
     int32_t m_width = 0;
     int32_t m_height = 0;
-    bool m_filled;
+    bool m_filled = false;
     int32_t m_color = -1;
 };
 #endif

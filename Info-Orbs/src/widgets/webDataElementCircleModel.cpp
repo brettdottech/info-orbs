@@ -58,7 +58,7 @@ int32_t WebDataElementCircleModel::getColor() {
     return m_color;
 }
 
-void WebDataElementCircleModel::parseData(JsonObject doc) {
+void WebDataElementCircleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
     }
@@ -73,17 +73,15 @@ void WebDataElementCircleModel::parseData(JsonObject doc) {
     }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
+    } else {
+        setColor(defaultColor);
     }
 }
 
-void WebDataElementCircleModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t color = getColor();
-    if (color < 0) {
-        color = defaultColor;
-    }
+void WebDataElementCircleModel::draw(TFT_eSPI& display) {
     if (getFilled()) {
-        display.fillCircle(getX(), getY(), getRadius(), color);
+        display.fillCircle(getX(), getY(), getRadius(), getColor());
     } else {
-        display.drawCircle(getX(), getY(), getRadius(), color);
+        display.drawCircle(getX(), getY(), getRadius(), getColor());
     }
 }

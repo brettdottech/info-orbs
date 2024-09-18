@@ -15,7 +15,7 @@ String WebDataModel::getData() {
     return m_data;
 }
 
-void WebDataModel::setData(String data) {
+void WebDataModel::setData(String data, int32_t defaultColor, int32_t defaultBackground) {
     if (m_data != data) {
         m_data = data;
         if (data[0] == '[') {
@@ -25,7 +25,7 @@ void WebDataModel::setData(String data) {
             setElementsCount(doc.size());
             for (int i = 0; i < doc.size(); i++) {
                 WebDataElementModel element = WebDataElementModel();
-                element.parseData(doc[i].as<JsonObject>());
+                element.parseData(doc[i].as<JsonObject>(), defaultColor, defaultBackground);
                 m_elements[i] = element;
             }
         }
@@ -108,51 +108,45 @@ void WebDataModel::setChangedStatus(bool changed) {
     m_changed = changed;
 }
 
-void WebDataModel::parseData(JsonObject doc) {
+void WebDataModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc.containsKey("label")) {
         setLabel(doc["label"].as<String>());
     }
     if (doc.containsKey("data")) {
-        setData(doc["data"].as<String>());
+        setData(doc["data"].as<String>(), defaultColor, defaultBackground);
     }
     if (doc.containsKey("color")) {
         setDataColor(doc["color"].as<String>());
+    } else {
+        setDataColor(defaultColor);
     }
     if (doc.containsKey("labelColor")) {
         setLabelColor(doc["labelColor"].as<String>());
+    } else {
+        setLabelColor(defaultColor);
     }
     if (doc.containsKey("background")) {
         setBackgroundColor(doc["background"].as<String>());
+    } else {
+        setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataModel::draw(TFT_eSPI& display, int32_t defaultColor, int32_t defaultBackground) {
-    int32_t background = getBackgroundColor();
-    if (background < 0) {
-        background = defaultBackground;
-    }
-    display.fillScreen(background);
+void WebDataModel::draw(TFT_eSPI& display) {
+    display.fillScreen(getBackgroundColor());
     if (getLabel()) {
-        int32_t dataColor = getDataColor();
-        if (dataColor < 0) {
-            dataColor = defaultColor;
-        }
-        int32_t labelColor = getLabelColor();
-        if (labelColor < 0) {
-            labelColor = dataColor;
-        }
-        display.setTextColor(labelColor);
+        display.setTextColor(getLabelColor());
         display.setTextSize(2);
         display.setTextDatum(MC_DATUM);
         display.drawString(getLabel(), 120, 70, 2);
-        display.setTextColor(dataColor);
+        display.setTextColor(getDataColor());
     }
     display.setTextDatum(MC_DATUM);
 
     if (getElementsCount() > 0) {
         for (int i = 0; i < getElementsCount(); i++) {
             WebDataElementModel element = getElement(i);
-            element.draw(display, defaultColor, defaultBackground);
+            element.draw(display);
         }
     } else {
         String wrappedLines[MAX_WRAPPED_LINES];
