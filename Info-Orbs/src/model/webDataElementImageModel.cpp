@@ -1,4 +1,4 @@
-#include "widgets/webDataElementImageModel.h"
+#include "model/webDataElementImageModel.h"
 
 int32_t WebDataElementImageModel::getX() {
     return m_x;

@@ -1,4 +1,4 @@
-#include "widgets/webDataElementTextModel.h"
+#include "model/webDataElementTextModel.h"
 
 int32_t WebDataElementTextModel::getX() {
     return m_x;

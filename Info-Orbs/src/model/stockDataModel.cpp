@@ -1,4 +1,4 @@
-#include "widgets/stockDataModel.h"
+#include "model/stockDataModel.h"
 
 #include <config.h>
 

@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <widget.h>
-#include "webDataModel.h"
+#include "model/webDataModel.h"
 #include "utils.h"
 
 class WebDataWidget : public Widget {

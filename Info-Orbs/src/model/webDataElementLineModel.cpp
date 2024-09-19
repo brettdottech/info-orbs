@@ -1,4 +1,4 @@
-#include "widgets/webDataElementLineModel.h"
+#include "model/webDataElementLineModel.h"
 
 int32_t WebDataElementLineModel::getX() {
     return m_x;

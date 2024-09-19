@@ -5,7 +5,7 @@
 #include <HTTPClient.h>
 #include <TFT_eSPI.h>
 
-#include "stockDataModel.h"
+#include "model/stockDataModel.h"
 #include "widget.h"
 
 #define MAX_STOCKS 5

@@ -1,4 +1,4 @@
-#include "widgets/webDataElementTriangleModel.h"
+#include "model/webDataElementTriangleModel.h"
 
 int32_t WebDataElementTriangleModel::getX() {
     return m_x;

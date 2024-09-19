@@ -1,4 +1,4 @@
-#include "widgets/webDataModel.h"
+#include "model/webDataModel.h"
 
 String WebDataModel::getLabel() {
     return m_label;
@@ -132,14 +132,24 @@ void WebDataModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_
     }
 }
 
+bool WebDataModel::isInitialized() {
+    return m_isInitialized;
+}
+
+void WebDataModel::setInitializedStatus(bool initialized) {
+    m_isInitialized = initialized;
+}
+
 void WebDataModel::draw(TFT_eSPI& display) {
-    display.fillScreen(getBackgroundColor());
+    if (!m_isInitialized) {
+        display.fillScreen(getBackgroundColor());
+        m_isInitialized = true;
+    }
     if (getLabel()) {
         display.setTextColor(getLabelColor());
         display.setTextSize(2);
         display.setTextDatum(MC_DATUM);
         display.drawString(getLabel(), 120, 70, 2);
-        display.setTextColor(getDataColor());
     }
     display.setTextDatum(MC_DATUM);
 
@@ -149,6 +159,8 @@ void WebDataModel::draw(TFT_eSPI& display) {
             element.draw(display);
         }
     } else {
+        display.setTextColor(getDataColor(), getBackgroundColor());
+
         String wrappedLines[MAX_WRAPPED_LINES];
         String dataValues = getData();
         int yOffset = 110;

@@ -1,4 +1,4 @@
-#include "widgets/webDataElementCharacterModel.h"
+#include "model/webDataElementCharacterModel.h"
 
 int32_t WebDataElementCharacterModel::getX() {
     return m_x;

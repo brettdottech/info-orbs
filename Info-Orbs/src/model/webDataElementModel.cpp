@@ -1,13 +1,13 @@
-#include "widgets/webDataElementModel.h"
+#include "model/webDataElementModel.h"
 
-#include "widgets/webDataElementArcModel.h"
-#include "widgets/webDataElementCharacterModel.h"
-#include "widgets/webDataElementCircleModel.h"
-#include "widgets/webDataElementImageModel.h"
-#include "widgets/webDataElementLineModel.h"
-#include "widgets/webDataElementRectangleModel.h"
-#include "widgets/webDataElementTextModel.h"
-#include "widgets/webDataElementTriangleModel.h"
+#include "model/webDataElementArcModel.h"
+#include "model/webDataElementCharacterModel.h"
+#include "model/webDataElementCircleModel.h"
+#include "model/webDataElementImageModel.h"
+#include "model/webDataElementLineModel.h"
+#include "model/webDataElementRectangleModel.h"
+#include "model/webDataElementTextModel.h"
+#include "model/webDataElementTriangleModel.h"
 
 void WebDataElementModel::setType(const String& type) {
     if (type == "text") {

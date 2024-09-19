@@ -3,11 +3,12 @@
 
 #include <ArduinoJson.h>
 #include <TFT_eSPI.h>
+
 #include "webDataElementModel.h"
 
 class WebDataModel {
    public:
-   virtual ~WebDataModel() = default;
+    virtual ~WebDataModel() = default;
     String getLabel();
     void setLabel(String label);
     String getData();
@@ -29,13 +30,17 @@ class WebDataModel {
     bool isChanged();
     void setChangedStatus(bool changed);
 
+    bool isInitialized();
+    void setInitializedStatus(bool initialized);
+
     void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground);
     void draw(TFT_eSPI& display);
 
    private:
+    bool m_isInitialized = false;
     String m_label = "";
     String m_data = "";
-    WebDataElementModel *m_elements = nullptr;
+    WebDataElementModel* m_elements = nullptr;
     int m_elementsCount = 0;
     int32_t m_labelColor = -1;
     int32_t m_color = -1;

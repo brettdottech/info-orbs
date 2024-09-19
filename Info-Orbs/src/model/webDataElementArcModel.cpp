@@ -1,4 +1,4 @@
-#include "widgets/webDataElementArcModel.h"
+#include "model/webDataElementArcModel.h"
 
 int32_t WebDataElementArcModel::getX() {
     return m_x;

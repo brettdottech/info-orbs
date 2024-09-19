@@ -1,4 +1,4 @@
-#include "widgets/webDataElement.h"
+#include "model/webDataElement.h"
 
 bool WebDataElement::isChanged() {
     return m_changed;

@@ -1,4 +1,4 @@
-#include "widgets/webDataElementCircleModel.h"
+#include "model/webDataElementCircleModel.h"
 
 int32_t WebDataElementCircleModel::getX() {
     return m_x;

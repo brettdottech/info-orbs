@@ -1,4 +1,4 @@
-#include "widgets/webDataElementRectangleModel.h"
+#include "model/webDataElementRectangleModel.h"
 
 int32_t WebDataElementRectangleModel::getX() {
     return m_x;

@@ -14,6 +14,7 @@ WebDataWidget::~WebDataWidget() {
 }
 
 void WebDataWidget::setup() {
+
 }
 
 void WebDataWidget::changeMode() {
@@ -22,6 +23,9 @@ void WebDataWidget::changeMode() {
 void WebDataWidget::draw(bool force) {
     for (int i = 0; i < 5; i++) {
         WebDataModel *data = &m_obj[i];
+        if (force) {
+            data->setInitializedStatus(false);
+        }
         if (data->isChanged() || force) {
             m_manager.selectScreen(i);
             data->draw(m_manager.getDisplay());
