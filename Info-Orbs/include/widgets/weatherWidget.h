@@ -9,7 +9,6 @@
 #include <math.h>
 #include <widget.h>
 
-#include "icons.h"
 #include "weatherDataModel.h"
 
 class WeatherWidget : public Widget {
