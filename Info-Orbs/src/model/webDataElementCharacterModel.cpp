@@ -44,6 +44,33 @@ void WebDataElementCharacterModel::setFont(int32_t font) {
     }
 }
 
+int32_t WebDataElementCharacterModel::getSize() {
+    return m_size;
+}
+void WebDataElementCharacterModel::setSize(int32_t size) {
+    if (m_size != size) {
+        m_size = size;
+        m_changed = true;
+    }
+}
+int32_t WebDataElementCharacterModel::getAlignment() {
+    return m_alignment;
+}
+void WebDataElementCharacterModel::setAlignment(int32_t alignment) {
+    if (m_alignment != alignment) {
+        m_alignment = alignment;
+        m_changed = true;
+    }
+}
+
+void WebDataElementCharacterModel::setAlignment(String alignment) {
+    int32_t newAlignment = Utils::stringToAlignment(alignment);
+    if (m_alignment != newAlignment) {
+        m_alignment = newAlignment;
+        m_changed = true;
+    }
+}
+
 int32_t WebDataElementCharacterModel::getBackgroundColor() {
     return m_background;
 }
@@ -89,6 +116,12 @@ void WebDataElementCharacterModel::parseData(const JsonObject& doc, int32_t defa
     if (doc.containsKey("font")) {
         setFont(doc["font"].as<int32_t>());
     }
+    if (doc.containsKey("size")) {
+        setSize(doc["size"].as<int32_t>());
+    }
+    if (doc.containsKey("alignment")) {
+        setAlignment(doc["alignment"].as<String>());
+    }
     if (doc.containsKey("color")) {
         setColor(doc["color"].as<String>());
     } else {
@@ -102,6 +135,8 @@ void WebDataElementCharacterModel::parseData(const JsonObject& doc, int32_t defa
 }
 
 void WebDataElementCharacterModel::draw(TFT_eSPI& display) {
+    display.setTextDatum(getAlignment());
+    display.setTextSize(getSize());
     display.setTextColor(getColor(), getBackgroundColor());
     display.drawChar(getCharacter()[0], getX(), getY(), getFont());
 }

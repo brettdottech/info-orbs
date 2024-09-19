@@ -100,6 +100,14 @@ void WebDataModel::setBackgroundColor(String background) {
     setBackgroundColor(Utils::stringToColor(background));
 }
 
+bool WebDataModel::isFullDraw() {
+    return m_fullDraw;
+}
+
+void WebDataModel::setFullDrawStatus(bool fullDraw) {
+    m_fullDraw = fullDraw;
+}
+
 bool WebDataModel::isChanged() {
     return m_changed;
 }
@@ -130,6 +138,11 @@ void WebDataModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_
     } else {
         setBackgroundColor(defaultBackground);
     }
+    if (doc.containsKey("fullDraw")) {
+        setFullDrawStatus(doc["fullDraw"].as<bool>());
+    } else {
+        setFullDrawStatus(false);
+    }
 }
 
 bool WebDataModel::isInitialized() {
@@ -141,7 +154,7 @@ void WebDataModel::setInitializedStatus(bool initialized) {
 }
 
 void WebDataModel::draw(TFT_eSPI& display) {
-    if (!m_isInitialized) {
+    if (!m_isInitialized || isFullDraw()) {
         display.fillScreen(getBackgroundColor());
         m_isInitialized = true;
     }

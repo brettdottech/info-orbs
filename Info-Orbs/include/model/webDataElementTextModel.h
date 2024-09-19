@@ -20,6 +20,13 @@ class WebDataElementTextModel : public WebDataElement {
     int32_t getFont();
     void setFont(int32_t font);
 
+    int32_t getSize();
+    void setSize(int32_t size);
+
+    int32_t getAlignment();
+    void setAlignment(int32_t alignment);
+    void setAlignment(String alignment);
+
     int32_t getBackgroundColor();
     void setBackgroundColor(int32_t background);
     void setBackgroundColor(String background);
@@ -36,6 +43,8 @@ class WebDataElementTextModel : public WebDataElement {
     int32_t m_y = 0;
     String m_text;
     int32_t m_font = 2;
+    int32_t m_size = 2;
+    int32_t m_alignment = MC_DATUM;
     int32_t m_color = -1;
     int32_t m_background = -1;
 };

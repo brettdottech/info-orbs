@@ -27,6 +27,10 @@ class WebDataModel {
     int32_t getBackgroundColor();
     void setBackgroundColor(int32_t background);
     void setBackgroundColor(String background);
+
+    bool isFullDraw();
+    void setFullDrawStatus(bool fullDraw);
+
     bool isChanged();
     void setChangedStatus(bool changed);
 
@@ -45,6 +49,7 @@ class WebDataModel {
     int32_t m_labelColor = -1;
     int32_t m_color = -1;
     int32_t m_background = -1;
+    bool m_fullDraw = false;
     bool m_changed = false;
 };
 #endif
