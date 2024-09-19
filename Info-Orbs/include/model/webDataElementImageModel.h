@@ -1,12 +1,13 @@
 #ifndef WEB_DATA_ELEMENT_IMAGE_MODEL_H
 #define WEB_DATA_ELEMENT_IMAGE_MODEL_H
 
-#include "webDataElement.h"
 #include <ArduinoJson.h>
 #include <TFT_eSPI.h>
-#include "utils.h"
 
-class WebDataElementImageModel: public WebDataElement {
+#include "utils.h"
+#include "webDataElement.h"
+
+class WebDataElementImageModel : public WebDataElement {
    public:
     int32_t getX();
     void setX(int32_t x);

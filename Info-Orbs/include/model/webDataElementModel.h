@@ -1,10 +1,11 @@
 #ifndef WEB_DATA_ELEMENT_MODEL_H
 #define WEB_DATA_ELEMENT_MODEL_H
 
-#include "webDataElement.h"
 #include <ArduinoJson.h>
 #include <TFT_eSPI.h>
+
 #include "utils.h"
+#include "webDataElement.h"
 
 enum WebDataElementModelTypes {
     TEXT,
@@ -31,7 +32,7 @@ class WebDataElementModel {
 
    private:
     WebDataElementModelTypes m_type = OTHER;
-    WebDataElement *m_element = nullptr;
+    WebDataElement* m_element = nullptr;
 
     bool m_changed = false;
 };
