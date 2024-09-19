@@ -4,7 +4,6 @@
 #include <Arduino.h>
 
 #include <iomanip>
-#include <sstream>
 
 class StockDataModel {
    public:

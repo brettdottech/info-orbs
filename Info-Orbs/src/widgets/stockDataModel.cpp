@@ -1,5 +1,5 @@
 #include "widgets/stockDataModel.h"
-
+#include "utils.h"
 #include <config.h>
 
 StockDataModel::StockDataModel() {
@@ -26,9 +26,7 @@ float StockDataModel::getCurrentPrice() {
     return m_currentPrice;
 }
 String StockDataModel::getCurrentPrice(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_currentPrice;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_currentPrice, digits);
 }
 
 StockDataModel &StockDataModel::setVolume(float volume) {
@@ -44,9 +42,7 @@ float StockDataModel::getVolume() {
 }
 
 String StockDataModel::getVolume(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_volume;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_volume, digits);
 }
 
 StockDataModel &StockDataModel::setPriceChange(float priceChange) {
@@ -60,9 +56,7 @@ float StockDataModel::getPriceChange() {
     return m_priceChange;
 }
 String StockDataModel::getPriceChange(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_priceChange;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_priceChange, digits);
 }
 
 StockDataModel &StockDataModel::setPercentChange(float percentChange) {
@@ -77,9 +71,7 @@ float StockDataModel::getPercentChange() {
 }
 
 String StockDataModel::getPercentChange(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_percentChange*100;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_percentChange*100, digits);
 }
 
 bool StockDataModel::isChanged() {
