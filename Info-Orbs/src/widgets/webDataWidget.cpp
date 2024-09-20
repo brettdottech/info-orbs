@@ -45,7 +45,16 @@ void WebDataWidget::update(bool force) {
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
-                JsonVariant array = doc.as<JsonArray>();
+                if (doc.containsKey("interval")) {
+                    m_updateDelay = doc["interval"];
+                }
+                JsonVariant array;
+                if (doc.containsKey("displays")) {
+                    array = doc["displays"].as<JsonArray>();
+                } else {
+                    // handle legacy response that doesn't have response level data
+                    array = doc.as<JsonArray>();
+                }
                 for (int i = 0; i < array.size(); i++) {
                     m_obj[i].parseData(array[i].as<JsonObject>(), m_defaultColor, m_defaultBackground);
                 }
