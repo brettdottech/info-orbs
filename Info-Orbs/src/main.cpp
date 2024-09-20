@@ -31,7 +31,6 @@ int connectionTimer{0};
 const int connectionTimeout{10000};
 bool isConnected{true};
 
-
 bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
     if (y >= tft.height())
         return 0;
@@ -85,6 +84,9 @@ void setup() {
 #ifdef WEB_DATA_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
 #endif
+#ifdef WEB_DATA_STOCK_WIDGET_URL
+  widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
+#endif
 }
 
 void loop() {
@@ -112,7 +114,6 @@ void loop() {
       widgetSet->next();
     }
 
-    
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
   }
