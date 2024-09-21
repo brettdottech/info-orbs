@@ -43,7 +43,6 @@ void WebDataElementModel::setChangedStatus(bool changed) {
 }
 
 void WebDataElementModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    // Serial.println("Parsing Data");
     delete m_element;
     m_element = nullptr;
 

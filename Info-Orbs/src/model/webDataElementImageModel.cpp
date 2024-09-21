@@ -54,6 +54,6 @@ void WebDataElementImageModel::parseData(const JsonObject& doc, int32_t defaultC
 }
 
 void WebDataElementImageModel::draw(TFT_eSPI& display) {
-    //TODO implement displaying an image
-    // display.drawImage(getImage(), getX(), getY());
+    // TODO implement displaying an image
+    //  display.drawImage(getImage(), getX(), getY());
 }

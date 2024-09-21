@@ -93,8 +93,6 @@ int32_t WebDataElementTriangleModel::getColor() {
 }
 
 void WebDataElementTriangleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    // Serial.println("Parsing Data Triangle");
-
     if (doc.containsKey("x1")) {
         setX(doc["x1"].as<int32_t>());
     } else if (doc.containsKey("x")) {

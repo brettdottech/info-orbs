@@ -97,8 +97,6 @@ int32_t WebDataElementArcModel::getColor() {
 }
 
 void WebDataElementArcModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    // Serial.println("Parsing Data");
-
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
     }

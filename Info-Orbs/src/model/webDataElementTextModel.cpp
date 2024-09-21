@@ -102,8 +102,6 @@ int32_t WebDataElementTextModel::getColor() {
 }
 
 void WebDataElementTextModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    // Serial.print("Parsing Data Text");
-
     if (doc.containsKey("x")) {
         setX(doc["x"].as<int32_t>());
     }
