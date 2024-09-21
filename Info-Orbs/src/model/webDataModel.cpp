@@ -19,7 +19,6 @@ void WebDataModel::setData(String data, int32_t defaultColor, int32_t defaultBac
     if (m_data != data) {
         m_data = data;
         if (data[0] == '[') {
-            // Serial.println("JSON");
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, data);
             setElementsCount(doc.size());
