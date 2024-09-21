@@ -24,9 +24,7 @@ void WebDataModel::setData(String data, int32_t defaultColor, int32_t defaultBac
             DeserializationError error = deserializeJson(doc, data);
             setElementsCount(doc.size());
             for (int i = 0; i < doc.size(); i++) {
-                WebDataElementModel element = WebDataElementModel();
-                element.parseData(doc[i].as<JsonObject>(), defaultColor, defaultBackground);
-                m_elements[i] = element;
+                m_elements[i].parseData(doc[i].as<JsonObject>(), defaultColor, defaultBackground);
             }
         } else {
             setElementsCount(0);
