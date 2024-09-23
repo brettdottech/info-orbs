@@ -130,6 +130,13 @@ int32_t Utils::stringToColor(String color) {
     }
 }
 
+String Utils::formatFloat(float value, int8_t digits)
+{
+    char tmp[30] = {};
+    dtostrf(value, 1, digits, tmp);
+    return tmp;
+}
+
 int32_t Utils::stringToAlignment(String alignment) {
     alignment.toLowerCase();
     if (alignment.indexOf(" ") != -1) {
@@ -176,3 +183,4 @@ int32_t Utils::stringToAlignment(String alignment) {
         return TL_DATUM;
     }
 }
+

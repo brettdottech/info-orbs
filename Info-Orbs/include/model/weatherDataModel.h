@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <iomanip>
-#include <sstream>
 
 #define NaN -1024.0
 class WeatherDataModel {

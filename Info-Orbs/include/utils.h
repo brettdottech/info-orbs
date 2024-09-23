@@ -11,6 +11,7 @@ class Utils {
     static int getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit);
     static String getWrappedLine(String str, int limit, int lineNum, int maxLines);
     static int32_t stringToColor(String color);
+    static String formatFloat(float value, int8_t digits);
     static int32_t stringToAlignment(String alignment);
 };
 
