@@ -1,4 +1,5 @@
 #include "widgets/weatherDataModel.h"
+#include "utils.h"
 
 WeatherDataModel::WeatherDataModel() {
 }
@@ -52,9 +53,7 @@ float WeatherDataModel::getCurrentTemperature() {
 }
 
 String WeatherDataModel::getCurrentTemperature(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_currentWeatherDeg;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_currentWeatherDeg, digits);
 }
 
 WeatherDataModel &WeatherDataModel::setTodayHigh(float high) {
@@ -70,9 +69,7 @@ float WeatherDataModel::getTodayHigh() {
 }
 
 String WeatherDataModel::getTodayHigh(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_todayHigh;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_todayHigh, digits);
 }
 
 WeatherDataModel &WeatherDataModel::setTodayLow(float low) {
@@ -88,9 +85,7 @@ float WeatherDataModel::getTodayLow() {
 }
 
 String WeatherDataModel::getTodayLow(int8_t digits) {
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_todayLow;
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_todayLow, digits);
 }
 
 WeatherDataModel &WeatherDataModel::setDaysIcons(String *icons) {
@@ -146,12 +141,10 @@ float WeatherDataModel::getDayLow(int num) {
 }
 
 String WeatherDataModel::getDayLow(int8_t num, int8_t digits) {
-    if (m_daysHigh[num] == NaN) {
+    if (m_daysLow[num] == NaN) {
         return "";
     }
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_daysLow[num];
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_daysLow[num], digits);
 }
 
 WeatherDataModel &WeatherDataModel::setDaysHighs(float highs[3]) {
@@ -176,9 +169,7 @@ String WeatherDataModel::getDayHigh(int8_t num, int8_t digits) {
     if (m_daysHigh[num] == NaN) {
         return "";
     }
-    std::ostringstream stream;
-    stream << std::fixed << std::setprecision(digits) << m_daysHigh[num];
-    return String(stream.str().c_str());
+    return Utils::formatFloat(m_daysHigh[num], digits);
 }
 
 WeatherDataModel &WeatherDataModel::setDayHigh(int num, float high) {
