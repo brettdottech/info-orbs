@@ -12,6 +12,7 @@ class Utils {
     static String getWrappedLine(String str, int limit, int lineNum, int maxLines);
     static int32_t stringToColor(String color);
     static String formatFloat(float value, int8_t digits);
+    static int32_t stringToAlignment(String alignment);
 };
 
 #endif

@@ -14,6 +14,7 @@
 #define SHOW_SECOND_TICKS true // ticking indeicator on the centre clock
 #define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
 //#define WEB_DATA_WIDGET_URL "" // use this to make your own widgets using an API/Webdata source
+//#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // use this as an alternative to the stock ticker widget
 // ============= END CONFIG ==============================================================================
 
 

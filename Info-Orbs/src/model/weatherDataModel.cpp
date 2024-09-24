@@ -1,4 +1,4 @@
-#include "widgets/weatherDataModel.h"
+#include "model/weatherDataModel.h"
 #include "utils.h"
 
 WeatherDataModel::WeatherDataModel() {
