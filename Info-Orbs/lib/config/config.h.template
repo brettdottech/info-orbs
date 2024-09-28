@@ -7,18 +7,15 @@
 #define WIFI_SSID "WIFINAME" // wifi name (please use 2.4gz network)
 #define WIFI_PASS "WIFIPASS" // wifi password
 // === CLOCK ===
-#define CLOCK true //enables or disables clock function
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
 #define SHOW_AM_PM_INDICATOR false // am/pm on the clock if using 12 hour
 #define SHOW_SECOND_TICKS true // ticking indeicator on the centre clock
 #define FORMAT_24_HOUR false // toggle 24 hour clock vs 12 hour clock, chnage between true/false
 // === WEATHER ===
-#define WEATHER true //enables or disables weather function
-#define WEATHER_LOCAION "Victoria, BC" //city/state for the weather
+#define WEATHER_LOCAION "Victoria, BC" //city/state for the weather. Disable Weather by comment it out with "//" at the beginning
 #define WEATHER_UNITS_METRIC //Comment this line out(or delete it) if you want imperial units for the weather
 // === STOCK ===
-#define STOCK true //enables or disables stock function
-#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stokcs to display on the stock tracker
+#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stokcs to display on the stock tracker Disable Stocks by comment it out with "//" at the beginning
 // === HARDWARE ===
 #define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
 //#define WEB_DATA_WIDGET_URL "" // use this to make your own widgets using an API/Webdata source

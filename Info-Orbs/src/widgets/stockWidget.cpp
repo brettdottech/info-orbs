@@ -1,3 +1,4 @@
+#ifdef STOCK_TICKER_LIST
 #include "widgets/stockWidget.h"
 
 #include <ArduinoJson.h>
@@ -123,3 +124,4 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
 
     display.drawString(stock.getPercentChange(2) + "%", centre, 147, 1);
 }
+#endif

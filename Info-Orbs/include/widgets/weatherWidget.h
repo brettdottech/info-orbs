@@ -1,3 +1,4 @@
+#ifdef WEATHER_LOCAION
 #ifndef WEAHTERWIDGET_H
 #define WEAHTERWIDGET_H
 
@@ -61,3 +62,4 @@ class WeatherWidget : public Widget {
     const int MODE_LOWS = 1;
 };
 #endif  // WEAHTERWIDGET_H
+#endif

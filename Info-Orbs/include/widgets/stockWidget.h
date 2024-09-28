@@ -1,3 +1,4 @@
+
 #ifndef STOCK_WIDGET_H
 #define STOCK_WIDGET_H
 

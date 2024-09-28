@@ -9,6 +9,7 @@
 #include <globalTime.h>
 #include <config.h>
 #include <widgets/stockWidget.h>
+#include <TJpg_Decoder.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -21,8 +22,9 @@ Button buttonOK(BUTTON_OK);
 Button buttonLeft(BUTTON_LEFT);
 Button buttonRight(BUTTON_RIGHT);
 
+//#ifdef TIMEZONE_API_LOCATION
 GlobalTime *globalTime; // Initialize the global time
-
+//#endif
 String connectingString{""};
 
 WifiWidget *wifiWidget{ nullptr };
@@ -78,19 +80,21 @@ void setup() {
   wifiWidget->setup();
 
   globalTime = GlobalTime::getInstance();
+
+  widgetSet->add(new ClockWidget(*sm));
   
-  #if CLOCK == true
-    widgetSet->add(new ClockWidget(*sm));
-  #endif
-  #if STOCK == true
+  #ifdef STOCK_TICKER_LIST
     widgetSet->add(new StockWidget(*sm));
   #endif
-  #if WEATHER == true
-    widgetSet->add(new WeatherWidget(*sm));
+  #ifdef WEATHER_LOCAION
+  widgetSet->add(new WeatherWidget(*sm));
   #endif
-#ifdef WEB_DATA_WIDGET_URL
-  widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
-#endif
+  #ifdef WEB_DATA_WIDGET_URL
+    widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
+  #endif
+  #ifdef WEB_DATA_STOCK_WIDGET_URL
+    widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
+  #endif
 }
 
 void loop() {
