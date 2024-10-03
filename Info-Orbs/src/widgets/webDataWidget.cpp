@@ -22,25 +22,13 @@ void WebDataWidget::changeMode() {
 void WebDataWidget::draw(bool force) {
     for (int i = 0; i < 5; i++) {
         WebDataModel *data = &m_obj[i];
+        if (force) {
+            data->setInitializedStatus(false);
+        }
         if (data->isChanged() || force) {
             m_manager.selectScreen(i);
-            TFT_eSPI &display = m_manager.getDisplay();
-            display.fillScreen(data->getBackgroundColor());
-            display.setTextColor(data->getLabelColor());
-            display.setTextSize(2);
-            display.setTextDatum(MC_DATUM);
-            display.drawString(data->getLabel(), 120, 70, 2);
-            display.setTextColor(data->getDataColor());
-            display.setTextDatum(MC_DATUM);
-            int yOffset = 110;
+            data->draw(m_manager.getDisplay());
 
-            String wrappedLines[MAX_WRAPPED_LINES];
-            String dataValues = data->getData();
-            int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
-            int height = display.fontHeight() + 10;
-            for (int i = 0; i < lineCount; i++) {
-                display.drawString(wrappedLines[i], 120, yOffset + (height*i), 2);
-            }
             data->setChangedStatus(false);
         }
     }
@@ -56,27 +44,19 @@ void WebDataWidget::update(bool force) {
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
-                for (int8_t i = 0; i < 5; i++) {
-                    WebDataModel *data = &m_obj[i];
-                    data->setLabel(doc[i]["label"].as<String>());
-                    data->setData(doc[i]["data"].as<String>());
-                    if (doc[i].containsKey("color")) {
-                        data->setDataColor(doc[i]["color"].as<String>());
-                    } else {
-                        data->setDataColor(m_defaultColor);
-                    }
-                    if (doc[i].containsKey("labelColor")) {
-                        data->setLabelColor(doc[i]["labelColor"].as<String>());
-                    } else {
-                        data->setLabelColor(data->getDataColor());
-                    }
-                    if (doc[i].containsKey("background")) {
-                        data->setBackgroundColor(doc[i]["background"].as<String>());
-                    } else {
-                        data->setBackgroundColor(m_defaultBackground);
-                    }
+                if (doc["interval"].is<int>()) {
+                    m_updateDelay = doc["interval"];
                 }
-
+                JsonVariant array;
+                if (doc["displays"].is<JsonArray>()) {
+                    array = doc["displays"].as<JsonArray>();
+                } else {
+                    // handle legacy response that doesn't have response level data
+                    array = doc.as<JsonArray>();
+                }
+                for (int i = 0; i < array.size(); i++) {
+                    m_obj[i].parseData(array[i].as<JsonObject>(), m_defaultColor, m_defaultBackground);
+                }
                 m_lastUpdate = millis();
             } else {
                 // Handle JSON deserialization error

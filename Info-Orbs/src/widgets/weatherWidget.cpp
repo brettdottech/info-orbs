@@ -1,5 +1,6 @@
 
 #include "widgets/weatherWidget.h"
+#include "icons.h"
 
 #include <config.h>
 
@@ -158,32 +159,26 @@ void WeatherWidget::drawWeatherIcon(String condition, int displayIndex, int x, i
     const byte *icon = NULL;
     int size = 0;
     if (condition == "partly-cloudy-night") {
-        icon = moonCloud;
-        size = sizeof(moonCloud);
+        icon = moonCloud_start;
+        size = moonCloud_end - moonCloud_start;
     } else if (condition == "partly-cloudy-day") {
-        icon = sunClouds;
-        size = sizeof(sunClouds);
+        icon = sunClouds_start;
+        size = sunClouds_end - sunClouds_start;
     } else if (condition == "clear-day") {
-        icon = sun;
-        size = sizeof(sun);
+        icon = sun_start;
+        size = sun_end - sun_start;
     } else if (condition == "clear-night") {
-        icon = moon;
-        size = sizeof(moon);
+        icon = moon_start;
+        size = moon_end - moon_start;
     } else if (condition == "snow") {
-        icon = snow;
-        size = sizeof(snow);
+        icon = snow_start;
+        size = snow_end - snow_start;
     } else if (condition == "rain") {
-        icon = rain;
-        size = sizeof(rain);
-    } else if (condition == "fog") {
-        icon = clouds;
-        size = sizeof(clouds);
-    } else if (condition == "wind") {
-        icon = clouds;
-        size = sizeof(clouds);
-    } else if (condition == "cloudy") {
-        icon = clouds;
-        size = sizeof(clouds);
+        icon = rain_start;
+        size = rain_end - rain_start;
+    } else if (condition == "fog" || condition == "wind" || condition == "cloudy") {
+        icon = clouds_start;
+        size = clouds_end - clouds_start;
     } else {
         Serial.println("unknown weather icon:" + condition);
     }

@@ -5,7 +5,6 @@
 #include <config.h>
 
 #include <iomanip>
-#include <sstream>
 
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
