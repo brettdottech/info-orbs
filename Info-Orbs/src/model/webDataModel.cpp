@@ -18,21 +18,19 @@ String WebDataModel::getData() {
 void WebDataModel::setData(String data, int32_t defaultColor, int32_t defaultBackground) {
     if (m_data != data) {
         m_data = data;
-        if (data[0] == '[') {
-            JsonDocument doc;
-            DeserializationError error = deserializeJson(doc, data);
-            setElementsCount(doc.size());
-            for (int i = 0; i < doc.size(); i++) {
-                m_elements[i].parseData(doc[i].as<JsonObject>(), defaultColor, defaultBackground);
-            }
-        } else {
-            setElementsCount(0);
-        }
+        setElementsCount(0);
         m_changed = true;
     }
 }
+void WebDataModel::setData(JsonArray data, int32_t defaultColor, int32_t defaultBackground) {
+    setElementsCount(data.size());
+    for (int i = 0; i < data.size(); i++) {
+        m_elements[i].parseData(data[i], defaultColor, defaultBackground);
+    }
+    m_changed = true;
+}
 
-const WebDataElementModel& WebDataModel::getElement(int index) {
+const WebDataElementModel &WebDataModel::getElement(int index) {
     return m_elements[index];
 }
 
@@ -50,7 +48,6 @@ void WebDataModel::setElementsCount(int32_t count) {
     if (m_elementsCount != count) {
         initElements(count);
         m_elementsCount = count;
-        m_changed = true;
     }
 }
 
@@ -115,29 +112,33 @@ void WebDataModel::setChangedStatus(bool changed) {
     m_changed = changed;
 }
 
-void WebDataModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    if (doc.containsKey("label")) {
-        setLabel(doc["label"].as<String>());
+void WebDataModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
+    if (const char *label = doc["label"]) {
+        setLabel(label);
     }
-    if (doc.containsKey("data")) {
-        setData(doc["data"].as<String>(), defaultColor, defaultBackground);
+    if (doc["data"].is<JsonArray>()) {
+        setData(doc["data"].as<JsonArray>(), defaultColor, defaultBackground);
+    } else if (const char *data = doc["data"]) {
+        setData(data, defaultColor, defaultBackground);
+    } else if (String data = doc["data"].as<String>()) {
+        setData(data, defaultColor, defaultBackground);
     }
-    if (doc.containsKey("color")) {
-        setDataColor(doc["color"].as<String>());
+    if (const char *color = doc["color"]) {
+        setDataColor(color);
     } else {
         setDataColor(defaultColor);
     }
-    if (doc.containsKey("labelColor")) {
-        setLabelColor(doc["labelColor"].as<String>());
+    if (const char *labelColor = doc["labelColor"]) {
+        setLabelColor(labelColor);
     } else {
         setLabelColor(defaultColor);
     }
-    if (doc.containsKey("background")) {
-        setBackgroundColor(doc["background"].as<String>());
+    if (const char *background = doc["background"]) {
+        setBackgroundColor(background);
     } else {
         setBackgroundColor(defaultBackground);
     }
-    if (doc.containsKey("fullDraw")) {
+    if (doc["fullDraw"].is<bool>()) {
         setFullDrawStatus(doc["fullDraw"].as<bool>());
     } else {
         setFullDrawStatus(false);
@@ -152,7 +153,7 @@ void WebDataModel::setInitializedStatus(bool initialized) {
     m_isInitialized = initialized;
 }
 
-void WebDataModel::draw(TFT_eSPI& display) {
+void WebDataModel::draw(TFT_eSPI &display) {
     if (!m_isInitialized || isFullDraw()) {
         display.fillScreen(getBackgroundColor());
         m_isInitialized = true;

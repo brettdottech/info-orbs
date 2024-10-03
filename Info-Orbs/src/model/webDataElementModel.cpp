@@ -42,12 +42,12 @@ void WebDataElementModel::setChangedStatus(bool changed) {
     m_changed = changed;
 }
 
-void WebDataElementModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataElementModel::parseData(JsonObject doc, int32_t defaultColor, int32_t defaultBackground) {
     delete m_element;
     m_element = nullptr;
 
-    if (doc.containsKey("type")) {
-        setType(doc["type"].as<String>());
+    if (const char* type = doc["type"]) {
+        setType(type);
         switch (getType()) {
             case TEXT:
                 m_element = new WebDataElementTextModel();

@@ -59,20 +59,20 @@ int32_t WebDataElementCircleModel::getColor() {
 }
 
 void WebDataElementCircleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    if (doc.containsKey("x")) {
+    if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (doc.containsKey("radius")) {
+    if (doc["radius"].is<int32_t>()) {
         setRadius(doc["radius"].as<int32_t>());
     }
-    if (doc.containsKey("filled")) {
+    if (doc["filled"].is<int32_t>()) {
         setFilled(doc["filled"].as<bool>());
     }
-    if (doc.containsKey("color")) {
-        setColor(doc["color"].as<String>());
+    if (const char* color = doc["color"]) {
+        setColor(color);
     } else {
         setColor(defaultColor);
     }

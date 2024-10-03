@@ -1,7 +1,8 @@
 #include "model/webDataElementImageModel.h"
-#include <WiFi.h>
+
 #include <HTTPClient.h>
 #include <LittleFS.h>
+#include <WiFi.h>
 
 int32_t WebDataElementImageModel::getX() {
     return m_x;
@@ -37,22 +38,20 @@ void WebDataElementImageModel::setImage(String image) {
 }
 
 void WebDataElementImageModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    Serial.println("Parsing Data");
-
-    if (doc.containsKey("x")) {
+    if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (doc.containsKey("image")) {
-        setImage(doc["image"].as<String>());
+    if (const char* image = doc["image"]) {
+        setImage(image);
     }
-    // if (doc.containsKey("imageUrl")) {
-    //     setImageUrl(doc["imageUrl"].as<String>());
+    // if (const char* imageUrl = doc["imageUrl"]) {
+    //     setImageUrl(imageUrl);
     // }
-    // if (doc.containsKey("imageBytes")) {
-    //     setImageBytes(doc["imageBytes"].as<String>());
+    // if (const char* imageBytes = doc["imageBytes"]) {
+    //     setImageBytes(imageBytes);
     // }
 }
 
@@ -64,84 +63,73 @@ void WebDataElementImageModel::draw(TFT_eSPI& display) {
 // Fetch a file from the URL given and save it in LittleFS
 // Return 1 if a web fetch was needed or 0 if file already exists
 bool getFile(String url, String filename) {
-
-  // If it exists then no need to fetch it
-  if (LittleFS.exists(filename) == true) {
-    Serial.println("Found " + filename);
-    return 0;
-  }
-
-  Serial.println("Downloading "  + filename + " from " + url);
-
-  // Check WiFi connection
-  if ((WiFi.status() == WL_CONNECTED)) {
-
-    Serial.print("[HTTP] begin...\n");
-
-#ifdef ARDUINO_ARCH_ESP8266
-    std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-    client -> setInsecure();
-    HTTPClient http;
-    http.begin(*client, url);
-#else
-    HTTPClient http;
-    // Configure server and url
-    http.begin(url);
-#endif
-
-    Serial.print("[HTTP] GET...\n");
-    // Start connection and send HTTP header
-    int httpCode = http.GET();
-    if (httpCode == 200) {
-      fs::File f = LittleFS.open(filename, "w+");
-      if (!f) {
-        Serial.println("file open failed");
+    // If it exists then no need to fetch it
+    if (LittleFS.exists(filename) == true) {
+        Serial.println("Found " + filename);
         return 0;
-      }
-      // HTTP header has been send and Server response header has been handled
-      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+    }
 
-      // File found at server
-      if (httpCode == HTTP_CODE_OK) {
+    Serial.println("Downloading " + filename + " from " + url);
 
-        // Get length of document (is -1 when Server sends no Content-Length header)
-        int total = http.getSize();
-        int len = total;
+    // Check WiFi connection
+    if ((WiFi.status() == WL_CONNECTED)) {
+        Serial.print("[HTTP] begin...\n");
 
-        // Create buffer for read
-        uint8_t buff[128] = { 0 };
+        HTTPClient http;
+        // Configure server and url
+        http.begin(url);
 
-        // Get tcp stream
-        WiFiClient * stream = http.getStreamPtr();
-
-        // Read all data from server
-        while (http.connected() && (len > 0 || len == -1)) {
-          // Get available data size
-          size_t size = stream->available();
-
-          if (size) {
-            // Read up to 128 bytes
-            int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
-
-            // Write it to file
-            f.write(buff, c);
-
-            // Calculate remaining bytes
-            if (len > 0) {
-              len -= c;
+        Serial.print("[HTTP] GET...\n");
+        // Start connection and send HTTP header
+        int httpCode = http.GET();
+        if (httpCode == 200) {
+            fs::File f = LittleFS.open(filename, "w+");
+            if (!f) {
+                Serial.println("file open failed");
+                return 0;
             }
-          }
-          yield();
+            // HTTP header has been send and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+            // File found at server
+            if (httpCode == HTTP_CODE_OK) {
+                // Get length of document (is -1 when Server sends no Content-Length header)
+                int total = http.getSize();
+                int len = total;
+
+                // Create buffer for read
+                uint8_t buff[128] = {0};
+
+                // Get tcp stream
+                WiFiClient* stream = http.getStreamPtr();
+
+                // Read all data from server
+                while (http.connected() && (len > 0 || len == -1)) {
+                    // Get available data size
+                    size_t size = stream->available();
+
+                    if (size) {
+                        // Read up to 128 bytes
+                        int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+
+                        // Write it to file
+                        f.write(buff, c);
+
+                        // Calculate remaining bytes
+                        if (len > 0) {
+                            len -= c;
+                        }
+                    }
+                    yield();
+                }
+                Serial.println();
+                Serial.print("[HTTP] connection closed or file end.\n");
+            }
+            f.close();
+        } else {
+            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
-        Serial.println();
-        Serial.print("[HTTP] connection closed or file end.\n");
-      }
-      f.close();
+        http.end();
     }
-    else {
-      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-    }
-    http.end();
-  }
-  return 1; // File was fetched from web
+    return 1;  // File was fetched from web
 }

@@ -14,7 +14,6 @@ WebDataWidget::~WebDataWidget() {
 }
 
 void WebDataWidget::setup() {
-
 }
 
 void WebDataWidget::changeMode() {
@@ -45,11 +44,11 @@ void WebDataWidget::update(bool force) {
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {
-                if (doc.containsKey("interval")) {
+                if (doc["interval"].is<int>()) {
                     m_updateDelay = doc["interval"];
                 }
                 JsonVariant array;
-                if (doc.containsKey("displays")) {
+                if (doc["displays"].is<JsonArray>()) {
                     array = doc["displays"].as<JsonArray>();
                 } else {
                     // handle legacy response that doesn't have response level data

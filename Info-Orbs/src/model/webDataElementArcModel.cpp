@@ -97,31 +97,31 @@ int32_t WebDataElementArcModel::getColor() {
 }
 
 void WebDataElementArcModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    if (doc.containsKey("x")) {
+    if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (doc.containsKey("radius")) {
+    if (doc["radius"].is<int32_t>()) {
         setRadius(doc["radius"].as<int32_t>());
     }
-    if (doc.containsKey("innerRadius")) {
+    if (doc["innerRadius"].is<int32_t>()) {
         setInnerRadius(doc["innerRadius"].as<int32_t>());
     }
-    if (doc.containsKey("angleStart")) {
+    if (doc["angleStart"].is<int32_t>()) {
         setAngleStart(doc["angleStart"].as<int32_t>());
     }
-    if (doc.containsKey("angleEnd")) {
+    if (doc["angleEnd"].is<int32_t>()) {
         setAngleEnd(doc["angleEnd"].as<int32_t>());
     }
-    if (doc.containsKey("color")) {
-        setColor(doc["color"].as<String>());
+    if (const char* color = doc["color"]) {
+        setColor(color);
     } else {
         setColor(defaultColor);
     }
-    if (doc.containsKey("background")) {
-        setBackgroundColor(doc["background"].as<String>());
+    if (const char* background = doc["background"]) {
+        setBackgroundColor(background);
     } else {
         setBackgroundColor(defaultBackground);
     }

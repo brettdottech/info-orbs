@@ -13,6 +13,7 @@ class WebDataModel {
     void setLabel(String label);
     String getData();
     void setData(String data, int32_t defaultColor, int32_t defaultBackground);
+    void setData(JsonArray data, int32_t defaultColor, int32_t defaultBackground);
     const WebDataElementModel& getElement(int index);
     int32_t getElementsCount();
     void setElementsCount(int32_t elementsCount);
