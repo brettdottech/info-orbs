@@ -1,7 +1,8 @@
 #include "model/webDataElementImageModel.h"
-#include <WiFi.h>
+
 #include <HTTPClient.h>
 #include <LittleFS.h>
+#include <WiFi.h>
 
 int32_t WebDataElementImageModel::getX() {
     return m_x;
@@ -37,22 +38,20 @@ void WebDataElementImageModel::setImage(String image) {
 }
 
 void WebDataElementImageModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    Serial.println("Parsing Data");
-
-    if (doc.containsKey("x")) {
+    if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (doc.containsKey("image")) {
-        setImage(doc["image"].as<String>());
+    if (const char* image = doc["image"]) {
+        setImage(image);
     }
-    // if (doc.containsKey("imageUrl")) {
-    //     setImageUrl(doc["imageUrl"].as<String>());
+    // if (const char* imageUrl = doc["imageUrl"]) {
+    //     setImageUrl(imageUrl);
     // }
-    // if (doc.containsKey("imageBytes")) {
-    //     setImageBytes(doc["imageBytes"].as<String>());
+    // if (const char* imageBytes = doc["imageBytes"]) {
+    //     setImageBytes(imageBytes);
     // }
 }
 
