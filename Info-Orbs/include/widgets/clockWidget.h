@@ -14,8 +14,8 @@ class ClockWidget : public Widget {
     void changeMode() override;
 
    private:
-    void displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing);
-    void displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color);
+    void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing);
+    void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(uint32_t color);
 
@@ -37,15 +37,15 @@ class ClockWidget : public Widget {
     int m_lastHourSingle{-1};
     int m_lastSecondSingle{-1};
 
-    // Didgets
-    String m_display1Didget;
-    String m_lastDisplay1Didget{"-1"};
-    String m_display2Didget;
-    String m_lastDisplay2Didget{"-1"};
+    // Digits
+    String m_display1Digit;
+    String m_lastDisplay1Digit{"-1"};
+    String m_display2Digit;
+    String m_lastDisplay2Digit{"-1"};
     // Display 3 is :
-    String m_display4Didget;
-    String m_lastDisplay4Didget{"-1"};
-    String m_display5Didget;
-    String m_lastDisplay5Didget{"-1"};
+    String m_display4Digit;
+    String m_lastDisplay4Digit{"-1"};
+    String m_display5Digit;
+    String m_lastDisplay5Digit{"-1"};
 };
 #endif  // CLOCKWIDGET_H
