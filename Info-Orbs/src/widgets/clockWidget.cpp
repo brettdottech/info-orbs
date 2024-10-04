@@ -10,40 +10,40 @@ ClockWidget::~ClockWidget() {
 }
 
 void ClockWidget::setup() {
-    m_lastDisplay1Didget = "-1";
-    m_lastDisplay2Didget = "-1";
-    m_lastDisplay4Didget = "-1";
-    m_lastDisplay5Didget = "-1";
+    m_lastDisplay1Digit = "-1";
+    m_lastDisplay2Digit = "-1";
+    m_lastDisplay4Digit = "-1";
+    m_lastDisplay5Digit = "-1";
 }
 
 void ClockWidget::draw(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
     
-    if (m_lastDisplay1Didget != m_display1Didget || force) {
-        displayDidget(0, m_display1Didget, 7, 5, FOREGROUND_COLOR);
-        m_lastDisplay1Didget = m_display1Didget;
-        if (SHADOWING != 1 &&m_display1Didget == " ") {
+    if (m_lastDisplay1Digit != m_display1Digit || force) {
+        displayDigit(0, m_display1Digit, 7, 5, FOREGROUND_COLOR);
+        m_lastDisplay1Digit = m_display1Digit;
+        if (SHADOWING != 1 &&m_display1Digit == " ") {
             m_manager.clearScreen(0);
         }
     }
-    if (m_lastDisplay2Didget != m_display2Didget || force) {
-        displayDidget(1, m_display2Didget, 7, 5, FOREGROUND_COLOR);
-        m_lastDisplay2Didget = m_display2Didget;
+    if (m_lastDisplay2Digit != m_display2Digit || force) {
+        displayDigit(1, m_display2Digit, 7, 5, FOREGROUND_COLOR);
+        m_lastDisplay2Digit = m_display2Digit;
     }
-    if (m_lastDisplay4Didget != m_display4Didget || force) {
-        displayDidget(3, m_display4Didget, 7, 5, FOREGROUND_COLOR);
-        m_lastDisplay4Didget = m_display4Didget;
+    if (m_lastDisplay4Digit != m_display4Digit || force) {
+        displayDigit(3, m_display4Digit, 7, 5, FOREGROUND_COLOR);
+        m_lastDisplay4Digit = m_display4Digit;
     }
-    if (m_lastDisplay5Didget != m_display5Didget || force) {
-        displayDidget(4, m_display5Didget, 7, 5, FOREGROUND_COLOR);
-        m_lastDisplay5Didget = m_display5Didget;
+    if (m_lastDisplay5Digit != m_display5Digit || force) {
+        displayDigit(4, m_display5Digit, 7, 5, FOREGROUND_COLOR);
+        m_lastDisplay5Digit = m_display5Digit;
     }
 
     if (m_secondSingle != m_lastSecondSingle || force) {
         if (m_secondSingle % 2 == 0) {
-            displayDidget(2, ":", 7, 5, FOREGROUND_COLOR, false);
+            displayDigit(2, ":", 7, 5, FOREGROUND_COLOR, false);
         } else {
-            displayDidget(2, ":", 7, 5, BG_COLOR, false);
+            displayDigit(2, ":", 7, 5, BG_COLOR, false);
         }
 #if SHOW_SECOND_TICKS == true        
         displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
@@ -80,14 +80,14 @@ void ClockWidget::update(bool force) {
     if (m_lastHourSingle != m_hourSingle || force) {
         if (m_hourSingle < 10) {
             if (FORMAT_24_HOUR) {
-                m_display1Didget = "0";
+                m_display1Digit = "0";
             } else {
-                m_display1Didget = " ";
+                m_display1Digit = " ";
             }
         } else {
-            m_display1Didget = int(m_hourSingle/10);
+            m_display1Digit = int(m_hourSingle/10);
         }
-        m_display2Didget = m_hourSingle % 10;
+        m_display2Digit = m_hourSingle % 10;
 
         m_lastHourSingle = m_hourSingle;
     }
@@ -95,8 +95,8 @@ void ClockWidget::update(bool force) {
     if (m_lastMinuteSingle != m_minuteSingle || force) {
         String currentMinutePadded = String(m_minuteSingle).length() == 1 ? "0" + String(m_minuteSingle) : String(m_minuteSingle);
 
-        m_display4Didget = currentMinutePadded.substring(0, 1);
-        m_display5Didget = currentMinutePadded.substring(1, 2);
+        m_display4Digit = currentMinutePadded.substring(0, 1);
+        m_display5Digit = currentMinutePadded.substring(1, 2);
 
         m_lastMinuteSingle = m_minuteSingle;
     }
@@ -108,7 +108,7 @@ void ClockWidget::changeMode() {
     draw(true);
 }
 
-void ClockWidget::displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing) {
+void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();
     display.setTextSize(fontSize);
@@ -119,11 +119,11 @@ void ClockWidget::displayDidget(int displayIndex, const String& didget, int font
     } else {
         display.setTextColor(color, TFT_BLACK);
     }
-    display.drawString(didget, SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
+    display.drawString(digit, SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
 }
 
-void ClockWidget::displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color) {
-    this->displayDidget(displayIndex, didget, font, fontSize, color, SHADOWING);
+void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color) {
+    this->displayDigit(displayIndex, digit, font, fontSize, color, SHADOWING);
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
