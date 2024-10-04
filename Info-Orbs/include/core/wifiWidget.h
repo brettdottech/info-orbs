@@ -1,7 +1,8 @@
 #pragma once
 #ifndef WIFIWIDGET_H
 #define WIFIWIDGET_H
-#include "widget.h"
+
+#include <widget.h>
 
 class WifiWidget : public Widget{
 public:
@@ -11,7 +12,8 @@ public:
     void update(bool force = false) override;
     void draw(bool force = false) override;
     void changeMode() override;
-
+    String getName() override;
+    
     bool isConnected() { return m_isConnected; }
 
 private:

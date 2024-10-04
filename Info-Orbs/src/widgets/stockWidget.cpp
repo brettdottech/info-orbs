@@ -122,3 +122,7 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
 
     display.drawString(stock.getPercentChange(2) + "%", centre, 147, 1);
 }
+
+String StockWidget::getName() {
+    return "Stock";
+}

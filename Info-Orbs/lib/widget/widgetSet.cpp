@@ -59,25 +59,28 @@ void WidgetSet::switchWidget() {
   getCurrent()->draw(true);
 }
 
-void WidgetSet::showLoading() {
-  // display loading screen here
-    m_screenManager->fillAllScreens(TFT_BLACK);
-    m_screenManager->selectScreen(2);
+void WidgetSet::showCenteredLine(int screen, int size, String text) {
+    m_screenManager->selectScreen(screen);
 
     TFT_eSPI &display = m_screenManager->getDisplay();
 
     display.fillScreen(TFT_BLACK);
     display.setTextColor(TFT_WHITE);
-    display.setTextSize(3);  // Set text size
+    display.setTextSize(size);  // Set text size
+    display.drawCentreString(text, 120, 100, 1);
+}
 
-    // Calculate center positions
-    int centre = display.width() / 2;
-    display.drawString("Loading Data", centre, centre, 1);
+
+void WidgetSet::showLoading() {
+    m_screenManager->fillAllScreens(TFT_BLACK);
+    
+    WidgetSet::showCenteredLine(2, 3, "Loading Data:");
 }
 
 void WidgetSet::updateAll() {
   for (int8_t i; i<m_widgetCount; i++) {
-    Serial.println("updating widget #" + String(i));
+    Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
+    showCenteredLine(3, 3, m_widgets[i]->getName().c_str());
     m_widgets[i]->update();
   }
 }

@@ -69,3 +69,7 @@ void WebDataWidget::update(bool force) {
         http.end();
     }
 }
+
+String WebDataWidget::getName() {
+    return "WebData";
+}

@@ -12,6 +12,7 @@ public:
     virtual void update(bool force = false) = 0;
     virtual void draw(bool force = false) = 0;
     virtual void changeMode() = 0;
+    virtual String getName() = 0;
     void setBusy(bool busy);
 
 protected:
