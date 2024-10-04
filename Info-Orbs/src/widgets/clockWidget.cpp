@@ -136,3 +136,7 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
         display.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds - 180, 6 * seconds - 180 + 6, color, TFT_BLACK);
     }
 }
+
+String ClockWidget::getName() {
+    return "Clock";
+}

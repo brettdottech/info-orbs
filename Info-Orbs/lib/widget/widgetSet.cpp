@@ -67,23 +67,20 @@ void WidgetSet::showCenteredLine(int screen, int size, String text) {
     display.fillScreen(TFT_BLACK);
     display.setTextColor(TFT_WHITE);
     display.setTextSize(size);  // Set text size
-
-    // Calculate center positions
-    int centre = display.width() / 2;
-    display.drawString(text, centre, centre, 1);
+    display.drawCentreString(text, 120, 100, 1);
 }
 
 
 void WidgetSet::showLoading() {
     m_screenManager->fillAllScreens(TFT_BLACK);
     
-    WidgetSet::showCenteredLine(2, 3, "Loading Data");
+    WidgetSet::showCenteredLine(2, 3, "Loading Data:");
 }
 
 void WidgetSet::updateAll() {
   for (int8_t i; i<m_widgetCount; i++) {
-    Serial.println("updating widget #" + String(i));
-    showCenteredLine(3, 3, String(i));
+    Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
+    showCenteredLine(3, 3, m_widgets[i]->getName().c_str());
     m_widgets[i]->update();
   }
 }

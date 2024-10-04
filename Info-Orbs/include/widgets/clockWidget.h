@@ -12,6 +12,7 @@ class ClockWidget : public Widget {
     void update(bool force = false) override;
     void draw(bool force = false) override;
     void changeMode() override;
+    String getName() override;
 
    private:
     void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing);
