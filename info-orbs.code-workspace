@@ -2,6 +2,10 @@
   "folders": [
     {
       "path": "."
+    },
+    {
+      "name": "Info-Orbs",
+      "path": "Info-Orbs"
     }
   ],
   "settings": {
