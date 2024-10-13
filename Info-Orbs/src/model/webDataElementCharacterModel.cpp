@@ -101,38 +101,38 @@ int32_t WebDataElementCharacterModel::getColor() {
     return m_color;
 }
 
-void WebDataElementCharacterModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    if (doc.containsKey("x")) {
+void WebDataElementCharacterModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
+    if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y")) {
+    if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (doc.containsKey("character")) {
-        setCharacter(doc["character"].as<String>());
+    if (const char *character = doc["character"]) {
+        setCharacter(character);
     }
-    if (doc.containsKey("font")) {
+    if (doc["font"].is<int32_t>()) {
         setFont(doc["font"].as<int32_t>());
     }
-    if (doc.containsKey("size")) {
+    if (doc["size"].is<int32_t>()) {
         setSize(doc["size"].as<int32_t>());
     }
-    if (doc.containsKey("alignment")) {
-        setAlignment(doc["alignment"].as<String>());
+    if (const char *alignment = doc["alignment"]) {
+        setAlignment(alignment);
     }
-    if (doc.containsKey("color")) {
-        setColor(doc["color"].as<String>());
+    if (const char *color = doc["color"]) {
+        setColor(color);
     } else {
         setColor(defaultColor);
     }
-    if (doc.containsKey("background")) {
-        setBackgroundColor(doc["background"].as<String>());
+    if (const char *background = doc["background"]) {
+        setBackgroundColor(background);
     } else {
         setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataElementCharacterModel::draw(TFT_eSPI& display) {
+void WebDataElementCharacterModel::draw(TFT_eSPI &display) {
     display.setTextDatum(getAlignment());
     display.setTextSize(getSize());
     display.setTextColor(getColor(), getBackgroundColor());

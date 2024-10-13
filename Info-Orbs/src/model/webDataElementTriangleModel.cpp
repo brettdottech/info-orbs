@@ -93,33 +93,33 @@ int32_t WebDataElementTriangleModel::getColor() {
 }
 
 void WebDataElementTriangleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
-    if (doc.containsKey("x1")) {
+    if (doc["x1"].is<int32_t>()) {
         setX(doc["x1"].as<int32_t>());
-    } else if (doc.containsKey("x")) {
+    } else if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
-    if (doc.containsKey("y1")) {
+    if (doc["y1"].is<int32_t>()) {
         setY(doc["y1"].as<int32_t>());
-    } else if (doc.containsKey("y")) {
+    } else if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (doc.containsKey("x2")) {
+    if (doc["x2"].is<int32_t>()) {
         setX2(doc["x2"].as<int32_t>());
     }
-    if (doc.containsKey("y2")) {
+    if (doc["y2"].is<int32_t>()) {
         setY2(doc["y2"].as<int32_t>());
     }
-    if (doc.containsKey("x3")) {
+    if (doc["x3"].is<int32_t>()) {
         setX3(doc["x3"].as<int32_t>());
     }
-    if (doc.containsKey("y3")) {
+    if (doc["y3"].is<int32_t>()) {
         setY3(doc["y3"].as<int32_t>());
     }
-    if (doc.containsKey("filled")) {
+    if (doc["filled"].is<bool>()) {
         setFilled(doc["filled"].as<bool>());
     }
-    if (doc.containsKey("color")) {
-        setColor(doc["color"].as<String>());
+    if (const char* color = doc["color"]) {
+        setColor(color);
     } else {
         setColor(defaultColor);
     }
