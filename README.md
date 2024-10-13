@@ -1,6 +1,6 @@
 ## KanyonKris Fork ##
 ### Changes ###
-- Added WiFiManager. A better way to setup the WiFi connection. Creates an Access Point portal the user connects to and selects/enters the SSID and password of their WiFi Router. Then switches to station mode and connects to the router. If it can't connect to the router it switches to AP portal mode so the user can select/enter a different SSID and password. Much better than hardcoded credentials in a config.h file.
+- Added WiFiManager. A better way to setup the WiFi connection. Creates an Access Point portal the user connects to (Info-Orbs) and selects/enters the SSID and password of their WiFi Router. Then switches to station mode and connects to the router. If it can't connect to the router it switches to AP portal mode so the user can select/enter a different SSID and password. Much better than hardcoded credentials in a config.h file.
 
 ### To Do ###
 - Add settings parameters to the portal so all/most of the user settings in the config.h can be changed in the portal.
