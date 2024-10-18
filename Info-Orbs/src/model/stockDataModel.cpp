@@ -8,7 +8,7 @@ StockDataModel::StockDataModel() {
 StockDataModel &StockDataModel::setSymbol(String symbol) {
     if (m_symbol != symbol) {
         m_symbol = String(symbol);
-        // this is not a regular data field so do not mark changed when set
+        // This is not a regular data field so do not mark changed when set
     }
     return *this;
 }

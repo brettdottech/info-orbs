@@ -47,19 +47,19 @@ void ScreenManager::fillAllScreens(uint32_t color) {
   reset();
 }
 
-// clears all screens by resetting them to black
+// Clears all screens by resetting them to black
 void ScreenManager::clearAllScreens() {
   fillAllScreens(TFT_BLACK);
 }
 
-// clears one screens by resetting it to black
+// Clears one screens by resetting it to black
 void ScreenManager::clearScreen(int screen) {
   selectScreen(screen);
   m_tft.fillScreen(TFT_BLACK);
 }
 
 // Selects all screens
-// I don't think that state should be used, It's kinda wierd saying "ow select
+// I don't think that state should be used, It's kinda weird saying "ow select
 // all the screens to "off"
 void ScreenManager::selectAllScreens() {
   for (int i = 0; i < NUM_SCREENS; i++) {

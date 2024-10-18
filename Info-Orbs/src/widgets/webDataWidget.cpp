@@ -51,7 +51,7 @@ void WebDataWidget::update(bool force) {
                 if (doc["displays"].is<JsonArray>()) {
                     array = doc["displays"].as<JsonArray>();
                 } else {
-                    // handle legacy response that doesn't have response level data
+                    // Handle legacy response that doesn't have response level data
                     array = doc.as<JsonArray>();
                 }
                 for (int i = 0; i < array.size(); i++) {
