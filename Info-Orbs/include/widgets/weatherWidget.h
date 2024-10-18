@@ -36,10 +36,10 @@ class WeatherWidget : public Widget {
     GlobalTime* m_time;
     int8_t m_mode;
 
-    const long m_updateDelay = 600000;  // weather refresh rate
+    const long m_updateDelay = 600000;  // Weather refresh rate
     unsigned long m_lastUpdate = 0;
 
-    const int centre = 120;  // centre location of the screen(240x240)
+    const int centre = 120;  // Centre location of the screen(240x240)
 
     int m_clockStamp = 0;
 

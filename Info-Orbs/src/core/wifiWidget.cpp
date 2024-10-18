@@ -29,7 +29,7 @@ void WifiWidget::setup() {
 }
 
 void WifiWidget::update(bool force) {
-  //force is currently an unhandled due to not knowing what behavior it would change
+  // Force is currently an unhandled due to not knowing what behavior it would change
 
 	if(WiFi.status() == WL_CONNECTED) {
 		m_isConnected = true;
@@ -49,7 +49,7 @@ void WifiWidget::update(bool force) {
 }
 
 void WifiWidget::draw(bool force) {
-  //force is currently an unhandled due to not knowing what behavior it would change
+  // Force is currently an unhandled due to not knowing what behavior it would change
 
 	if(!m_isConnected && !m_connectionFailed) {
 		TFT_eSPI &display = m_manager.getDisplay();

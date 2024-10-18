@@ -188,7 +188,7 @@ void WeatherWidget::drawWeatherIcon(String condition, int displayIndex, int x, i
 }
 
 // This displays the current weather temp on a single screen. Pass in display number, background color, text color
-// dosent round deg, just removes all text after the decimil, should prob be fixed
+// doesnt round deg, just removes all text after the decimil, should probably be fixed
 void WeatherWidget::singleWeatherDeg(int displayIndex, uint32_t backgroundColor, uint32_t textColor) {
     m_manager.selectScreen(displayIndex);
 
@@ -214,8 +214,8 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
     //=== TEXT OVERFLOW ============================
-    // this takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
-    // given the small width of the screens this will porbablly be needed to this project again so making sure to outline it
+    // This takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
+    // Given the small width of the screens this will porbablly be needed to this project again so making sure to outline it
     // clearly as this should liekly eventually be turned into a fucntion. Before use the array size should be made to be dynamic.
     // In this case its used for the weather text description
 
