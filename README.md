@@ -1,4 +1,3 @@
-
 # Welcome to Info Orbs!
 
 Info Orbs is a desk display widget built on top of an ESP32 with the intention of creating a large library of widgets/functionality!

@@ -9,6 +9,11 @@
 #include <globalTime.h>
 #include <config.h>
 #include <widgets/stockWidget.h>
+// #include <AsyncTCP.h>
+// #include <ESPAsyncWebServer.h>
+// #include <WebServer.h>
+// #define ESP32
+// #include <NetWizard.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
