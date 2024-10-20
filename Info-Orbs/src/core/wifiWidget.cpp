@@ -26,9 +26,6 @@ void WifiWidget::setup() {
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   Serial.println("Connecting to WiFi..");
-
-
-
 }
 
 void WifiWidget::update(bool force) {
@@ -107,4 +104,8 @@ void WifiWidget::connectionTimedOut() {
   // m_manager.selectScreen(0);
   // display.drawCentreString("Connection", 120, 80, 1);
   // display.drawCentreString(m_connectionString, 120, 100, 1);
+}
+
+String WifiWidget::getName(){
+    return "WiFi";
 }
