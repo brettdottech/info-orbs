@@ -92,7 +92,7 @@ void StockWidget::getStockData(StockDataModel &stock) {
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
     Serial.println("displayStock - " + stock.getSymbol() + " ~ " + stock.getCurrentPrice());
     if (stock.getCurrentPrice() == 0.0) {
-        // there isn't any data to display yet
+        // There isn't any data to display yet
         return;
     }
     m_manager.selectScreen(displayIndex);

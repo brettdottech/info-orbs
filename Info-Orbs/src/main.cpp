@@ -57,7 +57,7 @@ void setup() {
   sm->reset();
   widgetSet = new WidgetSet(sm);
 
-  TJpgDec.setSwapBytes(true); // jpeg rendering setup
+  TJpgDec.setSwapBytes(true); // JPEG rendering setup
   TJpgDec.setCallback(tft_output);
 
 #ifdef GC9A01_DRIVER
@@ -93,7 +93,7 @@ void loop() {
   if (wifiWidget->isConnected() == false) {
     wifiWidget->update();
     wifiWidget->draw();
-    widgetSet->setClearScreensOnDrawCurrent(); //clear screen after wifiWidget
+    widgetSet->setClearScreensOnDrawCurrent(); // Clear screen after wifiWidget
     delay(100);
   } else {
     if (!widgetSet->initialUpdateDone()) {
