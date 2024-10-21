@@ -41,7 +41,7 @@ class ParqetWidget : public Widget {
     unsigned long m_clockDelay = 60*1000;  // update the clock every minute
     unsigned long m_clockDelayPrev = 0;
 
-    String m_modes[MODE_COUNT] = {"today", "ytd", "max"}; // Others like 1y, 5y... are also available
+    String m_modes[MODE_COUNT] = {"today", "ytd", "max"}; // Possible timeframes: today, 1w, 1m, 3m, 6m, 1y, 3y, mtd, ytd, max
     int8_t m_curMode = 0;
 
     boolean m_showClock = true; // Show clock on first screen
