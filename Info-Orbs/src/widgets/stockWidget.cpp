@@ -56,7 +56,7 @@ void StockWidget::changeMode() {
 }
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.marketdata.app/v1/stocks/quotes/" + stock.getSymbol() + "/?token=aVhwT1NWWkhIZVBRZlIwOUlHb01keWFrMEI5Ql9QM1ZIZndtay1ub0V3OD0";
+    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
 
     HTTPClient http;
     http.begin(httpRequestAddress);
@@ -68,12 +68,12 @@ void StockWidget::getStockData(StockDataModel &stock) {
         DeserializationError error = deserializeJson(doc, payload);
 
         if (!error) {
-            float currentPrice = doc["last"][0].as<float>();
+            float currentPrice = doc["close"].as<float>();
             if (currentPrice > 0.0) {
-                stock.setCurrentPrice(doc["last"][0].as<float>());
-                stock.setPercentChange(doc["changepct"][0].as<float>());
-                stock.setPriceChange(doc["change"][0].as<float>());
-                stock.setVolume(doc["volume"][0].as<float>());
+                stock.setCurrentPrice(doc["close"].as<float>());
+                stock.setPercentChange(doc["percent_change"].as<float>()/100);
+                stock.setPriceChange(doc["change"].as<float>());
+                stock.setVolume(doc["acerage_volume"].as<float>());
             } else {
                 Serial.println("skipping invalid data for: " + stock.getSymbol());
             }
@@ -100,27 +100,39 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     TFT_eSPI &display = m_manager.getDisplay();
 
     display.fillScreen(TFT_BLACK);
-    display.setTextColor(TFT_WHITE);
     display.setTextSize(4);  // Set text size
 
     // Calculate center positions
     int screenWidth = display.width();
     int centre = 120;
+    int arrowOffsetX = 0;
+    int arrowOffsetY = 0;
 
-    // Draw stock data
-    display.fillRect(0, 0, screenWidth, 50, 0x0256);  // rgb565 colors
-    display.drawString(stock.getSymbol(), centre, 27, 1);
-    display.drawString("$" + stock.getCurrentPrice(2), centre, 51 + display.fontHeight(1), 1);
 
     if (stock.getPercentChange() < 0.0) {
         display.setTextColor(TFT_RED, TFT_BLACK);
-        display.fillTriangle(120, 220, 140, 185, 100, 185, TFT_RED);
+        display.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
     } else {
         display.setTextColor(TFT_GREEN, TFT_BLACK);
-        display.fillTriangle(120, 185, 140, 220, 100, 220, TFT_GREEN);
+        display.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
     }
 
-    display.drawString(stock.getPercentChange(2) + "%", centre, 147, 1);
+    // Draw stock data
+    display.setTextColor(TFT_BLACK);
+
+    display.fillRect(0,68, screenWidth, 45, TFT_WHITE);  // rgb565 colors
+
+    display.drawString(stock.getSymbol(), centre, 92, 1);
+
+
+    display.drawString("$" + stock.getCurrentPrice(2), centre, 120 + display.fontHeight(1), 1);
+
+
+    display.fillRect(0,0,screenWidth, 68, TFT_RED);  // rgb565 colors
+    display.setTextSize(3);  // Set text size
+    display.drawString(stock.getPercentChange(2) + "%", centre, 43, 1);
+    display.drawArc (centre, centre, 120, 115, 0, 360, TFT_RED, TFT_RED);
+  
 }
 
 String StockWidget::getName() {

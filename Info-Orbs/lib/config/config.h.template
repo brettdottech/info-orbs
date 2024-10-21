@@ -7,7 +7,7 @@
 #define WIFI_PASS "WIFIPASS" // Wifi password
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
 #define WEATHER_LOCAION "Victoria, BC" //city/state for the weather
-#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stocks to display on the stock tracker
+#define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,TSLA,GME" // Choose your 5 stokcs to display on the stock tracker
 #define WEATHER_UNITS_METRIC //Comment this line out(or delete it) if you want imperial units for the weather
 #define FORMAT_24_HOUR false // Toggle 24 hour clock vs 12 hour clock, change between true/false
 #define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
