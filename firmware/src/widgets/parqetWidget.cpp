@@ -23,11 +23,19 @@ void ParqetWidget::setup() {
 
 
 void ParqetWidget::draw(bool force) {
+    // Check if we need more than one page
     bool isMultiPage = m_portfolio.getHoldingsCount() > (m_showClock ? 4 : 5);
-    if (force || m_changed || (isMultiPage && (millis() - m_cycleDelayPrev) >= m_cycleDelay) || (m_showClock && (millis() - m_clockDelayPrev) >= m_clockDelay)) {
+    // Do we need to update the screens because cycle time is expired
+    bool updateByCycle = isMultiPage && (millis() - m_cycleDelayPrev) >= m_cycleDelay;
+    // Do we need to update the clock screen?
+    bool updateByClock = m_showClock && (millis() - m_clockDelayPrev) >= m_clockDelay;
+    // Do we need to update the stock screens?
+    bool updateStocks = force || m_changed || updateByCycle;
+    if (updateStocks || updateByClock) {
         int8_t stockDisplays = 5;
         int8_t startDisplay = 0;
         if (m_showClock) {
+            // Update the clock in every update
             stockDisplays--;
             startDisplay++;
             int8_t curPage = m_holdingsDisplayFrom/stockDisplays + 1;
@@ -35,23 +43,26 @@ void ParqetWidget::draw(bool force) {
             String extra = String(curPage) + "/" + String(totalPages);
             displayClock(0, TFT_BLACK, TFT_WHITE, extra);
         }
-        for (int8_t i = 0; i < stockDisplays; i++) {
-            int8_t displayIdx = startDisplay + i;
-            int8_t holdingIdx = m_holdingsDisplayFrom + i;
-            if (holdingIdx < m_portfolio.getHoldingsCount()) {
-                ParqetHoldingDataModel holding = m_portfolio.getHolding(holdingIdx);
-                displayStock(displayIdx, holding, TFT_WHITE, TFT_BLACK);
-            } else {
-                clearScreen(displayIdx, TFT_BLACK);
+        if (updateStocks) {
+            // Update the stocks only of necessary
+            for (int8_t i = 0; i < stockDisplays; i++) {
+                int8_t displayIdx = startDisplay + i;
+                int8_t holdingIdx = m_holdingsDisplayFrom + i;
+                if (holdingIdx < m_portfolio.getHoldingsCount()) {
+                    ParqetHoldingDataModel holding = m_portfolio.getHolding(holdingIdx);
+                    displayStock(displayIdx, holding, TFT_WHITE, TFT_BLACK);
+                } else {
+                    clearScreen(displayIdx, TFT_BLACK);
+                }
             }
+            // In the next cycle, show the next set of stocks
+            m_holdingsDisplayFrom += stockDisplays;
+            if (m_holdingsDisplayFrom >= m_portfolio.getHoldingsCount()) {
+                m_holdingsDisplayFrom = 0;
+            }
+            m_changed = false;
+            m_cycleDelayPrev = millis();
         }
-        m_holdingsDisplayFrom += stockDisplays;
-        if (m_holdingsDisplayFrom >= m_portfolio.getHoldingsCount()) {
-            m_holdingsDisplayFrom = 0;
-        }
-        m_changed = false;
-        m_cycleDelayPrev = millis();
-        m_clockDelayPrev = millis();
     }
 }
 
