@@ -42,6 +42,7 @@ void ParqetWidget::draw(bool force) {
             int8_t totalPages = (m_portfolio.getHoldingsCount()-1) / stockDisplays + 1;
             String extra = String(curPage) + "/" + String(totalPages);
             displayClock(0, TFT_BLACK, TFT_WHITE, extra);
+            m_clockDelayPrev = millis();
         }
         if (updateStocks) {
             // Update the stocks only of necessary
