@@ -134,11 +134,12 @@ void ParqetWidget::updatePortfolio() {
 
         if (!error) {
             JsonArray holdings = doc["holdings"];
-            ParqetHoldingDataModel *holdingArray = new ParqetHoldingDataModel[holdings.size()];
+            // Initialize a new array (reserver one extra element for totals)
+            ParqetHoldingDataModel *holdingArray = new ParqetHoldingDataModel[holdings.size()+1];
             int count = 0;
             for (JsonVariant holding : holdings) {
                 String type = holding["assetType"].as<String>();
-                if (type == "security") {
+                if (type == "security" || type == "crypto") {
                     // stocks or etf/funds
                     String id = holding["asset"]["identifier"].as<String>();
                     String name = holding["sharedAsset"]["name"].as<String>();
@@ -152,7 +153,7 @@ void ParqetWidget::updatePortfolio() {
                     if (isSold || currentValue == 0) {
                         Serial.printf("Skipping %s, %s\n", name.c_str(), id.c_str());
                     } else {
-                        Serial.printf("Name: %s, id: %s, cur: %s, start: %.2f, now: %.2f, delta: %.2f, deltaPct: %.2f, curValue: %.2f\n", name.c_str(), id.c_str(), currency.c_str(), purchasePrice, currentPrice, currentValue);
+                        Serial.printf("Name: %s, id: %s, cur: %s, start: %.2f, now: %.2f, curValue: %.2f\n", name.c_str(), id.c_str(), currency.c_str(), purchasePrice, currentPrice, currentValue);
                         ParqetHoldingDataModel h = ParqetHoldingDataModel();
                         h.setId(id);
                         h.setName(name);
@@ -186,7 +187,6 @@ void ParqetWidget::updatePortfolio() {
                 }
                 holdingArray[count++] = h;
             }
-
             m_portfolio.setHoldings(holdingArray, count);
         } else {
             // Handle JSON deserialization error
