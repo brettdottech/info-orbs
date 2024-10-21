@@ -35,7 +35,7 @@ class ParqetWidget : public Widget {
     unsigned long m_stockDelay = 15*60*1000;  //default to 15m between updates
     unsigned long m_stockDelayPrev = 0;
 
-    unsigned long m_cycleDelay = 10*1000;  // cycle through pages (for more than 4/5 stocks) every 10 seconds
+    unsigned long m_cycleDelay = 30*1000;  // cycle through pages (for more than 4/5 stocks) every 30 seconds
     unsigned long m_cycleDelayPrev = 0;
 
     unsigned long m_clockDelay = 60*1000;  // update the clock every minute

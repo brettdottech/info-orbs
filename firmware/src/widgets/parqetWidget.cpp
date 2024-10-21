@@ -162,12 +162,16 @@ void ParqetWidget::updatePortfolio() {
                 JsonVariant perf = doc["performance"];
                 ParqetHoldingDataModel h = ParqetHoldingDataModel();
                 h.setId("total");
-                h.setName("Total");
+                h.setName("T O T A L");
                 h.setPurchasePrice(perf["purchaseValueForInterval"].as<float>());
                 h.setPurchaseValue(perf["purchaseValueForInterval"].as<float>());
                 h.setCurrentPrice(perf["portfolioValue"].as<float>());
                 h.setCurrentValue(perf["portfolioValue"].as<float>());
                 h.setShares(1);
+                // AFAIK, the whole portfolio is shown in the same currency. To avoid another HTTP request, we just use the currency of the first holding
+                if (count > 0) {
+                    h.setCurrency(holdingArray[0].getCurrency());
+                }
                 holdingArray[count++] = h;
             }
 
@@ -263,10 +267,10 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     }
 
     // Draw stock data (multiline)    
-    display.fillRect(0, 80, screenWidth, 100, TFT_LIGHTGREY);
-    display.fillRect(0, 80, screenWidth, 5, TFT_DARKGREY);
-    display.fillRect(0, 175, screenWidth, 5, TFT_DARKGREY);
-    display.setTextColor(TFT_BLACK);
+    // display.fillRect(0, 80, screenWidth, 100, TFT_LIGHTGREY);
+    // display.fillRect(0, 80, screenWidth, 5, TFT_DARKGREY);
+    // display.fillRect(0, 175, screenWidth, 5, TFT_DARKGREY);
+    display.setTextColor(TFT_WHITE);
     display.setTextSize(2);
 
     String wrappedLines[MAX_WRAPPED_LINES];
@@ -276,7 +280,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     if (lineCount > MAX_STOCKNAME_LINES) {
         lineCount = MAX_STOCKNAME_LINES;
     }
-    int height = display.fontHeight() + 10;
+    int height = 28;
     yOffset += (MAX_STOCKNAME_LINES-lineCount)*height/2;
     for (int i = 0; i < lineCount; i++) {
         display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
@@ -285,10 +289,14 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
 
     if (stock.getPercentChange() < 0.0) {
         display.setTextColor(TFT_RED, TFT_BLACK);
+        display.fillRect(0, 80, screenWidth, 5, TFT_RED);
+        display.fillRect(0, 175, screenWidth, 5, TFT_RED);
         // display.fillTriangle(120, 240, 130, 220, 110, 220, TFT_RED);
         display.drawArc(120, 120, 120, 115, 0, 360, TFT_RED, TFT_BLACK);
     } else {
         display.setTextColor(TFT_GREEN, TFT_BLACK);
+        display.fillRect(0, 80, screenWidth, 5, TFT_GREEN);
+        display.fillRect(0, 175, screenWidth, 5, TFT_GREEN);
         // display.fillTriangle(120, 220, 130, 240, 110, 240, TFT_GREEN);
         display.drawArc(120, 120, 120, 115, 0, 360, TFT_GREEN, TFT_BLACK);
     }
