@@ -89,6 +89,31 @@ void setup() {
 #endif
 }
 
+void checkButtons() {
+    if (buttonLeft.pressed()) {
+      Serial.println("Left button pressed");
+      widgetSet->prev();
+    }
+    if (buttonLeft.longPressed()) {
+      Serial.println("Left button longpressed");
+    }
+    if (buttonOK.pressed()) {
+      Serial.println("OK button pressed");
+      widgetSet->changeMode();
+    }
+    if (buttonOK.longPressed()) {
+      Serial.println("OK button longpressed");
+      widgetSet->changeModeLongpress();
+    }
+    if (buttonRight.pressed()) {
+      Serial.println("Right button pressed");
+      widgetSet->next();
+    }
+    if (buttonRight.longPressed()) {
+      Serial.println("Right button longpressed");
+    }
+}
+
 void loop() {
   if (wifiWidget->isConnected() == false) {
     wifiWidget->update();
@@ -101,18 +126,7 @@ void loop() {
     }
     globalTime->updateTime();
 
-    if (buttonLeft.pressed()) {
-      Serial.println("Left button pressed");
-      widgetSet->prev();
-    }
-    if (buttonOK.pressed()) {
-      Serial.println("OK button pressed");
-      widgetSet->changeMode();
-    }
-    if (buttonRight.pressed()) {
-      Serial.println("Right button pressed");
-      widgetSet->next();
-    }
+    checkButtons();
 
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();

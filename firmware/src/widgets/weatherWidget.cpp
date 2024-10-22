@@ -19,6 +19,9 @@ void WeatherWidget::changeMode() {
     draw(true);
 }
 
+void WeatherWidget::changeModeLongpress() {    
+}
+
 void WeatherWidget::setup() {
     m_lastUpdate = millis() - m_updateDelay + 1000;
     m_time = GlobalTime::getInstance();

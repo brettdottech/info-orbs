@@ -108,6 +108,9 @@ void ClockWidget::changeMode() {
     draw(true);
 }
 
+void ClockWidget::changeModeLongpress() {    
+}
+
 void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();

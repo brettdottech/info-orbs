@@ -33,6 +33,10 @@ void WidgetSet::changeMode() {
   m_widgets[m_currentWidget]->changeMode();
 }
 
+void WidgetSet::changeModeLongpress() {
+  m_widgets[m_currentWidget]->changeModeLongpress();
+}
+
 void WidgetSet::setClearScreensOnDrawCurrent() {
   m_clearScreensOnDrawCurrent = true;
 }
