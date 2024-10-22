@@ -2,7 +2,7 @@
 
 Info Orbs is a desk display widget built on top of an ESP32 with the intention of creating a large library of widgets/functionality!
 
-Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://discord.gg/xZhYuQ9y64) | [Youtube Assembly/Flashing Video](https://link.brett.tech/orbsYT) 
+Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://link.brett.tech/discord) | [Youtube Assembly/Flashing Video](https://link.brett.tech/orbsYT) 
 <p>
     <img src="references/weather.png" alt="Weather Widget" style="width:30%;">
     <img src="references/time.png" alt="Clock Widget" style="width: 30%;">
