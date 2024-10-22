@@ -2,7 +2,7 @@
 #define SCREENMANAGER_H
 
 // Include any necessary libraries here
-#include <config.h>
+#include <config_helper.h>
 #include <TFT_eSPI.h>
 #include <SPI.h>
 

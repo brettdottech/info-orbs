@@ -7,7 +7,7 @@
 #include <Arduino.h>
 #include <Button.h>
 #include <globalTime.h>
-#include <config.h>
+#include <config_helper.h>
 #include <widgets/stockWidget.h>
 
 TFT_eSPI tft = TFT_eSPI();

@@ -2,7 +2,7 @@
 #define WIDGET_H
 
 #include <screenManager.h>
-#include <config.h>
+#include <config_helper.h>
 
 class Widget {
 public:

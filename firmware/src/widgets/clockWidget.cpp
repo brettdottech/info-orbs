@@ -1,6 +1,6 @@
 #include "widgets/clockWidget.h"
 
-#include <config.h>
+#include <config_helper.h>
 #include <globalTime.h>
 
 ClockWidget::ClockWidget(ScreenManager& manager) : Widget(manager) {
