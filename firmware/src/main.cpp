@@ -8,7 +8,9 @@
 #include <Button.h>
 #include <globalTime.h>
 #include <config.h>
-#include <widgets/stockWidget.h>
+#ifdef STOCK_TICKER_LIST
+  #include <widgets/stockWidget.h>
+#endif
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -79,7 +81,9 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
+#ifdef STOCK_TICKER_LIST
   widgetSet->add(new StockWidget(*sm));
+#endif
   widgetSet->add(new WeatherWidget(*sm));
 #ifdef WEB_DATA_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
