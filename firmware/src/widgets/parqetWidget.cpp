@@ -80,13 +80,8 @@ void ParqetWidget::update(bool force) {
 }
 
 void ParqetWidget::changeMode() {
-    // In the next cycle, show the next set of stocks
-    int8_t stockDisplays = m_showClock ? 4:5;
-    m_holdingsDisplayFrom += stockDisplays;
-    if (m_holdingsDisplayFrom >= m_portfolio.getHoldingsCount()) {
-        m_holdingsDisplayFrom = 0;
-    }
-    m_changed = true;
+    // Force drawing to show the next set of stocks
+    draw(true);
 }
 
 void ParqetWidget::changeModeLongpress() {
