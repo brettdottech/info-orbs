@@ -7,6 +7,7 @@
 #include <iomanip>
 
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
+#ifdef STOCK_TICKER_LIST
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
     strcpy(stockList, STOCK_TICKER_LIST);
 
@@ -22,6 +23,7 @@ StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
             break;
         }
     } while (symbol = strtok(nullptr, ","));
+#endif
 }
 
 void StockWidget::setup() {
