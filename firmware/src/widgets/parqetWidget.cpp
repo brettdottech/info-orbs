@@ -80,14 +80,22 @@ void ParqetWidget::update(bool force) {
 }
 
 void ParqetWidget::changeMode() {
+    // In the next cycle, show the next set of stocks
+    int8_t stockDisplays = m_showClock ? 4:5;
+    m_holdingsDisplayFrom += stockDisplays;
+    if (m_holdingsDisplayFrom >= m_portfolio.getHoldingsCount()) {
+        m_holdingsDisplayFrom = 0;
+    }
+    m_changed = true;
+}
+
+void ParqetWidget::changeModeLongpress() {
+    // change timeframe
     m_curMode++;
     if (m_curMode >= MODE_COUNT) {
         m_curMode = 0;
     }
     update(true);
-}
-
-void ParqetWidget::changeModeLongpress() {
 }
 
 String ParqetWidget::getTimeframe() {
