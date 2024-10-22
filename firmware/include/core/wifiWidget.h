@@ -13,7 +13,8 @@ public:
     void draw(bool force = false) override;
     void changeMode() override;
     String getName() override;
-    
+    void changeModeLongpress() override;
+
     bool isConnected() { return m_isConnected; }
 
 private:
