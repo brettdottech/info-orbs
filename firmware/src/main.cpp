@@ -17,8 +17,12 @@ bool lastButtonOKState = HIGH;
 bool lastButtonLeftState = HIGH;
 bool lastButtonRightState = HIGH;
 
-unsigned long m_widgetDelay = 20*60*1000;  // Automatically cycle widgets every X ms, set to 0 to disable
-unsigned long m_widgetDelayPrev = 0;
+#ifdef WIDGET_CYCLE_DELAY
+unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY;  // Automatically cycle widgets every X ms, set to 0 to disable
+#else
+unsigned long m_widgetCycleDelay = 0;
+#endif
+unsigned long m_widgetCycleDelayPrev = 0;
 
 Button buttonOK(BUTTON_OK);
 Button buttonLeft(BUTTON_LEFT);
@@ -91,13 +95,13 @@ void setup() {
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
 #endif
 
-  m_widgetDelayPrev = millis();
+  m_widgetCycleDelayPrev = millis();
 }
 
 void checkCycleWidgets() {
-  if (m_widgetDelay > 0 && (m_widgetDelayPrev == 0 || (millis() - m_widgetDelayPrev) >= m_widgetDelay)) {
+  if (m_widgetCycleDelay > 0 && (m_widgetCycleDelayPrev == 0 || (millis() - m_widgetCycleDelayPrev) >= m_widgetCycleDelay)) {
         widgetSet->next();
-        m_widgetDelayPrev = millis();
+        m_widgetCycleDelayPrev = millis();
     }
 }
 
@@ -115,7 +119,7 @@ void loop() {
 
     if (buttonLeft.pressed()) {
       Serial.println("Left button pressed");
-      m_widgetDelayPrev = millis();
+      m_widgetCycleDelayPrev = millis();
       widgetSet->prev();
     }
     if (buttonOK.pressed()) {
@@ -124,7 +128,7 @@ void loop() {
     }
     if (buttonRight.pressed()) {
       Serial.println("Right button pressed");
-      m_widgetDelayPrev = millis();
+      m_widgetCycleDelayPrev = millis();
       widgetSet->next();
     }
 
