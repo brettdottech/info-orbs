@@ -10,8 +10,8 @@
 #include "widget.h"
 #include "utils.h"
 
-#define MODE_COUNT 3
-#define MAX_STOCKNAME_LINES 3
+#define PARQET_MODE_COUNT 6
+#define PARQET_MAX_STOCKNAME_LINES 3
 
 class ParqetWidget : public Widget {
    public:
@@ -25,6 +25,7 @@ class ParqetWidget : public Widget {
    private:
     String getTimeframe();
     void updatePortfolio();
+    void updatePortfolioChart();
     void displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
     ParqetDataModel getPortfolio();
     void clearScreen(int8_t displayIndex, int32_t background);
@@ -41,11 +42,12 @@ class ParqetWidget : public Widget {
     unsigned long m_clockDelay = 60*1000;  // update the clock every minute
     unsigned long m_clockDelayPrev = 0;
 
-    String m_modes[MODE_COUNT] = {"today", "ytd", "max"}; // Possible timeframes: today, 1w, 1m, 3m, 6m, 1y, 3y, mtd, ytd, max
+    String m_modes[PARQET_MODE_COUNT] = {"today", "1w", "1m", "3m", "ytd", "max"}; // Possible timeframes: today, 1w, 1m, 3m, 6m, 1y, 3y, mtd, ytd, max
     int8_t m_curMode = 0;
 
     boolean m_showClock = true; // Show clock on first screen
     boolean m_showTotal = true; // Show your total portfolio value
+    boolean m_showTotalChart = true; // Show performance chart for total
     boolean m_showValues = false; // Show current price (false) or value in portfolio (true)
 
     ParqetDataModel m_portfolio;
