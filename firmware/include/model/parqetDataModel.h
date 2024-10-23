@@ -14,6 +14,7 @@ class ParqetDataModel {
     void setHoldings(ParqetHoldingDataModel *holdings, int count);
     ParqetHoldingDataModel &getHolding(int index);
     void setChartData(float* chartData, int count);
+    void clearChartData();
     float* getChartData();
     int getHoldingsCount();
     int getChartDataCount();
