@@ -40,6 +40,34 @@ ParqetHoldingDataModel &ParqetDataModel::getHolding(int index) {
     return m_holdings[index];
 }
 
+void ParqetDataModel::setChartData(float* chartData, int count) {
+    Serial.printf("setChartData() count=%d\n", count);
+    m_chartdata = chartData;
+    m_chartdataCount = count;
+}
+
+float* ParqetDataModel::getChartData() {
+    return m_chartdata;
+}
+
 int ParqetDataModel::getHoldingsCount() {
     return m_holdingsCount;
+}
+
+int ParqetDataModel::getChartDataCount() {
+    return m_chartdataCount;
+}
+
+void ParqetDataModel::getChartDataScale(uint8_t maxY, float &scale, float &minY) {
+    float minVal = infinityf();
+    float maxVal = -infinityf();
+    for (int i=0; i < m_chartdataCount; i++) {
+        if (m_chartdata[i] < minVal)
+            minVal = m_chartdata[i];
+        if (m_chartdata[i] > maxVal)
+            maxVal = m_chartdata[i];            
+    }
+    float delta = maxVal - minVal;
+    scale = maxY / delta;
+    minY = minVal;
 }

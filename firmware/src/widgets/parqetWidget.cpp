@@ -70,8 +70,11 @@ void ParqetWidget::draw(bool force) {
 void ParqetWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
         setBusy(true);
-        Serial.println("Update ParquetPortfolio");
+        Serial.println("Update ParqetPortfolio");
         updatePortfolio();
+        if (m_showTotalChart && getTimeframe() != "today") {
+            updatePortfolioChart();
+        }
         m_holdingsDisplayFrom = 0;
         m_changed = true;
         setBusy(false);
@@ -87,7 +90,7 @@ void ParqetWidget::changeMode() {
 void ParqetWidget::changeModeLongpress() {
     // change timeframe
     m_curMode++;
-    if (m_curMode >= MODE_COUNT) {
+    if (m_curMode >= PARQET_MODE_COUNT) {
         m_curMode = 0;
     }
     update(true);
@@ -204,6 +207,62 @@ void ParqetWidget::updatePortfolio() {
     http.end();
 }
 
+void ParqetWidget::updatePortfolioChart() {
+    String portfolioId = m_portfolio.getPortfolioId();
+    Serial.printf("Parqet: Update Portfolio Chart %s\n", portfolioId.c_str());
+    String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble/charts?resolution=200";
+    String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"perfChartConfig\": [\"u\"], \"timeframe\": \"" + getTimeframe() + "\"}";
+    Serial.printf("POST Payload: %s\n", postPayload.c_str());
+    HTTPClient http;
+    const char* keys[] = {"Transfer-Encoding"};
+    http.collectHeaders(keys, 1);
+    http.begin(httpRequestAddress);
+    http.addHeader("Content-Type", "application/json"); 
+
+    int httpCode = http.POST(postPayload);
+    Serial.printf("HTTP %d, Size %d\n", httpCode, http.getSize());
+
+    if (httpCode == 200) {  // Check for the returning code
+        Stream& rawStream = http.getStream();
+        ChunkDecodingStream decodedStream(http.getStream());
+
+        // Choose the right stream depending on the Transfer-Encoding header
+        // Parqet might send chunked responses
+        Stream& response =
+            http.header("Transfer-Encoding") == "chunked" ? decodedStream : rawStream;
+
+        // Parse response
+        JsonDocument doc;
+        JsonDocument filter;
+        filter["charts"][0]["values"]["perfHistory"] = true;
+        // filter["interval"] = true;
+        DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+
+        if (!error) {
+            JsonArray charts = doc["charts"];
+            // Initialize a new array
+            float *chartsArray = new float[charts.size()];
+            int count = 0;
+            for (JsonVariant chart: charts) {
+                float perf = chart["values"]["perfHistory"];
+                chartsArray[count++] = perf;
+                // printf("Chart data %d: %.2f\n", count, perf);
+                
+            }
+            m_portfolio.setChartData(chartsArray, count);
+        } else {
+            // Handle JSON deserialization error
+            Serial.println("deserializeJson() failed");
+            Serial.println(error.c_str());
+        }
+    } else {
+        // Handle HTTP request error
+        Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+
+    http.end();
+}
+
 void ParqetWidget::clearScreen(int8_t displayIndex, int32_t background) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
@@ -274,31 +333,52 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     int screenWidth = display.width();
     int centre = 120;
 
-    display.drawString(stock.getCurrency(), centre, 28, 1);
+    display.drawString(stock.getCurrency(), centre, 30, 1);
     if (m_showValues) {
         display.drawString(stock.getCurrentValue(2), centre, 62, 1);
     } else {
         display.drawString(stock.getCurrentPrice(2), centre, 62, 1);
     }
 
-    // Draw stock data (multiline)    
-    // display.fillRect(0, 80, screenWidth, 100, TFT_LIGHTGREY);
-    // display.fillRect(0, 80, screenWidth, 5, TFT_DARKGREY);
-    // display.fillRect(0, 175, screenWidth, 5, TFT_DARKGREY);
     display.setTextColor(TFT_WHITE);
-    display.setTextSize(2);
 
-    String wrappedLines[MAX_WRAPPED_LINES];
-    String dataValues = stock.getName();
-    int yOffset = 100;
-    int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 14);
-    if (lineCount > MAX_STOCKNAME_LINES) {
-        lineCount = MAX_STOCKNAME_LINES;
-    }
-    int height = 28;
-    yOffset += (MAX_STOCKNAME_LINES-lineCount)*height/2;
-    for (int i = 0; i < lineCount; i++) {
-        display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
+    if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() > 7) {
+        // total with chart (we only plot this when we have more than 7 data points)
+        int chartDataCount = m_portfolio.getChartDataCount();
+        float* chartData = m_portfolio.getChartData();
+        float scale;
+        float minY;
+        int maxChartData = 200;
+        int endLine = 170;
+        int spaceInBetween = (maxChartData / chartDataCount) - 1;
+        int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount-1)) / 2;
+        m_portfolio.getChartDataScale(80, scale, minY);
+        int zeroAtY = endLine + minY * scale;
+        Serial.printf("Scale: %f, minY: %f, zeroAtY: %d\n", scale, minY, zeroAtY);
+        for (int i=0; i < chartDataCount; i++) {
+            int x = (spaceInBetween+1)*i + xOffset;
+            int y = endLine - (int) ((chartData[i] - minY) * scale);
+            bool positive = chartData[i] >= 0;
+            // Serial.printf("Drawing line %d, v=%f, @ %d/%d\n", i, chartData[i], x, y);
+            display.drawLine(x, zeroAtY, x, y, positive ? TFT_GREEN: TFT_RED);
+        }
+        display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
+    } else {
+        // Draw stock data (multiline)
+        display.setTextSize(2);
+
+        String wrappedLines[MAX_WRAPPED_LINES];
+        String dataValues = stock.getName();
+        int yOffset = 100;
+        int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 14);
+        if (lineCount > PARQET_MAX_STOCKNAME_LINES) {
+            lineCount = PARQET_MAX_STOCKNAME_LINES;
+        }
+        int height = 28;
+        yOffset += (PARQET_MAX_STOCKNAME_LINES-lineCount)*height/2;
+        for (int i = 0; i < lineCount; i++) {
+            display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
+        }
     }
     display.setTextSize(3);
 
