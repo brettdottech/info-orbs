@@ -41,7 +41,7 @@ void ParqetWidget::draw(bool force) {
             int8_t curPage = m_holdingsDisplayFrom/stockDisplays + 1;
             int8_t totalPages = (m_portfolio.getHoldingsCount()-1) / stockDisplays + 1;
             String extra = String(curPage) + "/" + String(totalPages);
-            displayClock(0, TFT_BLACK, TFT_WHITE, extra);
+            displayClock(0, TFT_BLACK, TFT_WHITE, extra, TFT_DARKGREY);
             m_clockDelayPrev = millis();
         }
         if (updateStocks) {
@@ -65,12 +65,16 @@ void ParqetWidget::draw(bool force) {
             m_cycleDelayPrev = millis();
         }
     }
+    m_everDrawn = true;
 }
 
 void ParqetWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
         setBusy(true);
         Serial.println("Update ParqetPortfolio");
+        if (m_everDrawn) {
+            displayClock(0, TFT_BLACK, TFT_WHITE, "Updating", TFT_RED);
+        }
         updatePortfolio();
         if (m_showTotalChart && getTimeframe() != "today") {
             updatePortfolioChart();
@@ -269,7 +273,7 @@ void ParqetWidget::clearScreen(int8_t displayIndex, int32_t background) {
     display.fillScreen(background);
 }
 
-void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32_t color, String extra) {
+void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32_t color, String extra, uint32_t extraColor) {
     Serial.printf("displayClock at screen %d\n", displayIndex);
     m_manager.selectScreen(displayIndex);
 
@@ -306,13 +310,13 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
     display.drawString(":", centre, clky, 8);
 
 
-    display.fillRect(0, 0, 240, 50, TFT_DARKGREY);
+    display.fillRect(0, 0, 240, 50, extraColor);
     display.setTextDatum(MC_DATUM);
     display.setTextColor(color);
     display.setTextSize(2);
     display.drawString(extra, centre, 27, 2);
 
-    display.fillRect(0, 190, 240, 50, TFT_DARKGREY);
+    display.fillRect(0, 190, 240, 50, extraColor);
     display.setTextDatum(MC_DATUM);
     display.setTextColor(color);
     display.setTextSize(2);
