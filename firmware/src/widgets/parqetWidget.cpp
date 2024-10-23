@@ -72,13 +72,11 @@ void ParqetWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
         setBusy(true);
         Serial.println("Update ParqetPortfolio");
-        if (m_everDrawn) {
+        if (m_everDrawn && m_showClock) {
             displayClock(0, TFT_BLACK, TFT_WHITE, "Updating", TFT_RED);
         }
         updatePortfolio();
-        if (m_showTotalChart && getTimeframe() != "today") {
-            updatePortfolioChart();
-        }
+        updatePortfolioChart();
         m_holdingsDisplayFrom = 0;
         m_changed = true;
         setBusy(false);
@@ -214,6 +212,10 @@ void ParqetWidget::updatePortfolio() {
 void ParqetWidget::updatePortfolioChart() {
     String portfolioId = m_portfolio.getPortfolioId();
     Serial.printf("Parqet: Update Portfolio Chart %s\n", portfolioId.c_str());
+    if (!m_showTotalChart || getTimeframe() == "today") {
+        m_portfolio.clearChartData();
+        return;
+    }
     String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble/charts?resolution=200";
     String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"perfChartConfig\": [\"u\"], \"timeframe\": \"" + getTimeframe() + "\"}";
     Serial.printf("POST Payload: %s\n", postPayload.c_str());

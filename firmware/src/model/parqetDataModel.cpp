@@ -42,9 +42,18 @@ ParqetHoldingDataModel &ParqetDataModel::getHolding(int index) {
 
 void ParqetDataModel::setChartData(float* chartData, int count) {
     Serial.printf("setChartData() count=%d\n", count);
+    // Delete old array
+    delete [] m_chartdata;
+    // Assign new array
     m_chartdata = chartData;
     m_chartdataCount = count;
 }
+
+void ParqetDataModel::clearChartData() {
+    Serial.println("clearChartData()");
+    setChartData(new float[0], 0);
+}
+
 
 float* ParqetDataModel::getChartData() {
     return m_chartdata;
