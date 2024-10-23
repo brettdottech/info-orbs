@@ -29,7 +29,7 @@ class ParqetWidget : public Widget {
     void displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
     ParqetDataModel getPortfolio();
     void clearScreen(int8_t displayIndex, int32_t background);
-    void displayClock(int8_t displayIndex, uint32_t background, uint32_t color, String extra);
+    void displayClock(int8_t displayIndex, uint32_t background, uint32_t color, String extra, uint32_t extraColor);
     
     GlobalTime* m_time;
 
@@ -53,6 +53,7 @@ class ParqetWidget : public Widget {
     ParqetDataModel m_portfolio;
     int m_holdingsDisplayFrom = 0;
     boolean m_changed = false;
+    boolean m_everDrawn = false; // Track if our widget was ever drawn (to distinguish between an onboot and an onwidget update)
 
 };
 #endif  // PARQET_WIDGET_H
