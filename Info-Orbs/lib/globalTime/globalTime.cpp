@@ -40,9 +40,13 @@ void GlobalTime::updateTime() {
 
         m_day = day(m_unixEpoch);
         m_month = month(m_unixEpoch);
-        m_monthName = monthStr(m_month);
+//PSC 10/22/2024 Added Monthname in German
+//        m_monthName = monthStr(m_month);
+        m_monthName = LOC_MONTH[m_month-1];
         m_year = year(m_unixEpoch);
-        m_weekday = dayStr(weekday(m_unixEpoch));
+//PSC 10/22/2024 Added Weekday in German
+//        m_weekday = dayStr(weekday(m_unixEpoch));
+        m_weekday = LOC_WEEKDAY[(weekday(m_unixEpoch))-1];
         m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
     }
 }
