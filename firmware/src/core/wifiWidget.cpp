@@ -1,9 +1,12 @@
 #include "core/wifiWidget.h"
 #include <WiFi.h>
+#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 
 WifiWidget::WifiWidget(ScreenManager& manager) : Widget(manager) {}
 
 WifiWidget::~WifiWidget() {}
+
+WiFiManager wifimgr;
 
 void WifiWidget::setup() {
   TFT_eSPI &display = m_manager.getDisplay();
@@ -15,25 +18,44 @@ void WifiWidget::setup() {
   m_manager.selectScreen(0);
   display.drawCentreString("Connecting" + m_connectionString, 120, 80, 1);
 
+  WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
 
-  m_manager.selectScreen(1);
-  display.drawCentreString("Connecting to", 120, 80, 1);
-  display.drawCentreString("WiFi..", 120, 100, 1);
-  display.drawCentreString(WIFI_SSID, 120, 130, 1);
+  // reset settings - wipe stored credentials for testing
+  // these are stored by the ESP WiFi library
+  // wifimgr.resetSettings();
 
-  // Serial.println("Connecting to WiFi..");
+  // Set WiFiManager to non-blocking so status and info can be displayed
+  wifimgr.setConfigPortalBlocking(false);
+  // wm.setConfigPortalTimeout(60);
 
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-  Serial.println("Connecting to WiFi..");
+  // WiFiManager automatically connects using saved credentials,
+  if(wifimgr.autoConnect("Info-Orbs")){
+    Serial.print("WifiManager connected.");
+  }
+  // if connection fails, it starts an access point with a WiFi setup portal at 192.168.4.1.
+  else {
+    m_configPortalRunning = true;
+    Serial.println("Configuration portal running.");
+    m_manager.selectScreen(1);
+    display.drawCentreString("Configure WiFi", 120, 80, 1);
+    display.drawCentreString("by browsing to:", 120, 100, 1);
+    display.drawCentreString("192.168.4.1", 120, 120, 1);
+  }
 }
 
 void WifiWidget::update(bool force) {
   // Force is currently an unhandled due to not knowing what behavior it would change
 
+  // If WiFiManager is non-blocking, this keeps the configuration portal running
+  wifimgr.process();
+
 	if(WiFi.status() == WL_CONNECTED) {
 		m_isConnected = true;
 		m_connectionString = "Connected";
+    m_ipaddress = WiFi.localIP().toString();
+    Serial.print("IP address: ");
+    Serial.println(m_ipaddress);
+
 	} else {
 		m_connectionTimer += 500;
 		m_dotsString += ".";
@@ -41,7 +63,7 @@ void WifiWidget::update(bool force) {
 		if(m_dotsString.length() > 3) {
 			m_dotsString = "";
 		}
-		if(m_connectionTimer > m_connectionTimeout) {
+		if(m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
 			m_connectionFailed = true;
 			connectionTimedOut();
 		}
@@ -49,7 +71,7 @@ void WifiWidget::update(bool force) {
 }
 
 void WifiWidget::draw(bool force) {
-  // Force is currently an unhandled due to not knowing what behavior it would change
+  //force is currently an unhandled due to not knowing what behavior it would change
 
 	if(!m_isConnected && !m_connectionFailed) {
 		TFT_eSPI &display = m_manager.getDisplay();
@@ -62,6 +84,10 @@ void WifiWidget::draw(bool force) {
 		m_manager.selectScreen(0);
 		display.fillScreen(TFT_BLACK);
 		display.drawCentreString("Connected", 120, 100, 1);
+    m_manager.selectScreen(1);
+    display.drawCentreString("IP Address:", 120, 80, 1);
+    display.drawCentreString(m_ipaddress, 120, 120, 1);
+
     Serial.println();
     Serial.println("Connected to WiFi");
 		m_isConnected = true;
