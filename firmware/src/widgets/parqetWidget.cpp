@@ -364,13 +364,34 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount-1)) / 2;
         m_portfolio.getChartDataScale(80, scale, minY);
         int zeroAtY = endLine + minY * scale;
-        Serial.printf("Scale: %f, minY: %f, zeroAtY: %d\n", scale, minY, zeroAtY);
+        Serial.printf("Scale: %f, minY: %f, zeroAtY: %d, siB=%d, %xOff=%d\n", scale, minY, zeroAtY, spaceInBetween, xOffset);
         for (int i=0; i < chartDataCount; i++) {
             int x = (spaceInBetween+1)*i + xOffset;
             int y = endLine - (int) ((chartData[i] - minY) * scale);
             bool positive = chartData[i] >= 0;
             // Serial.printf("Drawing line %d, v=%f, @ %d/%d\n", i, chartData[i], x, y);
-            display.drawLine(x, zeroAtY, x, y, positive ? TFT_GREEN: TFT_RED);
+            if (spaceInBetween == 0) {
+                // Draw one line
+                display.drawLine(x, zeroAtY, x, y, positive ? TFT_GREEN: TFT_RED);
+            } else if (spaceInBetween == 1) {
+                // Draw two lines
+                display.drawLine(x, zeroAtY, x, y, positive ? TFT_GREEN: TFT_RED);
+                display.drawLine(x+1, zeroAtY, x+1, y, positive ? TFT_GREEN: TFT_RED);
+            } else {
+                // Draw rect
+                int myY = zeroAtY;
+                // Calc height
+                int h = y-zeroAtY;
+                if (h < 0) {
+                    // Height is negative, but fillRect() does not support this
+                    // Move Y and invert height
+                    h *= -1;
+                    myY -= h;
+                }
+                // Serial.printf("Drawing rect %d, v=%f, @ %d/%d/%d/%d\n", i, chartData[i], x - spaceInBetween/2, myY, spaceInBetween, h);
+                display.fillRect(x - spaceInBetween/2, myY, spaceInBetween, h, positive ? TFT_GREEN : TFT_RED);
+            }
+            
         }
         display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
     } else {
