@@ -211,13 +211,18 @@ void ParqetWidget::updatePortfolio() {
 
 void ParqetWidget::updatePortfolioChart() {
     String portfolioId = m_portfolio.getPortfolioId();
+    String timeframe = getTimeframe();
     Serial.printf("Parqet: Update Portfolio Chart %s\n", portfolioId.c_str());
-    if (!m_showTotalChart || getTimeframe() == "today") {
+    if (!m_showTotalChart || (timeframe == "today" && m_overrideTotalChartToday == "")) {
         m_portfolio.clearChartData();
         return;
     }
     String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble/charts?resolution=200";
-    String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"perfChartConfig\": [\"u\"], \"timeframe\": \"" + getTimeframe() + "\"}";
+    
+    if (timeframe == "today") {
+        timeframe = m_overrideTotalChartToday;
+    }
+    String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"perfChartConfig\": [\"u\"], \"timeframe\": \"" + timeframe + "\"}";
     Serial.printf("POST Payload: %s\n", postPayload.c_str());
     HTTPClient http;
     const char* keys[] = {"Transfer-Encoding"};
