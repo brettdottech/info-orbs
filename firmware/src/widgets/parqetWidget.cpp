@@ -179,7 +179,7 @@ void ParqetWidget::updatePortfolio() {
                 }
             }
             // Add total
-            if (m_showTotal) {
+            if (m_showTotalScreen) {
                 JsonVariant perf = doc["performance"];
                 ParqetHoldingDataModel h = ParqetHoldingDataModel();
                 h.setId("total");
@@ -340,10 +340,14 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     int centre = 120;
 
     display.drawString(stock.getCurrency(), centre, 30, 1);
-    if (m_showValues) {
-        display.drawString(stock.getCurrentValue(2), centre, 62, 1);
+    if (stock.getId() != "total" || m_showTotalValue) {
+        if (m_showValues) {
+            display.drawString(stock.getCurrentValue(2), centre, 62, 1);
+            } else {
+            display.drawString(stock.getCurrentPrice(2), centre, 62, 1);
+        }
     } else {
-        display.drawString(stock.getCurrentPrice(2), centre, 62, 1);
+        display.drawString("Portfolio", centre, 62, 1);
     }
 
     display.setTextColor(TFT_WHITE);
