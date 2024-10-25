@@ -46,8 +46,9 @@ class ParqetWidget : public Widget {
     int8_t m_curMode = 0;
 
     boolean m_showClock = true; // Show clock on first screen
-    boolean m_showTotal = true; // Show your total portfolio value
-    boolean m_showTotalChart = true; // Show performance chart for total
+    boolean m_showTotalScreen = true; // Show a total portfolio screen
+    boolean m_showTotalValue = false; // Show your total portfolio value
+    boolean m_showTotalChart = true; // Show performance chart for total (if we have more than 7 datapoints, ie. not for "today")
     boolean m_showValues = false; // Show current price (false) or value in portfolio (true)
 
     ParqetDataModel m_portfolio;
