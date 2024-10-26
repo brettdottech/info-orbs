@@ -21,7 +21,6 @@ void ParqetWidget::setup() {
     m_holdingsDisplayFrom = 0;
 }
 
-
 void ParqetWidget::draw(bool force) {
     // Check if we need more than one page
     bool isMultiPage = m_portfolio.getHoldingsCount() > (m_showClock ? 4 : 5);
@@ -433,4 +432,8 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     }
 
     display.drawString(stock.getPercentChange(2) + "%", centre, 202, 1);
+}
+
+String ParqetWidget::getName() {
+    return "Parqet";
 }
