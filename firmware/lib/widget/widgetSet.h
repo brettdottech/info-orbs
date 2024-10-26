@@ -16,6 +16,7 @@ public:
     void next();
     void prev();
     void changeMode();
+    void changeModeLongpress();
     void showLoading();
     void updateAll();
     bool initialUpdateDone();

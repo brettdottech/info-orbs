@@ -19,6 +19,9 @@ void WebDataWidget::setup() {
 void WebDataWidget::changeMode() {
 }
 
+void WebDataWidget::changeModeLongpress() {    
+}
+
 void WebDataWidget::draw(bool force) {
     for (int i = 0; i < 5; i++) {
         WebDataModel *data = &m_obj[i];
