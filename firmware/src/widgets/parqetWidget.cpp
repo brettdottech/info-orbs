@@ -365,28 +365,28 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() >= 7) {
         // total with chart (we only plot this when we have at least 7 data points)
         int chartDataCount = m_portfolio.getChartDataCount();
-        float* chartData = m_portfolio.getChartData();
-        float scale;
-        float minY;
+        float *chartData = m_portfolio.getChartData();
+        float scale, minVal, maxVal;
         int maxChartData = 200;
         int endLine = 170;
         int spaceInBetween = (maxChartData / chartDataCount) - 1;
-        int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount-1)) / 2;
-        m_portfolio.getChartDataScale(80, scale, minY);
-        int zeroAtY = endLine + minY * scale;
-        Serial.printf("Scale: %f, minY: %f, zeroAtY: %d, siB=%d, %xOff=%d\n", scale, minY, zeroAtY, spaceInBetween, xOffset);
-        for (int i=0; i < chartDataCount; i++) {
-            int x = (spaceInBetween+1)*i + xOffset;
-            int y = endLine - (int) ((chartData[i] - minY) * scale);
+        int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount - 1)) / 2;
+        m_portfolio.getChartDataScale(80, scale, minVal, maxVal);
+        int zeroAtY = endLine + minVal * scale;
+        Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, %xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
+        for (int i = 0; i < chartDataCount; i++)
+        {
+            int x = (spaceInBetween + 1) * i + xOffset;
+            int y = endLine - (int)((chartData[i] - minVal) * scale);
             bool positive = chartData[i] >= 0;
             // Serial.printf("Drawing line %d, v=%f, @ %d/%d\n", i, chartData[i], x, y);
             if (spaceInBetween == 0) {
                 // Draw one line
-                display.drawLine(x, zeroAtY, x, y, positive ? TFT_GREEN: TFT_RED);
+                display.drawLine(x, zeroAtY, x, y, positive ? TFT_DARKGREEN: TFT_RED);
             } else if (spaceInBetween == 1) {
                 // Draw two lines
-                display.drawLine(x, zeroAtY, x, y, positive ? TFT_GREEN: TFT_RED);
-                display.drawLine(x+1, zeroAtY, x+1, y, positive ? TFT_GREEN: TFT_RED);
+                display.drawLine(x, zeroAtY, x, y, positive ? TFT_DARKGREEN: TFT_RED);
+                display.drawLine(x+1, zeroAtY, x+1, y, positive ? TFT_DARKGREEN: TFT_RED);
             } else {
                 // Draw rect
                 int myY = zeroAtY;
@@ -399,12 +399,21 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
                     myY -= h;
                 }
                 // Serial.printf("Drawing rect %d, v=%f, @ %d/%d/%d/%d\n", i, chartData[i], x - spaceInBetween/2, myY, spaceInBetween, h);
-                display.fillRect(x - spaceInBetween/2, myY, spaceInBetween, h, positive ? TFT_GREEN : TFT_RED);
+                display.fillRect(x - spaceInBetween/2, myY, spaceInBetween, h, positive ? TFT_DARKGREEN : TFT_RED);
             }
             
         }
-        display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
-    } else {
+        // display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
+        // display.setTextColor(TFT_WHITE);
+        // display.setTextSize(0);
+        // display.setTextDatum(BL_DATUM);
+        // display.drawString(String(minVal) + "%", 25, endLine, 2);
+        // display.setTextDatum(TL_DATUM);
+        // display.drawString(String(maxVal) + "%", 25, endLine - (int)((maxVal - minVal) * scale), 2);
+        // display.setTextDatum(MC_DATUM);
+    }
+    else
+    {
         // Draw stock data (multiline)
         display.setTextSize(2);
 
