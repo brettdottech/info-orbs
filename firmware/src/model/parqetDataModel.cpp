@@ -67,16 +67,17 @@ int ParqetDataModel::getChartDataCount() {
     return m_chartdataCount;
 }
 
-void ParqetDataModel::getChartDataScale(uint8_t maxY, float &scale, float &minY) {
-    float minVal = infinityf();
-    float maxVal = -infinityf();
+void ParqetDataModel::getChartDataScale(uint8_t maxY, float &scale, float &minVal, float &maxVal) {
+    float _minVal = infinityf();
+    float _maxVal = -infinityf();
     for (int i=0; i < m_chartdataCount; i++) {
-        if (m_chartdata[i] < minVal)
-            minVal = m_chartdata[i];
-        if (m_chartdata[i] > maxVal)
-            maxVal = m_chartdata[i];            
+        if (m_chartdata[i] < _minVal)
+            _minVal = m_chartdata[i];
+        if (m_chartdata[i] > _maxVal)
+            _maxVal = m_chartdata[i];            
     }
-    float delta = maxVal - minVal;
+    float delta = _maxVal - _minVal;
     scale = maxY / delta;
-    minY = minVal;
+    minVal = _minVal;
+    maxVal = _maxVal;
 }
