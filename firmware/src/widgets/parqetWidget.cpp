@@ -440,20 +440,17 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     display.setTextDatum(MC_DATUM);
     display.setTextSize(3);
 
-    if (stock.getPercentChange() < 0.0) {
-        display.setTextColor(TFT_RED, TFT_BLACK);
-        display.fillRect(0, 80, screenWidth, 5, TFT_RED);
-        display.fillRect(0, 175, screenWidth, 5, TFT_RED);
-        // display.fillTriangle(120, 240, 130, 220, 110, 220, TFT_RED);
-        display.drawArc(120, 120, 120, 115, 0, 360, TFT_RED, TFT_BLACK);
-    } else {
-        display.setTextColor(TFT_GREEN, TFT_BLACK);
-        display.fillRect(0, 80, screenWidth, 5, TFT_GREEN);
-        display.fillRect(0, 175, screenWidth, 5, TFT_GREEN);
-        // display.fillTriangle(120, 220, 130, 240, 110, 240, TFT_GREEN);
-        display.drawArc(120, 120, 120, 115, 0, 360, TFT_GREEN, TFT_BLACK);
+    uint32_t stockColor = TFT_DARKGREY;
+    if (stock.getPercentChange() < 0) {
+        stockColor = TFT_RED;
+    } else if (stock.getPercentChange() > 0) {
+        stockColor = TFT_DARKGREEN;
     }
 
+    display.setTextColor(stockColor, TFT_BLACK);
+    display.fillRect(0, 80, screenWidth, 5, stockColor);
+    display.fillRect(0, 175, screenWidth, 5, stockColor);
+    display.drawArc(120, 120, 120, 115, 0, 360, stockColor, TFT_BLACK);
     display.drawString(stock.getPercentChange(2) + "%", centre, 202, 1);
 }
 
