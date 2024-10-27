@@ -250,13 +250,19 @@ void ParqetWidget::updatePortfolioChart() {
 
         if (!error) {
             JsonArray charts = doc["charts"];
+            bool first = true;
             // Initialize a new array
             float *chartsArray = new float[charts.size()];
             int count = 0;
             for (JsonVariant chart: charts) {
-                float perf = chart["values"]["perfHistory"];
+                if (first) {
+                    // Skip first data point (because the first two will be SOD/EOD of the same date and SOD always has perf==0)
+                    first = false;
+                } else {
+                    float perf = chart["values"]["perfHistory"];
                 chartsArray[count++] = perf;
                 // printf("Chart data %d: %.2f\n", count, perf);
+                }
                 
             }
             m_portfolio.setChartData(chartsArray, count);
@@ -356,8 +362,8 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
 
     display.setTextColor(TFT_WHITE);
 
-    if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() > 7) {
-        // total with chart (we only plot this when we have more than 7 data points)
+    if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() >= 7) {
+        // total with chart (we only plot this when we have at least 7 data points)
         int chartDataCount = m_portfolio.getChartDataCount();
         float* chartData = m_portfolio.getChartData();
         float scale;
