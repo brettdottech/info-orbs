@@ -367,11 +367,12 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         int chartDataCount = m_portfolio.getChartDataCount();
         float *chartData = m_portfolio.getChartData();
         float scale, minVal, maxVal;
+        int chartHeight = 80;
         int maxChartData = 200;
         int endLine = 170;
         int spaceInBetween = (maxChartData / chartDataCount) - 1;
         int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount - 1)) / 2;
-        m_portfolio.getChartDataScale(80, scale, minVal, maxVal);
+        m_portfolio.getChartDataScale(chartHeight, scale, minVal, maxVal);
         int zeroAtY = endLine + minVal * scale;
         Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, %xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
         for (int i = 0; i < chartDataCount; i++)
@@ -403,14 +404,19 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
             }
             
         }
-        // display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
-        // display.setTextColor(TFT_WHITE);
-        // display.setTextSize(0);
-        // display.setTextDatum(BL_DATUM);
-        // display.drawString(String(minVal) + "%", 25, endLine, 2);
-        // display.setTextDatum(TL_DATUM);
-        // display.drawString(String(maxVal) + "%", 25, endLine - (int)((maxVal - minVal) * scale), 2);
-        // display.setTextDatum(MC_DATUM);
+        display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
+        display.setTextColor(TFT_WHITE);
+        display.setTextSize(0);
+        if (minVal != 0 && zeroAtY < endLine - 20) {
+            // Show minVal if the zero line is not interfering
+            display.setTextDatum(BL_DATUM);
+            display.drawString(String(minVal) + "%", 25, endLine, 2);
+        }
+        if (maxVal != 0 && zeroAtY > endLine - chartHeight + 20) {
+            // Show maxVal if the zero line is not interfering
+            display.setTextDatum(TL_DATUM);
+            display.drawString(String(maxVal) + "%", 25, endLine - chartHeight, 2);
+        }
     }
     else
     {
@@ -430,6 +436,8 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
             display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
         }
     }
+    
+    display.setTextDatum(MC_DATUM);
     display.setTextSize(3);
 
     if (stock.getPercentChange() < 0.0) {
