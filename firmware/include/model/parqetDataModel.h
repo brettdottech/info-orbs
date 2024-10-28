@@ -18,7 +18,7 @@ class ParqetDataModel {
     float* getChartData();
     int getHoldingsCount();
     int getChartDataCount();
-    void getChartDataScale(uint8_t maxY, float &scale, float &minVal, float &maxVal);
+    void getChartDataScale(uint8_t maxY, float &scale, float &minVal, float &maxVal, float &chartMinVal);
 
    private:
     String m_portfolioId = "";
