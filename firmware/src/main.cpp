@@ -105,32 +105,32 @@ void checkCycleWidgets() {
 }
 
 void checkButtons() {
-    if (buttonLeft.pressed()) {
-      Serial.println("Left button pressed");
-      m_widgetCycleDelayPrev = millis();
-      widgetSet->prev();
-    }
-    if (buttonLeft.longPressed()) {
-      Serial.println("Left button longpressed");
-      widgetSet->buttonPressed(LEFT_BUTTON_PRESSED_LONG);
-    }
-    if (buttonOK.pressed()) {
-      Serial.println("OK button pressed");
-      widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED);
-    }
-    if (buttonOK.longPressed()) {
-      Serial.println("OK button longpressed");
-      widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED_LONG);
-    }
-    if (buttonRight.pressed()) {
-      Serial.println("Right button pressed");
-      m_widgetCycleDelayPrev = millis();
-      widgetSet->next();
-    }
-    if (buttonRight.longPressed()) {
-      Serial.println("Right button longpressed");
-      widgetSet->buttonPressed(RIGHT_BUTTON_PRESSED_LONG);
-    }
+  // Reset cycle timer whenever a button is pressed
+  m_widgetCycleDelayPrev = millis();
+  if (buttonLeft.pressed()) {
+    Serial.println("Left button pressed");
+    widgetSet->prev();
+  }
+  if (buttonLeft.longPressed()) {
+    Serial.println("Left button longpressed");
+    widgetSet->buttonPressed(LEFT_BUTTON_PRESSED_LONG);
+  }
+  if (buttonOK.pressed()) {
+    Serial.println("OK button pressed");
+    widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED);
+  }
+  if (buttonOK.longPressed()) {
+    Serial.println("OK button longpressed");
+    widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED_LONG);
+  }
+  if (buttonRight.pressed()) {
+    Serial.println("Right button pressed");
+    widgetSet->next();
+  }
+  if (buttonRight.longPressed()) {
+    Serial.println("Right button longpressed");
+    widgetSet->buttonPressed(RIGHT_BUTTON_PRESSED_LONG);
+  }
 }
 
 void loop() {
