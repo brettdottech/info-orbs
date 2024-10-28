@@ -112,14 +112,15 @@ void checkButtons() {
     }
     if (buttonLeft.longPressed()) {
       Serial.println("Left button longpressed");
+      widgetSet->buttonPressed(LEFT_BUTTON_PRESSED_LONG);
     }
     if (buttonOK.pressed()) {
       Serial.println("OK button pressed");
-      widgetSet->changeMode();
+      widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED);
     }
     if (buttonOK.longPressed()) {
       Serial.println("OK button longpressed");
-      widgetSet->changeModeLongpress();
+      widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED_LONG);
     }
     if (buttonRight.pressed()) {
       Serial.println("Right button pressed");
@@ -128,6 +129,7 @@ void checkButtons() {
     }
     if (buttonRight.longPressed()) {
       Serial.println("Right button longpressed");
+      widgetSet->buttonPressed(RIGHT_BUTTON_PRESSED_LONG);
     }
 }
 

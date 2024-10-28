@@ -15,8 +15,7 @@ public:
     Widget *getCurrent();
     void next();
     void prev();
-    void changeMode();
-    void changeModeLongpress();
+    void buttonPressed(uint8_t buttonId);
     void showLoading();
     void updateAll();
     bool initialUpdateDone();

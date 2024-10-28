@@ -16,10 +16,7 @@ WebDataWidget::~WebDataWidget() {
 void WebDataWidget::setup() {
 }
 
-void WebDataWidget::changeMode() {
-}
-
-void WebDataWidget::changeModeLongpress() {    
+void WebDataWidget::buttonPressed(uint8_t buttonId) {
 }
 
 void WebDataWidget::draw(bool force) {

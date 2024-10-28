@@ -29,12 +29,8 @@ Widget *WidgetSet::getCurrent() {
   return m_widgets[m_currentWidget];
 }
 
-void WidgetSet::changeMode() {
-  m_widgets[m_currentWidget]->changeMode();
-}
-
-void WidgetSet::changeModeLongpress() {
-  m_widgets[m_currentWidget]->changeModeLongpress();
+void WidgetSet::buttonPressed(uint8_t buttonId) {
+  m_widgets[m_currentWidget]->buttonPressed(buttonId);
 }
 
 void WidgetSet::setClearScreensOnDrawCurrent() {

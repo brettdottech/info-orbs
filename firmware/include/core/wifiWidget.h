@@ -11,9 +11,8 @@ public:
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
+    void buttonPressed(uint8_t buttonId) override;
     String getName() override;
-    void changeModeLongpress() override;
 
     bool isConnected() { return m_isConnected; }
 

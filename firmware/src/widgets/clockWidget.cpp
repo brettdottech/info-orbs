@@ -108,7 +108,9 @@ void ClockWidget::changeMode() {
     draw(true);
 }
 
-void ClockWidget::changeModeLongpress() {    
+void ClockWidget::buttonPressed(uint8_t buttonId) {
+    if (buttonId == MIDDLE_BUTTON_PRESSED)
+        changeMode();
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing) {
