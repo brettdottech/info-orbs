@@ -8,7 +8,9 @@
 #include <Button.h>
 #include <globalTime.h>
 #include <config.h>
-#include <widgets/stockWidget.h>
+#ifdef STOCK_TICKER_LIST
+  #include <widgets/stockWidget.h>
+#endif
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -16,6 +18,13 @@ TFT_eSPI tft = TFT_eSPI();
 bool lastButtonOKState = HIGH;
 bool lastButtonLeftState = HIGH;
 bool lastButtonRightState = HIGH;
+
+#ifdef WIDGET_CYCLE_DELAY
+unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY;  // Automatically cycle widgets every X ms, set to 0 to disable
+#else
+unsigned long m_widgetCycleDelay = 0;
+#endif
+unsigned long m_widgetCycleDelayPrev = 0;
 
 Button buttonOK(BUTTON_OK);
 Button buttonLeft(BUTTON_LEFT);
@@ -79,7 +88,9 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
+#ifdef STOCK_TICKER_LIST
   widgetSet->add(new StockWidget(*sm));
+#endif
   widgetSet->add(new WeatherWidget(*sm));
 #ifdef WEB_DATA_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
@@ -87,11 +98,21 @@ void setup() {
 #ifdef WEB_DATA_STOCK_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
 #endif
+
+  m_widgetCycleDelayPrev = millis();
+}
+
+void checkCycleWidgets() {
+  if (m_widgetCycleDelay > 0 && (m_widgetCycleDelayPrev == 0 || (millis() - m_widgetCycleDelayPrev) >= m_widgetCycleDelay)) {
+        widgetSet->next();
+        m_widgetCycleDelayPrev = millis();
+    }
 }
 
 void checkButtons() {
     if (buttonLeft.pressed()) {
       Serial.println("Left button pressed");
+      m_widgetCycleDelayPrev = millis();
       widgetSet->prev();
     }
     if (buttonLeft.longPressed()) {
@@ -107,6 +128,7 @@ void checkButtons() {
     }
     if (buttonRight.pressed()) {
       Serial.println("Right button pressed");
+      m_widgetCycleDelayPrev = millis();
       widgetSet->next();
     }
     if (buttonRight.longPressed()) {
@@ -130,5 +152,7 @@ void loop() {
 
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();
+
+    checkCycleWidgets();
   }
 }
