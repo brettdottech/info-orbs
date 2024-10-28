@@ -1,5 +1,5 @@
-#ifndef WEAHTERWIDGET_H
-#define WEAHTERWIDGET_H
+#ifndef WEATHERWIDGET_H
+#define WEATHERWIDGET_H
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
@@ -11,17 +11,18 @@
 
 #include "model/weatherDataModel.h"
 
-class WeatherWidget : public Widget {
-   public:
-    WeatherWidget(ScreenManager& manager);
+class WeatherWidget : public Widget
+{
+public:
+    WeatherWidget(ScreenManager &manager);
     ~WeatherWidget() override;
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
     void changeMode() override;
     String getName() override;
-    
-   private:
+
+private:
     void displayClock(int displayIndex, uint32_t background, uint32_t textColor);
 
     void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
@@ -33,13 +34,13 @@ class WeatherWidget : public Widget {
     int getClockStamp();
     int drawDegrees(String number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor);
 
-    GlobalTime* m_time;
+    GlobalTime *m_time;
     int8_t m_mode;
 
-    const long m_updateDelay = 600000;  // Weather refresh rate
+    const long m_updateDelay = 600000; // Weather refresh rate
     unsigned long m_lastUpdate = 0;
 
-    const int centre = 120;  // Centre location of the screen(240x240)
+    const int centre = 120; // Centre location of the screen(240x240)
 
     int m_clockStamp = 0;
 
@@ -60,4 +61,4 @@ class WeatherWidget : public Widget {
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 };
-#endif  // WEAHTERWIDGET_H
+#endif // WEATHERWIDGET_H
