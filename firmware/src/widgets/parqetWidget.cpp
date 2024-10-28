@@ -83,18 +83,18 @@ void ParqetWidget::update(bool force) {
     }
 }
 
-void ParqetWidget::changeMode() {
-    // Force drawing to show the next set of stocks
-    draw(true);
-}
-
-void ParqetWidget::changeModeLongpress() {
-    // change timeframe
-    m_curMode++;
-    if (m_curMode >= PARQET_MODE_COUNT) {
-        m_curMode = 0;
+void ParqetWidget::buttonPressed(uint8_t buttonId) {
+    if (buttonId == MIDDLE_BUTTON_PRESSED) {
+        // Force drawing to show the next set of stocks
+        draw(true);
+    } else if (buttonId == MIDDLE_BUTTON_PRESSED_LONG) {
+        // change timeframe
+        m_curMode++;
+        if (m_curMode >= PARQET_MODE_COUNT) {
+            m_curMode = 0;
+        }
+        update(true);
     }
-    update(true);
 }
 
 String ParqetWidget::getTimeframe() {
