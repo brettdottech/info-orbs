@@ -11,9 +11,10 @@ class ClockWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
-    void changeModeLongpress() override;
+    void buttonPressed(uint8_t buttonId) override;
     String getName() override;
+
+    void changeMode();
 
    private:
     void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing);

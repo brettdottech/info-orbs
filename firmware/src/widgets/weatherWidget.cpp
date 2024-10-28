@@ -19,7 +19,9 @@ void WeatherWidget::changeMode() {
     draw(true);
 }
 
-void WeatherWidget::changeModeLongpress() {    
+void WeatherWidget::buttonPressed(uint8_t buttonId) {
+    if (buttonId == MIDDLE_BUTTON_PRESSED)
+        changeMode();
 }
 
 void WeatherWidget::setup() {
