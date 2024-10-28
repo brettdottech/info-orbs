@@ -15,8 +15,7 @@ class WebDataWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
-    void changeModeLongpress() override;
+    void buttonPressed(uint8_t buttonId) override;
     String getName() override;
 
    private:

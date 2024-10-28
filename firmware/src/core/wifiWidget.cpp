@@ -75,9 +75,8 @@ void WifiWidget::draw(bool force) {
 	}
 }
 
-void WifiWidget::changeMode() {}
-
-void WifiWidget::changeModeLongpress() {}
+void WifiWidget::buttonPressed(uint8_t buttonId) {
+}
 
 void WifiWidget::connectionTimedOut() {
   switch (WiFi.status()) {
