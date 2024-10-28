@@ -366,19 +366,19 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         // total with chart (we only plot this when we have at least 7 data points)
         int chartDataCount = m_portfolio.getChartDataCount();
         float *chartData = m_portfolio.getChartData();
-        float scale, minVal, maxVal;
+        float scale, minVal, maxVal, chartMinVal;
         int chartHeight = 80;
         int maxChartData = 200;
         int endLine = 170;
         int spaceInBetween = (maxChartData / chartDataCount) - 1;
         int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount - 1)) / 2;
-        m_portfolio.getChartDataScale(chartHeight, scale, minVal, maxVal);
-        int zeroAtY = endLine + minVal * scale;
-        Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, %xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
+        m_portfolio.getChartDataScale(chartHeight, scale, minVal, maxVal, chartMinVal);
+        int zeroAtY = endLine + (int)(chartMinVal * scale);
+        Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
         for (int i = 0; i < chartDataCount; i++)
         {
             int x = (spaceInBetween + 1) * i + xOffset;
-            int y = endLine - (int)((chartData[i] - minVal) * scale);
+            int y = zeroAtY - (int)(chartData[i] * scale);
             bool positive = chartData[i] >= 0;
             // Serial.printf("Drawing line %d, v=%f, @ %d/%d\n", i, chartData[i], x, y);
             if (spaceInBetween == 0) {
