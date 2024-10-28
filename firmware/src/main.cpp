@@ -14,11 +14,6 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-// Button states
-bool lastButtonOKState = HIGH;
-bool lastButtonLeftState = HIGH;
-bool lastButtonRightState = HIGH;
-
 #ifdef WIDGET_CYCLE_DELAY
 unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY;  // Automatically cycle widgets every X ms, set to 0 to disable
 #else
