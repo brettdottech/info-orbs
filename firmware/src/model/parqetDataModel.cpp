@@ -79,7 +79,12 @@ void ParqetDataModel::getChartDataScale(uint8_t maxY, float &scale, float &minVa
     float zero = 0;
     // the chart will always show zero, we need to take that into account for our scale
     float delta = max(_maxVal, zero) - min(_minVal, zero);
-    scale = maxY / delta;
+    if (delta == 0) {
+        // avoid Div by zero
+        scale = 1;
+    } else {
+        scale = maxY / delta;
+    }
     minVal = _minVal;
     maxVal = _maxVal;
     chartMinVal = min(_minVal, zero);
