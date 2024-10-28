@@ -60,15 +60,6 @@ void setup() {
   TJpgDec.setSwapBytes(true); // JPEG rendering setup
   TJpgDec.setCallback(tft_output);
 
-#ifdef GC9A01_DRIVER
-  Serial.println("GC9A01 Driver");
-#endif
-#ifdef ILI9341_DRIVER
-  Serial.println("ILI9341 Driver");
-#endif
-#if HARDWARE == WOKWI
-  Serial.println("Wokwi Build");
-#endif
 
   pinMode(BUSY_PIN, OUTPUT);
   Serial.println("Connecting to: " + String(WIFI_SSID));
