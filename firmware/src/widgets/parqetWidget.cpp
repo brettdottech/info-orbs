@@ -367,7 +367,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         int chartDataCount = m_portfolio.getChartDataCount();
         float *chartData = m_portfolio.getChartData();
         float scale, minVal, maxVal, chartMinVal;
-        int chartHeight = 80;
+        int chartHeight = 82;
         int maxChartData = 200;
         int endLine = 170;
         int spaceInBetween = (maxChartData / chartDataCount) - 1;
@@ -404,18 +404,23 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
             }
             
         }
-        display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
+        // display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
+        display.fillRect(0, zeroAtY-1, 240, 3, TFT_WHITE);
         display.setTextColor(TFT_WHITE);
         display.setTextSize(0);
-        if (minVal != 0 && zeroAtY < endLine - 20) {
+        int minAtY = zeroAtY - (int)(minVal * scale);
+        int maxAtY = zeroAtY - (int)(maxVal * scale);
+        if (zeroAtY < minAtY - 15 || zeroAtY > minAtY) {
             // Show minVal if the zero line is not interfering
+            display.drawLine(0, minAtY, 240, minAtY, TFT_DARKGREY);
             display.setTextDatum(BL_DATUM);
-            display.drawString(String(minVal) + "%", 25, endLine, 2);
+            display.drawString(String(minVal) + "%", 25, minAtY, 2);
         }
-        if (maxVal != 0 && zeroAtY > endLine - chartHeight + 20) {
+        if (zeroAtY > maxAtY + 15 || zeroAtY < maxAtY) {
             // Show maxVal if the zero line is not interfering
+            display.drawLine(0, maxAtY, 240, maxAtY, TFT_DARKGREY);
             display.setTextDatum(TL_DATUM);
-            display.drawString(String(maxVal) + "%", 25, endLine - chartHeight, 2);
+            display.drawString(String(maxVal) + "%", 25, maxAtY, 2);
         }
     }
     else
