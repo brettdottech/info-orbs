@@ -8,6 +8,9 @@
 *.exe
 *.out
 
+# Visual Studio files
+.vscode
+
 # Build directory and Arduino IDE specific files
 /build/
 *.d
@@ -16,4 +19,3 @@
 libraries/
 # firmware/lib/config/config.h
 .pio
-.vscode/*
