@@ -106,28 +106,33 @@ void checkCycleWidgets() {
 
 void checkButtons() {
   // Reset cycle timer whenever a button is pressed
-  m_widgetCycleDelayPrev = millis();
   if (buttonLeft.pressed()) {
+    m_widgetCycleDelayPrev = millis();
     Serial.println("Left button pressed");
     widgetSet->prev();
   }
   if (buttonLeft.longPressed()) {
+    m_widgetCycleDelayPrev = millis();
     Serial.println("Left button longpressed");
     widgetSet->buttonPressed(LEFT_BUTTON_PRESSED_LONG);
   }
   if (buttonOK.pressed()) {
+    m_widgetCycleDelayPrev = millis();
     Serial.println("OK button pressed");
     widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED);
   }
   if (buttonOK.longPressed()) {
+    m_widgetCycleDelayPrev = millis();
     Serial.println("OK button longpressed");
     widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED_LONG);
   }
   if (buttonRight.pressed()) {
+    m_widgetCycleDelayPrev = millis();
     Serial.println("Right button pressed");
     widgetSet->next();
   }
   if (buttonRight.longPressed()) {
+    m_widgetCycleDelayPrev = millis();
     Serial.println("Right button longpressed");
     widgetSet->buttonPressed(RIGHT_BUTTON_PRESSED_LONG);
   }
