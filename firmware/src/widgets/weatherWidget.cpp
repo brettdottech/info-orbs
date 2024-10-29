@@ -249,6 +249,7 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
 
 // This displays the next 3 days weather forecast
 void WeatherWidget::threeDayWeather(int displayIndex) {
+    const int days = 3;
     const int columnSize = 75;
     const int highLowY = 199;
 
@@ -261,26 +262,28 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
 
     display.fillRect(0, 170, 240, 70, TFT_BLACK);
 
-    for (int i = 0; i < 3; i++) {
-        int x = (centre - columnSize) + i * columnSize;
-        String temperature;
-        display.setTextColor(TFT_WHITE);
-        if (m_mode == MODE_HIGHS) {
-            temperature = model.getDayHigh(i, 0);
-            if (temperature != "") {
-                display.drawString("highs", centre, highLowY, 4);
-            }
-        } else if (m_mode == MODE_LOWS) {
-            temperature = model.getDayLow(i, 0);
-            if (temperature != "") {
-                display.drawString("lows", centre, highLowY, 4);
-            }
+    display.setTextColor(TFT_WHITE);
+    display.drawString(m_mode == MODE_HIGHS ? "highs" : "lows", centre, highLowY, 4);
+    
+    int temperatureFontId = 6;  // 48px 0-9 only
+    // Look up all the temperatures, and if any of them are more than 2 digits, we need
+    // to scale down the font -- or it won't look right on the screen.
+    String temps[days];
+    for (auto i = 0; i < days; i++) {
+        temps[i] = m_mode == MODE_HIGHS ? model.getDayHigh(i, 0) : model.getDayLow(i, 0);
+        if (temps[i].length() > 2) {
+            // We've got a nutty 3-digit temperature, scale down
+            temperatureFontId = 4;  // 26px 0-9; if there were a 36 or 32, I'd use it
         }
+    }
+
+    display.setTextColor(TFT_BLACK);
+    for (auto i = 0; i < days; i++) {
+        // TODO: only works for 3 days
+        const int x = (centre - columnSize) + i * columnSize;
+
         drawWeatherIcon(model.getDayIcon(i), displayIndex, x - 30, 40, 4);
-        display.setTextColor(TFT_BLACK);
-        if (temperature != "") {
-            drawDegrees(temperature, x, 122, 6, 1, 7, 4, TFT_BLACK, TFT_WHITE);
-        }
+        drawDegrees(temps[i], x, 122, temperatureFontId, 1, 7, 4, TFT_BLACK, TFT_WHITE);
 
         String shortDayName = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
         shortDayName.remove(3);
