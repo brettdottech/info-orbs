@@ -9,12 +9,7 @@
 *.out
 
 # Visual Studio files
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+.vscode
 
 # Local History for Visual Studio Code
 .history/
@@ -28,5 +23,9 @@
 
 # Arduino libraries (if installed in the project directory)
 libraries/
-# firmware/lib/config/config.h
+
+# User edited config file
+firmware/lib/config/config.h
+
+# PlatformIO files
 .pio
