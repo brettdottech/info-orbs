@@ -16,4 +16,4 @@
 libraries/
 # firmware/lib/config/config.h
 .pio
-.vscode
+.vscode/*
