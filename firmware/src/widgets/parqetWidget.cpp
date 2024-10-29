@@ -367,18 +367,18 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         int chartDataCount = m_portfolio.getChartDataCount();
         float *chartData = m_portfolio.getChartData();
         float scale, minVal, maxVal, chartMinVal;
-        int chartHeight = 82;
+        int chartHeight = 83;
         int maxChartData = 200;
-        int endLine = 170;
+        int endLine = 171;
         int spaceInBetween = (maxChartData / chartDataCount) - 1;
         int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount - 1)) / 2;
         m_portfolio.getChartDataScale(chartHeight, scale, minVal, maxVal, chartMinVal);
-        int zeroAtY = endLine + (int)(chartMinVal * scale);
+        int zeroAtY = endLine + round(chartMinVal * scale);
         Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
         for (int i = 0; i < chartDataCount; i++)
         {
             int x = (spaceInBetween + 1) * i + xOffset;
-            int y = zeroAtY - (int)(chartData[i] * scale);
+            int y = zeroAtY - round(chartData[i] * scale);
             bool positive = chartData[i] >= 0;
             // Serial.printf("Drawing line %d, v=%f, @ %d/%d\n", i, chartData[i], x, y);
             if (spaceInBetween == 0) {
@@ -408,8 +408,9 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         display.fillRect(0, zeroAtY-1, 240, 3, TFT_WHITE);
         display.setTextColor(TFT_WHITE);
         display.setTextSize(0);
-        int minAtY = zeroAtY - (int)(minVal * scale);
-        int maxAtY = zeroAtY - (int)(maxVal * scale);
+        int minAtY = zeroAtY - round(minVal * scale);
+        int maxAtY = zeroAtY - round(maxVal * scale);
+        Serial.printf("min/max lines would be at %d/%d\n", minAtY, maxAtY);
         if (zeroAtY < minAtY - 15 || zeroAtY > minAtY) {
             // Show minVal if the zero line is not interfering
             display.drawLine(0, minAtY, 240, minAtY, TFT_DARKGREY);
@@ -454,9 +455,9 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
 
     display.setTextColor(stockColor, TFT_BLACK);
     display.fillRect(0, 80, screenWidth, 5, stockColor);
-    display.fillRect(0, 175, screenWidth, 5, stockColor);
+    display.fillRect(0, 176, screenWidth, 5, stockColor);
     display.drawArc(120, 120, 120, 115, 0, 360, stockColor, TFT_BLACK);
-    display.drawString(stock.getPercentChange(2) + "%", centre, 202, 1);
+    display.drawString(stock.getPercentChange(2) + "%", centre, 203, 1);
 }
 
 String ParqetWidget::getName() {
