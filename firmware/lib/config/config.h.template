@@ -7,17 +7,18 @@
 #define WIFI_PASS "WIFIPASS" // wifi password
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
 #define WEATHER_LOCAION "Victoria, BC" //city/state for the weather
-#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stokcs to display on the stock tracker
+#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stocks to display on the stock tracker
 #define WEATHER_UNITS_METRIC //Comment this line out(or delete it) if you want imperial units for the weather
 #define FORMAT_24_HOUR false // toggle 24 hour clock vs 12 hour clock, chnage between true/false
-#define SHOW_AM_PM_INDICATOR false // am/pm on the clock if using 12 hour
-#define SHOW_SECOND_TICKS true // ticking indeicator on the centre clock
+#define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
+#define SHOW_SECOND_TICKS true // ticking indicator on the centre clock
 #define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
 #define LOC_DE // Defined if Monthnames and Weekdays should be in German
 //#define LOC_EN // Defined if Monthnames and Weekdays should be in English
 //#define LOC_FR // Defined if Monthnames and Weekdays should be in French
 //#define WEB_DATA_WIDGET_URL "" // use this to make your own widgets using an API/Webdata source
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // use this as an alternative to the stock ticker widget
+#define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X ms, set to 0 to disable
 // ============= END CONFIG ==============================================================================
 
 
@@ -81,9 +82,8 @@
 #define TIMEZONE_API_URL "http://api.timezonedb.com/v2.1/get-time-zone"
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
 
-
-#define BG_COLOR 0x20a1         // clock shadow colour(Light brown)
-#define FOREGROUND_COLOR 0xfc80  // orange for clock
+#define BG_COLOR 0x20a1         // Clock shadow color (Light brown)
+#define FOREGROUND_COLOR 0xfc80  // Orange for clock
 
 #define MAX_RETRIES 3
 
