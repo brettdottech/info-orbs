@@ -47,7 +47,8 @@ void WeatherWidget::update(bool force) {
         setBusy(true);
         if (force) {
             int retry = 0;
-            while (!getWeatherData() && retry++ < MAX_RETRIES);
+            while (!getWeatherData() && retry++ < MAX_RETRIES)
+                ;
         } else {
             getWeatherData();
         }
@@ -60,7 +61,8 @@ bool WeatherWidget::getWeatherData() {
     HTTPClient http;
     http.begin(httpRequestAddress);
     int httpCode = http.GET();
-    if (httpCode > 0) {  // Check for the returning code
+    if (httpCode > 0) { 
+        // Check for the returning code
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, http.getString());
         http.end();
@@ -81,18 +83,18 @@ bool WeatherWidget::getWeatherData() {
         } else {
             // Handle JSON deserialization error
             switch (error.code()) {
-                case DeserializationError::Ok:
-                    Serial.print(F("Deserialization succeeded"));
-                    break;
-                case DeserializationError::InvalidInput:
-                    Serial.print(F("Invalid input!"));
-                    break;
-                case DeserializationError::NoMemory:
-                    Serial.print(F("Not enough memory"));
-                    break;
-                default:
-                    Serial.print(F("Deserialization failed"));
-                    break;
+            case DeserializationError::Ok:
+                Serial.print(F("Deserialization succeeded"));
+                break;
+            case DeserializationError::InvalidInput:
+                Serial.print(F("Invalid input!"));
+                break;
+            case DeserializationError::NoMemory:
+                Serial.print(F("Not enough memory"));
+                break;
+            default:
+                Serial.print(F("Deserialization failed"));
+                break;
             }
 
             return false;
@@ -107,39 +109,33 @@ bool WeatherWidget::getWeatherData() {
 }
 
 void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t color) {
+    const int clockY = 94;
+    const int dayOfWeekY = 160;
+    const int dateY = 197;
+
     m_manager.selectScreen(displayIndex);
 
     TFT_eSPI &display = m_manager.getDisplay();
-
-    int clky = 95;
-    display.setTextColor(color);
-    display.setTextSize(1);
-    display.setTextDatum(MC_DATUM);
 
     display.fillScreen(background);
     display.setTextColor(color);
     display.setTextSize(1);
     display.setTextDatum(MC_DATUM);
 #ifdef WEATHER_UNITS_METRIC
-    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, 151, 2);
+    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, dateY, 4);
 #else
-    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, 151, 2);
+    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, dateY, 4);
 #endif
-    display.setTextSize(3);
-    display.drawString(m_time->getWeekday(), centre, 178, 2);
-    display.setTextColor(color);
+    display.setTextSize(2);
+    display.drawString(m_time->getWeekday(), centre, dayOfWeekY, 4);
+
+    display.setTextSize(1);
     display.setTextDatum(MR_DATUM);
-    display.setTextSize(1);
-
-    display.drawString(m_time->getHourPadded(), centre - 5, clky, 8);
-
-    display.setTextColor(color);
-    display.setTextDatum(ML_DATUM);
-    display.setTextSize(1);
-    display.drawString(m_time->getMinutePadded(), centre + 5, clky, 8);
+    display.drawString(m_time->getHourPadded(), centre - 5, clockY, 8);
     display.setTextDatum(MC_DATUM);
-    display.setTextColor(color);
-    display.drawString(":", centre, clky, 8);
+    display.drawString(":", centre, clockY, 8);
+    display.setTextDatum(ML_DATUM);
+    display.drawString(m_time->getMinutePadded(), centre + 5, clockY, 8);
 }
 
 // This will write an image to the screen when called from a hex array. Pass in:
@@ -182,6 +178,7 @@ void WeatherWidget::drawWeatherIcon(String condition, int displayIndex, int x, i
     } else {
         Serial.println("unknown weather icon:" + condition);
     }
+
     if (icon != NULL && size > 0) {
         showJPG(displayIndex, x, y, icon, size, scale);
     }
@@ -195,18 +192,18 @@ void WeatherWidget::singleWeatherDeg(int displayIndex, uint32_t backgroundColor,
     TFT_eSPI &display = m_manager.getDisplay();
     display.fillScreen(backgroundColor);
 
-    drawDegrees(model.getCurrentTemperature(0), centre, 100, 8, 1, 15, 8, textColor, backgroundColor);
+    drawDegrees(model.getCurrentTemperature(0), centre, 108, 8, 1, 15, 8, textColor, backgroundColor);
 
     display.fillRect(0, 170, 240, 70, TFT_BLACK);
 
     display.fillRect(centre - 1, 170, 2, 240, TFT_WHITE);
 
     display.setTextColor(TFT_WHITE);
-    display.setTextSize(2);
-    display.drawString("High", 80, 190, 1);
-    drawDegrees(model.getTodayHigh(0), 80, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
-    display.drawString("Low", 160, 190, 1);
-    drawDegrees(model.getTodayLow(0), 160, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
+    display.setTextSize(1);
+    display.drawString("high", 80, 190, 4);
+    display.drawString("low", 160, 190, 4);
+    drawDegrees(model.getTodayHigh(0), 80, 216, 4, 1, 4, 2, TFT_WHITE, TFT_BLACK);
+    drawDegrees(model.getTodayLow(0), 160, 216, 4, 1, 4, 2, TFT_WHITE, TFT_BLACK);
 }
 
 // This displays the users current city and the text desctiption of the weather. Pass in display number, background color, text color
@@ -235,60 +232,59 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
 
     display.fillScreen(b);
     display.setTextColor(t);
-    display.setTextSize(3);
+    display.setTextSize(2);
     display.setTextDatum(MC_DATUM);
     String cityName = model.getCityName();
     cityName.remove(cityName.indexOf(",", 0));
-    display.drawString(cityName, centre, 80, 2);
-    display.setTextSize(2);
-    display.setTextFont(1);
-    display.drawString(messageArr[0], centre, 120);
-    display.drawString(messageArr[1], centre, 140);
-    display.drawString(messageArr[2], centre, 160);
-    display.drawString(messageArr[3], centre, 180);
+    display.drawString(cityName, centre, 84, 4);
+    display.setTextSize(1);
+    display.setTextFont(4);
+
+    auto y = 118;
+    for (auto i = 0; i < 4; i++) {
+        display.drawString(messageArr[i], centre, y);
+        y += 21;
+    }
 }
 
 // This displays the next 3 days weather forecast
 void WeatherWidget::threeDayWeather(int displayIndex) {
+    const int columnSize = 75;
+    const int highLowY = 199;
+
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
 
     display.setTextDatum(MC_DATUM);
     display.fillScreen(TFT_WHITE);
-    display.setTextSize(2);
-
-    display.fillRect(78, 0, 3, 240, TFT_BLACK);
-    display.fillRect(157, 0, 3, 240, TFT_BLACK);
+    display.setTextSize(1);
 
     display.fillRect(0, 170, 240, 70, TFT_BLACK);
-    display.setTextColor(TFT_WHITE);
-    display.drawString("Next 3 Days", centre, 191, 1);
 
     for (int i = 0; i < 3; i++) {
-        int xOffset = (centre - 75) + i * 75;
+        int x = (centre - columnSize) + i * columnSize;
         String temperature;
         display.setTextColor(TFT_WHITE);
         if (m_mode == MODE_HIGHS) {
             temperature = model.getDayHigh(i, 0);
             if (temperature != "") {
-                display.drawString("Highs", centre, 215, 1);
+                display.drawString("highs", centre, highLowY, 4);
             }
         } else if (m_mode == MODE_LOWS) {
             temperature = model.getDayLow(i, 0);
             if (temperature != "") {
-                display.drawString("Lows", centre, 215, 1);
+                display.drawString("lows", centre, highLowY, 4);
             }
         }
-        drawWeatherIcon(model.getDayIcon(i), displayIndex, xOffset - 30, 47, 4);
+        drawWeatherIcon(model.getDayIcon(i), displayIndex, x - 30, 40, 4);
         display.setTextColor(TFT_BLACK);
         if (temperature != "") {
-            drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
+            drawDegrees(temperature, x, 122, 6, 1, 7, 4, TFT_BLACK, TFT_WHITE);
         }
 
-        String weekUpdate = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
-        weekUpdate.remove(3);
-        weekUpdate.toUpperCase();
-        display.drawString(weekUpdate, xOffset, 150, 2);
+        String shortDayName = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
+        shortDayName.remove(3);
+        display.drawString(shortDayName, x, 154, 4);
     }
 }
 
