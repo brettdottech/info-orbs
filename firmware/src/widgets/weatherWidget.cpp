@@ -118,7 +118,7 @@ void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t
 
     display.fillScreen(background);
     display.setTextColor(color);
-    display.setTextSize(2);
+    display.setTextSize(1);
     display.setTextDatum(MC_DATUM);
 #ifdef WEATHER_UNITS_METRIC
     display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, 151, 2);
