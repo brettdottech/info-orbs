@@ -19,3 +19,6 @@ firmware/lib/config/config.h
 
 # VS Code
 /.vscode/
+
+# JetBrains
+/.idea/
