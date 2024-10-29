@@ -83,18 +83,18 @@ bool WeatherWidget::getWeatherData() {
         } else {
             // Handle JSON deserialization error
             switch (error.code()) {
-            case DeserializationError::Ok:
-                Serial.print(F("Deserialization succeeded"));
-                break;
-            case DeserializationError::InvalidInput:
-                Serial.print(F("Invalid input!"));
-                break;
-            case DeserializationError::NoMemory:
-                Serial.print(F("Not enough memory"));
-                break;
-            default:
-                Serial.print(F("Deserialization failed"));
-                break;
+                case DeserializationError::Ok:
+                    Serial.print(F("Deserialization succeeded"));
+                    break;
+                case DeserializationError::InvalidInput:
+                    Serial.print(F("Invalid input!"));
+                    break;
+                case DeserializationError::NoMemory:
+                    Serial.print(F("Not enough memory"));
+                    break;
+                default:
+                    Serial.print(F("Deserialization failed"));
+                    break;
             }
 
             return false;
