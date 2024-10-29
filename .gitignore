@@ -14,5 +14,6 @@
 
 # Arduino libraries (if installed in the project directory)
 libraries/
-firmware/lib/config/config.h
+# firmware/lib/config/config.h
 .pio
+.vscode
