@@ -1,5 +1,5 @@
-#ifndef WEAHTERWIDGET_H
-#define WEAHTERWIDGET_H
+#ifndef WEATHERWIDGET_H
+#define WEATHERWIDGET_H
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
@@ -60,4 +60,4 @@ class WeatherWidget : public Widget {
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 };
-#endif  // WEAHTERWIDGET_H
+#endif  // WEATHERWIDGET_H
