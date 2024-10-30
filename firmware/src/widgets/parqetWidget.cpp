@@ -114,6 +114,12 @@ void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state)
         }
         update(true);
     }
+    else if (buttonId == BUTTON_OK && state == BTN_LONG)
+    {
+        // Reset view to default timeframe and reload
+        m_curMode = 0;
+        update(true);
+    }
 }
 
 String ParqetWidget::getTimeframe()
