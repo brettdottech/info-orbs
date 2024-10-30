@@ -16,7 +16,7 @@ WebDataWidget::~WebDataWidget() {
 void WebDataWidget::setup() {
 }
 
-void WebDataWidget::buttonPressed(uint8_t buttonId) {
+void WebDataWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void WebDataWidget::draw(bool force) {
