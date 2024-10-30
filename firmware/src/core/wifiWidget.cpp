@@ -75,7 +75,7 @@ void WifiWidget::draw(bool force) {
 	}
 }
 
-void WifiWidget::buttonPressed(uint8_t buttonId) {
+void WifiWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void WifiWidget::connectionTimedOut() {
