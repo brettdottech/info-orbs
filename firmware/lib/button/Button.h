@@ -1,18 +1,20 @@
-#ifndef Button_h
-#define Button_h
+#ifndef BUTTON_H
+#define BUTTON_H
 #include <Arduino.h>
+
+enum ButtonState {
+	BTN_NOTHING, BTN_SHORT, BTN_MEDIUM, BTN_LONG
+};
 
 class Button
 {
 	public:
 		Button(uint8_t pin);
 		void begin();
-		uint8_t read();
-		bool toggled();
-		bool pressed();
-		bool longPressed();
-		// bool released();
-		bool has_changed();
+		bool pressedShort();
+		bool pressedMedium();
+		bool pressedLong();
+		ButtonState getState();
 		
 #if BUTTON_MODE == INPUT_PULLDOWN
 		const static bool PRESSED_LEVEL = HIGH;
@@ -22,20 +24,32 @@ class Button
 		const static bool RELEASED_LEVEL = HIGH;
 #endif
 
-		const static uint8_t STATE_NOTHING = 0;
-		const static uint8_t STATE_PRESSED = 1;
-		const static uint8_t STATE_LONGPRESSED = 2;
-
-		const static long LONGPRESS_TIME = 500;
+#ifdef BUTTON_DEBOUNCE_TIME
+		const static long DEBOUNCE_TIME = BUTTON_DEBOUNCE_TIME;
+#else
+		const static long DEBOUNCE_TIME = 100;
+#endif
+#ifdef BUTTON_MEDIUM_PRESS_TIME
+		const static long MEDIUM_PRESS_TIME = BUTTON_MEDIUM_PRESS_TIME;
+#else
+		const static long MEDIUM_PRESS_TIME = 500;
+#endif
+#ifdef BUTTON_LONG_PRESS_TIME
+		const static long LONG_PRESS_TIME = BUTTON_LONG_PRESS_TIME;
+#else
+		const static long LONG_PRESS_TIME = 2000;
+#endif
 
 	private:
 		uint8_t  m_pin;
-		uint16_t m_delay;
 		bool     m_stateLevel;
-		uint8_t  m_state;
+		ButtonState  m_state;
 		bool     m_hasChanged;
-		uint32_t m_ignoreUntil;
+		unsigned long m_lastStateLevelChange;
 		unsigned long m_pressedSince;
+
+		ButtonState read();
+		bool has_changed();
 };
 
-#endif
+#endif // BUTTON_H

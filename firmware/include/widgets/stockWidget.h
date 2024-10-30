@@ -16,7 +16,7 @@ class StockWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void buttonPressed(uint8_t buttonId) override;
+    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
 
     void changeMode();

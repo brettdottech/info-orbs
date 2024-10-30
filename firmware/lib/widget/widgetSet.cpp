@@ -29,8 +29,8 @@ Widget *WidgetSet::getCurrent() {
   return m_widgets[m_currentWidget];
 }
 
-void WidgetSet::buttonPressed(uint8_t buttonId) {
-  m_widgets[m_currentWidget]->buttonPressed(buttonId);
+void WidgetSet::buttonPressed(uint8_t buttonId, ButtonState state) {
+  m_widgets[m_currentWidget]->buttonPressed(buttonId, state);
 }
 
 void WidgetSet::setClearScreensOnDrawCurrent() {

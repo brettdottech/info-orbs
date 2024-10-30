@@ -106,35 +106,33 @@ void checkCycleWidgets() {
 
 void checkButtons() {
   // Reset cycle timer whenever a button is pressed
-  if (buttonLeft.pressed()) {
+  if (buttonLeft.pressedShort()) {
+    // Left short press cycles widgets backward
     m_widgetCycleDelayPrev = millis();
-    Serial.println("Left button pressed");
     widgetSet->prev();
-  }
-  if (buttonLeft.longPressed()) {
+  } else if (buttonRight.pressedShort()) {
+    // Right short press cycles widgets forward
     m_widgetCycleDelayPrev = millis();
-    Serial.println("Left button longpressed");
-    widgetSet->buttonPressed(LEFT_BUTTON_PRESSED_LONG);
-  }
-  if (buttonOK.pressed()) {
-    m_widgetCycleDelayPrev = millis();
-    Serial.println("OK button pressed");
-    widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED);
-  }
-  if (buttonOK.longPressed()) {
-    m_widgetCycleDelayPrev = millis();
-    Serial.println("OK button longpressed");
-    widgetSet->buttonPressed(MIDDLE_BUTTON_PRESSED_LONG);
-  }
-  if (buttonRight.pressed()) {
-    m_widgetCycleDelayPrev = millis();
-    Serial.println("Right button pressed");
     widgetSet->next();
-  }
-  if (buttonRight.longPressed()) {
-    m_widgetCycleDelayPrev = millis();
-    Serial.println("Right button longpressed");
-    widgetSet->buttonPressed(RIGHT_BUTTON_PRESSED_LONG);
+  } else {
+    ButtonState leftState = buttonLeft.getState();
+    ButtonState middleState = buttonOK.getState();
+    ButtonState rightState = buttonRight.getState();
+
+    // Everying else that is not BTN_NOTHING will be forwarded to the current widget
+    if (leftState != BTN_NOTHING) {
+      Serial.printf("Left button pressed, state=%d\n", leftState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_LEFT, leftState);
+    } else if (middleState != BTN_NOTHING) {
+      Serial.printf("Middle button pressed, state=%d\n", middleState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_OK, middleState);
+    } else if (rightState != BTN_NOTHING) {
+      Serial.printf("Right button pressed, state=%d\n", rightState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+    }
   }
 }
 
