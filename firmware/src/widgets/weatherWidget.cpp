@@ -321,3 +321,7 @@ int WeatherWidget::drawDegrees(String number, int x, int y, uint8_t font, uint8_
 int WeatherWidget::getClockStamp() {
     return m_time->getHour() * 60 + m_time->getMinute();
 }
+
+String WeatherWidget::getName() {
+    return "Weather";
+}
