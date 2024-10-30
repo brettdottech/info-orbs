@@ -97,14 +97,14 @@ void ParqetWidget::update(bool force)
     }
 }
 
-void ParqetWidget::buttonPressed(uint8_t buttonId)
+void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state)
 {
-    if (buttonId == MIDDLE_BUTTON_PRESSED)
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
     {
         // Force drawing to show the next set of stocks
         draw(true);
     }
-    else if (buttonId == MIDDLE_BUTTON_PRESSED_LONG)
+    else if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
     {
         // Change timeframe and force update
         m_curMode++;
