@@ -126,8 +126,9 @@ void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t
 #else
     display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, dateY, 4);
 #endif
-    display.setTextSize(2);
-    display.drawString(m_time->getWeekday(), centre, dayOfWeekY, 4);
+    const String weekDay = m_time->getWeekday();
+    display.setTextSize(weekDay.length() > 7 ? 1 : 2);
+    display.drawString(weekDay, centre, dayOfWeekY, 4);
 
     display.setTextSize(1);
     display.setTextDatum(MR_DATUM);
