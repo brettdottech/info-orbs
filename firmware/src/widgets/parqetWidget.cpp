@@ -345,7 +345,7 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
 
     TFT_eSPI &display = m_manager.getDisplay();
 
-    int clky = 100;
+    int clky = 105;
     int center = 120;
 
     display.setTextSize(1);
@@ -353,9 +353,9 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
     display.setTextColor(color);
     display.setTextDatum(MC_DATUM);
 #ifdef WEATHER_UNITS_METRIC
-    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), center, 160, 4);
+    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), center, clky + 60, 4);
 #else
-    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), center, 160, 4);
+    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), center, clky + 60, 4);
 #endif
 
     display.setTextDatum(MR_DATUM);
