@@ -67,14 +67,9 @@ bool WeatherWidget::getWeatherData() {
 
         if (!error) {
             model.setCityName(doc["resolvedAddress"].as<String>());
-//PSC 10/20/2024 Added current time when data was created on visual crossing
-            model.setUhrzeit(doc["currentConditions"]["datetime"].as<String>());
+            model.setLastUpdate(doc["currentConditions"]["datetime"].as<String>());
             model.setCurrentTemperature(doc["currentConditions"]["temp"].as<float>());
             model.setCurrentText(doc["days"][0]["description"].as<String>());
-
-            //PSC added Datetime from the data when it was created
-            
-
             model.setCurrentIcon(doc["currentConditions"]["icon"].as<String>());
             model.setTodayHigh(doc["days"][0]["tempmax"].as<float>());
             model.setTodayLow(doc["days"][0]["tempmin"].as<float>());
@@ -252,12 +247,11 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     display.drawString(messageArr[2], centre, 160);
     display.drawString(messageArr[3], centre, 180);
 
-//PSC 10/20/2024 Added current time when data was created on visual crossing
-   String uhrzeit = model.getUhrzeit();
-    display.setTextSize(3);
+   String lastupdate = model.getLastUpdate();
+   display.setTextSize(3);
    display.setTextColor(TFT_RED);
-   uhrzeit.remove(5);
-   display.drawString(uhrzeit, centre, 210);
+   lastupdate.remove(5);
+   display.drawString(lastupdate, centre, 210);
 }
 
 // This displays the next 3 days weather forecast
@@ -296,9 +290,6 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         if (temperature != "") {
             drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
         }
-
-//PSC 10/22/2024 Added Weekday in German
-//        String weekUpdate = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
         String weekUpdate = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
         weekUpdate.remove(3);
         weekUpdate.toUpperCase();
