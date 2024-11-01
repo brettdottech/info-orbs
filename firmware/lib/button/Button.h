@@ -42,10 +42,10 @@ class Button
 
 	private:
 		uint8_t  m_pin;
-		bool     m_stateLevel;
+		bool     m_pinLevel;
 		ButtonState  m_state;
 		bool     m_hasChanged;
-		unsigned long m_lastStateLevelChange;
+		unsigned long m_lastPinLevelChange;
 		unsigned long m_pressedSince;
 
 		ButtonState read();
