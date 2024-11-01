@@ -6,8 +6,13 @@
 
 #define MAX_WRAPPED_LINES 10
 
+enum ScreenMode { 
+    Light = 1,
+    Dark = 2
+};
+
 class Utils {
-   public:
+public:
     static int getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit);
     static String getWrappedLine(String str, int limit, int lineNum, int maxLines);
     static int32_t stringToColor(String color);
