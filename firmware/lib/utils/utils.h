@@ -11,6 +11,11 @@ enum ScreenMode {
     Dark = 2
 };
 
+#define ScreenWidth 240
+#define ScreenHeight 240
+#define ScreenCenterX (ScreenWidth/2)
+#define ScreenCenterY (ScreenHeight/2)
+
 class Utils {
 public:
     static int getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit);

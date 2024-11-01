@@ -34,5 +34,7 @@ extern const byte rainB_start[] asm("_binary_icons_jpg_black_rainB_jpg_start");
 extern const byte rainB_end[] asm("_binary_icons_jpg_black_rainB_jpg_end");
 extern const byte cloudsB_start[] asm("_binary_icons_jpg_black_cloudsB_jpg_start");
 extern const byte cloudsB_end[] asm("_binary_icons_jpg_black_cloudsB_jpg_end");
+extern const byte logo_start[] asm("_binary_icons_logo_jpg_start");
+extern const byte logo_end[] asm("_binary_icons_logo_jpg_end");
 
 #endif

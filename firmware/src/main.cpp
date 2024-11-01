@@ -8,6 +8,9 @@
 #include <Button.h>
 #include <globalTime.h>
 #include <config.h>
+#include <utils.h>
+#include <icons.h>
+
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
@@ -51,7 +54,6 @@ ScreenManager* sm;
 WidgetSet* widgetSet;
 
 void setup() {
-
   buttonLeft.begin();
   buttonOK.begin();
   buttonRight.begin();
@@ -60,14 +62,28 @@ void setup() {
   Serial.println();
   Serial.println("Starting up...");
 
-  sm = new ScreenManager(tft);
-  sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_WHITE);
-  sm->reset();
-  widgetSet = new WidgetSet(sm);
-
   TJpgDec.setSwapBytes(true); // JPEG rendering setup
   TJpgDec.setCallback(tft_output);
+
+  sm = new ScreenManager(tft);
+  sm->selectAllScreens();
+  sm->getDisplay().fillScreen(TFT_BLACK);
+  sm->reset();
+  TFT_eSPI &display = sm->getDisplay();
+  display.setTextColor(TFT_WHITE);
+
+  sm->selectScreen(0);
+  display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
+  sm->selectScreen(1);
+  display.drawCentreString("info-Orbs", ScreenCenterX, ScreenCenterY - 30, 4);
+  display.drawCentreString("by", ScreenCenterX, ScreenCenterY, 4);
+  display.drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 4);
+
+  sm->selectScreen(2);
+  TJpgDec.setJpgScale(1);
+  TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
+
+  widgetSet = new WidgetSet(sm);
 
 #ifdef GC9A01_DRIVER
   Serial.println("GC9A01 Driver");
