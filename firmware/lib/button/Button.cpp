@@ -3,8 +3,8 @@
 
 
 Button::Button(uint8_t pin)
-    : m_pin(pin), m_lastStateLevelChange(0),
-      m_stateLevel(RELEASED_LEVEL), m_state(BTN_NOTHING),
+    : m_pin(pin), m_lastPinLevelChange(0),
+      m_pinLevel(RELEASED_LEVEL), m_state(BTN_NOTHING),
       m_hasChanged(false) {}
 
 void Button::begin() {
@@ -12,15 +12,15 @@ void Button::begin() {
 }
 
 ButtonState Button::read() {
-  if (millis() - m_lastStateLevelChange < DEBOUNCE_TIME) {
+  if (millis() - m_lastPinLevelChange < DEBOUNCE_TIME) {
     // State change still within debounce time -> ignore
 	  return m_state;
   }
 
-  if (digitalRead(m_pin) != m_stateLevel) {
-    m_stateLevel = !m_stateLevel;
-    m_lastStateLevelChange = millis();
-    if (m_stateLevel == RELEASED_LEVEL) {
+  if (digitalRead(m_pin) != m_pinLevel) {
+    m_pinLevel = !m_pinLevel;
+    m_lastPinLevelChange = millis();
+    if (m_pinLevel == RELEASED_LEVEL) {
       // Button was now released
       // We now check if this was a short, medium or long press
       if (millis() - m_pressedSince >= LONG_PRESS_TIME) {
