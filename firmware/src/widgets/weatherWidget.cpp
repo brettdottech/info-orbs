@@ -72,9 +72,9 @@ bool WeatherWidget::getWeatherData() {
 
         if (!error) {
             model.setCityName(doc["resolvedAddress"].as<String>());
-            model.setLastUpdate(doc["currentConditions"]["datetime"].as<String>());
             model.setCurrentTemperature(doc["currentConditions"]["temp"].as<float>());
             model.setCurrentText(doc["days"][0]["description"].as<String>());
+
             model.setCurrentIcon(doc["currentConditions"]["icon"].as<String>());
             model.setTodayHigh(doc["days"][0]["tempmax"].as<float>());
             model.setTodayLow(doc["days"][0]["tempmin"].as<float>());
@@ -219,9 +219,9 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
     //=== TEXT OVERFLOW ============================
-	// This takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
+    // This takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
     // Given the small width of the screens this will porbablly be needed to this project again so making sure to outline it
-    // clearly as this should liekly eventually be turned into a function. Before use the array size should be made to be dynamic.
+    // clearly as this should liekly eventually be turned into a fucntion. Before use the array size should be made to be dynamic.
     // In this case its used for the weather text description
 
     String message = model.getCurrentText() + " ";
@@ -251,12 +251,6 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     display.drawString(messageArr[1], centre, 140);
     display.drawString(messageArr[2], centre, 160);
     display.drawString(messageArr[3], centre, 180);
-
-   String lastupdate = model.getLastUpdate();
-   display.setTextSize(3);
-   display.setTextColor(TFT_RED);
-   lastupdate.remove(5);
-   display.drawString(lastupdate, centre, 210);
 }
 
 // This displays the next 3 days weather forecast
@@ -295,7 +289,8 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         if (temperature != "") {
             drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
         }
-        String weekUpdate = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
+
+        String weekUpdate = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
         weekUpdate.remove(3);
         weekUpdate.toUpperCase();
         display.drawString(weekUpdate, xOffset, 150, 2);
