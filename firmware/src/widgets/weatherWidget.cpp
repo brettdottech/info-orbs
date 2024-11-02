@@ -20,7 +20,7 @@ void WeatherWidget::changeMode() {
 }
 
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_LEFT && state == BTN_SHORT)
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
 }
 
