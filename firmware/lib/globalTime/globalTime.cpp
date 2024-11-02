@@ -3,6 +3,21 @@
 #include <TimeLib.h>
 #include <config.h>
 
+#ifdef LOC_EN
+    const char LOC_MONTH[12][10] = {"January","February","March","April","May","June","July","August","September","October","November","December"}; // Define english for month
+    const char LOC_WEEKDAY[7][11] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"}; // Define english for weekday
+#endif
+
+#ifdef LOC_DE
+   const char LOC_MONTH[12][10] = {"Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"}; // Define german for month
+   const char LOC_WEEKDAY[7][11] = {"Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"}; // Define german for weekday
+#endif
+
+#ifdef LOC_FR
+    const char LOC_MONTH[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}; // Define french for month
+    const char LOC_WEEKDAY[7][11] = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"}; // Define french for weekday
+#endif
+
 GlobalTime *GlobalTime::m_instance = nullptr;
 
 GlobalTime::GlobalTime() {
@@ -40,9 +55,9 @@ void GlobalTime::updateTime() {
 
         m_day = day(m_unixEpoch);
         m_month = month(m_unixEpoch);
-        m_monthName = monthStr(m_month);
+        m_monthName = LOC_MONTH[m_month-1];
         m_year = year(m_unixEpoch);
-        m_weekday = dayStr(weekday(m_unixEpoch));
+        m_weekday = LOC_WEEKDAY[(weekday(m_unixEpoch))-1];
         m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
     }
 }
