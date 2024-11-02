@@ -358,11 +358,8 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
     display.fillScreen(background);
     display.setTextColor(color);
     display.setTextDatum(MC_DATUM);
-#ifdef WEATHER_UNITS_METRIC
-    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), center, clky + 60, 4);
-#else
-    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), center, clky + 60, 4);
-#endif
+
+    display.drawString(m_time->getDayAndMonth(), center, clky + 60, 4);
 
     display.setTextDatum(MR_DATUM);
     display.drawString(m_time->getHourPadded(), center - 5, clky, 8);
