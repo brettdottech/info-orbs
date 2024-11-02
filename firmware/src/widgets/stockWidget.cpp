@@ -57,6 +57,12 @@ void StockWidget::changeMode() {
     update(true);
 }
 
+void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_LEFT && state == BTN_SHORT)
+        changeMode();
+}
+
+
 void StockWidget::getStockData(StockDataModel &stock) {
     String httpRequestAddress = "https://api.marketdata.app/v1/stocks/quotes/" + stock.getSymbol() + "/?token=aVhwT1NWWkhIZVBRZlIwOUlHb01keWFrMEI5Ql9QM1ZIZndtay1ub0V3OD0";
 

@@ -19,6 +19,11 @@ void WeatherWidget::changeMode() {
     draw(true);
 }
 
+void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_LEFT && state == BTN_SHORT)
+        changeMode();
+}
+
 void WeatherWidget::setup() {
     m_lastUpdate = millis() - m_updateDelay + 1000;
     m_time = GlobalTime::getInstance();

@@ -108,6 +108,11 @@ void ClockWidget::changeMode() {
     draw(true);
 }
 
+void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_LEFT && state == BTN_SHORT)
+        changeMode();
+}
+
 void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();
