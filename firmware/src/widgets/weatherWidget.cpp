@@ -4,6 +4,21 @@
 
 #include <config.h>
 
+#ifdef LOC_EN
+    const char LOC_MONTH[12][10] = {"January","February","March","April","May","June","July","August","September","October","November","December"}; // Define english for month
+    const char LOC_WEEKDAY[7][11] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"}; // Define english for weekday
+#endif
+
+#ifdef LOC_DE
+   const char LOC_MONTH[12][10] = {"Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"}; // Define german for month
+   const char LOC_WEEKDAY[7][11] = {"Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"}; // Define german for weekday
+#endif
+
+#ifdef LOC_FR
+    const char LOC_MONTH[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}; // Define french for month
+    const char LOC_WEEKDAY[7][11] = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"}; // Define french for weekday
+#endif
+
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
     m_mode = MODE_HIGHS;
 }
@@ -290,7 +305,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
             drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
         }
 
-        String weekUpdate = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
+        String weekUpdate = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
         weekUpdate.remove(3);
         weekUpdate.toUpperCase();
         display.drawString(weekUpdate, xOffset, 150, 2);
