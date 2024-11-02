@@ -16,9 +16,11 @@ class StockWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
+    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
-    
+
+    void changeMode();
+
    private:
     void getStockData(StockDataModel &stock);
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
