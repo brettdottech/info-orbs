@@ -13,6 +13,9 @@
 #define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
 #define SHOW_SECOND_TICKS true // Ticking indicator on the centre clock
 #define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
+//#define LOC_DE // Defined if Monthnames and Weekdays should be in German
+#define LOC_EN // Defined if Monthnames and Weekdays should be in English
+//#define LOC_FR // Defined if Monthnames and Weekdays should be in French
 //#define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
 #define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X ms, set to 0 to disable
@@ -87,5 +90,20 @@
 #define FOREGROUND_COLOR 0xfc80  // Orange for clock
 
 #define MAX_RETRIES 3
+
+#ifdef LOC_DE
+    const char LOC_MONTH[12][10] = {"Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"}; // Define german for month
+    const char LOC_WEEKDAY[7][11] = {"Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"}; // Define german for weekday
+#endif
+
+#ifdef LOC_EN
+    const char LOC_MONTH[12][10] = {"January","February","March","April","May","June","July","August","September","October","November","December"}; // Define english for month
+    const char LOC_WEEKDAY[7][11] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"}; // Define english for weekday
+#endif
+
+#ifdef LOC_FR
+    const char LOC_MONTH[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}; // Define french for month
+    const char LOC_WEEKDAY[7][11] = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"}; // Define french for weekday
+#endif
 
 #endif
