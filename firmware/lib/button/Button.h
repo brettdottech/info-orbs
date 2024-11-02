@@ -27,7 +27,7 @@ class Button
 #ifdef BUTTON_DEBOUNCE_TIME
 		const static long DEBOUNCE_TIME = BUTTON_DEBOUNCE_TIME;
 #else
-		const static long DEBOUNCE_TIME = 100;
+		const static long DEBOUNCE_TIME = 50;
 #endif
 #ifdef BUTTON_MEDIUM_PRESS_TIME
 		const static long MEDIUM_PRESS_TIME = BUTTON_MEDIUM_PRESS_TIME;
