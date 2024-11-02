@@ -14,13 +14,11 @@
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
+#ifdef PARQET_PORTFOLIO_ID
+  #include <widgets/parqetWidget.h>
+#endif
 
 TFT_eSPI tft = TFT_eSPI();
-
-// Button states
-bool lastButtonOKState = HIGH;
-bool lastButtonLeftState = HIGH;
-bool lastButtonRightState = HIGH;
 
 #ifdef WIDGET_CYCLE_DELAY
 unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY;  // Automatically cycle widgets every X ms, set to 0 to disable
@@ -104,6 +102,9 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
+#ifdef PARQET_PORTFOLIO_ID
+  widgetSet->add(new ParqetWidget(*sm));
+#endif
 #ifdef STOCK_TICKER_LIST
   widgetSet->add(new StockWidget(*sm));
 #endif
@@ -125,6 +126,38 @@ void checkCycleWidgets() {
     }
 }
 
+void checkButtons() {
+  // Reset cycle timer whenever a button is pressed
+  if (buttonLeft.pressedShort()) {
+    // Left short press cycles widgets backward
+    m_widgetCycleDelayPrev = millis();
+    widgetSet->prev();
+  } else if (buttonRight.pressedShort()) {
+    // Right short press cycles widgets forward
+    m_widgetCycleDelayPrev = millis();
+    widgetSet->next();
+  } else {
+    ButtonState leftState = buttonLeft.getState();
+    ButtonState middleState = buttonOK.getState();
+    ButtonState rightState = buttonRight.getState();
+
+    // Everying else that is not BTN_NOTHING will be forwarded to the current widget
+    if (leftState != BTN_NOTHING) {
+      Serial.printf("Left button pressed, state=%d\n", leftState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_LEFT, leftState);
+    } else if (middleState != BTN_NOTHING) {
+      Serial.printf("Middle button pressed, state=%d\n", middleState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_OK, middleState);
+    } else if (rightState != BTN_NOTHING) {
+      Serial.printf("Right button pressed, state=%d\n", rightState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+    }
+  }
+}
+
 void loop() {
   if (wifiWidget->isConnected() == false) {
     wifiWidget->update();
@@ -137,20 +170,7 @@ void loop() {
     }
     globalTime->updateTime();
 
-    if (buttonLeft.pressed()) {
-      Serial.println("Left button pressed");
-      m_widgetCycleDelayPrev = millis();
-      widgetSet->prev();
-    }
-    if (buttonOK.pressed()) {
-      Serial.println("OK button pressed");
-      widgetSet->changeMode();
-    }
-    if (buttonRight.pressed()) {
-      Serial.println("Right button pressed");
-      m_widgetCycleDelayPrev = millis();
-      widgetSet->next();
-    }
+    checkButtons();
 
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();

@@ -15,9 +15,9 @@ class WebDataWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
+    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
-    
+
    private:
     int m_lastUpdate = 0;
     int m_updateDelay = 1000;

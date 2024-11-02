@@ -18,11 +18,12 @@ class WeatherWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
+    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
-    
 private:
     void displayClock(int displayIndex);
+    void changeMode();
+    void displayClock(int displayIndex, uint32_t background, uint32_t textColor);
     void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
     void drawWeatherIcon(int displayIndex, const String& condition, int x, int y, int scale);
     void singleWeatherDeg(int displayIndex);

@@ -56,6 +56,10 @@
     #define BUTTON_RIGHT 14
 #endif
 
+#define BUTTON_DEBOUNCE_TIME 50        // Debounce buttons for X ms
+#define BUTTON_MEDIUM_PRESS_TIME 500    // Medium press is registered after X ms
+#define BUTTON_LONG_PRESS_TIME 2000     // Long press is registered after X ms
+
 #define BUTTON_MODE INPUT_PULLDOWN
 #define BUSY_PIN 2
 
