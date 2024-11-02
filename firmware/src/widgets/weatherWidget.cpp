@@ -200,17 +200,6 @@ void WeatherWidget::drawWeatherIcon(int displayIndex, const String& condition, i
     if (iconStart != NULL && size > 0) {
         showJPG(displayIndex, x, y, iconStart, size, scale);
     }
-
-    String description = condition;
-    description.replace("-", " ");
-    description.replace(" day", "");
-    description.replace(" night", "");
-    m_manager.selectScreen(displayIndex);
-
-    TFT_eSPI &display = m_manager.getDisplay();
-    display.setTextColor(m_foregroundColor);
-    display.setTextSize(1);
-    display.drawString(description, centre, 203, 2);
 }
 
 // Displays the current temperature on a single screen. 
@@ -231,8 +220,8 @@ void WeatherWidget::singleWeatherDeg(int displayIndex) {
 
     display.setTextColor(m_invertedForegroundColor);
     display.setTextSize(1);
-    display.drawString("high", 80, 190, 4);
-    display.drawString("low", 160, 190, 4);
+    display.drawString("High", 80, 190, 4);
+    display.drawString("Low", 160, 190, 4);
     drawDegrees(model.getTodayHigh(0), 80, 216, 4, 1, 4, 2, m_invertedForegroundColor, m_invertedBackgroundColor);
     drawDegrees(model.getTodayLow(0), 160, 216, 4, 1, 4, 2, m_invertedForegroundColor, m_invertedBackgroundColor);
 }
@@ -274,7 +263,7 @@ void WeatherWidget::weatherText(int displayIndex) {
     auto y = 118;
     for (auto i = 0; i < 4; i++) {
         display.drawString(messageArr[i], centre, y);
-        y += 21;
+        y += 22;
     }
 }
 
@@ -297,7 +286,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     }
 
     display.setTextColor(m_invertedForegroundColor);
-    display.drawString(m_mode == MODE_HIGHS ? "highs" : "lows", centre, highLowY, 4);
+    display.drawString(m_mode == MODE_HIGHS ? "Highs" : "Lows", centre, highLowY, 4);
     
     int temperatureFontId = 6;  // 48px 0-9 only
     // Look up all the temperatures, and if any of them are more than 2 digits, we need
