@@ -15,6 +15,7 @@ class Button
 		bool pressedMedium();
 		bool pressedLong();
 		ButtonState getState();
+		void isrButtonChange();
 		
 #if BUTTON_MODE == INPUT_PULLDOWN
 		const static bool PRESSED_LEVEL = HIGH;
@@ -27,7 +28,7 @@ class Button
 #ifdef BUTTON_DEBOUNCE_TIME
 		const static unsigned long DEBOUNCE_TIME = BUTTON_DEBOUNCE_TIME;
 #else
-		const static unsigned long DEBOUNCE_TIME = 50;
+		const static unsigned long DEBOUNCE_TIME = 35;
 #endif
 #ifdef BUTTON_MEDIUM_PRESS_TIME
 		const static unsigned long MEDIUM_PRESS_TIME = BUTTON_MEDIUM_PRESS_TIME;
@@ -48,7 +49,6 @@ class Button
 		unsigned long m_lastPinLevelChange;
 		unsigned long m_pressedSince;
 
-		ButtonState read();
 		bool has_changed();
 };
 
