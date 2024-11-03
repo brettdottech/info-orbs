@@ -1,0 +1,98 @@
+{
+  "interval": 5000,
+  "displays": [
+    {
+      "label": "CPU",
+      "data": 48,
+      "labelColor": "blue",
+      "color": "red",
+      "background": "silver",
+      "alignment": "right"
+    },
+    {
+      "label": "PNY NVME",
+      "data": 46.85
+    },
+    {
+      "label": "WD Blue NVME",
+      "data": 38.85
+    },
+    {
+      "label": "Uptime",
+      "data": [
+        {
+          "type": "circle",
+          "x": 50,
+          "y": 50,
+          "radius": 20,
+          "color": "red",
+          "filled": true
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 170,
+          "font": 1,
+          "text": "TestMe ",
+          "color": "white",
+          "background": "darkgrey"
+        },
+        {
+          "type": "rectangle",
+          "x": 70,
+          "y": 180,
+          "height": 50,
+          "width": 100,
+          "filled": true,
+          "color": "blue"
+        },
+        {
+          "type": "triangle",
+          "x": 120,
+          "y": 120,
+          "x2": 180,
+          "y2": 60,
+          "x3": 60,
+          "y3": 60,
+          "filled": false,
+          "color": "red"
+        },
+        {
+          "type": "line",
+          "x": 60,
+          "y": 120,
+          "x2": 180,
+          "y2": 120,
+          "color": "blue"
+        },
+        {
+          "type": "arc",
+          "x": 120,
+          "y": 120,
+          "radius": 30,
+          "innerRadius": 20,
+          "angleStart": 270,
+          "angleEnd": 90,
+          "color": "blue"
+        },
+        {
+          "type": "character",
+          "x": 120,
+          "y": 190,
+          "character": "E",
+          "color": "green",
+          "font": 2
+        }
+      ],
+      "labelX": 100,
+      "labelY": 100
+    },
+    {
+      "label": "Load 1 min",
+      "data": "1.51",
+      "color": "green",
+      "labelColor": "dArK Green",
+      "fullDraw": false
+    }
+  ]
+}
