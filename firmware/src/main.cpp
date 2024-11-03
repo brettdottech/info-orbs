@@ -24,8 +24,8 @@ unsigned long m_widgetCycleDelay = 0;
 #endif
 unsigned long m_widgetCycleDelayPrev = 0;
 
-Button buttonOK(BUTTON_OK);
 Button buttonLeft(BUTTON_LEFT);
+Button buttonOK(BUTTON_OK);
 Button buttonRight(BUTTON_RIGHT);
 
 GlobalTime *globalTime; // Initialize the global time
