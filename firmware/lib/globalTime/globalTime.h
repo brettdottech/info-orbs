@@ -7,11 +7,15 @@
 #include <HTTPClient.h>
 #include <config.h>
 
-#if defined(LOC_DE) // German
+enum LOCALES {
+    de, en, fr
+};
+
+#if LOCALE==de // German
    const char LOC_MONTH[12][10] = {"Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"}; // Define german for month
    const char LOC_WEEKDAY[7][11] = {"Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"}; // Define german for weekday
    const String LOC_FORMAT_DAYMONTH = "%d. %B"; // in strftime format
-#elif defined(LOC_FR) // French
+#elif LOCALE==fr // French
     const char LOC_MONTH[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}; // Define french for month
     const char LOC_WEEKDAY[7][11] = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"}; // Define french for weekday
     const String LOC_FORMAT_DAYMONTH ="%d %B"; // in strftime format
