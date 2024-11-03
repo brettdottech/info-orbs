@@ -17,7 +17,7 @@
 //#define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
 #define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X ms, set to 0 to disable
-#define LOCALE en // Language selection for Month and Weekday - values are en, de, fr
+#define LOCALE EN // Language selection for Month and Weekday - values are EN, DE, FR
 // ============= END CONFIG ==============================================================================
 
 
