@@ -25,19 +25,19 @@ class Button
 #endif
 
 #ifdef BUTTON_DEBOUNCE_TIME
-		const static long DEBOUNCE_TIME = BUTTON_DEBOUNCE_TIME;
+		const static unsigned long DEBOUNCE_TIME = BUTTON_DEBOUNCE_TIME;
 #else
-		const static long DEBOUNCE_TIME = 50;
+		const static unsigned long DEBOUNCE_TIME = 50;
 #endif
 #ifdef BUTTON_MEDIUM_PRESS_TIME
-		const static long MEDIUM_PRESS_TIME = BUTTON_MEDIUM_PRESS_TIME;
+		const static unsigned long MEDIUM_PRESS_TIME = BUTTON_MEDIUM_PRESS_TIME;
 #else
-		const static long MEDIUM_PRESS_TIME = 500;
+		const static unsigned long MEDIUM_PRESS_TIME = 500;
 #endif
 #ifdef BUTTON_LONG_PRESS_TIME
-		const static long LONG_PRESS_TIME = BUTTON_LONG_PRESS_TIME;
+		const static unsigned long LONG_PRESS_TIME = BUTTON_LONG_PRESS_TIME;
 #else
-		const static long LONG_PRESS_TIME = 2000;
+		const static unsigned long LONG_PRESS_TIME = 2000;
 #endif
 
 	private:
