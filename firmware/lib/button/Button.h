@@ -43,11 +43,11 @@ class Button
 
 	private:
 		uint8_t  m_pin;
-		bool     m_pinLevel;
-		ButtonState  m_state;
-		bool     m_hasChanged;
-		unsigned long m_lastPinLevelChange;
-		unsigned long m_pressedSince;
+		volatile bool     m_pinLevel;
+		volatile ButtonState  m_state;
+		volatile bool     m_hasChanged;
+		volatile unsigned long m_lastPinLevelChange;
+		volatile unsigned long m_pressedSince;
 
 		bool has_changed();
 };

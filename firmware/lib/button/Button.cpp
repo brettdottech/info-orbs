@@ -19,7 +19,7 @@ void Button::isrButtonChange() {
     return;
   }
 
-  int newPinLevel = digitalRead(m_pin);
+  bool newPinLevel = digitalRead(m_pin);
   if (newPinLevel != m_pinLevel) {
     m_pinLevel = newPinLevel;
     m_lastPinLevelChange = millis();
