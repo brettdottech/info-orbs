@@ -50,8 +50,8 @@ class GlobalTime {
     WiFiUDP m_udp;
     NTPClient *m_timeClient{nullptr};
 
-    const int m_oneSecond{1000};
-    int m_updateTimer{0};
+    unsigned long m_oneSecond = 1000;
+    unsigned long m_updateTimer = 0;
 
     bool m_format24hour{FORMAT_24_HOUR};
 

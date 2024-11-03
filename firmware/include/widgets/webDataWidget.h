@@ -19,8 +19,8 @@ class WebDataWidget : public Widget {
     String getName() override;
 
    private:
-    int m_lastUpdate = 0;
-    int m_updateDelay = 1000;
+    unsigned long m_lastUpdate = 0;
+    unsigned long m_updateDelay = 1000;
     String httpRequestAddress;
     WebDataModel m_obj[5];
     int32_t m_defaultColor = TFT_WHITE;
