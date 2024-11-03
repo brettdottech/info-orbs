@@ -23,7 +23,7 @@ class ClockWidget : public Widget {
     int m_timeZoneOffset;
 
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
-    long m_secondTimer = 2000;  // this time is used to refressh/check the clock every second.
+    long m_secondTimer = 1000;  // this time is used to refressh/check the clock every second.
     long m_secondTimerPrev = 0;
 
     // WiFiUDP m_udp;

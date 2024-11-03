@@ -67,9 +67,21 @@ void ClockWidget::displayAmPm(uint32_t color) {
 }
 
 void ClockWidget::update(bool force) {
-    if (millis() - m_secondTimerPrev < m_secondTimer && !force) {
-        return;
-    }
+    unsigned long currentMillis = millis();
+    unsigned long elapsedMillis;
+
+// Handle millis() overflow
+if (currentMillis < m_secondTimerPrev) {
+    elapsedMillis = (ULONG_MAX - m_secondTimerPrev) + currentMillis + 1;
+} else {
+    elapsedMillis = currentMillis - m_secondTimerPrev;
+}
+
+if (elapsedMillis < m_secondTimer && !force) {
+    return;
+}
+
+    m_secondTimerPrev = currentMillis;
 
     GlobalTime* time = GlobalTime::getInstance();
     m_hourSingle = time->getHour();
