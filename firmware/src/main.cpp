@@ -8,7 +8,6 @@
 #include <Button.h>
 #include <globalTime.h>
 #include <config_helper.h>
-#include <widgets/stockWidget.h>
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
