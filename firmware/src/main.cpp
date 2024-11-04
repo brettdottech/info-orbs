@@ -25,8 +25,8 @@ unsigned long m_widgetCycleDelay = 0;
 #endif
 unsigned long m_widgetCycleDelayPrev = 0;
 
-Button buttonOK(BUTTON_OK);
 Button buttonLeft(BUTTON_LEFT);
+Button buttonOK(BUTTON_OK);
 Button buttonRight(BUTTON_RIGHT);
 
 GlobalTime *globalTime; // Initialize the global time
@@ -49,15 +49,29 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
 ScreenManager* sm;
 WidgetSet* widgetSet;
 
-void setup() {
+/**
+ * The ISR handlers must be static
+ */
+void isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
+void isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
+void isrButtonChangeRight() { buttonRight.isrButtonChange(); }
 
+void setupButtons() {
   buttonLeft.begin();
   buttonOK.begin();
   buttonRight.begin();
 
+  attachInterrupt(digitalPinToInterrupt(BUTTON_LEFT), isrButtonChangeLeft, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_OK), isrButtonChangeMiddle, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
+}
+
+void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println("Starting up...");
+
+  setupButtons();
 
   sm = new ScreenManager(tft);
   sm->selectAllScreens();
@@ -115,10 +129,12 @@ void checkButtons() {
   // Reset cycle timer whenever a button is pressed
   if (buttonLeft.pressedShort()) {
     // Left short press cycles widgets backward
+    Serial.println("Left button short pressed -> switch to prev Widget");
     m_widgetCycleDelayPrev = millis();
     widgetSet->prev();
   } else if (buttonRight.pressedShort()) {
     // Right short press cycles widgets forward
+    Serial.println("Right button short pressed -> switch to next Widget");
     m_widgetCycleDelayPrev = millis();
     widgetSet->next();
   } else {
