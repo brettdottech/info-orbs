@@ -1,7 +1,7 @@
 #include "globalTime.h"
 
 #include <TimeLib.h>
-#include <config.h>
+#include <config_helper.h>
 
 GlobalTime *GlobalTime::m_instance = nullptr;
 

@@ -1,6 +1,6 @@
 #include "model/stockDataModel.h"
 #include "utils.h"
-#include <config.h>
+#include <config_helper.h>
 
 StockDataModel::StockDataModel() {
 }

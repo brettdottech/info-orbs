@@ -7,13 +7,14 @@
 #include <Arduino.h>
 #include <Button.h>
 #include <globalTime.h>
-#include <config.h>
+#include <config_helper.h>
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
 #ifdef PARQET_PORTFOLIO_ID
   #include <widgets/parqetWidget.h>
 #endif
+
 
 TFT_eSPI tft = TFT_eSPI();
 

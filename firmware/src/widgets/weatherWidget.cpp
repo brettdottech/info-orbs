@@ -2,7 +2,7 @@
 #include "widgets/weatherWidget.h"
 #include "icons.h"
 
-#include <config.h>
+#include <config_helper.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
     m_mode = MODE_HIGHS;

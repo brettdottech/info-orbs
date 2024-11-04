@@ -5,7 +5,7 @@
 #include <TimeLib.h>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include <config.h>
+#include <config_helper.h>
 
 // Define locales
 #define EN 0

@@ -1,5 +1,5 @@
 #include "Button.h"
-#include "config.h"
+#include "config_helper.h"
 
 
 Button::Button(uint8_t pin)

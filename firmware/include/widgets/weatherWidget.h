@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <TJpg_Decoder.h>
-#include <config.h>
+#include <config_helper.h>
 #include <globalTime.h>
 #include <math.h>
 #include <widget.h>
