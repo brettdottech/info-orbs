@@ -1,180 +1,228 @@
 #include "model/weatherDataModel.h"
 #include "utils.h"
 
-WeatherDataModel::WeatherDataModel() {
+WeatherDataModel::WeatherDataModel()
+{
 }
 
-WeatherDataModel &WeatherDataModel::setCityName(String city) {
-    if (m_cityName != city) {
+WeatherDataModel &WeatherDataModel::setCityName(String city)
+{
+    if (m_cityName != city)
+    {
         m_cityName = city;
         m_changed = true;
     }
     return *this;
 }
 
-String WeatherDataModel::getCityName() {
+String WeatherDataModel::getCityName()
+{
     return m_cityName;
 }
 
-WeatherDataModel &WeatherDataModel::setCurrentText(String text) {
-    if (m_currentWeatherText != text) {
+WeatherDataModel &WeatherDataModel::setCurrentText(String text)
+{
+    if (m_currentWeatherText != text)
+    {
         m_currentWeatherText = text;
         m_changed = true;
     }
     return *this;
 }
 
-String WeatherDataModel::getCurrentText() {
+String WeatherDataModel::getCurrentText()
+{
     return m_currentWeatherText;
 }
 
-WeatherDataModel &WeatherDataModel::setCurrentIcon(String icon) {
-    if (m_currentWeatherIcon != icon) {
+WeatherDataModel &WeatherDataModel::setCurrentIcon(String icon)
+{
+    if (m_currentWeatherIcon != icon)
+    {
         m_currentWeatherIcon = icon;
         m_changed = true;
     }
     return *this;
 }
 
-String WeatherDataModel::getCurrentIcon() {
+String WeatherDataModel::getCurrentIcon()
+{
     return m_currentWeatherIcon;
 }
 
-WeatherDataModel &WeatherDataModel::setCurrentTemperature(float degrees) {
-    if (m_currentWeatherDeg != degrees) {
+WeatherDataModel &WeatherDataModel::setCurrentTemperature(float degrees)
+{
+    if (m_currentWeatherDeg != degrees)
+    {
         m_currentWeatherDeg = degrees;
         m_changed = true;
     }
     return *this;
 }
 
-float WeatherDataModel::getCurrentTemperature() {
+float WeatherDataModel::getCurrentTemperature()
+{
     return m_currentWeatherDeg;
 }
 
-String WeatherDataModel::getCurrentTemperature(int8_t digits) {
+String WeatherDataModel::getCurrentTemperature(int8_t digits)
+{
     return Utils::formatFloat(m_currentWeatherDeg, digits);
 }
 
-WeatherDataModel &WeatherDataModel::setTodayHigh(float high) {
-    if (m_todayHigh != high) {
+WeatherDataModel &WeatherDataModel::setTodayHigh(float high)
+{
+    if (m_todayHigh != high)
+    {
         m_todayHigh = high;
         m_changed = true;
     }
     return *this;
 }
 
-float WeatherDataModel::getTodayHigh() {
+float WeatherDataModel::getTodayHigh()
+{
     return m_todayHigh;
 }
 
-String WeatherDataModel::getTodayHigh(int8_t digits) {
+String WeatherDataModel::getTodayHigh(int8_t digits)
+{
     return Utils::formatFloat(m_todayHigh, digits);
 }
 
-WeatherDataModel &WeatherDataModel::setTodayLow(float low) {
-    if (m_todayLow != low) {
+WeatherDataModel &WeatherDataModel::setTodayLow(float low)
+{
+    if (m_todayLow != low)
+    {
         m_todayLow = low;
         m_changed = true;
     }
     return *this;
 }
 
-float WeatherDataModel::getTodayLow() {
+float WeatherDataModel::getTodayLow()
+{
     return m_todayLow;
 }
 
-String WeatherDataModel::getTodayLow(int8_t digits) {
+String WeatherDataModel::getTodayLow(int8_t digits)
+{
     return Utils::formatFloat(m_todayLow, digits);
 }
 
-WeatherDataModel &WeatherDataModel::setDaysIcons(String *icons) {
-    for (int i; i < 3; i++) {
+WeatherDataModel &WeatherDataModel::setDaysIcons(String *icons)
+{
+    for (int i; i < 3; i++)
+    {
         setDayIcon(i, icons[i]);
     }
     return *this;
 }
 
-String &WeatherDataModel::getDaysIcons() {
+String &WeatherDataModel::getDaysIcons()
+{
     return *m_daysIcons;
 }
 
-WeatherDataModel &WeatherDataModel::setDayIcon(int num, String icon) {
-    if (num < 3 && m_daysIcons[num] != icon) {
+WeatherDataModel &WeatherDataModel::setDayIcon(int num, String icon)
+{
+    if (num < 3 && m_daysIcons[num] != icon)
+    {
         m_daysIcons[num] = icon;
         m_changed = true;
     }
     return *this;
 }
 
-String WeatherDataModel::getDayIcon(int num) {
-    if (num >= 3) {
+String WeatherDataModel::getDayIcon(int num)
+{
+    if (num >= 3)
+    {
         return "";
     }
     return m_daysIcons[num];
 }
 
-WeatherDataModel &WeatherDataModel::setDaysLows(float *lows) {
-    for (int i; i < 3; i++) {
+WeatherDataModel &WeatherDataModel::setDaysLows(float *lows)
+{
+    for (int i; i < 3; i++)
+    {
         setDayLow(i, lows[i]);
     }
     return *this;
 }
 
-WeatherDataModel &WeatherDataModel::setDayLow(int num, float low) {
-    if (num < 3 && m_daysLow[num] != low) {
+WeatherDataModel &WeatherDataModel::setDayLow(int num, float low)
+{
+    if (num < 3 && m_daysLow[num] != low)
+    {
         m_daysLow[num] = low;
         m_changed = true;
     }
     return *this;
 }
 
-float &WeatherDataModel::getDaysLows() {
+float &WeatherDataModel::getDaysLows()
+{
     return *m_daysLow;
 }
 
-float WeatherDataModel::getDayLow(int num) {
-    if (num >= 3) {
+float WeatherDataModel::getDayLow(int num)
+{
+    if (num >= 3)
+    {
         return NaN;
     }
     return m_daysLow[num];
 }
 
-String WeatherDataModel::getDayLow(int8_t num, int8_t digits) {
-    if (m_daysLow[num] == NaN) {
+String WeatherDataModel::getDayLow(int8_t num, int8_t digits)
+{
+    if (m_daysLow[num] == NaN)
+    {
         return "";
     }
     return Utils::formatFloat(m_daysLow[num], digits);
 }
 
-WeatherDataModel &WeatherDataModel::setDaysHighs(float highs[3]) {
-    for (int i; i < 3; i++) {
+WeatherDataModel &WeatherDataModel::setDaysHighs(float highs[3])
+{
+    for (int i; i < 3; i++)
+    {
         setDayHigh(i, highs[i]);
     }
     return *this;
 }
 
-float &WeatherDataModel::getDaysHighs() {
+float &WeatherDataModel::getDaysHighs()
+{
     return *m_daysHigh;
 }
 
-float WeatherDataModel::getDayHigh(int num) {
-    if (num >= 3) {
+float WeatherDataModel::getDayHigh(int num)
+{
+    if (num >= 3)
+    {
         return NaN;
     }
     return m_daysHigh[num];
 }
 
-String WeatherDataModel::getDayHigh(int8_t num, int8_t digits) {
-    if (m_daysHigh[num] == NaN) {
+String WeatherDataModel::getDayHigh(int8_t num, int8_t digits)
+{
+    if (m_daysHigh[num] == NaN)
+    {
         return "";
     }
     return Utils::formatFloat(m_daysHigh[num], digits);
 }
 
-WeatherDataModel &WeatherDataModel::setDayHigh(int num, float high) {
-    if (num < 3 && m_daysHigh[num] != high) {
-        if (m_daysHigh[num] != high) {
+WeatherDataModel &WeatherDataModel::setDayHigh(int num, float high)
+{
+    if (num < 3 && m_daysHigh[num] != high)
+    {
+        if (m_daysHigh[num] != high)
+        {
             m_daysHigh[num] = high;
             m_changed = true;
         }
@@ -182,10 +230,27 @@ WeatherDataModel &WeatherDataModel::setDayHigh(int num, float high) {
     return *this;
 }
 
-bool WeatherDataModel::isChanged() {
+WeatherDataModel &WeatherDataModel::setLastUpdate(String lastupdate)
+{
+    if (m_lastupdate != lastupdate)
+    {
+        m_lastupdate = lastupdate;
+        m_changed = true;
+    }
+    return *this;
+}
+
+String WeatherDataModel::getLastUpdate()
+{
+    return m_lastupdate;
+}
+
+bool WeatherDataModel::isChanged()
+{
     return m_changed;
 }
-WeatherDataModel &WeatherDataModel::setChangedStatus(bool changed) {
+WeatherDataModel &WeatherDataModel::setChangedStatus(bool changed)
+{
     m_changed = changed;
     return *this;
 }
