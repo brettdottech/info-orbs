@@ -7,7 +7,10 @@
 #include <Arduino.h>
 #include <Button.h>
 #include <globalTime.h>
+#include <utils.h>
+#include <icons.h>
 #include <config_helper.h>
+
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
@@ -49,6 +52,7 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
 ScreenManager* sm;
 WidgetSet* widgetSet;
 
+
 /**
  * The ISR handlers must be static
  */
@@ -71,16 +75,30 @@ void setup() {
   Serial.println();
   Serial.println("Starting up...");
 
+
+  TJpgDec.setSwapBytes(true); // JPEG rendering setup
+  TJpgDec.setCallback(tft_output);
   setupButtons();
 
   sm = new ScreenManager(tft);
   sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_WHITE);
+  sm->getDisplay().fillScreen(TFT_BLACK);
   sm->reset();
-  widgetSet = new WidgetSet(sm);
+  TFT_eSPI &display = sm->getDisplay();
+  display.setTextColor(TFT_WHITE);
 
-  TJpgDec.setSwapBytes(true); // JPEG rendering setup
-  TJpgDec.setCallback(tft_output);
+  sm->selectScreen(0);
+  display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
+  sm->selectScreen(1);
+  display.drawCentreString("info-Orbs", ScreenCenterX, ScreenCenterY - 30, 4);
+  display.drawCentreString("by", ScreenCenterX, ScreenCenterY, 4);
+  display.drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 4);
+
+  sm->selectScreen(2);
+  TJpgDec.setJpgScale(1);
+  TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
+
+  widgetSet = new WidgetSet(sm);
 
 #ifdef GC9A01_DRIVER
   Serial.println("GC9A01 Driver");

@@ -3,6 +3,7 @@
 
 #include <widget.h>
 #include <screenManager.h>
+#include <utils.h>
 
 #define MAX_WIDGETS 5
 
@@ -23,7 +24,7 @@ public:
     void setClearScreensOnDrawCurrent();
 
    private:
-    void showCenteredLine(int screen, int size, String text);
+    void showCenteredLine(int screen, const String& text);
     ScreenManager *m_screenManager;
     bool m_clearScreensOnDrawCurrent = true;
     Widget *m_widgets[MAX_WIDGETS];

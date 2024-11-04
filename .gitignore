@@ -20,3 +20,4 @@ firmware/lib/config/config.h
 # VS Code
 .vscode/
 
+.vscode/extensions.json

@@ -6,10 +6,11 @@
 #define WIFI_SSID "WIFINAME" // Wifi name (please use 2.4gz network)
 #define WIFI_PASS "WIFIPASS" // Wifi password
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
-#define WEATHER_LOCAION "Victoria, BC" //city/state for the weather
+#define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
+#define WEATHER_SCREEN_MODE Light // Can be either Light or Dark 
+#define WEATHER_UNITS_METRIC // Comment this line out (or delete it) if you want imperial units for the weather
 #define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stocks to display on the stock tracker
 //#define PARQET_PORTFOLIO_ID "" // set the id of your parqet.com portfolio. Make sure the portfolio is set to public!
-#define WEATHER_UNITS_METRIC //Comment this line out(or delete it) if you want imperial units for the weather
 #define FORMAT_24_HOUR false // Toggle 24 hour clock vs 12 hour clock, change between true/false
 #define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
 #define SHOW_SECOND_TICKS true // Ticking indicator on the centre clock

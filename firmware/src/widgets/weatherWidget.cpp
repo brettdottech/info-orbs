@@ -1,3 +1,14 @@
+// TODO: 
+// 1
+// factor out a selectDisplay that selects the dispay and returns the workable object,
+// so we don't have this select, getDisplay crap all over the place
+// 2
+// make high/low an enum, if we even keep it (I strongly suggest just switching back
+// and forth between high and low every 10 seconds or something)
+// 3 
+// factor out the JSON error handling (come on now)
+// 4
+// factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "widgets/weatherWidget.h"
 #include "icons.h"
@@ -27,21 +38,24 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 void WeatherWidget::setup() {
     m_lastUpdate = millis() - m_updateDelay + 1000;
     m_time = GlobalTime::getInstance();
+#ifdef WEATHER_SCREEN_MODE
+    m_screenMode = WEATHER_SCREEN_MODE;
+#endif
+    configureColors();
 }
 
 void WeatherWidget::draw(bool force) {
     m_time->updateTime();
     int clockStamp = getClockStamp();
     if (clockStamp != m_clockStamp || force) {
-        displayClock(0, TFT_WHITE, TFT_BLACK);
+        displayClock(0);
         m_clockStamp = clockStamp;
     }
 
-    // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
     if (force || model.isChanged()) {
-        weatherText(1, TFT_WHITE, TFT_BLACK);
-        drawWeatherIcon(model.getCurrentIcon(), 2, 0, 0, 1);
-        singleWeatherDeg(3, TFT_WHITE, TFT_BLACK);
+        weatherText(1);
+        drawWeatherIcon(2, model.getCurrentIcon(), 0, 0, 1);
+        singleWeatherDeg(3);
         threeDayWeather(4);
         model.setChangedStatus(false);
     }
@@ -52,7 +66,8 @@ void WeatherWidget::update(bool force) {
         setBusy(true);
         if (force) {
             int retry = 0;
-            while (!getWeatherData() && retry++ < MAX_RETRIES);
+            while (!getWeatherData() && retry++ < MAX_RETRIES)
+                ;
         } else {
             getWeatherData();
         }
@@ -65,7 +80,8 @@ bool WeatherWidget::getWeatherData() {
     HTTPClient http;
     http.begin(httpRequestAddress);
     int httpCode = http.GET();
-    if (httpCode > 0) {  // Check for the returning code
+    if (httpCode > 0) { 
+        // Check for the return code   TODO: factor out
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, http.getString());
         http.end();
@@ -111,41 +127,41 @@ bool WeatherWidget::getWeatherData() {
     return true;
 }
 
-void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t color) {
+void WeatherWidget::displayClock(int displayIndex) {
+    const int clockY = 94;
+    const int dayOfWeekY = 160;
+    const int dateY = 197;
+
     m_manager.selectScreen(displayIndex);
 
     TFT_eSPI &display = m_manager.getDisplay();
 
-    int clky = 95;
-    display.setTextColor(color);
+    display.fillScreen(m_backgroundColor);
+    display.setTextColor(m_foregroundColor);
     display.setTextSize(1);
     display.setTextDatum(MC_DATUM);
+#ifdef WEATHER_UNITS_METRIC
+    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, dateY, 4);
+#else
+    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, dateY, 4);
+#endif
+    const String weekDay = m_time->getWeekday();
+    // "Tuesday" fits with the large font, "Thursday" and "Wednesday" need to be smaller
+    display.setTextSize(weekDay.length() > 7 ? 1 : 2);
+    display.drawString(weekDay, centre, dayOfWeekY, 4);
 
-    display.fillScreen(background);
-    display.setTextColor(color);
-    display.setTextSize(2);
-    display.setTextDatum(MC_DATUM);
-    display.drawString(m_time->getDayAndMonth(), centre, 151, 2);
-    display.setTextSize(3);
-    display.drawString(m_time->getWeekday(), centre, 178, 2);
-    display.setTextColor(color);
+    display.setTextSize(1);
     display.setTextDatum(MR_DATUM);
-    display.setTextSize(1);
-
-    display.drawString(m_time->getHourPadded(), centre - 5, clky, 8);
-
-    display.setTextColor(color);
-    display.setTextDatum(ML_DATUM);
-    display.setTextSize(1);
-    display.drawString(m_time->getMinutePadded(), centre + 5, clky, 8);
+    display.drawString(m_time->getHourPadded(), centre - 5, clockY, 8);
     display.setTextDatum(MC_DATUM);
-    display.setTextColor(color);
-    display.drawString(":", centre, clky, 8);
+    display.drawString(":", centre, clockY, 8);
+    display.setTextDatum(ML_DATUM);
+    display.drawString(m_time->getMinutePadded(), centre + 5, clockY, 8);
 }
 
-// This will write an image to the screen when called from a hex array. Pass in:
-// Screen #, X, Y coords, Bye Array To Pass, the sizeof that array, scale of the image(1= full size, then multiples of 2 to scale down)
-// getting the byte array size is very annoying as its computed on compile so you cant do it dynamicly.
+// Write an image to the screen from a hex array. 
+// scale of the image (1=full size, then multiples of 2 to scale down)
+// getting the byte array size is very annoying as it's computed on compile, so you can't do it dynamically.
 void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[], int jpgDataSize, int scale) {
     m_manager.selectScreen(displayIndex);
 
@@ -155,63 +171,68 @@ void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[]
     TJpgDec.drawJpg(x, y, jpgData, jpgDataSize);
 }
 
-// This takes the text output form the weatehr API and maps it to arespective icon/byte aarray, then displays it,
-void WeatherWidget::drawWeatherIcon(String condition, int displayIndex, int x, int y, int scale) {
-    const byte *icon = NULL;
-    int size = 0;
+// Take the text output from the weather API and map it to a icon/byte array, then display it
+void WeatherWidget::drawWeatherIcon(int displayIndex, const String& condition, int x, int y, int scale) {
+    const byte *iconStart = NULL;
+    const byte *iconEnd = NULL;
+
     if (condition == "partly-cloudy-night") {
-        icon = moonCloud_start;
-        size = moonCloud_end - moonCloud_start;
+        iconStart = m_screenMode == Light ? moonCloudW_start : moonCloudB_start;
+        iconEnd = m_screenMode == Light ? moonCloudW_end : moonCloudB_end;
     } else if (condition == "partly-cloudy-day") {
-        icon = sunClouds_start;
-        size = sunClouds_end - sunClouds_start;
+        iconStart = m_screenMode == Light ? sunCloudsW_start : sunCloudsB_start;
+        iconEnd = m_screenMode == Light ? sunCloudsW_end : sunCloudsB_end;
     } else if (condition == "clear-day") {
-        icon = sun_start;
-        size = sun_end - sun_start;
+        iconStart = m_screenMode == Light ? sunW_start : sunB_start;
+        iconEnd = m_screenMode == Light ? sunW_end : sunB_end;
     } else if (condition == "clear-night") {
-        icon = moon_start;
-        size = moon_end - moon_start;
+        iconStart = m_screenMode == Light ? moonW_start : moonB_start;
+        iconEnd = m_screenMode == Light ? moonW_end : moonB_end;
     } else if (condition == "snow") {
-        icon = snow_start;
-        size = snow_end - snow_start;
+        iconStart = m_screenMode == Light ? snowW_start : snowB_start;
+        iconEnd = m_screenMode == Light ? snowW_end : snowB_end;
     } else if (condition == "rain") {
-        icon = rain_start;
-        size = rain_end - rain_start;
+        iconStart = m_screenMode == Light ? rainW_start : rainB_start;
+        iconEnd = m_screenMode == Light ? rainW_end : rainB_end;
     } else if (condition == "fog" || condition == "wind" || condition == "cloudy") {
-        icon = clouds_start;
-        size = clouds_end - clouds_start;
+        iconStart = m_screenMode == Light ? cloudsW_start : cloudsB_start;
+        iconEnd = m_screenMode == Light ? cloudsW_end : cloudsB_end;
     } else {
         Serial.println("unknown weather icon:" + condition);
     }
-    if (icon != NULL && size > 0) {
-        showJPG(displayIndex, x, y, icon, size, scale);
+
+    const int size = iconEnd - iconStart;
+    if (iconStart != NULL && size > 0) {
+        showJPG(displayIndex, x, y, iconStart, size, scale);
     }
 }
 
-// This displays the current weather temp on a single screen. Pass in display number, background color, text color
-// doesnt round deg, just removes all text after the decimil, should probably be fixed
-void WeatherWidget::singleWeatherDeg(int displayIndex, uint32_t backgroundColor, uint32_t textColor) {
+// Displays the current temperature on a single screen. 
+// doesn't round deg, just removes all text after the decimal
+void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.selectScreen(displayIndex);
 
     TFT_eSPI &display = m_manager.getDisplay();
-    display.fillScreen(backgroundColor);
+    display.fillScreen(m_backgroundColor);
 
-    drawDegrees(model.getCurrentTemperature(0), centre, 100, 8, 1, 15, 8, textColor, backgroundColor);
+    drawDegrees(model.getCurrentTemperature(0), centre, 108, 8, 1, 15, 8, m_foregroundColor, m_backgroundColor);
 
-    display.fillRect(0, 170, 240, 70, TFT_BLACK);
+    // No glaring white chunks in Dark mode
+    if (m_screenMode == Light) {
+        display.fillRect(0, 170, 240, 70, m_foregroundColor);
+        display.fillRect(centre - 1, 170, 2, 240, m_backgroundColor);
+    }
 
-    display.fillRect(centre - 1, 170, 2, 240, TFT_WHITE);
-
-    display.setTextColor(TFT_WHITE);
-    display.setTextSize(2);
-    display.drawString("High", 80, 190, 1);
-    drawDegrees(model.getTodayHigh(0), 80, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
-    display.drawString("Low", 160, 190, 1);
-    drawDegrees(model.getTodayLow(0), 160, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
+    display.setTextColor(m_invertedForegroundColor);
+    display.setTextSize(1);
+    display.drawString("High", 80, 190, 4);
+    display.drawString("Low", 160, 190, 4);
+    drawDegrees(model.getTodayHigh(0), 80, 216, 4, 1, 4, 2, m_invertedForegroundColor, m_invertedBackgroundColor);
+    drawDegrees(model.getTodayLow(0), 160, 216, 4, 1, 4, 2, m_invertedForegroundColor, m_invertedBackgroundColor);
 }
 
-// This displays the users current city and the text desctiption of the weather. Pass in display number, background color, text color
-void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
+// Display the user's current city and the text description of the weather
+void WeatherWidget::weatherText(int displayIndex) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
     //=== TEXT OVERFLOW ============================
@@ -234,66 +255,72 @@ void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     }
     //=== OVERFLOW END ==============================
 
-    display.fillScreen(b);
-    display.setTextColor(t);
-    display.setTextSize(3);
+    display.fillScreen(m_backgroundColor);
+    display.setTextColor(m_foregroundColor);
+    display.setTextSize(2);
     display.setTextDatum(MC_DATUM);
     String cityName = model.getCityName();
     cityName.remove(cityName.indexOf(",", 0));
-    display.drawString(cityName, centre, 80, 2);
-    display.setTextSize(2);
-    display.setTextFont(1);
-    display.drawString(messageArr[0], centre, 120);
-    display.drawString(messageArr[1], centre, 140);
-    display.drawString(messageArr[2], centre, 160);
-    display.drawString(messageArr[3], centre, 180);
+    display.drawString(cityName, centre, 84, 4);
+    display.setTextSize(1);
+    display.setTextFont(4);
+
+    auto y = 118;
+    for (auto i = 0; i < 4; i++) {
+        display.drawString(messageArr[i], centre, y);
+        y += 22;
+    }
 }
 
-// This displays the next 3 days weather forecast
+// Displays the next 3 days' weather forecast
 void WeatherWidget::threeDayWeather(int displayIndex) {
+    const int days = 3;
+    const int columnSize = 75;
+    const int highLowY = 199;
+
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
 
     display.setTextDatum(MC_DATUM);
-    display.fillScreen(TFT_WHITE);
-    display.setTextSize(2);
+    display.fillScreen(m_backgroundColor);
+    display.setTextSize(1);
 
-    display.fillRect(78, 0, 3, 240, TFT_BLACK);
-    display.fillRect(157, 0, 3, 240, TFT_BLACK);
-
-    display.fillRect(0, 170, 240, 70, TFT_BLACK);
-    display.setTextColor(TFT_WHITE);
-    display.drawString("Next 3 Days", centre, 191, 1);
-
-    for (int i = 0; i < 3; i++) {
-        int xOffset = (centre - 75) + i * 75;
-        String temperature;
-        display.setTextColor(TFT_WHITE);
-        if (m_mode == MODE_HIGHS) {
-            temperature = model.getDayHigh(i, 0);
-            if (temperature != "") {
-                display.drawString("Highs", centre, 215, 1);
-            }
-        } else if (m_mode == MODE_LOWS) {
-            temperature = model.getDayLow(i, 0);
-            if (temperature != "") {
-                display.drawString("Lows", centre, 215, 1);
-            }
-        }
-        drawWeatherIcon(model.getDayIcon(i), displayIndex, xOffset - 30, 47, 4);
-        display.setTextColor(TFT_BLACK);
-        if (temperature != "") {
-            drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
-        }
-
-        String weekUpdate = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
-        weekUpdate.remove(3);
-        weekUpdate.toUpperCase();
-        display.drawString(weekUpdate, xOffset, 150, 2);
+    // No glaring white chunks in Dark mode
+    if (m_screenMode == Light) {
+        display.fillRect(0, 170, 240, 70, m_foregroundColor);
     }
+
+    display.setTextColor(m_invertedForegroundColor);
+    display.drawString(m_mode == MODE_HIGHS ? "Highs" : "Lows", centre, highLowY, 4);
+    
+    int temperatureFontId = 6;  // 48px 0-9 only
+    // Look up all the temperatures, and if any of them are more than 2 digits, we need
+    // to scale down the font -- or it won't look right on the screen.
+    String temps[days];
+    for (auto i = 0; i < days; i++) {
+        temps[i] = m_mode == MODE_HIGHS ? model.getDayHigh(i, 0) : model.getDayLow(i, 0);
+        if (temps[i].length() > 2) {
+            // We've got a nutty 3-digit temperature, scale down
+            temperatureFontId = 4;  // 26px 0-9; if there were a 36 or 32, I'd use it
+        }
+    }
+
+    display.setTextColor(m_foregroundColor);
+    for (auto i = 0; i < days; i++) {
+        // TODO: only works for 3 days
+        const int x = (centre - columnSize) + i * columnSize;
+
+        drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
+        drawDegrees(temps[i], x, 122, temperatureFontId, 1, 7, 4, m_foregroundColor, m_backgroundColor);
+
+        String shortDayName = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
+        shortDayName.remove(3);
+        display.drawString(shortDayName, x, 154, 4);
+    }
+
 }
 
-int WeatherWidget::drawDegrees(String number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {
+int WeatherWidget::drawDegrees(const String& number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {
     TFT_eSPI &display = m_manager.getDisplay();
 
     display.setTextColor(textColor);
@@ -316,6 +343,17 @@ int WeatherWidget::drawDegrees(String number, int x, int y, uint8_t font, uint8_
 
 int WeatherWidget::getClockStamp() {
     return m_time->getHour() * 60 + m_time->getMinute();
+}
+
+void WeatherWidget::configureColors() {
+    m_foregroundColor = m_screenMode == Light ? TFT_BLACK : TFT_WHITE;
+    m_backgroundColor = m_screenMode == Light ? TFT_WHITE : TFT_BLACK;
+
+    // NOTE: In Light mode, we draw decorative black chunks and display the high and low on them in white.
+    //       It does not make sense to have glaring white chunks in dark mode, so we don't draw them at all,
+    //       and display the high and low in white too.
+    m_invertedForegroundColor = m_screenMode == Light ? m_backgroundColor : m_foregroundColor;
+    m_invertedBackgroundColor = m_screenMode == Light ? m_foregroundColor : m_backgroundColor;
 }
 
 String WeatherWidget::getName() {
