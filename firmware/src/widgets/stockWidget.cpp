@@ -114,11 +114,9 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     int arrowOffsetX = 0;
     int arrowOffsetY = -109;
     String currencySymbol = "$";
-    if (stock.getCurrency() == "EUR")
-    {
+    if (stock.getCurrency() == "EUR"){
        currencySymbol = "EUR";
-    } else if (stock.getCurrency() == "GBP")
-    {
+    } else if (stock.getCurrency() == "GBP"){
        currencySymbol = "GBP";
     }
     
