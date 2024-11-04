@@ -125,11 +125,7 @@ void WeatherWidget::displayClock(int displayIndex, uint32_t background, uint32_t
     display.setTextColor(color);
     display.setTextSize(2);
     display.setTextDatum(MC_DATUM);
-#ifdef WEATHER_UNITS_METRIC
-    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, 151, 2);
-#else
-    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, 151, 2);
-#endif
+    display.drawString(m_time->getDayAndMonth(), centre, 151, 2);
     display.setTextSize(3);
     display.drawString(m_time->getWeekday(), centre, 178, 2);
     display.setTextColor(color);
@@ -290,7 +286,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
             drawDegrees(temperature, xOffset, centre, 2, 2, 4, 2, TFT_BLACK, TFT_WHITE);
         }
 
-        String weekUpdate = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
+        String weekUpdate = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
         weekUpdate.remove(3);
         weekUpdate.toUpperCase();
         display.drawString(weekUpdate, xOffset, 150, 2);
