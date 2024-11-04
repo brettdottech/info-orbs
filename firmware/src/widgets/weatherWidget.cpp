@@ -275,7 +275,7 @@ void WeatherWidget::weatherText(int displayIndex) {
     String lastupdate = model.getLastUpdate();
     display.setTextSize(1);
     display.setTextColor(TFT_RED);
-	//Show only first 5 chars hh:mm without seconds
+    //Show only first 5 chars hh:mm without seconds
     lastupdate.remove(5);
     display.drawString(lastupdate, centre, 210);
 }
