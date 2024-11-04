@@ -140,11 +140,7 @@ void WeatherWidget::displayClock(int displayIndex) {
     display.setTextColor(m_foregroundColor);
     display.setTextSize(1);
     display.setTextDatum(MC_DATUM);
-#ifdef WEATHER_UNITS_METRIC
-    display.drawString(String(m_time->getDay()) + " " + m_time->getMonthName(), centre, dateY, 4);
-#else
-    display.drawString(m_time->getMonthName() + " " + String(m_time->getDay()), centre, dateY, 4);
-#endif
+    display.drawString(m_time->getDayAndMonth(), centre, dateY, 4);
     const String weekDay = m_time->getWeekday();
     // "Tuesday" fits with the large font, "Thursday" and "Wednesday" need to be smaller
     display.setTextSize(weekDay.length() > 7 ? 1 : 2);
