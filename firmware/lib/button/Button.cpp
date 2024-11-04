@@ -3,35 +3,41 @@
 
 
 Button::Button(uint8_t pin)
-    : m_pin(pin), m_delay(100), m_ignoreUntil(0),
+    : m_pin(pin), m_lastPinLevelChange(0),
+      m_pinLevel(RELEASED_LEVEL), m_state(BTN_NOTHING),
       m_hasChanged(false) {}
 
 void Button::begin() {
-#if BUTTON_MODE == INPUT_PULLDOWN
-    m_state = LOW;
-#else
-    m_state = HIGH;
-#endif
-    pinMode(m_pin, BUTTON_MODE);
+  pinMode(m_pin, BUTTON_MODE);
 }
 
-bool Button::read() {
-  if (m_ignoreUntil > millis()) {
-	return m_state;
+ButtonState Button::read() {
+  if (millis() - m_lastPinLevelChange < DEBOUNCE_TIME) {
+    // State change still within debounce time -> ignore
+	  return m_state;
   }
 
-  if (digitalRead(m_pin) != m_state) {
-    m_ignoreUntil = millis() + m_delay;
-    m_state = !m_state;
+  if (digitalRead(m_pin) != m_pinLevel) {
+    m_pinLevel = !m_pinLevel;
+    m_lastPinLevelChange = millis();
+    if (m_pinLevel == RELEASED_LEVEL) {
+      // Button was now released
+      // We now check if this was a short, medium or long press
+      if (millis() - m_pressedSince >= LONG_PRESS_TIME) {
+        m_state = BTN_LONG;
+      } else if (millis() - m_pressedSince >= MEDIUM_PRESS_TIME) {
+        m_state = BTN_MEDIUM;
+      } else {
+        m_state = BTN_SHORT;
+      }
+    } else {
+      // Start button press
+      m_pressedSince = millis();
+      m_state = BTN_NOTHING;
+    }
     m_hasChanged = true;
   }
-
   return m_state;
-}
-
-bool Button::toggled() {
-  read();
-  return has_changed();
 }
 
 bool Button::has_changed() {
@@ -42,16 +48,23 @@ bool Button::has_changed() {
   return false;
 }
 
-bool Button::pressed() {
-  if (read() == PRESSED && has_changed() == true)
-    return true;
-  else
-    return false;
+bool Button::pressedShort() {
+  return (read() == BTN_SHORT && has_changed());
 }
 
-bool Button::released() {
-  if (read() == RELEASED && has_changed() == true)
-    return true;
-  else
-    return false;
+bool Button::pressedMedium() {
+  return (read() == BTN_MEDIUM && has_changed());
+}
+
+bool Button::pressedLong() {
+  return (read() == BTN_LONG && has_changed());
+}
+
+ButtonState Button::getState() {
+  ButtonState state = read();
+  if (has_changed()) {
+    return state;
+  } else {
+    return BTN_NOTHING;
+  }
 }

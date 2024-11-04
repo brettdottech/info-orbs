@@ -15,7 +15,7 @@ public:
     Widget *getCurrent();
     void next();
     void prev();
-    void changeMode();
+    void buttonPressed(uint8_t buttonId, ButtonState state);
     void showLoading();
     void updateAll();
     bool initialUpdateDone();

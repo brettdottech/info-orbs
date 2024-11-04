@@ -11,8 +11,10 @@ class ClockWidget : public Widget {
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void changeMode() override;
+    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
+
+    void changeMode();
 
    private:
     void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing);
@@ -24,8 +26,8 @@ class ClockWidget : public Widget {
     int m_timeZoneOffset;
 
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
-    long m_secondTimer = 2000;  // This time is used to refressh/check the clock every second.
-    long m_secondTimerPrev = 0;
+    unsigned long m_secondTimer = 2000;  // This time is used to refressh/check the clock every second.
+    unsigned long m_secondTimerPrev = 0;
 
     // WiFiUDP m_udp;
     // NTPClient* m_timeClient{ nullptr };

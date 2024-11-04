@@ -40,9 +40,9 @@ void GlobalTime::updateTime() {
 
         m_day = day(m_unixEpoch);
         m_month = month(m_unixEpoch);
-        m_monthName = monthStr(m_month);
+        m_monthName = LOC_MONTH[m_month-1];
         m_year = year(m_unixEpoch);
-        m_weekday = dayStr(weekday(m_unixEpoch));
+        m_weekday = LOC_WEEKDAY[(weekday(m_unixEpoch))-1];
         m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
     }
 }
@@ -106,6 +106,17 @@ String GlobalTime::getTime() {
 
 String GlobalTime::getWeekday() {
     return m_weekday;
+}
+
+String GlobalTime::getDayAndMonth() {
+#ifdef WEATHER_UNITS_METRIC
+    String retVal = LOC_FORMAT_DAYMONTH;
+    retVal.replace("%d", String(m_day));
+    retVal.replace("%B", m_monthName);
+    return retVal;
+#else
+    return m_monthName + " " + String(m_day);
+#endif
 }
 
 #include <HTTPClient.h> // Include the necessary header file

@@ -7,6 +7,7 @@
 #include <iomanip>
 
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
+#ifdef STOCK_TICKER_LIST
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
     strcpy(stockList, STOCK_TICKER_LIST);
 
@@ -22,6 +23,7 @@ StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
             break;
         }
     } while (symbol = strtok(nullptr, ","));
+#endif
 }
 
 void StockWidget::setup() {
@@ -54,6 +56,12 @@ void StockWidget::update(bool force) {
 void StockWidget::changeMode() {
     update(true);
 }
+
+void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
+        changeMode();
+}
+
 
 void StockWidget::getStockData(StockDataModel &stock) {
     String httpRequestAddress = "https://api.marketdata.app/v1/stocks/quotes/" + stock.getSymbol() + "/?token=aVhwT1NWWkhIZVBRZlIwOUlHb01keWFrMEI5Ql9QM1ZIZndtay1ub0V3OD0";
