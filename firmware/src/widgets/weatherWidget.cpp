@@ -313,7 +313,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
         drawDegrees(temps[i], x, 122, temperatureFontId, 1, 7, 4, m_foregroundColor, m_backgroundColor);
 
-        String shortDayName = LOC_WEEKDAY(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
+        String weekUpdate = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
         shortDayName.remove(3);
         display.drawString(shortDayName, x, 154, 4);
     }
