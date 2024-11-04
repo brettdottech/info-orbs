@@ -21,7 +21,7 @@ String StockDataModel::getSymbol() {
 
 StockDataModel &StockDataModel::setCompany(String company) {
     if (m_company != company) {
-        m_company = String(company);
+        m_company = company;
         m_changed = true;
     }
     return *this;
@@ -33,7 +33,7 @@ String StockDataModel::getCompany() {
 
 StockDataModel &StockDataModel::setCurrency(String currency) {
     if (m_currency != currency) {
-        m_currency = String(currency);
+        m_currency = currency;
         m_changed = true;
     }
     return *this;
