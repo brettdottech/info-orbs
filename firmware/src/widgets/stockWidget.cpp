@@ -154,10 +154,6 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     display.setTextColor(TFT_WHITE);
 
     display.drawString(currencySymbol + stock.getCurrentPrice(2), centre, 155, 1);
-
-
-    //display.fillRect(0,0,screenWidth, 68, TFT_RED);  // rgb565 colors
-    //display.setTextSize(3);  // Set text size
   
 }
 
