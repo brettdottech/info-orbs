@@ -1,0 +1,340 @@
+{
+  "interval": "20000",
+  "displays": [
+    {
+      "fullDraw": false,
+      "data": [
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "height": 50,
+          "width": 240,
+          "color": "blue",
+          "filled": true
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 27,
+          "font": 1,
+          "size": 4,
+          "text": "SPY",
+          "align": "center",
+          "color": "white",
+          "background": "blue"
+        },
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 50,
+          "width": 240,
+          "height": 190,
+          "filled": true,
+          "color": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 83,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "$569.67",
+          "color": "white",
+          "background": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 147,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "0.25%",
+          "color": "green",
+          "background": "black"
+        },
+        {
+          "type": "triangle",
+          "x": 120,
+          "y": 185,
+          "x2": 140,
+          "y2": 220,
+          "x3": 100,
+          "y3": 220,
+          "filled": true,
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "fullDraw": false,
+      "data": [
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "height": 50,
+          "width": 240,
+          "color": "blue",
+          "filled": true
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 27,
+          "font": 1,
+          "size": 4,
+          "text": "VT",
+          "align": "center",
+          "color": "white",
+          "background": "blue"
+        },
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 50,
+          "width": 240,
+          "height": 190,
+          "filled": true,
+          "color": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 83,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "$118.28",
+          "color": "white",
+          "background": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 147,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "0.32%",
+          "color": "green",
+          "background": "black"
+        },
+        {
+          "type": "triangle",
+          "x": 120,
+          "y": 185,
+          "x2": 140,
+          "y2": 220,
+          "x3": 100,
+          "y3": 220,
+          "filled": true,
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "fullDraw": false,
+      "data": [
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "height": 50,
+          "width": 240,
+          "color": "blue",
+          "filled": true
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 27,
+          "font": 1,
+          "size": 4,
+          "text": "GOOG",
+          "align": "center",
+          "color": "white",
+          "background": "blue"
+        },
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 50,
+          "width": 240,
+          "height": 190,
+          "filled": true,
+          "color": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 83,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "$162.90",
+          "color": "white",
+          "background": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 147,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "-1.06%",
+          "color": "green",
+          "background": "black"
+        },
+        {
+          "type": "triangle",
+          "x": 120,
+          "y": 220,
+          "x2": 140,
+          "y2": 185,
+          "x3": 100,
+          "y3": 185,
+          "filled": true,
+          "color": "red"
+        }
+      ]
+    },
+    {
+      "fullDraw": false,
+      "data": [
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "height": 50,
+          "width": 240,
+          "color": "blue",
+          "filled": true
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 27,
+          "font": 1,
+          "size": 4,
+          "text": "TSLA",
+          "align": "center",
+          "color": "white",
+          "background": "blue"
+        },
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 50,
+          "width": 240,
+          "height": 190,
+          "filled": true,
+          "color": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 83,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "$249.40",
+          "color": "white",
+          "background": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 147,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "4.68%",
+          "color": "green",
+          "background": "black"
+        },
+        {
+          "type": "triangle",
+          "x": 120,
+          "y": 185,
+          "x2": 140,
+          "y2": 220,
+          "x3": 100,
+          "y3": 220,
+          "filled": true,
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "fullDraw": false,
+      "data": [
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "height": 50,
+          "width": 240,
+          "color": "blue",
+          "filled": true
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 27,
+          "font": 1,
+          "size": 4,
+          "text": "GME",
+          "align": "center",
+          "color": "white",
+          "background": "blue"
+        },
+        {
+          "type": "rectangle",
+          "x": 0,
+          "y": 50,
+          "width": 240,
+          "height": 190,
+          "filled": true,
+          "color": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 83,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "$22.60",
+          "color": "white",
+          "background": "black"
+        },
+        {
+          "type": "text",
+          "x": 120,
+          "y": 147,
+          "font": 1,
+          "size": 4,
+          "align": "center",
+          "text": "3.43%",
+          "color": "green",
+          "background": "black"
+        },
+        {
+          "type": "triangle",
+          "x": 120,
+          "y": 185,
+          "x2": 140,
+          "y2": 220,
+          "x3": 100,
+          "y3": 220,
+          "filled": true,
+          "color": "green"
+        }
+      ]
+    }
+  ]
+}
