@@ -7,17 +7,19 @@
 #include <Arduino.h>
 #include <Button.h>
 #include <globalTime.h>
-#include <config.h>
+#include <utils.h>
+#include <icons.h>
+#include <config_helper.h>
+
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
+#ifdef PARQET_PORTFOLIO_ID
+  #include <widgets/parqetWidget.h>
+#endif
+
 
 TFT_eSPI tft = TFT_eSPI();
-
-// Button states
-bool lastButtonOKState = HIGH;
-bool lastButtonLeftState = HIGH;
-bool lastButtonRightState = HIGH;
 
 #ifdef WIDGET_CYCLE_DELAY
 unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY;  // Automatically cycle widgets every X ms, set to 0 to disable
@@ -26,8 +28,8 @@ unsigned long m_widgetCycleDelay = 0;
 #endif
 unsigned long m_widgetCycleDelayPrev = 0;
 
-Button buttonOK(BUTTON_OK);
 Button buttonLeft(BUTTON_LEFT);
+Button buttonOK(BUTTON_OK);
 Button buttonRight(BUTTON_RIGHT);
 
 GlobalTime *globalTime; // Initialize the global time
@@ -50,24 +52,53 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
 ScreenManager* sm;
 WidgetSet* widgetSet;
 
-void setup() {
 
+/**
+ * The ISR handlers must be static
+ */
+void isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
+void isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
+void isrButtonChangeRight() { buttonRight.isrButtonChange(); }
+
+void setupButtons() {
   buttonLeft.begin();
   buttonOK.begin();
   buttonRight.begin();
 
+  attachInterrupt(digitalPinToInterrupt(BUTTON_LEFT), isrButtonChangeLeft, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_OK), isrButtonChangeMiddle, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
+}
+
+void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println("Starting up...");
 
-  sm = new ScreenManager(tft);
-  sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_WHITE);
-  sm->reset();
-  widgetSet = new WidgetSet(sm);
 
   TJpgDec.setSwapBytes(true); // JPEG rendering setup
   TJpgDec.setCallback(tft_output);
+  setupButtons();
+
+  sm = new ScreenManager(tft);
+  sm->selectAllScreens();
+  sm->getDisplay().fillScreen(TFT_BLACK);
+  sm->reset();
+  TFT_eSPI &display = sm->getDisplay();
+  display.setTextColor(TFT_WHITE);
+
+  sm->selectScreen(0);
+  display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
+  sm->selectScreen(1);
+  display.drawCentreString("info-Orbs", ScreenCenterX, ScreenCenterY - 30, 4);
+  display.drawCentreString("by", ScreenCenterX, ScreenCenterY, 4);
+  display.drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 4);
+
+  sm->selectScreen(2);
+  TJpgDec.setJpgScale(1);
+  TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
+
+  widgetSet = new WidgetSet(sm);
 
   #ifdef GC9A01_DRIVER
   Serial.println("GC9A01 Driver");
@@ -85,6 +116,9 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
+#ifdef PARQET_PORTFOLIO_ID
+  widgetSet->add(new ParqetWidget(*sm));
+#endif
 #ifdef STOCK_TICKER_LIST
   widgetSet->add(new StockWidget(*sm));
 #endif
@@ -106,6 +140,40 @@ void checkCycleWidgets() {
     }
 }
 
+void checkButtons() {
+  // Reset cycle timer whenever a button is pressed
+  if (buttonLeft.pressedShort()) {
+    // Left short press cycles widgets backward
+    Serial.println("Left button short pressed -> switch to prev Widget");
+    m_widgetCycleDelayPrev = millis();
+    widgetSet->prev();
+  } else if (buttonRight.pressedShort()) {
+    // Right short press cycles widgets forward
+    Serial.println("Right button short pressed -> switch to next Widget");
+    m_widgetCycleDelayPrev = millis();
+    widgetSet->next();
+  } else {
+    ButtonState leftState = buttonLeft.getState();
+    ButtonState middleState = buttonOK.getState();
+    ButtonState rightState = buttonRight.getState();
+
+    // Everying else that is not BTN_NOTHING will be forwarded to the current widget
+    if (leftState != BTN_NOTHING) {
+      Serial.printf("Left button pressed, state=%d\n", leftState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_LEFT, leftState);
+    } else if (middleState != BTN_NOTHING) {
+      Serial.printf("Middle button pressed, state=%d\n", middleState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_OK, middleState);
+    } else if (rightState != BTN_NOTHING) {
+      Serial.printf("Right button pressed, state=%d\n", rightState);
+      m_widgetCycleDelayPrev = millis();
+      widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+    }
+  }
+}
+
 void loop() {
   if (wifiWidget->isConnected() == false) {
     wifiWidget->update();
@@ -118,20 +186,7 @@ void loop() {
     }
     globalTime->updateTime();
 
-    if (buttonLeft.pressed()) {
-      Serial.println("Left button pressed");
-      m_widgetCycleDelayPrev = millis();
-      widgetSet->prev();
-    }
-    if (buttonOK.pressed()) {
-      Serial.println("OK button pressed");
-      widgetSet->changeMode();
-    }
-    if (buttonRight.pressed()) {
-      Serial.println("Right button pressed");
-      m_widgetCycleDelayPrev = millis();
-      widgetSet->next();
-    }
+    checkButtons();
 
     widgetSet->updateCurrent();
     widgetSet->drawCurrent();

@@ -2,7 +2,9 @@
 #define WIDGET_H
 
 #include <screenManager.h>
-#include <config.h>
+#include <config_helper.h>
+#include <Button.h>
+
 
 class Widget {
 public:
@@ -11,7 +13,7 @@ public:
     virtual void setup() = 0;
     virtual void update(bool force = false) = 0;
     virtual void draw(bool force = false) = 0;
-    virtual void changeMode() = 0;
+    virtual void buttonPressed(uint8_t buttonId, ButtonState state) = 0;
     virtual String getName() = 0;
     void setBusy(bool busy);
 

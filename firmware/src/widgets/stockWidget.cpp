@@ -2,7 +2,7 @@
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include <config.h>
+#include <config_helper.h>
 
 #include <iomanip>
 
@@ -56,6 +56,12 @@ void StockWidget::update(bool force) {
 void StockWidget::changeMode() {
     update(true);
 }
+
+void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
+        changeMode();
+}
+
 
 void StockWidget::getStockData(StockDataModel &stock) {
     String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();

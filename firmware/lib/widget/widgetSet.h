@@ -3,6 +3,7 @@
 
 #include <widget.h>
 #include <screenManager.h>
+#include <utils.h>
 
 #define MAX_WIDGETS 5
 
@@ -15,7 +16,7 @@ public:
     Widget *getCurrent();
     void next();
     void prev();
-    void changeMode();
+    void buttonPressed(uint8_t buttonId, ButtonState state);
     void showLoading();
     void updateAll();
     bool initialUpdateDone();
@@ -23,7 +24,7 @@ public:
     void setClearScreensOnDrawCurrent();
 
    private:
-    void showCenteredLine(int screen, int size, String text);
+    void showCenteredLine(int screen, const String& text);
     ScreenManager *m_screenManager;
     bool m_clearScreensOnDrawCurrent = true;
     Widget *m_widgets[MAX_WIDGETS];

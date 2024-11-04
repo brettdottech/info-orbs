@@ -1,6 +1,6 @@
 #include "widgets/clockWidget.h"
 
-#include <config.h>
+#include <config_helper.h>
 #include <globalTime.h>
 
 ClockWidget::ClockWidget(ScreenManager& manager) : Widget(manager) {
@@ -60,6 +60,7 @@ void ClockWidget::displayAmPm(uint32_t color) {
     GlobalTime* time = GlobalTime::getInstance();
     m_manager.selectScreen(2);
     TFT_eSPI& display = m_manager.getDisplay();
+    display.setTextDatum(MC_DATUM);
     display.setTextSize(4);
     display.setTextColor(color, TFT_BLACK, true);
     String am_pm = time->isPM() ? "PM" : "AM";
@@ -108,9 +109,15 @@ void ClockWidget::changeMode() {
     draw(true);
 }
 
+void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
+        changeMode();
+}
+
 void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& display = m_manager.getDisplay();
+    display.setTextDatum(MC_DATUM);
     display.setTextSize(fontSize);
     if (shadowing && font == 7) {
         display.setTextColor(BG_COLOR, TFT_BLACK);

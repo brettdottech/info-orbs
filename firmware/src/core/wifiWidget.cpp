@@ -1,81 +1,73 @@
 #include "core/wifiWidget.h"
 #include <WiFi.h>
+#include <utils.h>
+
+const int lineHeight = 40;
+const int statusScreenIndex = 3;
 
 WifiWidget::WifiWidget(ScreenManager& manager) : Widget(manager) {}
 
 WifiWidget::~WifiWidget() {}
 
 void WifiWidget::setup() {
-  TFT_eSPI &display = m_manager.getDisplay();
-  m_manager.selectAllScreens();
-  display.fillScreen(TFT_BLACK);
-  display.setTextSize(2);
-  display.setTextColor(TFT_WHITE);
+    TFT_eSPI &display = m_manager.getDisplay();
+    display.setTextSize(1);
+    display.setTextColor(TFT_WHITE);
 
-  m_manager.selectScreen(0);
-  display.drawCentreString("Connecting" + m_connectionString, 120, 80, 1);
+    m_manager.selectScreen(statusScreenIndex);
+    display.drawCentreString("Connecting to WiFi", ScreenCenterX, ScreenCenterY - lineHeight, 4);
+    display.drawCentreString(WIFI_SSID, ScreenCenterX, ScreenCenterY, 4);
 
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-  m_manager.selectScreen(1);
-  display.drawCentreString("Connecting to", 120, 80, 1);
-  display.drawCentreString("WiFi..", 120, 100, 1);
-  display.drawCentreString(WIFI_SSID, 120, 130, 1);
-
-  // Serial.println("Connecting to WiFi..");
-
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-  Serial.println("Connecting to WiFi..");
+    Serial.println("Connecting to WiFi...");
 }
 
 void WifiWidget::update(bool force) {
-  // Force is currently an unhandled due to not knowing what behavior it would change
+    // Force is currently unhandled due to not knowing what behavior it would change
 
-	if(WiFi.status() == WL_CONNECTED) {
-		m_isConnected = true;
-		m_connectionString = "Connected";
-	} else {
-		m_connectionTimer += 500;
-		m_dotsString += ".";
-    Serial.print(".");
-		if(m_dotsString.length() > 3) {
-			m_dotsString = "";
-		}
-		if(m_connectionTimer > m_connectionTimeout) {
-			m_connectionFailed = true;
-			connectionTimedOut();
-		}
-	}
+    if (WiFi.status() == WL_CONNECTED) {
+        m_isConnected = true;
+        m_connectionString = "Connected";
+    } else {
+        m_connectionTimer += 500;
+        m_dotsString += " . ";
+        Serial.print(".");
+        if (m_dotsString.length() > 9) {
+            m_dotsString = "";
+        }
+        if (m_connectionTimer > m_connectionTimeout) {
+            m_connectionFailed = true;
+            connectionTimedOut();
+        }
+    }
 }
 
 void WifiWidget::draw(bool force) {
-  // Force is currently an unhandled due to not knowing what behavior it would change
+    // Force is currently unhandled due to not knowing what behavior it would change
+    TFT_eSPI &display = m_manager.getDisplay();
+    m_manager.selectScreen(statusScreenIndex);
+    const int blankRectTop = ScreenCenterY + lineHeight / 2;
 
-	if(!m_isConnected && !m_connectionFailed) {
-		TFT_eSPI &display = m_manager.getDisplay();
-		m_manager.selectScreen(0);
-		display.fillRect(0, 100, 240, 100, TFT_BLACK);
-		display.drawCentreString(m_dotsString, 120, 100, 1);
-	} else if(m_isConnected && !m_hasDisplayedSuccess) {
-		m_hasDisplayedSuccess = true;
-		TFT_eSPI &display = m_manager.getDisplay();
-		m_manager.selectScreen(0);
-		display.fillScreen(TFT_BLACK);
-		display.drawCentreString("Connected", 120, 100, 1);
-    Serial.println();
-    Serial.println("Connected to WiFi");
-		m_isConnected = true;
-	} else if(m_connectionFailed && !m_hasDisplayedError) {
-		m_hasDisplayedError = true;
-		TFT_eSPI &display = m_manager.getDisplay();
-		m_manager.selectScreen(0);
-		display.drawCentreString("Connection", 120, 80, 1);
-		display.fillRect(0, 100, 240, 100, TFT_BLACK);
-		display.drawCentreString(m_connectionString, 120, 100, 1);
-	}
+    if (!m_isConnected && !m_connectionFailed) {
+        display.fillRect(0, blankRectTop, ScreenWidth, ScreenHeight - blankRectTop, TFT_BLACK);
+        display.drawCentreString(m_dotsString, ScreenCenterX, ScreenCenterY + lineHeight, 4);
+    } else if (m_isConnected && !m_hasDisplayedSuccess) {
+        m_hasDisplayedSuccess = true;
+        display.fillScreen(TFT_BLACK);
+        display.drawCentreString("Success", ScreenCenterX, ScreenCenterY, 4);
+        Serial.println();
+        Serial.println("Connected to WiFi");
+        m_isConnected = true;
+    } else if (m_connectionFailed && !m_hasDisplayedError) {
+        m_hasDisplayedError = true;
+        display.fillRect(0, blankRectTop, ScreenWidth, ScreenHeight - blankRectTop, TFT_BLACK);
+        display.drawCentreString(m_connectionString, ScreenCenterX, ScreenCenterY + lineHeight, 4);
+    }
 }
 
-void WifiWidget::changeMode() {}
+void WifiWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+}
 
 void WifiWidget::connectionTimedOut() {
   switch (WiFi.status()) {
@@ -98,14 +90,8 @@ void WifiWidget::connectionTimedOut() {
     m_connectionString = "Unknown";
     break;
   }
-
-  // Serial.println("Connection timed out");
-  // TFT_eSPI &display = m_manager.getDisplay();
-  // m_manager.selectScreen(0);
-  // display.drawCentreString("Connection", 120, 80, 1);
-  // display.drawCentreString(m_connectionString, 120, 100, 1);
 }
 
-String WifiWidget::getName(){
+String WifiWidget::getName() {
     return "WiFi";
 }
