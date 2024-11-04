@@ -1,7 +1,10 @@
 #include "Button.h"
-#include "config.h"
+#include "config_helper.h"
 
 
+/**
+ * After calling begin() make sure to attach an interrupt handler in main.cpp that will call isrButtonChange()
+ */
 Button::Button(uint8_t pin)
     : m_pin(pin), m_lastPinLevelChange(0),
       m_pinLevel(RELEASED_LEVEL), m_state(BTN_NOTHING),
@@ -11,14 +14,14 @@ void Button::begin() {
   pinMode(m_pin, BUTTON_MODE);
 }
 
-ButtonState Button::read() {
+void Button::isrButtonChange() {
   if (millis() - m_lastPinLevelChange < DEBOUNCE_TIME) {
-    // State change still within debounce time -> ignore
-	  return m_state;
+    return;
   }
 
-  if (digitalRead(m_pin) != m_pinLevel) {
-    m_pinLevel = !m_pinLevel;
+  bool newPinLevel = digitalRead(m_pin);
+  if (newPinLevel != m_pinLevel) {
+    m_pinLevel = newPinLevel;
     m_lastPinLevelChange = millis();
     if (m_pinLevel == RELEASED_LEVEL) {
       // Button was now released
@@ -37,7 +40,6 @@ ButtonState Button::read() {
     }
     m_hasChanged = true;
   }
-  return m_state;
 }
 
 bool Button::has_changed() {
@@ -49,21 +51,20 @@ bool Button::has_changed() {
 }
 
 bool Button::pressedShort() {
-  return (read() == BTN_SHORT && has_changed());
+  return (m_state == BTN_SHORT && has_changed());
 }
 
 bool Button::pressedMedium() {
-  return (read() == BTN_MEDIUM && has_changed());
+  return (m_state == BTN_MEDIUM && has_changed());
 }
 
 bool Button::pressedLong() {
-  return (read() == BTN_LONG && has_changed());
+  return (m_state == BTN_LONG && has_changed());
 }
 
 ButtonState Button::getState() {
-  ButtonState state = read();
   if (has_changed()) {
-    return state;
+    return m_state;
   } else {
     return BTN_NOTHING;
   }

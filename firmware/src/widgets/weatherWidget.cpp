@@ -13,7 +13,7 @@
 #include "widgets/weatherWidget.h"
 #include "icons.h"
 
-#include <config.h>
+#include <config_helper.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
     m_mode = MODE_HIGHS;
@@ -31,7 +31,7 @@ void WeatherWidget::changeMode() {
 }
 
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_LEFT && state == BTN_SHORT)
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
 }
 
@@ -313,10 +313,11 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
         drawDegrees(temps[i], x, 122, temperatureFontId, 1, 7, 4, m_foregroundColor, m_backgroundColor);
 
-        String shortDayName = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
+        String LOC_WEEKDAY = dayStr(weekday(m_time->getUnixEpoch() + (86400 * (i + 1))));
         shortDayName.remove(3);
         display.drawString(shortDayName, x, 154, 4);
     }
+
 }
 
 int WeatherWidget::drawDegrees(const String& number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {

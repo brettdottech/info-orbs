@@ -2,7 +2,7 @@
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include <config.h>
+#include <config_helper.h>
 
 #include <iomanip>
 
@@ -58,7 +58,7 @@ void StockWidget::changeMode() {
 }
 
 void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_LEFT && state == BTN_SHORT)
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
 }
 
