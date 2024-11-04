@@ -119,14 +119,8 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     } else if (stock.getCurrency() == "GBP"){
        currencySymbol = "GBP";
     }
-    
-    
 
 // Outputs
-
-
-
-
     display.fillRect(0,70, screenWidth, 49, TFT_WHITE);  // rgb565 colors
     display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  // rgb565 
     display.setTextSize(1);  // Set text size
@@ -138,10 +132,6 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     display.setTextDatum(CC_DATUM);
     display.setTextColor(TFT_BLACK);
     display.drawString(stock.getCompany(), centre, 118, 1);
-
-
-
-
     display.setTextSize(4);  // Set text size
     if (stock.getPercentChange() < 0.0) {
         display.setTextColor(TFT_RED, TFT_BLACK);
