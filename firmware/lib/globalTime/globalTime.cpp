@@ -24,11 +24,11 @@ GlobalTime *GlobalTime::getInstance() {
 
 void GlobalTime::updateTime() {
     if (millis() - m_updateTimer > m_oneSecond) {
-        m_timeClient->update();
-        m_unixEpoch = m_timeClient->getEpochTime();
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
             getTimeZoneOffsetFromAPI();
         }
+        m_timeClient->update();
+        m_unixEpoch = m_timeClient->getEpochTime();
         m_updateTimer = millis();
         m_minute = minute(m_unixEpoch);
         if (m_format24hour) {
