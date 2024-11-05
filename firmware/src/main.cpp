@@ -86,11 +86,14 @@ void setup() {
   sm->getDisplay().fillScreen(TFT_BLACK);
   sm->reset();
   TFT_eSPI &display = sm->getDisplay();
-  display.setTextSize(1);
-  display.setTextColor(TFT_WHITE);
+  OpenFontRender &render = sm->getRender();
+  // display.setTextColor(TFT_WHITE);
+  render.setFontColor(TFT_WHITE);
 
   sm->selectScreen(0);
-  display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
+  render.setAlignment(Align::MiddleCenter);
+  render.drawString("Welcome", ScreenCenterX, ScreenCenterY);
+  // display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
   sm->selectScreen(1);
   display.drawCentreString("info-Orbs", ScreenCenterX, ScreenCenterY - 30, 4);
   display.drawCentreString("by", ScreenCenterX, ScreenCenterY, 4);

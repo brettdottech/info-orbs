@@ -26,10 +26,20 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   Serial.println("SCREEN_3_CS:" + String(SCREEN_3_CS));
   Serial.println("SCREEN_4_CS:" + String(SCREEN_4_CS));
   Serial.println("SCREEN_5_CS:" + String(SCREEN_5_CS));
+
+  if (m_render.loadFont(font_roboto_regular, sizeof(font_roboto_regular))) {
+    Serial.println("Render initialize error");
+    return;
+  }
+  m_render.setDrawer(tft);
 }
 
 TFT_eSPI &ScreenManager::getDisplay() {
   return m_tft;
+}
+
+OpenFontRender &ScreenManager::getRender() {
+  return m_render;
 }
 
 // Selects a single screen
