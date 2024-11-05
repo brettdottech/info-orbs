@@ -119,13 +119,22 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     int centre = 120;
     int arrowOffsetX = 0;
     int arrowOffsetY = -109;
-    String currencySymbol = "$";
-    if (stock.getCurrency() == "EUR"){
-       currencySymbol = "EUR";
-    } else if (stock.getCurrency() == "GBP"){
-       currencySymbol = "GBP";
-    }
 
+    // ensuring proper currency display
+    String currencySymbol = "$";
+    String currencySymbolEUR = "EUR";
+    String currencySymbolGBP = "GBP";
+    // the below are just placeholders untill we have a unicode font that supports the currency symbols, which is why we're not just using the direct value from getCurrency.
+    // additionally, in some cases(crypto) the ticker wont return a currency value, so it must be extracted from the symbol deffinition 
+    if (stock.getCurrency() == "EUR"){
+       currencySymbol = currencySymbolEUR;
+    } else if (stock.getCurrency() == "GBP"){
+       currencySymbol = currencySymbolGBP;
+    } else if (stock.getSymbol().indexOf("/EUR") != -1){
+       currencySymbol = currencySymbolEUR;
+    } else if (stock.getSymbol().indexOf("/GBP") != -1){
+       currencySymbol = currencySymbolGBP;
+    }
 // Outputs
     display.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
     display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  
