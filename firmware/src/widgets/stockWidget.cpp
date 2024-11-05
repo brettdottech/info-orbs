@@ -81,11 +81,11 @@ void StockWidget::getStockData(StockDataModel &stock) {
                 stock.setCurrentPrice(doc["close"].as<float>());
                 stock.setPercentChange(doc["percent_change"].as<float>()/100);
                 stock.setPriceChange(doc["change"].as<float>());
-                stock.setHP(doc["fifty_two_week"]["high"].as<float>());
-                stock.setLP(doc["fifty_two_week"]["low"].as<float>());
+                stock.setHighPrice(doc["fifty_two_week"]["high"].as<float>());
+                stock.setLowPrice(doc["fifty_two_week"]["low"].as<float>());
                 stock.setCompany(doc["name"].as<String>());
                 stock.setCurrency(doc["currency"].as<String>());
-                stock.setSymbol(doc["symbol"].as<String>());
+                stock.setTicker(doc["symbol"].as<String>());
             } else {
                 Serial.println("skipping invalid data for: " + stock.getSymbol());
             }
@@ -127,18 +127,18 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     }
 
 // Outputs
-    display.fillRect(0,70, screenWidth, 49, TFT_WHITE);  // rgb565 colors
-    display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  // rgb565 
-    display.setTextSize(1);  // Set text size
+    display.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
+    display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  
+    display.setTextSize(1);  
     display.setTextColor(TFT_WHITE);
     display.drawString("52 Week:", centre, 188, 1);
     display.setTextDatum(ML_DATUM);
-    display.drawString("H: " + currencySymbol + stock.getHP(), 89, 201, 1);
-    display.drawString("L: " + currencySymbol + stock.getLP(), 89, 211, 1);
+    display.drawString("H: " + currencySymbol + stock.getHighPrice(), 89, 201, 1);
+    display.drawString("L: " + currencySymbol + stock.getLowPrice(), 89, 211, 1);
     display.setTextDatum(CC_DATUM);
     display.setTextColor(TFT_BLACK);
     display.drawString(stock.getCompany(), centre, 118, 1);
-    display.setTextSize(4);  // Set text size
+    display.setTextSize(4); 
     if (stock.getPercentChange() < 0.0) {
         display.setTextColor(TFT_RED, TFT_BLACK);
         display.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
@@ -156,7 +156,7 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     // Draw stock data
     display.setTextColor(TFT_BLACK);
 
-    display.drawString(stock.getSymbol(), centre, 93, 1);
+    display.drawString(stock.getTicker(), centre, 93, 1);
     display.setTextColor(TFT_WHITE);
 
     display.drawString(currencySymbol + stock.getCurrentPrice(2), centre, 155, 1);

@@ -16,7 +16,16 @@ String StockDataModel::getSymbol() {
     return m_symbol;
 }
 
-
+StockDataModel &StockDataModel::setTicker(String ticker) {
+    if (m_ticker != ticker) {
+        m_ticker = String(ticker);
+        // This is not a regular data field so do not mark changed when set
+    }
+    return *this;
+}
+String StockDataModel::getTicker() {
+    return m_ticker;
+}
 
 
 StockDataModel &StockDataModel::setCompany(String company) {
@@ -57,38 +66,38 @@ String StockDataModel::getCurrentPrice(int8_t digits) {
     return Utils::formatFloat(m_currentPrice, digits);
 }
 
-StockDataModel &StockDataModel::setHP(float HP) {
-    if (m_HP != HP) {
-        m_HP = HP;
+StockDataModel &StockDataModel::setHighPrice(float highPrice) {
+    if (m_highPrice != highPrice) {
+        m_highPrice = highPrice;
         m_changed = true;
     }
     return *this;
 }
 
-float StockDataModel::getHP() {
-    return m_HP;
+float StockDataModel::getHighPrice() {
+    return m_highPrice;
 }
 
-String StockDataModel::getHP(int8_t digits) {
-    return Utils::formatFloat(m_HP, digits);
+String StockDataModel::getHighPrice(int8_t digits) {
+    return Utils::formatFloat(m_highPrice, digits);
 }
 
 
 
-StockDataModel &StockDataModel::setLP(float LP) {
-    if (m_LP != LP) {
-        m_LP = LP;
+StockDataModel &StockDataModel::setLowPrice(float lowPrice) {
+    if (m_lowPrice != lowPrice) {
+        m_lowPrice = lowPrice;
         m_changed = true;
     }
     return *this;
 }
 
-float StockDataModel::getLP() {
-    return m_LP;
+float StockDataModel::getLowPrice() {
+    return m_lowPrice;
 }
 
-String StockDataModel::getLP(int8_t digits) {
-    return Utils::formatFloat(m_LP, digits);
+String StockDataModel::getLowPrice(int8_t digits) {
+    return Utils::formatFloat(m_lowPrice, digits);
 }
 
 
