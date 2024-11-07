@@ -259,6 +259,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     const int highLowY = 199;
 
     m_manager.selectScreen(displayIndex);
+    m_manager.clearScreen(displayIndex);
     int fontSize = 30;
 
     // No glaring white chunks in Dark mode
@@ -275,7 +276,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     String temps[days];
     for (auto i = 0; i < days; i++) {
         temps[i] = m_mode == MODE_HIGHS ? model.getDayHigh(i, 0) : model.getDayLow(i, 0);
-        if (temps[i].length() > 3) {
+        if (temps[i].length() > 4) {
             // We've got a nutty 3-digit temperature (plus degree sign), scale down
             temperatureFontSize = fontSize-5; // smaller
         }
