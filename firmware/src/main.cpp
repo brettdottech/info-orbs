@@ -82,24 +82,27 @@ void setup() {
   setupButtons();
 
   sm = new ScreenManager(tft);
-  sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_BLACK);
-  sm->reset();
-  TFT_eSPI &display = sm->getDisplay();
-  OpenFontRender &render = sm->getRender();
-  // display.setTextColor(TFT_WHITE);
-  render.setFontColor(TFT_WHITE);
+  sm->fillAllScreens(TFT_BLACK);
 
   sm->selectScreen(0);
-  render.setAlignment(Align::MiddleCenter);
-  render.drawString("Welcome", ScreenCenterX, ScreenCenterY);
-  // display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
+  sm->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 40);
+
   sm->selectScreen(1);
-  display.drawCentreString("info-Orbs", ScreenCenterX, ScreenCenterY - 30, 4);
-  display.drawCentreString("by", ScreenCenterX, ScreenCenterY, 4);
-  display.drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 4);
+  sm->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 40, 30);
+  sm->drawCentreString("by", ScreenCenterX, ScreenCenterY, 30);
+  sm->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 40, 30);
 
   sm->selectScreen(2);
+
+  // Screen &screen0 = sm->selectScreen(0);
+  // screen0.drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 40);
+
+  // Screen &screen1 = sm->selectScreen(1);
+  // screen1.drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 40, 30);
+  // screen1.drawCentreString("by", ScreenCenterX, ScreenCenterY, 30);
+  // screen1.drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 40, 30);
+
+  // Screen &screen2 = sm->selectScreen(2);
   TJpgDec.setJpgScale(1);
   TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
 
