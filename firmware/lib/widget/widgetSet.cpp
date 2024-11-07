@@ -68,7 +68,7 @@ void WidgetSet::showCenteredLine(int screen, const String& text) {
 
 
 void WidgetSet::showLoading() {
-    showCenteredLine(3, "loading data");
+    showCenteredLine(3, "Loading data:");
 }
 
 void WidgetSet::updateAll() {

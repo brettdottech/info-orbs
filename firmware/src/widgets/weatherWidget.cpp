@@ -128,55 +128,21 @@ bool WeatherWidget::getWeatherData() {
 }
 
 void WeatherWidget::displayClock(int displayIndex) {
-    const int clockY = 90;
-    const int dayOfWeekY = 200;
+    const int clockY = 120;
+    const int dayOfWeekY = 190;
     const int dateY = 50;
 
     m_manager.selectScreen(displayIndex);
-
-    TFT_eSPI &display = m_manager.getDisplay();
-    OpenFontRender &render = m_manager.getRender();
-    render.setAlignment(Align::BottomCenter);
-
-    display.fillScreen(m_backgroundColor);
-    // display.setTextColor(m_foregroundColor);
-    // display.setTextSize(1);
-    // display.setTextDatum(MC_DATUM);
-    render.setFontColor(m_foregroundColor);
-    render.setFontSize(25);
+    m_manager.fillScreen(m_backgroundColor);
+    m_manager.setFontColor(m_foregroundColor);
     
-    render.drawString(m_time->getDayAndMonth().c_str(), centre, dateY);
+    m_manager.drawCentreString(m_time->getDayAndMonth().c_str(), centre, dateY, 25);
     const String weekDay = m_time->getWeekday();
-    // "Tuesday" fits with the large font, "Thursday" and "Wednesday" need to be smaller
-    // display.setTextSize(weekDay.length() > 7 ? 1 : 2);
-    render.setFontSize(30);
-    render.drawString(weekDay.c_str(), centre, dayOfWeekY);
+    m_manager.drawCentreString(weekDay.c_str(), centre, dayOfWeekY, 30);
 
-    // FT_BBox bbox = render.calculateBoundingBoxFmt(0,0,30,Align::TopCenter,Layout::Horizontal,weekDay.c_str());
-    // Serial.printf("bbox1: x=%f %f, y=%f %f\n", bbox.xMin, bbox.xMax, bbox.yMin, bbox.yMax);
-    // bbox = render.calculateBoundingBoxFmt(120,120,30,Align::MiddleCenter,Layout::Horizontal,weekDay.c_str());
-    // Serial.printf("bbox2: x=%f %f, y=%f %f\n", bbox.xMin, bbox.xMax, bbox.yMin, bbox.yMax);
-    // bbox = render.calculateBoundingBoxFmt(0,0,30,Align::BottomCenter,Layout::Horizontal,weekDay.c_str());
-    // Serial.printf("bbox3: x=%f %f, y=%f %f\n", bbox.xMin, bbox.xMax, bbox.yMin, bbox.yMax);
-    // render.setAlignment(Align::MiddleCenter);
-    // render.drawString(weekDay.c_str(), centre, dayOfWeekY-bbox.yMin, TFT_RED);
-    
-
-    // display.setTextSize(1);
-    // display.setTextDatum(MR_DATUM);
-    render.setAlignment(Align::MiddleRight);
-    render.setFontSize(95);
-    render.drawString(m_time->getHourPadded().c_str(), centre - 10, clockY);
-    render.setAlignment(Align::MiddleCenter);
-    // display.setTextDatum(MC_DATUM);
-    render.drawString(":", centre, clockY-10);
-    // display.setTextDatum(ML_DATUM);
-    render.setAlignment(Align::MiddleLeft);
-    render.drawString(m_time->getMinutePadded().c_str(), centre + 10, clockY);
-
-    // display.drawLine(0, 120, 240, 120, TFT_GREEN);
-    // display.drawLine(0, clockY, 240, clockY, TFT_BLUE);
-    // display.drawLine(0, dayOfWeekY, 240, dayOfWeekY, TFT_GREEN);
+    m_manager.drawString(m_time->getHourPadded().c_str(), centre - 10, clockY, 90, Align::MiddleRight);
+    m_manager.drawString(":", centre, clockY, 90, Align::MiddleCenter);
+    m_manager.drawString(m_time->getMinutePadded().c_str(), centre + 10, clockY, 90, Align::MiddleLeft);
 }
 
 // Write an image to the screen from a hex array. 
@@ -254,8 +220,6 @@ void WeatherWidget::singleWeatherDeg(int displayIndex) {
 // Display the user's current city and the text description of the weather
 void WeatherWidget::weatherText(int displayIndex) {
     m_manager.selectScreen(displayIndex);
-    TFT_eSPI &display = m_manager.getDisplay();
-    OpenFontRender &render = m_manager.getRender();
 
     //=== TEXT OVERFLOW ============================
     // This takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
@@ -277,26 +241,16 @@ void WeatherWidget::weatherText(int displayIndex) {
     }
     //=== OVERFLOW END ==============================
 
-    display.fillScreen(m_backgroundColor);
-    // display.setTextColor(m_foregroundColor);
-    // display.setTextSize(2);
-    // display.setTextDatum(MC_DATUM);
+    m_manager.fillScreen(m_backgroundColor);
     String cityName = model.getCityName();
     cityName.remove(cityName.indexOf(",", 0));
-    // display.drawString(cityName, centre, 84, 4);
 
-    render.setFontColor(m_foregroundColor);
-    render.setFontSize(45);
-    render.setAlignment(Align::MiddleCenter);
-    render.drawString(cityName.c_str(), centre, 70);
+    m_manager.setFontColor(m_foregroundColor);
+    m_manager.drawCentreString(cityName.c_str(), centre, 80, 45);
 
-    // display.setTextSize(1);
-    // display.setTextFont(4);
-    render.setFontSize(21);
-
-    auto y = 120;
+    auto y = 125;
     for (auto i = 0; i < 4; i++) {
-        render.drawString(messageArr[i].c_str(), centre, y);
+        m_manager.drawCentreString(messageArr[i].c_str(), centre, y, 21);
         y += 25;
     }
 }
