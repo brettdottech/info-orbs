@@ -26,7 +26,6 @@ void WifiWidget::setup() {
 
   // Set WiFiManager to non-blocking so status and info can be displayed
   wifimgr.setConfigPortalBlocking(false);
-  // wm.setConfigPortalTimeout(60);
 
   // WiFiManager automatically connects using saved credentials,
   if(wifimgr.autoConnect("Info-Orbs")){
@@ -49,29 +48,28 @@ void WifiWidget::update(bool force) {
   // If WiFiManager is non-blocking, this keeps the configuration portal running
   wifimgr.process();
 
-	if(WiFi.status() == WL_CONNECTED) {
-		m_isConnected = true;
-		m_connectionString = "Connected";
+  if(WiFi.status() == WL_CONNECTED) {
+    m_isConnected = true;
+    m_connectionString = "Connected";
     m_ipaddress = WiFi.localIP().toString();
     Serial.print("IP address: ");
     Serial.println(m_ipaddress);
-
-	} else {
-		m_connectionTimer += 500;
-		m_dotsString += ".";
+  } else {
+    m_connectionTimer += 500;
+    m_dotsString += ".";
     Serial.print(".");
-		if(m_dotsString.length() > 3) {
-			m_dotsString = "";
-		}
-		if(m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
-			m_connectionFailed = true;
-			connectionTimedOut();
-		}
-	}
+    if(m_dotsString.length() > 3) {
+      m_dotsString = "";
+    }
+    if(m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
+      m_connectionFailed = true;
+      connectionTimedOut();
+    }
+  }
 }
 
 void WifiWidget::draw(bool force) {
-  //force is currently an unhandled due to not knowing what behavior it would change
+  // Force is currently an unhandled due to not knowing what behavior it would change
 
 	if(!m_isConnected && !m_connectionFailed) {
 		TFT_eSPI &display = m_manager.getDisplay();
