@@ -197,24 +197,21 @@ void WeatherWidget::drawWeatherIcon(int displayIndex, const String& condition, i
 // doesn't round deg, just removes all text after the decimal
 void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.selectScreen(displayIndex);
-
-    TFT_eSPI &display = m_manager.getDisplay();
-    display.fillScreen(m_backgroundColor);
-
-    drawDegrees(model.getCurrentTemperature(0), centre, 108, 8, 1, 15, 8, m_foregroundColor, m_backgroundColor);
+    m_manager.fillScreen(m_backgroundColor);
+    m_manager.drawCentreString(model.getCurrentTemperature(0).c_str(), centre, 90, 120);
 
     // No glaring white chunks in Dark mode
     if (m_screenMode == Light) {
-        display.fillRect(0, 170, 240, 70, m_foregroundColor);
-        display.fillRect(centre - 1, 170, 2, 240, m_backgroundColor);
+        m_manager.fillRect(0, 170, 240, 70, m_foregroundColor);
+        m_manager.fillRect(centre - 1, 170, 2, 240, m_backgroundColor);
     }
 
-    display.setTextColor(m_invertedForegroundColor);
-    display.setTextSize(1);
-    display.drawString("High", 80, 190, 4);
-    display.drawString("Low", 160, 190, 4);
-    drawDegrees(model.getTodayHigh(0), 80, 216, 4, 1, 4, 2, m_invertedForegroundColor, m_invertedBackgroundColor);
-    drawDegrees(model.getTodayLow(0), 160, 216, 4, 1, 4, 2, m_invertedForegroundColor, m_invertedBackgroundColor);
+    int fontSize = 30;
+    m_manager.setFontColor(m_invertedForegroundColor);
+    m_manager.drawCentreString("High", 80, 170, fontSize);
+    m_manager.drawCentreString("Low", 160, 170, fontSize);
+    m_manager.drawCentreString(model.getTodayHigh(0).c_str(), 80, 210, fontSize);
+    m_manager.drawCentreString(model.getTodayLow(0).c_str(), 160, 210, fontSize);
 }
 
 // Display the user's current city and the text description of the weather
@@ -262,67 +259,63 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     const int highLowY = 199;
 
     m_manager.selectScreen(displayIndex);
-    TFT_eSPI &display = m_manager.getDisplay();
-
-    display.setTextDatum(MC_DATUM);
-    display.fillScreen(m_backgroundColor);
-    display.setTextSize(1);
+    int fontSize = 30;
 
     // No glaring white chunks in Dark mode
     if (m_screenMode == Light) {
-        display.fillRect(0, 170, 240, 70, m_foregroundColor);
+        m_manager.fillRect(0, 170, 240, 70, m_foregroundColor);
     }
 
-    display.setTextColor(m_invertedForegroundColor);
-    display.drawString(m_mode == MODE_HIGHS ? "Highs" : "Lows", centre, highLowY, 4);
+    m_manager.setFontColor(m_invertedForegroundColor);
+    m_manager.drawString(m_mode == MODE_HIGHS ? "Highs" : "Lows", centre, highLowY, fontSize, Align::MiddleCenter);
     
-    int temperatureFontId = 6;  // 48px 0-9 only
+    int temperatureFontSize = fontSize;  // 0-9 only
     // Look up all the temperatures, and if any of them are more than 2 digits, we need
     // to scale down the font -- or it won't look right on the screen.
     String temps[days];
     for (auto i = 0; i < days; i++) {
         temps[i] = m_mode == MODE_HIGHS ? model.getDayHigh(i, 0) : model.getDayLow(i, 0);
-        if (temps[i].length() > 2) {
-            // We've got a nutty 3-digit temperature, scale down
-            temperatureFontId = 4;  // 26px 0-9; if there were a 36 or 32, I'd use it
+        if (temps[i].length() > 3) {
+            // We've got a nutty 3-digit temperature (plus degree sign), scale down
+            temperatureFontSize = fontSize-5; // smaller
         }
     }
 
-    display.setTextColor(m_foregroundColor);
+    m_manager.setFontColor(m_foregroundColor);
     for (auto i = 0; i < days; i++) {
         // TODO: only works for 3 days
         const int x = (centre - columnSize) + i * columnSize;
 
         drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
-        drawDegrees(temps[i], x, 122, temperatureFontId, 1, 7, 4, m_foregroundColor, m_backgroundColor);
+        m_manager.drawCentreString(temps[i].c_str(), x, 122, temperatureFontSize);
 
         String shortDayName = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
         shortDayName.remove(3);
-        display.drawString(shortDayName, x, 154, 4);
+        m_manager.drawString(shortDayName.c_str(), x, 154, fontSize, Align::MiddleCenter);
     }
 
 }
 
-int WeatherWidget::drawDegrees(const String& number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {
-    TFT_eSPI &display = m_manager.getDisplay();
+// int WeatherWidget::drawDegrees(const String& number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {
+//     TFT_eSPI &display = m_manager.getDisplay();
 
-    display.setTextColor(textColor);
-    display.setTextFont(font);
-    display.setTextSize(size);
-    display.setTextDatum(MC_DATUM);
+//     display.setTextColor(textColor);
+//     display.setTextFont(font);
+//     display.setTextSize(size);
+//     display.setTextDatum(MC_DATUM);
 
-    int16_t textWidth = display.textWidth(number);
-    int16_t fontHeight = display.fontHeight(font);
-    int offset = ceil(fontHeight * 0.15);
-    int circleX = textWidth / 2 + x + offset;
-    int circleY = y - fontHeight / 2 + floor(fontHeight / 10);
+//     int16_t textWidth = display.textWidth(number);
+//     int16_t fontHeight = display.fontHeight(font);
+//     int offset = ceil(fontHeight * 0.15);
+//     int circleX = textWidth / 2 + x + offset;
+//     int circleY = y - fontHeight / 2 + floor(fontHeight / 10);
 
-    display.drawString(number, x, y, font);
-    display.fillCircle(circleX, circleY, outerRadius, textColor);
-    display.fillCircle(circleX, circleY, innerRadius, backgroundColor);
+//     display.drawString(number, x, y, font);
+//     display.fillCircle(circleX, circleY, outerRadius, textColor);
+//     display.fillCircle(circleX, circleY, innerRadius, backgroundColor);
 
-    return textWidth + offset;
-}
+//     return textWidth + offset;
+// }
 
 int WeatherWidget::getClockStamp() {
     return m_time->getHour() * 60 + m_time->getMinute();

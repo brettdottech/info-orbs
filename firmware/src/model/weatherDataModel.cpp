@@ -53,7 +53,7 @@ float WeatherDataModel::getCurrentTemperature() {
 }
 
 String WeatherDataModel::getCurrentTemperature(int8_t digits) {
-    return Utils::formatFloat(m_currentWeatherDeg, digits);
+    return Utils::formatFloat(m_currentWeatherDeg, digits) + "°";
 }
 
 WeatherDataModel &WeatherDataModel::setTodayHigh(float high) {
@@ -69,7 +69,7 @@ float WeatherDataModel::getTodayHigh() {
 }
 
 String WeatherDataModel::getTodayHigh(int8_t digits) {
-    return Utils::formatFloat(m_todayHigh, digits);
+    return Utils::formatFloat(m_todayHigh, digits) + "°";
 }
 
 WeatherDataModel &WeatherDataModel::setTodayLow(float low) {
@@ -85,7 +85,7 @@ float WeatherDataModel::getTodayLow() {
 }
 
 String WeatherDataModel::getTodayLow(int8_t digits) {
-    return Utils::formatFloat(m_todayLow, digits);
+    return Utils::formatFloat(m_todayLow, digits) + "°";
 }
 
 WeatherDataModel &WeatherDataModel::setDaysIcons(String *icons) {
@@ -144,7 +144,7 @@ String WeatherDataModel::getDayLow(int8_t num, int8_t digits) {
     if (m_daysLow[num] == NaN) {
         return "";
     }
-    return Utils::formatFloat(m_daysLow[num], digits);
+    return Utils::formatFloat(m_daysLow[num], digits) + "°";
 }
 
 WeatherDataModel &WeatherDataModel::setDaysHighs(float highs[3]) {
@@ -169,7 +169,7 @@ String WeatherDataModel::getDayHigh(int8_t num, int8_t digits) {
     if (m_daysHigh[num] == NaN) {
         return "";
     }
-    return Utils::formatFloat(m_daysHigh[num], digits);
+    return Utils::formatFloat(m_daysHigh[num], digits) + "°";
 }
 
 WeatherDataModel &WeatherDataModel::setDayHigh(int num, float high) {

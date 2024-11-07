@@ -39,6 +39,9 @@ public:
     void drawString(const char *text, int x, int y);
     void drawCentreString(const char *text, int x, int y, unsigned int fontSize);
 
+    // Drawing stuff
+    void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
+
 private:
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& m_tft;

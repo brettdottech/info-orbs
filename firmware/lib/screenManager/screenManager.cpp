@@ -127,3 +127,7 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
 void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize=0) {
   drawString(text, x, y, fontSize, Align::MiddleCenter);
 }
+
+void ScreenManager::fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
+  m_tft.fillRect(x, y, w, h, color);
+}
