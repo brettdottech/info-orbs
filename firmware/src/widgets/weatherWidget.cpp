@@ -135,7 +135,7 @@ void WeatherWidget::displayClock(int displayIndex) {
     m_manager.selectScreen(displayIndex);
     m_manager.fillScreen(m_backgroundColor);
     m_manager.setFontColor(m_foregroundColor);
-    
+
     m_manager.drawCentreString(m_time->getDayAndMonth().c_str(), centre, dateY, 25);
     const String weekDay = m_time->getWeekday();
     m_manager.drawCentreString(weekDay.c_str(), centre, dayOfWeekY, 30);
@@ -202,16 +202,19 @@ void WeatherWidget::singleWeatherDeg(int displayIndex) {
 
     // No glaring white chunks in Dark mode
     if (m_screenMode == Light) {
-        m_manager.fillRect(0, 170, 240, 70, m_foregroundColor);
-        m_manager.fillRect(centre - 1, 170, 2, 240, m_backgroundColor);
+        m_manager.fillRect(0, 150, 240, 90, m_foregroundColor);
+        m_manager.fillRect(centre - 1, 150, 2, 90, m_backgroundColor);
     }
 
     int fontSize = 30;
     m_manager.setFontColor(m_invertedForegroundColor);
+    m_manager.setBackgroundColor(m_invertedBackgroundColor);
     m_manager.drawCentreString("High", 80, 170, fontSize);
     m_manager.drawCentreString("Low", 160, 170, fontSize);
     m_manager.drawCentreString(model.getTodayHigh(0).c_str(), 80, 210, fontSize);
     m_manager.drawCentreString(model.getTodayLow(0).c_str(), 160, 210, fontSize);
+    m_manager.setFontColor(m_foregroundColor);
+    m_manager.setBackgroundColor(m_backgroundColor);
 }
 
 // Display the user's current city and the text description of the weather
@@ -256,19 +259,21 @@ void WeatherWidget::weatherText(int displayIndex) {
 void WeatherWidget::threeDayWeather(int displayIndex) {
     const int days = 3;
     const int columnSize = 75;
-    const int highLowY = 199;
+    const int highLowY = 210;
 
     m_manager.selectScreen(displayIndex);
-    m_manager.clearScreen(displayIndex);
+    m_manager.fillScreen(m_backgroundColor);
     int fontSize = 30;
 
     // No glaring white chunks in Dark mode
     if (m_screenMode == Light) {
-        m_manager.fillRect(0, 170, 240, 70, m_foregroundColor);
+        m_manager.fillRect(0, 180, 240, 70, m_foregroundColor);
     }
 
-    m_manager.setFontColor(m_invertedForegroundColor);
-    m_manager.drawString(m_mode == MODE_HIGHS ? "Highs" : "Lows", centre, highLowY, fontSize, Align::MiddleCenter);
+    m_manager.drawString(m_mode == MODE_HIGHS ? "Highs" : "Lows", centre, highLowY, fontSize, Align::MiddleCenter, m_invertedForegroundColor, m_invertedBackgroundColor);
+    // Reset colors
+    m_manager.setFontColor(m_foregroundColor);
+    m_manager.setBackgroundColor(m_backgroundColor);
     
     int temperatureFontSize = fontSize;  // 0-9 only
     // Look up all the temperatures, and if any of them are more than 2 digits, we need
@@ -331,6 +336,8 @@ void WeatherWidget::configureColors() {
     //       and display the high and low in white too.
     m_invertedForegroundColor = m_screenMode == Light ? m_backgroundColor : m_foregroundColor;
     m_invertedBackgroundColor = m_screenMode == Light ? m_foregroundColor : m_backgroundColor;
+
+    m_manager.setBackgroundColor(m_backgroundColor);
 }
 
 String WeatherWidget::getName() {

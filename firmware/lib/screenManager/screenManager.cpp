@@ -77,6 +77,10 @@ void ScreenManager::setFontColor(uint32_t color) {
   m_render.setFontColor(color);
 }
 
+void ScreenManager::setBackgroundColor(uint32_t color) {
+  m_render.setBackgroundColor(color);
+}
+
 void ScreenManager::setAlignment(Align align) {
   m_render.setAlignment(align);
 }
@@ -110,7 +114,15 @@ void ScreenManager::drawString(const char *text, int x, int y) {
 }
 
 void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align) {
+  drawString(text, x, y, fontSize, align, m_render.getFontColor());
+}
 
+void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor) {
+  uint16_t bgColor = m_render.getBackgroundColor();
+  drawString(text, x, y, fontSize, align, fgColor, m_render.getBackgroundColor());
+ }
+
+void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor) {
   if (fontSize == 0) {
     // Keep current font size
     fontSize == m_render.getFontSize();
@@ -121,7 +133,7 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
 
   m_render.setAlignment(align);
   m_render.setFontSize(fontSize);
-  m_render.drawString(text, x, y-box.yMin);
+  m_render.drawString(text, x, y-box.yMin, fgColor, bgColor);
 }
 
 void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize=0) {

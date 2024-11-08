@@ -68,7 +68,7 @@ private:
 
     const String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
                                       weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                      "&include=days,current&iconSet=icons1";
+                                      "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;

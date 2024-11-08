@@ -29,14 +29,18 @@ public:
     void fillAllScreens(uint32_t color);
     void clearAllScreens();
     void setFontColor(uint32_t color);
+    void setBackgroundColor(uint32_t color);
     void setFontSize(uint32_t size);
     void setAlignment(Align align);
 
     void fillScreen(uint32_t color);
     void clearScreen(int screen);
 
+    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor);
+    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor);
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align);
     void drawString(const char *text, int x, int y);
+
     void drawCentreString(const char *text, int x, int y, unsigned int fontSize);
 
     // Drawing stuff
