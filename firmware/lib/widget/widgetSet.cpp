@@ -56,7 +56,10 @@ void WidgetSet::prev() {
 void WidgetSet::switchWidget() {
   m_screenManager->clearAllScreens();
   getCurrent()->setup();
+  uint32_t start = millis();
   getCurrent()->draw(true);
+  uint32_t end = millis();
+  Serial.printf("Drawing of %s took %d ms\n", getCurrent()->getName().c_str(), (end-start));
 }
 
 void WidgetSet::showCenteredLine(int screen, const String& text) {
