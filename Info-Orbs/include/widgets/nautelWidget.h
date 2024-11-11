@@ -25,7 +25,7 @@ class NautelWidget : public Widget {
     void displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color, bool shadowing);
     void displayDidget(int displayIndex, const String& didget, int font, int fontSize, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
-    void displayGauge(int displayIndex, int value, int minValue, int maxValue, int color);
+    void displayGauge(int displayIndex, float value, int minValue, int maxValue, int color);
     void displayAmPm(uint32_t color);
 
     void displayRadioStation(uint32_t color);

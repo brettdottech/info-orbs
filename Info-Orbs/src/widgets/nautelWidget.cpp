@@ -60,7 +60,7 @@ if (m_secondSingle != m_lastSecondSingle || force) {
         // displaySeconds(3, m_secondSingle, ALT_FOREGROUND_COLOR);     
         // displaySeconds(4, m_lastSecondSingle, TFT_BLACK);
         // displaySeconds(4, m_secondSingle, ALT_FOREGROUND_COLOR);
-        displayGauge(1, m_secondSingle, 0, 60, FOREGROUND_COLOR);
+        displayGauge(1, (float ((float) m_secondSingle/60.0)), 0, 1, FOREGROUND_COLOR);
         displayGauge(2, m_secondSingle * 2, 0, 120, TFT_GREEN);
         displayGauge(3, m_secondSingle * 3, 0, 180, TFT_ORANGE);
         displayGauge(4, m_secondSingle * 4 , 60, 240, TFT_RED);
@@ -142,8 +142,7 @@ void NautelWidget::displaySeconds(int displayIndex, int seconds, int color) {
     }
     
 }
-
-void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int maxValue, int color) {
+void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int maxValue, int color) {
     m_manager.reset();
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& tft = m_manager.getDisplay();
@@ -173,9 +172,9 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
         
         // Draw labels for min, max and middle values
         if (i == 0 || i == 5 || i == 10) {
-            int labelValue;
+            float labelValue;
             if (i == 0) labelValue = minValue;
-            else if (i == 5) labelValue = (minValue + maxValue) / 2;
+            else if (i == 5) labelValue = ((float)minValue + (float)maxValue) / 2.0;
             else labelValue = maxValue;
             
             // Position labels slightly inside the tick marks
@@ -193,7 +192,12 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
             
             tft.setTextColor(TFT_WHITE);
             tft.setTextSize(2);
+            // Only display floats if we have a value less than 10
+            if (labelValue >= 10 || labelValue == 0 || i == 0 | i == 10){
             tft.drawNumber(labelValue, labelX, labelY);
+            } else{
+            tft.drawFloat(labelValue, 2, labelX, labelY);
+            }
         }
     }
     
