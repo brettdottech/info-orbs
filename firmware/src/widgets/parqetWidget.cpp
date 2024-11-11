@@ -471,7 +471,9 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         yOffset += (PARQET_MAX_STOCKNAME_LINES - lineCount) * height / 2;
         for (int i = 0; i < lineCount; i++)
         {
-            m_manager.drawString(wrappedLines[i].c_str(), 120, yOffset + (height * i), 25, Align::MiddleCenter);
+            // Lager font if we need less lines
+            int fontSize = 21 + 12/lineCount;
+            m_manager.drawString(wrappedLines[i].c_str(), 120, yOffset + (height * i), fontSize, Align::MiddleCenter);
         }
     }
 
