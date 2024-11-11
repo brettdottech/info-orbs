@@ -21,7 +21,7 @@ void NautelWidget::draw(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
     
 
-if (m_secondSingle != m_lastSecondSingle || force) {
+//if (m_secondSingle != m_lastSecondSingle || force) {
 
         displaySeconds(0, m_lastSecondSingle, TFT_BLACK);
         displaySeconds(0, m_secondSingle, ALT_FOREGROUND_COLOR);  
@@ -33,7 +33,7 @@ if (m_secondSingle != m_lastSecondSingle || force) {
 
         m_lastSecondSingle = m_secondSingle;
 
-    }
+  //  }
 
 }
 
@@ -51,9 +51,9 @@ void NautelWidget::displayRadioStation(uint32_t color) {
 
 
 void NautelWidget::update(bool force) {
-    if (millis() - m_secondTimerPrev < m_secondTimer && !force) {
-        return;
-    }
+    // if (millis() - m_secondTimerPrev < m_secondTimer && !force) {
+    //     return;
+    // }
 
     GlobalTime* time = GlobalTime::getInstance();
     m_hourSingle = time->getHour();
@@ -89,13 +89,26 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& tft = m_manager.getDisplay();
  
-    int centerX = SCREEN_SIZE / 2 ;
-    int centerY = SCREEN_SIZE / 2 ;
 
     //Tidy values
     if (value < minValue){value = minValue;}
     if (value > maxValue){value = maxValue;}
+    // Calculate needle angle based on value
+    float valuePercent = (float)(value - minValue) / (maxValue - minValue);
+    float needleAngle = START_ANGLE + (TOTAL_ANGLE * valuePercent);
+    float needleRad = needleAngle * PI / 180.0;
+    // Do nothing if the needle has not moved.
+    if (lastNeedleAngle[displayIndex] == needleAngle){return;}
 
+    // Get the center of the screen
+    int centerX = SCREEN_SIZE / 2 ;
+    int centerY = SCREEN_SIZE / 2 ;
+    
+    // Calculate needle endpoints
+    int needleX = centerX + NEEDLE_LENGTH * cos(needleRad);
+    int needleY = centerY + NEEDLE_LENGTH * sin(needleRad);
+
+    
     // Draw gauge outline
     tft.drawCircle(centerX, centerY, GAUGE_RADIUS, TFT_WHITE);
     
@@ -141,16 +154,7 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
             }
         }
     }
-    
-    // Calculate needle angle based on value
-    float valuePercent = (float)(value - minValue) / (maxValue - minValue);
-    float needleAngle = START_ANGLE + (TOTAL_ANGLE * valuePercent);
-    float needleRad = needleAngle * PI / 180.0;
-    
-    // Calculate needle endpoints
-    int needleX = centerX + NEEDLE_LENGTH * cos(needleRad);
-    int needleY = centerY + NEEDLE_LENGTH * sin(needleRad);
-    
+        
     if(lastNeedleAngle[displayIndex] != -1){
     // Draw needle with thickness
     for (int i = -NEEDLE_WIDTH/2; i <= NEEDLE_WIDTH/2; i++) {
