@@ -14,59 +14,23 @@ void NautelWidget::setup() {
     m_lastDisplay2Didget = "-1";
     m_lastDisplay4Didget = "-1";
     m_lastDisplay5Didget = "-1";
-    //displayRadioStation(ALT_FOREGROUND_COLOR);
 
 }
 
 void NautelWidget::draw(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
     
-    // if (m_lastDisplay1Didget != m_display1Didget || force) {
-    //     displayDidget(0, m_display1Didget, 7, 5, ALT_FOREGROUND_COLOR );
-    //     m_lastDisplay1Didget = m_display1Didget;
-    //     if (SHADOWING != 1 &&m_display1Didget == " ") {
-    //         m_manager.clearScreen(0);
-    //     }
-    // }
-    // if (m_lastDisplay2Didget != m_display2Didget || force) {
-    //     displayDidget(1, m_display2Didget, 7, 5, ALT_FOREGROUND_COLOR );
-    //     m_lastDisplay2Didget = m_display2Didget;
-    // }
-    // if (m_lastDisplay4Didget != m_display4Didget || force) {
-    //     displayDidget(3, m_display4Didget, 7, 5, ALT_FOREGROUND_COLOR );
-    //     m_lastDisplay4Didget = m_display4Didget;
-    // }
-    // if (m_lastDisplay5Didget != m_display5Didget || force) {
-    //     displayDidget(4, m_display5Didget, 7, 5, ALT_FOREGROUND_COLOR );
-    //     m_lastDisplay5Didget = m_display5Didget;
-    // }
-
-//     if (m_secondSingle != m_lastSecondSingle || force) {
-//         if (m_secondSingle % 2 == 0) {
-//             displayDidget(2, "KRYZ", 7, 5, ALT_FOREGROUND_COLOR, false);
-//         } else {
-//             displayDidget(2, "KRYZ", 7, 5, BG_COLOR, false);
-//         }
 
 if (m_secondSingle != m_lastSecondSingle || force) {
-#if SHOW_SECOND_TICKS == true 
+
         displaySeconds(0, m_lastSecondSingle, TFT_BLACK);
         displaySeconds(0, m_secondSingle, ALT_FOREGROUND_COLOR);  
-        // displaySeconds(1, m_lastSecondSingle, TFT_BLACK);
-        // displaySeconds(1, m_secondSingle, ALT_FOREGROUND_COLOR);     
-        // displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
-        // displaySeconds(2, m_secondSingle, ALT_FOREGROUND_COLOR);
-        // displaySeconds(3, m_lastSecondSingle, TFT_BLACK);
-        // displaySeconds(3, m_secondSingle, ALT_FOREGROUND_COLOR);     
-        // displaySeconds(4, m_lastSecondSingle, TFT_BLACK);
-        // displaySeconds(4, m_secondSingle, ALT_FOREGROUND_COLOR);
+
         displayGauge(1, (float ((float) m_secondSingle/60.0)), 0, 1, FOREGROUND_COLOR);
         displayGauge(2, m_secondSingle * 2, 0, 120, TFT_GREEN);
         displayGauge(3, m_secondSingle * 3, 0, 180, TFT_ORANGE);
         displayGauge(4, m_secondSingle * 4 , 60, 240, TFT_RED);
 
-
-#endif
         m_lastSecondSingle = m_secondSingle;
 
     }
@@ -93,33 +57,9 @@ void NautelWidget::update(bool force) {
 
     GlobalTime* time = GlobalTime::getInstance();
     m_hourSingle = time->getHour();
-
     m_minuteSingle = time->getMinute();
     m_secondSingle = time->getSecond();
 
-    if (m_lastHourSingle != m_hourSingle || force) {
-        if (m_hourSingle < 10) {
-            if (FORMAT_24_HOUR) {
-                m_display1Didget = "0";
-            } else {
-                m_display1Didget = " ";
-            }
-        } else {
-            m_display1Didget = int(m_hourSingle/10);
-        }
-        m_display2Didget = m_hourSingle % 10;
-
-        m_lastHourSingle = m_hourSingle;
-    }
-
-    if (m_lastMinuteSingle != m_minuteSingle || force) {
-        String currentMinutePadded = String(m_minuteSingle).length() == 1 ? "0" + String(m_minuteSingle) : String(m_minuteSingle);
-
-        m_display4Didget = currentMinutePadded.substring(0, 1);
-        m_display5Didget = currentMinutePadded.substring(1, 2);
-
-        m_lastMinuteSingle = m_minuteSingle;
-    }
 }
 
 void NautelWidget::changeMode() {
@@ -133,8 +73,8 @@ void NautelWidget::displaySeconds(int displayIndex, int seconds, int color) {
     m_manager.selectScreen(displayIndex);
     int displaySeconds = seconds;
     TFT_eSPI& display = m_manager.getDisplay();
-    if (seconds > 20 && seconds < 40){displaySeconds = 21;}
-    // if (seconds < 40){displaySeconds = 39;}
+  
+ 
     if (displaySeconds < 30) {
         display.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 50, 6 * displaySeconds + 180, 6 * displaySeconds + 180 + 6, color, TFT_BLACK);
     } else {
@@ -142,12 +82,13 @@ void NautelWidget::displaySeconds(int displayIndex, int seconds, int color) {
     }
     
 }
+
+
 void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int maxValue, int color) {
     m_manager.reset();
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& tft = m_manager.getDisplay();
-    // int centerX = (displayIndex % 2) * 160 + 80;
-    // int centerY = (displayIndex / 2) * 128 + 64;
+ 
     int centerX = SCREEN_SIZE / 2 ;
     int centerY = SCREEN_SIZE / 2 ;
 
