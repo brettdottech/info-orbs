@@ -71,10 +71,17 @@ void ScreenManager::clearScreen(int screen) {
 
 void ScreenManager::fillScreen(uint32_t color) {
   m_tft.fillScreen(color);
+  // Set background for aliasing as well
+  m_render.setBackgroundColor(color);
 }
 
 void ScreenManager::setFontColor(uint32_t color) {
   m_render.setFontColor(color);
+}
+
+void ScreenManager::setFontColor(uint32_t color, uint32_t background) {
+  m_render.setFontColor(color);
+  m_render.setBackgroundColor(background);
 }
 
 void ScreenManager::setBackgroundColor(uint32_t color) {
@@ -142,4 +149,12 @@ void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned in
 
 void ScreenManager::fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
   m_tft.fillRect(x, y, w, h, color);
+}
+
+void ScreenManager::drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uint32_t color) {
+  m_tft.drawLine(xs, ys, xe, ye, color);
+}
+
+void ScreenManager::drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc) {
+  m_tft.drawArc(x, y, r, ir, startAngle, endAngle, fg_color, bg_color, smoothArc);
 }
