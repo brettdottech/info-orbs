@@ -127,7 +127,7 @@ bool GlobalTime::isPM() {
 
 void GlobalTime::getTimeZoneOffsetFromAPI() {
     HTTPClient http;
-    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&by=zone&zone=" + String(TIMEZONE_API_LOCATION));
+    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEndby=zone&zone=" + String(TIMEZONE_API_LOCATION));
     int httpCode = http.GET();
 
     if (httpCode > 0) {
