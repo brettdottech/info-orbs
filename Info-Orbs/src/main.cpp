@@ -2,6 +2,10 @@
 #include "widgetSet.h"
 #include "screenManager.h"
 #include "widgets/clockWidget.h"
+<<<<<<< Updated upstream
+=======
+#include "widgets/nautelWidget.h"
+>>>>>>> Stashed changes
 #include "widgets/weatherWidget.h"
 #include "widgets/webDataWidget.h"
 #include <Arduino.h>
@@ -79,6 +83,10 @@ void setup() {
   globalTime = GlobalTime::getInstance();
 
   widgetSet->add(new ClockWidget(*sm));
+<<<<<<< Updated upstream
+=======
+  widgetSet->add(new NautelWidget(*sm));
+>>>>>>> Stashed changes
   widgetSet->add(new StockWidget(*sm));
   widgetSet->add(new WeatherWidget(*sm));
 #ifdef WEB_DATA_WIDGET_URL
