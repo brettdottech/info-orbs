@@ -61,9 +61,9 @@ if (m_secondSingle != m_lastSecondSingle || force) {
         // displaySeconds(4, m_lastSecondSingle, TFT_BLACK);
         // displaySeconds(4, m_secondSingle, ALT_FOREGROUND_COLOR);
         displayGauge(1, m_secondSingle, 0, 60, FOREGROUND_COLOR);
-        displayGauge(2, m_secondSingle * 2, 0, 120, FOREGROUND_COLOR);
-        displayGauge(3, m_secondSingle * 3, 0, 180, FOREGROUND_COLOR);
-        displayGauge(4, m_secondSingle * 4 , 60, 240, FOREGROUND_COLOR);
+        displayGauge(2, m_secondSingle * 2, 0, 120, TFT_GREEN);
+        displayGauge(3, m_secondSingle * 3, 0, 180, TFT_ORANGE);
+        displayGauge(4, m_secondSingle * 4 , 60, 240, TFT_RED);
 
 
 #endif
@@ -184,7 +184,7 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
             
             // Adjust text alignment based on position
             if (i == 0) { // Left side
-                labelX -= 15;
+                labelX -= 0;
             } else if (i == 10) { // Right side
                 labelX -= 5;
             } else { // Middle
@@ -192,7 +192,7 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
             }
             
             tft.setTextColor(TFT_WHITE);
-            tft.setTextSize(1);
+            tft.setTextSize(2);
             tft.drawNumber(labelValue, labelX, labelY);
         }
     }
@@ -213,7 +213,11 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
         int offsetX = centerX + NEEDLE_LENGTH * cos(offsetRad);
         int offsetY = centerY + NEEDLE_LENGTH * sin(offsetRad);
         tft.drawLine(centerX, centerY, offsetX, offsetY, TFT_BLACK);
+       // tft.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 50, offsetX -180 , offsetY -180, TFT_BLACK, TFT_BLACK);
+
     }
+            tft.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 115, 50, lastNeedleAngle[displayIndex] -92.5, lastNeedleAngle[displayIndex] -87.5, TFT_BLACK, TFT_BLACK);
+
     }
 
     // Draw needle with thickness
@@ -223,6 +227,7 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
         int offsetY = centerY + NEEDLE_LENGTH * sin(offsetRad);
         tft.drawLine(centerX, centerY, offsetX, offsetY, color);
     }
+        tft.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 115, 50, needleAngle -92.5, needleAngle -87.5, color, TFT_BLACK);
     
     // Draw center hub
     tft.fillCircle(centerX, centerY, 5, color);
@@ -233,6 +238,7 @@ void NautelWidget::displayGauge(int displayIndex, int value, int minValue, int m
     tft.setTextSize(2);
     int valueWidth = 5 * String(value).length(); // Approximate width of the text
     //tft.drawNumber(value, centerX - valueWidth, centerY + GAUGE_RADIUS/2 + 20);
+    tft.drawString("value",SCREEN_SIZE / 2, SCREEN_SIZE - 50, 1);
     tft.drawString("KRYZ",SCREEN_SIZE / 2, SCREEN_SIZE - 20, 1);
     lastNeedleAngle[displayIndex] = needleAngle;
 }

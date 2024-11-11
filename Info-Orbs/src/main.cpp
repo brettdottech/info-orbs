@@ -79,8 +79,8 @@ void setup() {
 
   globalTime = GlobalTime::getInstance();
 
-  widgetSet->add(new ClockWidget(*sm));
   widgetSet->add(new NautelWidget(*sm));
+  widgetSet->add(new ClockWidget(*sm));
   widgetSet->add(new StockWidget(*sm));
   widgetSet->add(new WeatherWidget(*sm));
 #ifdef WEB_DATA_WIDGET_URL
