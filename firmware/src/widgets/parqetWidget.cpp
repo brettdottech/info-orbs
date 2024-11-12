@@ -210,8 +210,8 @@ void ParqetWidget::updatePortfolio()
                 }
                 else
                 {
-                    String id = holding["_id"].as<String>();
-                    Serial.printf("Invalid type: %s, id: %s\n", type.c_str(), id.c_str());
+                    // String id = holding["_id"].as<String>();
+                    // Serial.printf("Invalid type: %s, id: %s\n", type.c_str(), id.c_str());
                 }
             }
             // Add total
@@ -345,7 +345,7 @@ void ParqetWidget::clearScreen(int8_t displayIndex, int32_t background)
 
 void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32_t color, String extra, uint32_t extraColor)
 {
-    Serial.printf("displayClock at screen %d\n", displayIndex);
+    // Serial.printf("displayClock at screen %d\n", displayIndex);
     m_manager.selectScreen(displayIndex);
 
     int clky = 105;
@@ -368,7 +368,7 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
 
 void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor)
 {
-    Serial.printf("displayStock(): display=%d, stock=%s\n", displayIndex, stock.getName().c_str());
+    // Serial.printf("displayStock(): display=%d, stock=%s\n", displayIndex, stock.getName().c_str());
     m_manager.selectScreen(displayIndex);
     m_manager.fillScreen(backgroundColor);
     m_manager.setFontColor(textColor);
@@ -403,7 +403,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount - 1)) / 2;
         m_portfolio.getChartDataScale(chartHeight, scale, minVal, maxVal, chartMinVal);
         int zeroAtY = endLine + round(chartMinVal * scale);
-        Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
+        // Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
         for (int i = 0; i < chartDataCount; i++)
         {
             int x = (spaceInBetween + 1) * i + xOffset;
@@ -442,7 +442,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         m_manager.fillRect(0, zeroAtY - 1, 240, 3, TFT_WHITE);
         int minAtY = zeroAtY - round(minVal * scale);
         int maxAtY = zeroAtY - round(maxVal * scale);
-        Serial.printf("min/max lines would be at %d/%d\n", minAtY, maxAtY);
+        // Serial.printf("min/max lines would be at %d/%d\n", minAtY, maxAtY);
         if (zeroAtY < minAtY - 15 || zeroAtY > minAtY)
         {
             // Show minVal if the zero line is not interfering

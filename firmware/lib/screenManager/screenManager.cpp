@@ -15,6 +15,9 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   m_tft.setTextDatum(MC_DATUM);
   reset();
 
+  // I'm not sure which cache size is actually good.
+  // Needs testing.
+  m_render.setCacheSize(128, 128, 8192);
   if (m_render.loadFont(font_roboto_regular, sizeof(font_roboto_regular))) {
     Serial.println("Render initialize error");
     return;
