@@ -12,8 +12,24 @@ const float END_ANGLE = 45.0;      // Ending at right side
 const float TOTAL_ANGLE = 270.0;
 static float lastNeedleAngle[5] = {-1,-1,-1,-1,-1};
 static float lastValue[5] = {-1,-1,-1,-1,-1};
+// Configure measurements and units
 static String measure[5] = {"","", "Watts", "\xF7 C", "%"};
 static String units[5] = {"","SWR", "Power", "Temp", "Modulation"};
+//Configure color limits ^ direction
+static float colorLimits[5][3] = {
+    {-1,  -1, -1}, //Spare
+    {0.0, 0.5, 0.8}, // SWR
+    {0.0, 8.0, 100.0}, //Power Out
+    {0.0, 61.0, 75.0}, // Temp
+    {0.0, 50.0, 105.00}, // Modulation
+};
+static uint32_t colorValues[5][3] = {
+    {TFT_BLACK, TFT_BLACK, TFT_BLACK}, //Spare
+    {TFT_GREEN, TFT_ORANGE, TFT_RED}, //SWR
+    {TFT_RED, TFT_GREEN, TFT_ORANGE}, //Power Out 
+    {TFT_GREEN, TFT_ORANGE, TFT_RED}, //Temp
+    {TFT_RED, TFT_GREEN, TFT_ORANGE}, //Modulation
+};
 
 
 class NautelWidget : public Widget {

@@ -29,7 +29,7 @@ void NautelWidget::draw(bool force) {
         displayGauge(1, (float ((float) m_secondSingle/60.0)), 0, 1, FOREGROUND_COLOR);
         displayGauge(2, m_secondSingle * 2, 0, 120, TFT_GREEN);
         displayGauge(3, m_secondSingle * 3, 0, 180, TFT_ORANGE);
-        displayGauge(4, m_secondSingle * 4 , 60, 240, TFT_RED);
+        displayGauge(4, m_secondSingle * 3 , 0, 180, TFT_RED);
 
         m_lastSecondSingle = m_secondSingle;
 
@@ -90,6 +90,7 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
     TFT_eSPI& tft = m_manager.getDisplay();
     float step = (float)(maxValue  - minValue)/ TOTAL_ANGLE;
     bool up = false;
+    uint32_t activeColor = 0;
 
     //Tidy values
     if (value < minValue){value = minValue;}
@@ -176,19 +177,23 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
         }
     }
 
-    // Do nothing if the needle has not moved. Stops flickering   
+    // Do nothing if the needle has not moved. Stops flickering
     if(lastNeedleAngle[displayIndex] != -1 | lastNeedleAngle[displayIndex] != needleAngle){
+    // Select color
+    for (int i = 0; i <= 2; i++){
+    if (value > colorLimits[displayIndex][i]) {activeColor = colorValues[displayIndex][i];};
+    }
 
         if(up){
         tft.drawSmoothArc(centerX, centerY, 115, 60, lastNeedleAngle[displayIndex] -95, lastNeedleAngle[displayIndex] -92.5, TFT_BLACK, TFT_BLACK);
         }else{
         tft.drawSmoothArc(centerX, centerY, 115, 60, lastNeedleAngle[displayIndex] -87.5, lastNeedleAngle[displayIndex] -85, TFT_BLACK, TFT_BLACK);           
         }
-        tft.drawSmoothArc(centerX, centerY, 115, 60, needleAngle -92.5, needleAngle -87.5, color, TFT_BLACK);
+        tft.drawSmoothArc(centerX, centerY, 115, 60, needleAngle -92.5, needleAngle -87.5, activeColor, TFT_BLACK);
     }
 
     // Draw center hub
-    tft.drawCircle(centerX, centerY, 60, color);
+    tft.drawCircle(centerX, centerY, 60, activeColor);
     
     // Display Units and Measures
     tft.setTextColor(ALT_FOREGROUND_COLOR);
