@@ -6,8 +6,7 @@
 #include <TFT_eSPI.h>
 #include <SPI.h>
 #include <OpenFontRender.h>
-#include "../../include/roboto_regular.h"
-// #include "../../include/NotoSans_Bold.h"
+#include "../../include/ttffonts.h"
 
 #define NUM_SCREENS 5
 

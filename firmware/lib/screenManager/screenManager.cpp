@@ -18,7 +18,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   // I'm not sure which cache size is actually good.
   // Needs testing.
   m_render.setCacheSize(128, 128, 8192);
-  if (m_render.loadFont(font_roboto_regular, sizeof(font_roboto_regular))) {
+  if (m_render.loadFont(robotoRegular_start, robotoRegular_end-robotoRegular_start)) {
     Serial.println("Render initialize error");
     return;
   }
