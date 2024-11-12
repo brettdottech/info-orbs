@@ -46,21 +46,24 @@ void ScreenManager::setFont(TTF_Font font) {
     // just unload
     return;
   }
-  bool success = false;
+  // 0 is success
+  FT_Error error = 1;
   switch (font)
   {
   case ROBOTO_REGULAR:
-    success = m_render.loadFont(robotoRegular_start, robotoRegular_end-robotoRegular_start);
+    error = m_render.loadFont(robotoRegular_start, robotoRegular_end-robotoRegular_start);
     break;
   
   case FINAL_FRONTIER:
-    success = m_render.loadFont(finalFrontier_start, finalFrontier_end-finalFrontier_start);
+    error = m_render.loadFont(finalFrontier_start, finalFrontier_end-finalFrontier_start);
     break;
 
   }
-  if (!success) {
+  if (error == 0) {
+    m_curFont = font;
+  } else {
     Serial.printf("Unable to load TTF font %d\n", font);
-  }
+  } 
 }
 
 TFT_eSPI &ScreenManager::getDisplay() {
