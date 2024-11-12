@@ -88,16 +88,35 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
     m_manager.reset();
     m_manager.selectScreen(displayIndex);
     TFT_eSPI& tft = m_manager.getDisplay();
- 
+    float step = (float)(maxValue  - minValue)/ TOTAL_ANGLE;
+    bool up = false;
 
     //Tidy values
     if (value < minValue){value = minValue;}
     if (value > maxValue){value = maxValue;}
+    if (lastValue[displayIndex] < minValue){lastValue[displayIndex] = minValue;}
+    if (lastValue[displayIndex] > maxValue){lastValue[displayIndex] = maxValue;}
+
+    // Move the needle in the right direction & prevent jumping  
+    if (value > lastValue[displayIndex] & value > lastValue[displayIndex] - step){
+        value = lastValue[displayIndex] + step;
+        up = true;
+    }
+     if (value < lastValue[displayIndex] & value < lastValue[displayIndex] - step)
+    {
+        value = lastValue[displayIndex] - step;
+        up = false;
+    }
+
     //return if value is the same
-    if(lastValue[displayIndex] == value){return;};
+    if(lastValue[displayIndex] == value){return;}
 
     // Calculate needle angle based on value
     float valuePercent = (float)(value - minValue) / (maxValue - minValue);
+
+    
+
+    // Calc the angles
     float needleAngle = START_ANGLE + (TOTAL_ANGLE * valuePercent);
     float needleRad = needleAngle * PI / 180.0;
 
@@ -160,10 +179,14 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
     // Do nothing if the needle has not moved. Stops flickering   
     if(lastNeedleAngle[displayIndex] != -1 | lastNeedleAngle[displayIndex] != needleAngle){
 
-        tft.drawSmoothArc(centerX, centerY, 115, 60, lastNeedleAngle[displayIndex] -92.5, lastNeedleAngle[displayIndex] -87.5, TFT_BLACK, TFT_BLACK);
+        if(up){
+        tft.drawSmoothArc(centerX, centerY, 115, 60, lastNeedleAngle[displayIndex] -95, lastNeedleAngle[displayIndex] -92.5, TFT_BLACK, TFT_BLACK);
+        }else{
+        tft.drawSmoothArc(centerX, centerY, 115, 60, lastNeedleAngle[displayIndex] -87.5, lastNeedleAngle[displayIndex] -85, TFT_BLACK, TFT_BLACK);           
+        }
         tft.drawSmoothArc(centerX, centerY, 115, 60, needleAngle -92.5, needleAngle -87.5, color, TFT_BLACK);
     }
-    
+
     // Draw center hub
     tft.drawCircle(centerX, centerY, 60, color);
     
