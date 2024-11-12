@@ -93,12 +93,14 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
     //Tidy values
     if (value < minValue){value = minValue;}
     if (value > maxValue){value = maxValue;}
+    //return if value is the same
+    if(lastValue[displayIndex] == value){return;};
+
     // Calculate needle angle based on value
     float valuePercent = (float)(value - minValue) / (maxValue - minValue);
     float needleAngle = START_ANGLE + (TOTAL_ANGLE * valuePercent);
     float needleRad = needleAngle * PI / 180.0;
-    // Do nothing if the needle has not moved.
-    if (lastNeedleAngle[displayIndex] == needleAngle){return;}
+
 
     // Get the center of the screen
     int centerX = SCREEN_SIZE / 2 ;
@@ -110,7 +112,7 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
 
     
     // Draw gauge outline
-    tft.drawCircle(centerX, centerY, GAUGE_RADIUS, TFT_WHITE);
+    tft.drawCircle(centerX, centerY, GAUGE_RADIUS, TFT_LIGHTGREY);
     
     // Draw tick marks
     for (int i = 0; i <= 10; i++) {
@@ -122,7 +124,7 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
         int outerX = centerX + GAUGE_RADIUS * cos(angleRad);
         int outerY = centerY + GAUGE_RADIUS * sin(angleRad);
         
-        tft.drawLine(innerX, innerY, outerX, outerY, TFT_WHITE);
+        tft.drawLine(innerX, innerY, outerX, outerY, TFT_LIGHTGREY);
         
         // Draw labels for min, max and middle values
         if (i == 0 || i == 5 || i == 10) {
@@ -154,40 +156,43 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
             }
         }
     }
-        
-    if(lastNeedleAngle[displayIndex] != -1){
-    // Draw needle with thickness
-    for (int i = -NEEDLE_WIDTH/2; i <= NEEDLE_WIDTH/2; i++) {
-        float offsetRad = (lastNeedleAngle[displayIndex] + i) * PI / 180.0;
-        int offsetX = centerX + NEEDLE_LENGTH * cos(offsetRad);
-        int offsetY = centerY + NEEDLE_LENGTH * sin(offsetRad);
-        tft.drawLine(centerX, centerY, offsetX, offsetY, TFT_BLACK);
-       // tft.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 50, offsetX -180 , offsetY -180, TFT_BLACK, TFT_BLACK);
 
-    }
-            tft.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 115, 50, lastNeedleAngle[displayIndex] -92.5, lastNeedleAngle[displayIndex] -87.5, TFT_BLACK, TFT_BLACK);
+    // Do nothing if the needle has not moved. Stops flickering   
+    if(lastNeedleAngle[displayIndex] != -1 | lastNeedleAngle[displayIndex] != needleAngle){
 
+        tft.drawSmoothArc(centerX, centerY, 115, 60, lastNeedleAngle[displayIndex] -92.5, lastNeedleAngle[displayIndex] -87.5, TFT_BLACK, TFT_BLACK);
+        tft.drawSmoothArc(centerX, centerY, 115, 60, needleAngle -92.5, needleAngle -87.5, color, TFT_BLACK);
     }
-
-    // Draw needle with thickness
-    for (int i = -NEEDLE_WIDTH/2; i <= NEEDLE_WIDTH/2; i++) {
-        float offsetRad = (needleAngle + i) * PI / 180.0;
-        int offsetX = centerX + NEEDLE_LENGTH * cos(offsetRad);
-        int offsetY = centerY + NEEDLE_LENGTH * sin(offsetRad);
-        tft.drawLine(centerX, centerY, offsetX, offsetY, color);
-    }
-        tft.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 115, 50, needleAngle -92.5, needleAngle -87.5, color, TFT_BLACK);
     
     // Draw center hub
-    tft.fillCircle(centerX, centerY, 5, color);
-    tft.drawCircle(centerX, centerY, 5, TFT_WHITE);
+    tft.drawCircle(centerX, centerY, 60, color);
     
-    // Display current value below gauge in the empty space
+    // Display Units and Measures
     tft.setTextColor(ALT_FOREGROUND_COLOR);
     tft.setTextSize(2);
     int valueWidth = 5 * String(value).length(); // Approximate width of the text
-    //tft.drawNumber(value, centerX - valueWidth, centerY + GAUGE_RADIUS/2 + 20);
-    tft.drawString("value",SCREEN_SIZE / 2, SCREEN_SIZE - 50, 1);
-    tft.drawString("KRYZ",SCREEN_SIZE / 2, SCREEN_SIZE - 20, 1);
+    tft.drawString(measure[displayIndex],centerX, SCREEN_SIZE - 80, 1);
+    tft.drawString(units[displayIndex],centerX , SCREEN_SIZE - 30, 1);
+    
+    // Draw Value Erase last value the update new value
+    tft.setTextColor(TFT_BLACK);
+    tft.setTextSize(3);
+    if(lastValue[displayIndex] < 10){
+         tft.drawFloat(lastValue[displayIndex], 2, centerX, centerY);
+    }else{
+         tft.drawFloat(lastValue[displayIndex], 0, centerX, centerY);
+
+    }
+
+    tft.setTextColor(TFT_WHITE);
+    tft.setTextSize(3);
+    if(value < 10){
+         tft.drawFloat(value, 2, SCREEN_SIZE / 2, SCREEN_SIZE / 2);
+    }else{
+         tft.drawFloat(value, 0, SCREEN_SIZE / 2, SCREEN_SIZE / 2);
+
+    }
+
     lastNeedleAngle[displayIndex] = needleAngle;
+    lastValue[displayIndex] = value;
 }

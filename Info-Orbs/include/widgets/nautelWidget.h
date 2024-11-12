@@ -11,6 +11,10 @@ const float START_ANGLE = 135.0;  // Starting from left side
 const float END_ANGLE = 45.0;      // Ending at right side
 const float TOTAL_ANGLE = 270.0;
 static float lastNeedleAngle[5] = {-1,-1,-1,-1,-1};
+static float lastValue[5] = {-1,-1,-1,-1,-1};
+static String measure[5] = {"","", "Watts", "\xF7 F", "%"};
+static String units[5] = {"","SWR", "Power", "Temp", "Modulation"};
+
 
 class NautelWidget : public Widget {
    public:
