@@ -18,10 +18,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   // I'm not sure which cache size is actually good.
   // Needs testing.
   m_render.setCacheSize(128, 128, 8192);
-  if (m_render.loadFont(robotoRegular_start, robotoRegular_end-robotoRegular_start)) {
-    Serial.println("Render initialize error");
-    return;
-  }
+  setFont(ROBOTO_REGULAR);
   m_render.setDrawer(m_tft);
 
   Serial.println("ScreenManager initialized");
@@ -37,6 +34,33 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   Serial.println("SCREEN_4_CS:" + String(SCREEN_4_CS));
   Serial.println("SCREEN_5_CS:" + String(SCREEN_5_CS));
 
+}
+
+void ScreenManager::setFont(TTF_Font font) {
+  if (font == m_curFont) {
+    // nothing to do
+    return;
+  }
+  m_render.unloadFont();
+  if (font == TTF_Font::NONE) {
+    // just unload
+    return;
+  }
+  bool success = false;
+  switch (font)
+  {
+  case ROBOTO_REGULAR:
+    success = m_render.loadFont(robotoRegular_start, robotoRegular_end-robotoRegular_start);
+    break;
+  
+  case FINAL_FRONTIER:
+    success = m_render.loadFont(finalFrontier_start, finalFrontier_end-finalFrontier_start);
+    break;
+
+  }
+  if (!success) {
+    Serial.printf("Unable to load TTF font %d\n", font);
+  }
 }
 
 TFT_eSPI &ScreenManager::getDisplay() {

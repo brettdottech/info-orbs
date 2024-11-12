@@ -10,12 +10,17 @@
 
 #define NUM_SCREENS 5
 
-// Define your class or functions here
+enum TTF_Font {
+    NONE,
+    ROBOTO_REGULAR,
+    FINAL_FRONTIER
+};
 
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
 
+    void setFont(TTF_Font font);
     TFT_eSPI& getDisplay();
     OpenFontRender &getRender();
 
@@ -52,6 +57,7 @@ private:
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& m_tft;
     OpenFontRender m_render;
+    TTF_Font m_curFont = TTF_Font::NONE;
     // Screen *m_screens[NUM_SCREENS];
 
 
