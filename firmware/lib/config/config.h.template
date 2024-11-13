@@ -9,7 +9,7 @@
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
 #define WEATHER_SCREEN_MODE Light // Can be either Light or Dark 
 #define WEATHER_UNITS_METRIC // Comment this line out (or delete it) if you want imperial units for the weather
-#define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stocks to display on the stock tracker
+#define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,SPY,APC&country=Germany" //Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on "&country=Canada" to narrow down to your ticker)
 //#define PARQET_PORTFOLIO_ID "" // set the id of your parqet.com portfolio. Make sure the portfolio is set to public!
 #define FORMAT_24_HOUR false // Toggle 24 hour clock vs 12 hour clock, change between true/false
 #define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour

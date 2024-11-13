@@ -64,7 +64,7 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.marketdata.app/v1/stocks/quotes/" + stock.getSymbol() + "/?token=aVhwT1NWWkhIZVBRZlIwOUlHb01keWFrMEI5Ql9QM1ZIZndtay1ub0V3OD0";
+    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
 
     HTTPClient http;
     http.begin(httpRequestAddress);
@@ -76,12 +76,16 @@ void StockWidget::getStockData(StockDataModel &stock) {
         DeserializationError error = deserializeJson(doc, payload);
 
         if (!error) {
-            float currentPrice = doc["last"][0].as<float>();
+            float currentPrice = doc["close"].as<float>();
             if (currentPrice > 0.0) {
-                stock.setCurrentPrice(doc["last"][0].as<float>());
-                stock.setPercentChange(doc["changepct"][0].as<float>());
-                stock.setPriceChange(doc["change"][0].as<float>());
-                stock.setVolume(doc["volume"][0].as<float>());
+                stock.setCurrentPrice(doc["close"].as<float>());
+                stock.setPercentChange(doc["percent_change"].as<float>()/100);
+                stock.setPriceChange(doc["change"].as<float>());
+                stock.setHighPrice(doc["fifty_two_week"]["high"].as<float>());
+                stock.setLowPrice(doc["fifty_two_week"]["low"].as<float>());
+                stock.setCompany(doc["name"].as<String>());
+                stock.setTicker(doc["symbol"].as<String>());
+                stock.setCurrencySymbol(doc["currency"].as<String>());
             } else {
                 Serial.println("skipping invalid data for: " + stock.getSymbol());
             }
@@ -108,27 +112,47 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     TFT_eSPI &display = m_manager.getDisplay();
 
     display.fillScreen(TFT_BLACK);
-    display.setTextColor(TFT_WHITE);
-    display.setTextSize(4);  // Set text size
+
 
     // Calculate center positions
     int screenWidth = display.width();
     int centre = 120;
+    int arrowOffsetX = 0;
+    int arrowOffsetY = -109;
+ 
 
-    // Draw stock data
-    display.fillRect(0, 0, screenWidth, 50, 0x0256);  // rgb565 colors
-    display.drawString(stock.getSymbol(), centre, 27, 1);
-    display.drawString("$" + stock.getCurrentPrice(2), centre, 51 + display.fontHeight(1), 1);
 
+// Outputs
+    display.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
+    display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  
+    display.setTextSize(1);  
+    display.setTextColor(TFT_WHITE);
+    display.drawString("52 Week:", centre, 188, 1);
+    display.setTextDatum(ML_DATUM);
+    display.drawString("H: " + stock.getCurrencySymbol() + stock.getHighPrice(), 89, 201, 1);
+    display.drawString("L: " + stock.getCurrencySymbol() + stock.getLowPrice(), 89, 211, 1);
+    display.setTextDatum(CC_DATUM);
+    display.setTextColor(TFT_BLACK);
+    display.drawString(stock.getCompany(), centre, 118, 1);
+    display.setTextSize(4); 
     if (stock.getPercentChange() < 0.0) {
         display.setTextColor(TFT_RED, TFT_BLACK);
-        display.fillTriangle(120, 220, 140, 185, 100, 185, TFT_RED);
+        display.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
+        display.drawArc (centre, centre, 120, 118, 0, 360, TFT_RED, TFT_RED);
     } else {
         display.setTextColor(TFT_GREEN, TFT_BLACK);
-        display.fillTriangle(120, 185, 140, 220, 100, 220, TFT_GREEN);
+        display.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
+        display.drawArc (centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
     }
+    display.drawString(stock.getPercentChange(2) + "%", centre, 49, 1);
+    // Draw stock data
+    display.setTextColor(TFT_BLACK);
 
-    display.drawString(stock.getPercentChange(2) + "%", centre, 147, 1);
+    display.drawString(stock.getTicker(), centre, 93, 1);
+    display.setTextColor(TFT_WHITE);
+
+    display.drawString(stock.getCurrencySymbol() + stock.getCurrentPrice(2), centre, 155, 1);
+  
 }
 
 String StockWidget::getName() {
