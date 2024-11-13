@@ -122,7 +122,6 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
  
 
 
-    }
 // Outputs
     display.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
     display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  
