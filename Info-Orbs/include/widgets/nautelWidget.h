@@ -13,18 +13,18 @@ const float TOTAL_ANGLE = 270.0;
 static float lastNeedleAngle[5] = {-1,-1,-1,-1,-1};
 static float lastValue[5] = {-1,-1,-1,-1,-1};
 // Configure measurements and units
-static String measure[5] = {"","", "Watts", "\xF7 C", "%"};
-static String units[5] = {"","SWR", "Power", "Temp", "Modulation"};
+static String measure[5] = {"RPM","", "Watts", "\xF7 C", "%"};
+static String units[5] = {"Fan Speed","SWR", "Power", "Temp", "Modulation"};
 //Configure color limits ^ direction
 static float colorLimits[5][3] = {
-    {-1,  -1, -1}, //Spare
+    {0,  7000, 8000}, //FanSpeed
     {0.0, 2.0, 2.5}, // SWR
     {0.0, 8.0, 100.0}, //Power Out
     {0.0, 61.0, 75.0}, // Temp
     {0.0, 50.0, 105.00}, // Modulation
 };
 static uint32_t colorValues[5][3] = {
-    {TFT_BLACK, TFT_BLACK, TFT_BLACK}, //Spare
+    {TFT_RED, TFT_GREEN, TFT_ORANGE}, //FanSpeed
     {TFT_GREEN, TFT_ORANGE, TFT_RED}, //SWR
     {TFT_RED, TFT_GREEN, TFT_ORANGE}, //Power Out 
     {TFT_GREEN, TFT_ORANGE, TFT_RED}, //Temp

@@ -59,10 +59,6 @@ const float wsSwr = doc["swr"]; // "1.289"
 
 
 void NautelWidget::setup() {
-    m_lastDisplay1Didget = "-1";
-    m_lastDisplay2Didget = "-1";
-    m_lastDisplay4Didget = "-1";
-    m_lastDisplay5Didget = "-1";
 
     webSocket.beginSSL("ws.kryzradio.org", 443);
     // Set up the WebSocket onConnect callback
@@ -76,13 +72,11 @@ void NautelWidget::draw(bool force) {
 
 //if (m_secondSingle != m_lastSecondSingle || force) {
 
-        displaySeconds(0, m_lastSecondSingle, TFT_BLACK);
-        displaySeconds(0, m_secondSingle, ALT_FOREGROUND_COLOR);  
-
+        displayGauge(0, fanspeed, 5000, 9000, FOREGROUND_COLOR);
         displayGauge(1, swr, 0, 5, FOREGROUND_COLOR);
-        displayGauge(2, poweroutput, 0, 120, TFT_GREEN);
-        displayGauge(3, heatsinktemp, 0, 100, TFT_ORANGE);
-        displayGauge(4, peakmodulation, 0, 110, TFT_RED);
+        displayGauge(2, poweroutput, 0, 120, FOREGROUND_COLOR);
+        displayGauge(3, heatsinktemp, 0, 100, FOREGROUND_COLOR);
+        displayGauge(4, peakmodulation, 0, 110, FOREGROUND_COLOR);
 
         m_lastSecondSingle = m_secondSingle;
 
@@ -251,7 +245,7 @@ void NautelWidget::displayGauge(int displayIndex, float value, int minValue, int
     tft.drawCircle(centerX, centerY, 60, activeColor);
     
     // Display Units and Measures
-    tft.setTextColor(ALT_FOREGROUND_COLOR);
+    tft.setTextColor(color);
     tft.setTextSize(2);
     int valueWidth = 5 * String(value).length(); // Approximate width of the text
     tft.drawString(measure[displayIndex],centerX, SCREEN_SIZE - 80, 1);
