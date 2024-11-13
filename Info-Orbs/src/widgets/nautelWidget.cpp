@@ -2,6 +2,11 @@
 
 #include <config.h>
 #include <globalTime.h>
+#include <WebSocketsClient.h>
+#include <ArduinoJson.h>
+
+WebSocketsClient webSocket;
+
 
 NautelWidget::NautelWidget(ScreenManager& manager) : Widget(manager) {
 }
@@ -9,11 +14,50 @@ NautelWidget::NautelWidget(ScreenManager& manager) : Widget(manager) {
 NautelWidget::~NautelWidget() {
 }
 
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+     switch(type) {
+        case WStype_DISCONNECTED:
+            Serial.printf("[WSc] Disconnected!\n");
+            break;
+        case WStype_CONNECTED:
+            {
+                Serial.printf("[WSc] Connected to url: %s\n",  payload);
+
+			    // send message to server when Connected
+				webSocket.sendTXT("Connected");
+            }
+            break;
+        case WStype_TEXT:
+            Serial.printf("[WSc] get text: %s\n", payload);
+
+			// send message to server
+			// webSocket.sendTXT("message here");
+            break;
+        case WStype_BIN:
+            Serial.printf("[WSc] get binary length: %u\n", length);
+            //hexdump(payload, length);
+
+            // send data to server
+            // webSocket.sendBIN(payload, length);
+            break;
+		case WStype_ERROR:			
+		case WStype_FRAGMENT_TEXT_START:
+		case WStype_FRAGMENT_BIN_START:
+		case WStype_FRAGMENT:
+		case WStype_FRAGMENT_FIN:
+			break;
+    }
+}
+
 void NautelWidget::setup() {
     m_lastDisplay1Didget = "-1";
     m_lastDisplay2Didget = "-1";
     m_lastDisplay4Didget = "-1";
     m_lastDisplay5Didget = "-1";
+
+    webSocket.beginSSL("ws.kryzradio.org", 443);
+    // Set up the WebSocket onConnect callback
+    webSocket.onEvent(webSocketEvent);
 
 }
 
@@ -59,6 +103,8 @@ void NautelWidget::update(bool force) {
     m_hourSingle = time->getHour();
     m_minuteSingle = time->getMinute();
     m_secondSingle = time->getSecond();
+        // Start Websocket
+        webSocket.loop();
 
 }
 
