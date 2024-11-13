@@ -13,21 +13,21 @@ const float TOTAL_ANGLE = 270.0;
 static float lastNeedleAngle[5] = {-1,-1,-1,-1,-1};
 static float lastValue[5] = {-1,-1,-1,-1,-1};
 // Configure measurements and units
-static String measure[5] = {"RPM","", "Watts", "\xF7 C", "%"};
-static String units[5] = {"Fan Speed","SWR", "Power", "Temp", "Modulation"};
+static String measure[5] = {"RPM", "\xF7 C","", "Watts", "%"};
+static String units[5] = {"Fan Speed","Temp","SWR", "Power", "Modulation"};
 //Configure color limits ^ direction
 static float colorLimits[5][3] = {
     {0,  7000, 8000}, //FanSpeed
+    {0.0, 61.0, 75.0}, // Temp
     {0.0, 2.0, 2.5}, // SWR
     {0.0, 8.0, 100.0}, //Power Out
-    {0.0, 61.0, 75.0}, // Temp
     {0.0, 50.0, 105.00}, // Modulation
 };
 static uint32_t colorValues[5][3] = {
     {TFT_RED, TFT_GREEN, TFT_ORANGE}, //FanSpeed
+    {TFT_GREEN, TFT_ORANGE, TFT_RED}, //Temp
     {TFT_GREEN, TFT_ORANGE, TFT_RED}, //SWR
     {TFT_RED, TFT_GREEN, TFT_ORANGE}, //Power Out 
-    {TFT_GREEN, TFT_ORANGE, TFT_RED}, //Temp
     {TFT_RED, TFT_GREEN, TFT_ORANGE}, //Modulation
 };
 
@@ -55,7 +55,7 @@ class NautelWidget : public Widget {
     int m_timeZoneOffset;
 
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
-    long m_secondTimer = 2000;  // this time is used to refressh/check the clock every second.
+    long m_secondTimer = 1000;  // this time is used to refressh/check the clock every second.
     long m_secondTimerPrev = 0;
 
     // WiFiUDP m_udp;

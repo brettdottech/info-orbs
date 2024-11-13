@@ -73,9 +73,9 @@ void NautelWidget::draw(bool force) {
 //if (m_secondSingle != m_lastSecondSingle || force) {
 
         displayGauge(0, fanspeed, 5000, 9000, FOREGROUND_COLOR);
-        displayGauge(1, swr, 0, 5, FOREGROUND_COLOR);
-        displayGauge(2, poweroutput, 0, 120, FOREGROUND_COLOR);
-        displayGauge(3, heatsinktemp, 0, 100, FOREGROUND_COLOR);
+        displayGauge(1, heatsinktemp, 0, 100, FOREGROUND_COLOR);
+        displayGauge(2, swr, 0, 5, FOREGROUND_COLOR);
+        displayGauge(3, poweroutput, 0, 50, FOREGROUND_COLOR);
         displayGauge(4, peakmodulation, 0, 110, FOREGROUND_COLOR);
 
         m_lastSecondSingle = m_secondSingle;
