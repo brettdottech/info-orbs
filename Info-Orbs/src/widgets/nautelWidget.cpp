@@ -1,11 +1,22 @@
 #include "widgets/nautelWidget.h"
-
+#include <stdlib.h>
 #include <config.h>
 #include <globalTime.h>
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 
 WebSocketsClient webSocket;
+JsonDocument doc();
+ String stationName = "Listening";
+ String frequency = "Dailing";
+ String ip = "dhcp";
+ float fanspeed =  0.0;
+ float heatsinktemp = 0.0;
+ float peakmodulation = 0.0;
+ float poweroutput = 0.0;
+ float powerreflected = 0.0;
+ String date = "epoch";
+ float swr = 0.0;
 
 
 NautelWidget::NautelWidget(ScreenManager& manager) : Widget(manager) {
@@ -15,39 +26,37 @@ NautelWidget::~NautelWidget() {
 }
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-     switch(type) {
-        case WStype_DISCONNECTED:
-            Serial.printf("[WSc] Disconnected!\n");
-            break;
-        case WStype_CONNECTED:
-            {
-                Serial.printf("[WSc] Connected to url: %s\n",  payload);
 
-			    // send message to server when Connected
-				webSocket.sendTXT("Connected");
-            }
-            break;
-        case WStype_TEXT:
-            Serial.printf("[WSc] get text: %s\n", payload);
+const char* json = (char*)payload;
+JsonDocument doc;
+deserializeJson(doc, json);
 
-			// send message to server
-			// webSocket.sendTXT("message here");
-            break;
-        case WStype_BIN:
-            Serial.printf("[WSc] get binary length: %u\n", length);
-            //hexdump(payload, length);
+const String wsStationName = doc["stationName"]; // "KRYZ"
+const String wsFrequency = doc["frequency"]; // "98.5 Mhz"
+const String wsIp = doc["ip"]; // "192.168.10.12"
+const float wsFanspeed = doc["fanspeed"]; // "7323.0"
+const float wsHeatsinktemp = doc["heatsinktemp"]; // "24.01"
+const float wsPeakmodulation = doc["peakmodulation"]; // "100.013"
+const float wsPoweroutput = doc["poweroutput"]; // "11.023"
+const float wsPowerreflected = doc["powerreflected"]; // "0.176"
+const String wsDate = doc["date"]; // "2024-11-13 01:59:18.965820Z"
+const float wsSwr = doc["swr"]; // "1.289"
 
-            // send data to server
-            // webSocket.sendBIN(payload, length);
-            break;
-		case WStype_ERROR:			
-		case WStype_FRAGMENT_TEXT_START:
-		case WStype_FRAGMENT_BIN_START:
-		case WStype_FRAGMENT:
-		case WStype_FRAGMENT_FIN:
-			break;
-    }
+
+// Serial.println(fanspeed_ws);
+// Serial.println(ip)_ws;
+ stationName = wsStationName;
+ frequency = wsFrequency;
+ ip = wsIp;
+ fanspeed = wsFanspeed;
+ heatsinktemp = wsHeatsinktemp;
+ peakmodulation = wsPeakmodulation;
+ poweroutput = wsPoweroutput;
+ powerreflected = wsPowerreflected;
+ date = wsDate;
+ swr = wsSwr;
 }
+
 
 void NautelWidget::setup() {
     m_lastDisplay1Didget = "-1";
@@ -70,10 +79,10 @@ void NautelWidget::draw(bool force) {
         displaySeconds(0, m_lastSecondSingle, TFT_BLACK);
         displaySeconds(0, m_secondSingle, ALT_FOREGROUND_COLOR);  
 
-        displayGauge(1, (float ((float) m_secondSingle/60.0)), 0, 1, FOREGROUND_COLOR);
-        displayGauge(2, m_secondSingle * 2, 0, 120, TFT_GREEN);
-        displayGauge(3, m_secondSingle * 3, 0, 180, TFT_ORANGE);
-        displayGauge(4, m_secondSingle * 3 , 0, 180, TFT_RED);
+        displayGauge(1, swr, 0, 5, FOREGROUND_COLOR);
+        displayGauge(2, poweroutput, 0, 120, TFT_GREEN);
+        displayGauge(3, heatsinktemp, 0, 100, TFT_ORANGE);
+        displayGauge(4, peakmodulation, 0, 110, TFT_RED);
 
         m_lastSecondSingle = m_secondSingle;
 

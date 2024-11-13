@@ -18,7 +18,7 @@ static String units[5] = {"","SWR", "Power", "Temp", "Modulation"};
 //Configure color limits ^ direction
 static float colorLimits[5][3] = {
     {-1,  -1, -1}, //Spare
-    {0.0, 0.5, 0.8}, // SWR
+    {0.0, 2.0, 2.5}, // SWR
     {0.0, 8.0, 100.0}, //Power Out
     {0.0, 61.0, 75.0}, // Temp
     {0.0, 50.0, 105.00}, // Modulation
@@ -30,6 +30,7 @@ static uint32_t colorValues[5][3] = {
     {TFT_GREEN, TFT_ORANGE, TFT_RED}, //Temp
     {TFT_RED, TFT_GREEN, TFT_ORANGE}, //Modulation
 };
+
 
 
 class NautelWidget : public Widget {
