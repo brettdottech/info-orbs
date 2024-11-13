@@ -38,8 +38,8 @@ class StockDataModel {
     String m_symbol = "";
     String m_ticker = "";
     String m_company = "";
-    String m_currencySymbolGBP = "GBP";
-    String m_currencySymbolEUR = "EUR";
+    String m_currencySymbolGBP = "£";
+    String m_currencySymbolEUR = "€";
     String m_currencySymbol = "";
     float m_currentPrice = 0.0;
     float m_volume = 0.0;
