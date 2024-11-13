@@ -24,7 +24,7 @@ GlobalTime *GlobalTime::getInstance() {
 
 void GlobalTime::updateTime() {
     if (millis() - m_updateTimer > m_oneSecond) {
-        if (m_timeZoneOffset == -1) {
+        if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
             getTimeZoneOffsetFromAPI();
         }
         m_timeClient->update();
@@ -127,7 +127,7 @@ bool GlobalTime::isPM() {
 
 void GlobalTime::getTimeZoneOffsetFromAPI() {
     HTTPClient http;
-    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset&by=zone&zone=" + String(TIMEZONE_API_LOCATION));
+    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + String(TIMEZONE_API_LOCATION));
     int httpCode = http.GET();
 
     if (httpCode > 0) {
@@ -135,8 +135,17 @@ void GlobalTime::getTimeZoneOffsetFromAPI() {
         DeserializationError error = deserializeJson(doc, http.getString());
         if (!error) {
             m_timeZoneOffset = doc["gmtOffset"].as<int>();
+            if (doc["zoneEnd"].isNull()) {
+                // Timezone does not use DST, no futher updates necessary
+                m_nextTimeZoneUpdate = 0;
+            } else {
+                // Timezone uses DST, update when necessary
+                m_nextTimeZoneUpdate = doc["zoneEnd"].as<unsigned long>() + random(5*60); // Randomize update by 5 minutes to avoid flooding the API
+            }
             Serial.print("Timezone Offset from API: ");
             Serial.println(m_timeZoneOffset);
+            Serial.print("Next timezone update: ");
+            Serial.println(m_nextTimeZoneUpdate);
             m_timeClient->setTimeOffset(m_timeZoneOffset);
         } else {
             Serial.println("Deserialization error on timezone offset API response");

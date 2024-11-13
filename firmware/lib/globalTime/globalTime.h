@@ -66,6 +66,7 @@ class GlobalTime {
     String m_time;
     String m_weekday;
     int m_timeZoneOffset = -1; // A value that will be overwritten by the API
+    unsigned long m_nextTimeZoneUpdate = 0;
 
     WiFiUDP m_udp;
     NTPClient *m_timeClient{nullptr};
