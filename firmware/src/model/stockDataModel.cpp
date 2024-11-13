@@ -5,6 +5,25 @@
 StockDataModel::StockDataModel() {
 }
 
+StockDataModel &StockDataModel::setCurrencySymbol(String currencySymbol) {
+        if (currencySymbol == "EUR"){
+            m_currencySymbol = m_currencySymbolEUR;
+        } else if (currencySymbol == "GBP"){
+            m_currencySymbol = m_currencySymbolGBP ;
+        } else if (getSymbol().indexOf("/EUR") != -1){
+            m_currencySymbol = m_currencySymbolEUR;
+        } else if (getSymbol().indexOf("/GBP") != -1){
+            m_currencySymbol = m_currencySymbolGBP;
+        } else {
+            m_currencySymbol =  "$";
+        }
+    return *this;
+}
+
+String StockDataModel::getCurrencySymbol() {
+    return m_currencySymbol;
+}
+
 StockDataModel &StockDataModel::setSymbol(String symbol) {
     if (m_symbol != symbol) {
         m_symbol = String(symbol);
@@ -38,20 +57,6 @@ StockDataModel &StockDataModel::setCompany(String company) {
 String StockDataModel::getCompany() {
     return m_company;
 }
-
-
-StockDataModel &StockDataModel::setCurrency(String currency) {
-    if (m_currency != currency) {
-        m_currency = currency;
-        m_changed = true;
-    }
-    return *this;
-}
-String StockDataModel::getCurrency() {
-    return m_currency;
-}
-
-
 StockDataModel &StockDataModel::setCurrentPrice(float currentPrice) {
     if (m_currentPrice != currentPrice) {
         m_currentPrice = currentPrice;

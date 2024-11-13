@@ -84,8 +84,8 @@ void StockWidget::getStockData(StockDataModel &stock) {
                 stock.setHighPrice(doc["fifty_two_week"]["high"].as<float>());
                 stock.setLowPrice(doc["fifty_two_week"]["low"].as<float>());
                 stock.setCompany(doc["name"].as<String>());
-                stock.setCurrency(doc["currency"].as<String>());
                 stock.setTicker(doc["symbol"].as<String>());
+                stock.setCurrencySymbol(doc["currency"].as<String>());
             } else {
                 Serial.println("skipping invalid data for: " + stock.getSymbol());
             }
@@ -119,21 +119,9 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     int centre = 120;
     int arrowOffsetX = 0;
     int arrowOffsetY = -109;
+ 
 
-    // ensuring proper currency display
-    String currencySymbol = "$";
-    String currencySymbolEUR = "EUR";
-    String currencySymbolGBP = "GBP";
-    // the below are just placeholders untill we have a unicode font that supports the currency symbols, which is why we're not just using the direct value from getCurrency.
-    // additionally, in some cases(crypto) the ticker wont return a currency value, so it must be extracted from the symbol deffinition 
-    if (stock.getCurrency() == "EUR"){
-       currencySymbol = currencySymbolEUR;
-    } else if (stock.getCurrency() == "GBP"){
-       currencySymbol = currencySymbolGBP;
-    } else if (stock.getSymbol().indexOf("/EUR") != -1){
-       currencySymbol = currencySymbolEUR;
-    } else if (stock.getSymbol().indexOf("/GBP") != -1){
-       currencySymbol = currencySymbolGBP;
+
     }
 // Outputs
     display.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
@@ -142,8 +130,8 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     display.setTextColor(TFT_WHITE);
     display.drawString("52 Week:", centre, 188, 1);
     display.setTextDatum(ML_DATUM);
-    display.drawString("H: " + currencySymbol + stock.getHighPrice(), 89, 201, 1);
-    display.drawString("L: " + currencySymbol + stock.getLowPrice(), 89, 211, 1);
+    display.drawString("H: " + stock.getCurrencySymbol() + stock.getHighPrice(), 89, 201, 1);
+    display.drawString("L: " + stock.getCurrencySymbol() + stock.getLowPrice(), 89, 211, 1);
     display.setTextDatum(CC_DATUM);
     display.setTextColor(TFT_BLACK);
     display.drawString(stock.getCompany(), centre, 118, 1);
@@ -152,14 +140,10 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
         display.setTextColor(TFT_RED, TFT_BLACK);
         display.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
         display.drawArc (centre, centre, 120, 118, 0, 360, TFT_RED, TFT_RED);
-
-
     } else {
         display.setTextColor(TFT_GREEN, TFT_BLACK);
         display.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
         display.drawArc (centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
-
-
     }
     display.drawString(stock.getPercentChange(2) + "%", centre, 49, 1);
     // Draw stock data
@@ -168,7 +152,7 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     display.drawString(stock.getTicker(), centre, 93, 1);
     display.setTextColor(TFT_WHITE);
 
-    display.drawString(currencySymbol + stock.getCurrentPrice(2), centre, 155, 1);
+    display.drawString(stock.getCurrencySymbol() + stock.getCurrentPrice(2), centre, 155, 1);
   
 }
 

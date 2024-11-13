@@ -8,14 +8,14 @@
 class StockDataModel {
    public:
     StockDataModel();
+    StockDataModel &setCurrencySymbol(String currencySymbol);
+    String getCurrencySymbol();
     StockDataModel &setSymbol(String symbol);
     String getSymbol();
     StockDataModel &setTicker(String ticker);
     String getTicker();
     StockDataModel &setCompany(String company);
     String getCompany();
-    StockDataModel &setCurrency(String company);
-    String getCurrency();
     StockDataModel &setCurrentPrice(float currentPrice);
     float getCurrentPrice();
     String getCurrentPrice(int8_t digits);
@@ -38,7 +38,9 @@ class StockDataModel {
     String m_symbol = "";
     String m_ticker = "";
     String m_company = "";
-    String m_currency = "";
+    String m_currencySymbolGBP = "GBP";
+    String m_currencySymbolEUR = "EUR";
+    String m_currencySymbol = "";
     float m_currentPrice = 0.0;
     float m_volume = 0.0;
     float m_highPrice = 0.0;
