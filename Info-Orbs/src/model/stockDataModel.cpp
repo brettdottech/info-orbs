@@ -5,6 +5,25 @@
 StockDataModel::StockDataModel() {
 }
 
+StockDataModel &StockDataModel::setCurrencySymbol(String currencySymbol) {
+        if (currencySymbol == "EUR"){
+            m_currencySymbol = m_currencySymbolEUR;
+        } else if (currencySymbol == "GBP"){
+            m_currencySymbol = m_currencySymbolGBP ;
+        } else if (getSymbol().indexOf("/EUR") != -1){
+            m_currencySymbol = m_currencySymbolEUR;
+        } else if (getSymbol().indexOf("/GBP") != -1){
+            m_currencySymbol = m_currencySymbolGBP;
+        } else {
+            m_currencySymbol =  "$";
+        }
+    return *this;
+}
+
+String StockDataModel::getCurrencySymbol() {
+    return m_currencySymbol;
+}
+
 StockDataModel &StockDataModel::setSymbol(String symbol) {
     if (m_symbol != symbol) {
         m_symbol = String(symbol);
@@ -16,12 +35,21 @@ String StockDataModel::getSymbol() {
     return m_symbol;
 }
 
-
+StockDataModel &StockDataModel::setTicker(String ticker) {
+    if (m_ticker != ticker) {
+        m_ticker = String(ticker);
+        // This is not a regular data field so do not mark changed when set
+    }
+    return *this;
+}
+String StockDataModel::getTicker() {
+    return m_ticker;
+}
 
 
 StockDataModel &StockDataModel::setCompany(String company) {
     if (m_company != company) {
-        m_company = String(company);
+        m_company = company;
         m_changed = true;
     }
     return *this;
@@ -29,20 +57,6 @@ StockDataModel &StockDataModel::setCompany(String company) {
 String StockDataModel::getCompany() {
     return m_company;
 }
-
-
-StockDataModel &StockDataModel::setCurrency(String currency) {
-    if (m_currency != currency) {
-        m_currency = String(currency);
-        m_changed = true;
-    }
-    return *this;
-}
-String StockDataModel::getCurrency() {
-    return m_currency;
-}
-
-
 StockDataModel &StockDataModel::setCurrentPrice(float currentPrice) {
     if (m_currentPrice != currentPrice) {
         m_currentPrice = currentPrice;
@@ -57,38 +71,38 @@ String StockDataModel::getCurrentPrice(int8_t digits) {
     return Utils::formatFloat(m_currentPrice, digits);
 }
 
-StockDataModel &StockDataModel::setHP(float HP) {
-    if (m_HP != HP) {
-        m_HP = HP;
+StockDataModel &StockDataModel::setHighPrice(float highPrice) {
+    if (m_highPrice != highPrice) {
+        m_highPrice = highPrice;
         m_changed = true;
     }
     return *this;
 }
 
-float StockDataModel::getHP() {
-    return m_HP;
+float StockDataModel::getHighPrice() {
+    return m_highPrice;
 }
 
-String StockDataModel::getHP(int8_t digits) {
-    return Utils::formatFloat(m_HP, digits);
+String StockDataModel::getHighPrice(int8_t digits) {
+    return Utils::formatFloat(m_highPrice, digits);
 }
 
 
 
-StockDataModel &StockDataModel::setLP(float LP) {
-    if (m_LP != LP) {
-        m_LP = LP;
+StockDataModel &StockDataModel::setLowPrice(float lowPrice) {
+    if (m_lowPrice != lowPrice) {
+        m_lowPrice = lowPrice;
         m_changed = true;
     }
     return *this;
 }
 
-float StockDataModel::getLP() {
-    return m_LP;
+float StockDataModel::getLowPrice() {
+    return m_lowPrice;
 }
 
-String StockDataModel::getLP(int8_t digits) {
-    return Utils::formatFloat(m_LP, digits);
+String StockDataModel::getLowPrice(int8_t digits) {
+    return Utils::formatFloat(m_lowPrice, digits);
 }
 
 
