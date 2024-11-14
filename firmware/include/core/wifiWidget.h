@@ -25,10 +25,11 @@ private:
 
     bool m_hasDisplayedError{ false };
     bool m_hasDisplayedSuccess{ false };
-
+    bool m_configPortalRunning{ false }; 
     
     String m_connectionString{ "" };
     String m_dotsString{ "" };
+    String m_ipaddress{ "" };
     int m_connectionTimer{ 0 };
     const int m_connectionTimeout{ 10000 };
 

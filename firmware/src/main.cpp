@@ -108,7 +108,7 @@ void setup() {
   #endif
 
   pinMode(BUSY_PIN, OUTPUT);
-  Serial.println("Connecting to: " + String(WIFI_SSID));
+  Serial.println("Connecting to WiFi");
 
   wifiWidget = new WifiWidget(*sm);
   wifiWidget->setup();
