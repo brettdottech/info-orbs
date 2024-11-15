@@ -22,9 +22,16 @@ void WifiWidget::setup() {
 
     WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
 
+    // Remove unwanted buttons from the config portal
+    std::vector<const char *> wm_menu  = {"wifi"};  // buttons: wifi, info, exit, update
+    // Remove unwanted buttons from the Info page
+    wifimgr.setShowInfoUpdate(false);
+    wifimgr.setShowInfoErase(false);
+    wifimgr.setMenu(wm_menu);
+  
     // reset settings - wipe stored credentials for testing
     // these are stored by the ESP WiFi library
-    // wifimgr.resetSettings();
+    //wifimgr.resetSettings();
 
     // Set WiFiManager to non-blocking so status and info can be displayed
     wifimgr.setConfigPortalBlocking(false);
@@ -64,7 +71,7 @@ void WifiWidget::update(bool force) {
         if (m_dotsString.length() > 9) {
             m_dotsString = "";
         }
-        if (m_connectionTimer > m_connectionTimeout) {
+		if(m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
             m_connectionFailed = true;
             connectionTimedOut();
         }
