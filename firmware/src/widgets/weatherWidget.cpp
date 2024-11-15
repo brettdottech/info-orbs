@@ -246,7 +246,7 @@ void WeatherWidget::weatherText(int displayIndex) {
     cityName.remove(cityName.indexOf(",", 0));
 
     m_manager.setFontColor(m_foregroundColor);
-    m_manager.drawCentreString(cityName.c_str(), centre, 80, 45);
+    m_manager.drawFittedString(cityName.c_str(), centre, 80, 210, 50, Align::MiddleCenter);
 
     auto y = 125;
     for (auto i = 0; i < 4; i++) {

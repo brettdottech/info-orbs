@@ -24,8 +24,6 @@ public:
     TFT_eSPI& getDisplay();
     OpenFontRender &getRender();
 
-    // Screen& getScreen(int screen);
-
     void selectScreen(int screen);
     void selectAllScreens();
     void reset();
@@ -41,12 +39,17 @@ public:
     void fillScreen(uint32_t color);
     void clearScreen(int screen);
 
+    unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const char *str);
+
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor);
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor);
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align);
     void drawString(const char *text, int x, int y);
 
     void drawCentreString(const char *text, int x, int y, unsigned int fontSize);
+
+    void drawFittedString(const char *text, int x, int y, int limit_w, int limit_h, Align align);
+    void drawFittedString(const char *text, int x, int y, int limit_w, int limit_h);
 
     // Drawing stuff
     void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);

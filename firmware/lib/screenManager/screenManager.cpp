@@ -6,7 +6,6 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   for (int i = 0; i < NUM_SCREENS; i++) {
     pinMode(m_screen_cs[i], OUTPUT);
     digitalWrite(m_screen_cs[i], LOW);
-    // m_screens[i] = new Screen(*this, i);
   }
 
   m_tft.init();
@@ -141,9 +140,11 @@ void ScreenManager::reset() {
   }
 }
 
-// Screen &ScreenManager::getScreen(int screen) {
-//   return *(m_screens[screen]);
-// }
+unsigned int ScreenManager::calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const char *str) {
+  unsigned int calcFontSize = m_render.calculateFitFontSize(limit_width, limit_height, layout, str);
+  // Serial.printf("calcFitFontSize: t=%s, w=%d, h=%d -> fs=%d\n", str, limit_width, limit_height, calcFontSize);
+  return calcFontSize;
+}
 
 void ScreenManager::drawString(const char *text, int x, int y) {
   // Use current font size and alignment
@@ -175,6 +176,15 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
 
 void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize=0) {
   drawString(text, x, y, fontSize, Align::MiddleCenter);
+}
+
+void ScreenManager::drawFittedString(const char *text, int x, int y, int limit_w, int limit_h, Align align) {
+  unsigned int fontSize = calculateFitFontSize(limit_w, limit_h, Layout::Horizontal, text);
+  drawString(text, x, y, fontSize, align);
+}
+
+void ScreenManager::drawFittedString(const char *text, int x, int y, int limit_w, int limit_h) {
+  drawFittedString(text, x, y, limit_w, limit_h, m_render.getAlignment());
 }
 
 void ScreenManager::fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
