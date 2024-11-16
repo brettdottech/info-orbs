@@ -57,6 +57,10 @@ void ScreenManager::setFont(TTF_Font font) {
     error = m_render.loadFont(finalFrontier_start, finalFrontier_end-finalFrontier_start);
     break;
 
+  case DSEG7:
+    error = m_render.loadFont(dseg7_start, dseg7_end-dseg7_start);
+    break;
+
   case DSEG14:
     error = m_render.loadFont(dseg14_start, dseg14_end-dseg14_start);
     break;

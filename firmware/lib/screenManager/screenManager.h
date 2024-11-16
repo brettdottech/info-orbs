@@ -14,6 +14,7 @@ enum TTF_Font {
     NONE,
     ROBOTO_REGULAR,
     FINAL_FRONTIER,
+    DSEG7,
     DSEG14
 };
 
