@@ -30,6 +30,7 @@ private:
     String m_connectionString{ "" };
     String m_dotsString{ "" };
     String m_ipaddress{ "" };
+    String m_apssid{ "" };
     int m_connectionTimer{ 0 };
     const int m_connectionTimeout{ 10000 };
 

@@ -35,13 +35,19 @@ void WifiWidget::setup() {
 
     // Set WiFiManager to non-blocking so status and info can be displayed
     wifimgr.setConfigPortalBlocking(false);
+
+    // If you want the conig portal to only be available for some many seconds
     // wm.setConfigPortalTimeout(60);
 
-    // WiFiManager automatically connects using saved credentials,
-    if(wifimgr.autoConnect("Info-Orbs")){
+    // Add the last 2 digits of the MAC address onto the end of the config portal SSID
+    // so each Info-Orbs has a unique SSID
+		m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
+
+    // WiFiManager automatically connects using saved credentials...
+    if(wifimgr.autoConnect(m_apssid.c_str())){
       Serial.print("WifiManager connected.");
     }
-      // if connection fails, it starts an access point with a WiFi setup portal at 192.168.4.1.
+      // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1.
     else {
       m_configPortalRunning = true;
       Serial.println("Configuration portal running.");
