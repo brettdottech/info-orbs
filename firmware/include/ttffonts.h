@@ -12,6 +12,8 @@ extern const byte robotoRegular_end[] asm("_binary_fonts_RobotoRegular_ttf_end")
 extern const byte finalFrontier_start[] asm("_binary_fonts_FinalFrontier_ttf_start");
 extern const byte finalFrontier_end[] asm("_binary_fonts_FinalFrontier_ttf_end");
 
+// Chose either Classic or Modern here and remember to also adjust platformio.ini
+// ******************************************************************************
 // extern const byte dseg7_start[] asm("_binary_fonts_DSEG7ClassicBold_ttf_start");
 // extern const byte dseg7_end[] asm("_binary_fonts_DSEG7ClassicBold_ttf_end");
 // extern const byte dseg14_start[] asm("_binary_fonts_DSEG14ClassicBold_ttf_start");
