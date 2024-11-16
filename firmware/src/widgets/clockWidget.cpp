@@ -55,6 +55,8 @@ void ClockWidget::draw(bool force) {
             displayAmPm(FOREGROUND_COLOR);
         }
     }
+    // Switch back to avoid problems with the other widgets
+    m_manager.setFont(ROBOTO_REGULAR);
 }
 
 void ClockWidget::displayAmPm(uint32_t color) {
