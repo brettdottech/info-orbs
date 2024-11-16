@@ -4,6 +4,8 @@
 #include <globalTime.h>
 #include <widget.h>
 
+#define CLOCK_FONT DSEG14
+
 class ClockWidget : public Widget {
    public:
     ClockWidget(ScreenManager& manager);
@@ -17,8 +19,8 @@ class ClockWidget : public Widget {
     void changeMode();
 
    private:
-    void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing);
-    void displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color);
+    void displayDigit(int displayIndex, const String& digit, uint32_t color, bool shadowing);
+    void displayDigit(int displayIndex, const String& digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(uint32_t color);
 

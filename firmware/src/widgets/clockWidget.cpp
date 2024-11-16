@@ -17,33 +17,34 @@ void ClockWidget::setup() {
 }
 
 void ClockWidget::draw(bool force) {
+    m_manager.setFont(CLOCK_FONT);
     GlobalTime* time = GlobalTime::getInstance();
     
     if (m_lastDisplay1Digit != m_display1Digit || force) {
-        displayDigit(0, m_display1Digit, 7, 5, FOREGROUND_COLOR);
+        displayDigit(0, m_display1Digit, FOREGROUND_COLOR);
         m_lastDisplay1Digit = m_display1Digit;
         if (SHADOWING != 1 &&m_display1Digit == " ") {
             m_manager.clearScreen(0);
         }
     }
     if (m_lastDisplay2Digit != m_display2Digit || force) {
-        displayDigit(1, m_display2Digit, 7, 5, FOREGROUND_COLOR);
+        displayDigit(1, m_display2Digit, FOREGROUND_COLOR);
         m_lastDisplay2Digit = m_display2Digit;
     }
     if (m_lastDisplay4Digit != m_display4Digit || force) {
-        displayDigit(3, m_display4Digit, 7, 5, FOREGROUND_COLOR);
+        displayDigit(3, m_display4Digit, FOREGROUND_COLOR);
         m_lastDisplay4Digit = m_display4Digit;
     }
     if (m_lastDisplay5Digit != m_display5Digit || force) {
-        displayDigit(4, m_display5Digit, 7, 5, FOREGROUND_COLOR);
+        displayDigit(4, m_display5Digit, FOREGROUND_COLOR);
         m_lastDisplay5Digit = m_display5Digit;
     }
 
     if (m_secondSingle != m_lastSecondSingle || force) {
         if (m_secondSingle % 2 == 0) {
-            displayDigit(2, ":", 7, 5, FOREGROUND_COLOR, false);
+            displayDigit(2, ":", FOREGROUND_COLOR, false);
         } else {
-            displayDigit(2, ":", 7, 5, BG_COLOR, false);
+            displayDigit(2, ":", BG_COLOR, false);
         }
 #if SHOW_SECOND_TICKS == true        
         displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
@@ -59,12 +60,9 @@ void ClockWidget::draw(bool force) {
 void ClockWidget::displayAmPm(uint32_t color) {
     GlobalTime* time = GlobalTime::getInstance();
     m_manager.selectScreen(2);
-    TFT_eSPI& display = m_manager.getDisplay();
-    display.setTextDatum(MC_DATUM);
-    display.setTextSize(4);
-    display.setTextColor(color, TFT_BLACK, true);
+    m_manager.setFontColor(color, TFT_BLACK);
     String am_pm = time->isPM() ? "PM" : "AM";
-    display.drawString(am_pm, SCREEN_SIZE - 50, SCREEN_SIZE / 2, 1);
+    m_manager.drawString(am_pm.c_str(), SCREEN_SIZE / 4 * 3, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
 }
 
 void ClockWidget::update(bool force) {
@@ -114,33 +112,36 @@ void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         changeMode();
 }
 
-void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color, bool shadowing) {
+void ClockWidget::displayDigit(int displayIndex, const String& digit, uint32_t color, bool shadowing) {
+    int fontSize = 220;
     m_manager.selectScreen(displayIndex);
-    TFT_eSPI& display = m_manager.getDisplay();
-    display.setTextDatum(MC_DATUM);
-    display.setTextSize(fontSize);
-    if (shadowing && font == 7) {
-        display.setTextColor(BG_COLOR, TFT_BLACK);
-        display.drawString("8", SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
-        display.setTextColor(color);
-    } else {
-        display.setTextColor(color, TFT_BLACK);
+    // TODO: Sometimes the text is off by a few pixels, therefore we clear the screen here
+    // but it would be nice if we could avoid that
+    m_manager.clearScreen(displayIndex);
+    if (shadowing) {
+        m_manager.setFontColor(BG_COLOR, TFT_BLACK);
+        if (CLOCK_FONT == DSEG14) {
+            // DSEG14 uses ~ to fill all segments
+            m_manager.drawString("~", SCREEN_SIZE / 2, SCREEN_SIZE / 2, fontSize, Align::MiddleCenter);
+        } else if (CLOCK_FONT == DSEG7) {
+            // DESG7 uses 8 to fill all segments
+            m_manager.drawString("8", SCREEN_SIZE / 2, SCREEN_SIZE / 2, fontSize, Align::MiddleCenter);
+        }
     }
-    display.drawString(digit, SCREEN_SIZE / 2, SCREEN_SIZE / 2, font);
+    m_manager.setFontColor(color, TFT_BLACK);
+    m_manager.drawString(digit.c_str(), SCREEN_SIZE / 2, SCREEN_SIZE / 2, fontSize, Align::MiddleCenter);
 }
 
-void ClockWidget::displayDigit(int displayIndex, const String& digit, int font, int fontSize, uint32_t color) {
-    this->displayDigit(displayIndex, digit, font, fontSize, color, SHADOWING);
+void ClockWidget::displayDigit(int displayIndex, const String& digit, uint32_t color) {
+    displayDigit(displayIndex, digit, color, SHADOWING);
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    m_manager.reset();
     m_manager.selectScreen(displayIndex);
-    TFT_eSPI& display = m_manager.getDisplay();
     if (seconds < 30) {
-        display.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds + 180, 6 * seconds + 180 + 6, color, TFT_BLACK);
+        m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds + 180, 6 * seconds + 180 + 6, color, TFT_BLACK);
     } else {
-        display.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds - 180, 6 * seconds - 180 + 6, color, TFT_BLACK);
+        m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds - 180, 6 * seconds - 180 + 6, color, TFT_BLACK);
     }
 }
 
