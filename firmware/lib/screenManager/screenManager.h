@@ -13,7 +13,8 @@
 enum TTF_Font {
     NONE,
     ROBOTO_REGULAR,
-    FINAL_FRONTIER
+    FINAL_FRONTIER,
+    DSEG14
 };
 
 class ScreenManager {
@@ -55,6 +56,7 @@ public:
     void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
     void drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uint32_t color);
     void drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc = true);
+    void drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool roundEnds = false);
     void fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color);
 
 private:

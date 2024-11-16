@@ -57,6 +57,9 @@ void ScreenManager::setFont(TTF_Font font) {
     error = m_render.loadFont(finalFrontier_start, finalFrontier_end-finalFrontier_start);
     break;
 
+  case DSEG14:
+    error = m_render.loadFont(dseg14_start, dseg14_end-dseg14_start);
+    break;
   }
   if (error == 0) {
     m_curFont = font;
@@ -197,6 +200,10 @@ void ScreenManager::drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uin
 
 void ScreenManager::drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc) {
   m_tft.drawArc(x, y, r, ir, startAngle, endAngle, fg_color, bg_color, smoothArc);
+}
+
+void ScreenManager::drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool roundEnds) {
+  m_tft.drawSmoothArc(x, y, r, ir, startAngle, endAngle, fg_color, bg_color, roundEnds);
 }
 
 void ScreenManager::fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {

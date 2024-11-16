@@ -10,5 +10,7 @@ extern const byte robotoRegular_start[] asm("_binary_fonts_RobotoRegular_ttf_sta
 extern const byte robotoRegular_end[] asm("_binary_fonts_RobotoRegular_ttf_end");
 extern const byte finalFrontier_start[] asm("_binary_fonts_FinalFrontier_ttf_start");
 extern const byte finalFrontier_end[] asm("_binary_fonts_FinalFrontier_ttf_end");
+extern const byte dseg14_start[] asm("_binary_fonts_DSEG14ModernBold_ttf_start");
+extern const byte dseg14_end[] asm("_binary_fonts_DSEG14ModernBold_ttf_end");
 
 #endif
