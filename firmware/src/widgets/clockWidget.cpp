@@ -135,10 +135,10 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
         m_manager.setFontColor(BG_COLOR, TFT_BLACK);
         if (CLOCK_FONT == DSEG14) {
             // DSEG14 uses ~ to fill all segments
-            m_manager.drawString("~", defaultX, SCREEN_SIZE / 2, fontSize, Align::MiddleCenter);
+            m_manager.drawString("~", defaultX, defaultY, fontSize, Align::MiddleCenter);
         } else if (CLOCK_FONT == DSEG7) {
             // DESG7 uses 8 to fill all segments
-            m_manager.drawString("8", defaultX, SCREEN_SIZE / 2, fontSize, Align::MiddleCenter);
+            m_manager.drawString("8", defaultX, defaultY, fontSize, Align::MiddleCenter);
         } else {
             // Other fonts can't be shadowed
             m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
