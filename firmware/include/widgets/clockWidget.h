@@ -5,6 +5,14 @@
 #include <widget.h>
 
 #define CLOCK_FONT DSEG14
+#define CLOCK_OFFSET_X -10
+// Not all digits in DSEG7/14 are aligned identically, therefore we need to offset them
+#define CLOCK_DIGITS_OFFSET { {0, 0}, {1, -5}, {0, 0}, {1, 0}, {0, -5}, {0, 0}, {0, 0}, {0, -5}, {0, 0}, {0, 0} }
+
+struct DigitOffset {
+    int x;
+    int y;
+};
 
 class ClockWidget : public Widget {
    public:
@@ -19,10 +27,13 @@ class ClockWidget : public Widget {
     void changeMode();
 
    private:
-    void displayDigit(int displayIndex, const String& digit, uint32_t color, bool shadowing);
-    void displayDigit(int displayIndex, const String& digit, uint32_t color);
+    void displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing);
+    // void displayDigit(int displayIndex, const String& digit, uint32_t color, bool shadowing);
+    void displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color);
+    // void displayDigit(int displayIndex, const String& digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(uint32_t color);
+    DigitOffset getOffsetForDigit(const String& digit);
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
@@ -44,13 +55,15 @@ class ClockWidget : public Widget {
 
     // Digits
     String m_display1Digit;
-    String m_lastDisplay1Digit{"-1"};
+    String m_lastDisplay1Digit{""};
     String m_display2Digit;
-    String m_lastDisplay2Digit{"-1"};
+    String m_lastDisplay2Digit{""};
     // Display 3 is :
     String m_display4Digit;
-    String m_lastDisplay4Digit{"-1"};
+    String m_lastDisplay4Digit{""};
     String m_display5Digit;
-    String m_lastDisplay5Digit{"-1"};
+    String m_lastDisplay5Digit{""};
+
+    DigitOffset m_digitOffsets[10] = CLOCK_DIGITS_OFFSET;
 };
 #endif  // CLOCKWIDGET_H

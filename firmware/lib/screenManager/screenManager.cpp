@@ -174,11 +174,10 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
   }
   // Dirty hack to correct misaligned Y
   // See https://github.com/takkaO/OpenFontRender/issues/38
-  FT_BBox box = m_render.calculateBoundingBox(0,0,fontSize,Align::Center,Layout::Horizontal, text);
-
+  FT_BBox box = m_render.calculateBoundingBox(0,0,fontSize,Align::TopLeft,Layout::Horizontal, text);
   m_render.setAlignment(align);
   m_render.setFontSize(fontSize);
-  m_render.drawString(text, x, y-box.yMin, fgColor, bgColor);
+  m_render.drawString(text, x, y - box.yMin, fgColor, bgColor);
 }
 
 void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize=0) {
