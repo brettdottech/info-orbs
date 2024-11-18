@@ -18,6 +18,9 @@
   #include <widgets/parqetWidget.h>
 #endif
 
+#ifdef MQTT_WIDGET_HOST
+  #include <widgets/mqttWidget.h>   // MQTT
+#endif
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -52,6 +55,8 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
 ScreenManager* sm;
 WidgetSet* widgetSet;
 
+// Instantiate MQTTWidget pointer globally if needed
+MQTTWidget* mqttWidgetInstance = nullptr;
 
 /**
  * The ISR handlers must be static
@@ -128,6 +133,11 @@ void setup() {
 #endif
 #ifdef WEB_DATA_STOCK_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
+#endif
+
+#ifdef MQTT_WIDGET_HOST
+  // Instantiate MQTTWidget with host and port from config.h
+  widgetSet->add(new MQTTWidget(*sm, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
 #endif
 
   m_widgetCycleDelayPrev = millis();
