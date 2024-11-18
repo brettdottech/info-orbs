@@ -32,7 +32,7 @@ void WeatherWidget::draw(bool force) {
         m_clockStamp = clockStamp;
     }
 
-    // Weather, displays a clock, city & text weather discription, weather icon, temp, 3 day forecast
+    // Weather, displays a clock, city & text weather description, weather icon, temp, 3 day forecast
     if (force || model.isChanged()) {
         weatherText(1, TFT_WHITE, TFT_BLACK);
         drawWeatherIcon(model.getCurrentIcon(), 2, 0, 0, 1);
@@ -154,7 +154,7 @@ void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[]
     TJpgDec.drawJpg(x, y, jpgData, jpgDataSize);
 }
 
-// This takes the text output form the weatehr API and maps it to arespective icon/byte aarray, then displays it,
+// This takes the text output form the weather API and maps it to arespective icon/byte aarray, then displays it,
 void WeatherWidget::drawWeatherIcon(String condition, int displayIndex, int x, int y, int scale) {
     const byte *icon = NULL;
     int size = 0;
@@ -209,14 +209,14 @@ void WeatherWidget::singleWeatherDeg(int displayIndex, uint32_t backgroundColor,
     drawDegrees(model.getTodayLow(0), 160, 210, 1, 2, 4, 2, TFT_WHITE, TFT_BLACK);
 }
 
-// This displays the users current city and the text desctiption of the weather. Pass in display number, background color, text color
+// This displays the users current city and the text description of the weather. Pass in display number, background color, text color
 void WeatherWidget::weatherText(int displayIndex, int16_t b, int16_t t) {
     m_manager.selectScreen(displayIndex);
     TFT_eSPI &display = m_manager.getDisplay();
     //=== TEXT OVERFLOW ============================
     // this takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
-    // given the small width of the screens this will porbablly be needed to this project again so making sure to outline it
-    // clearly as this should liekly eventually be turned into a fucntion. Before use the array size should be made to be dynamic.
+    // given the small width of the screens this will probably be needed to this project again so making sure to outline it
+    // clearly as this should likely eventually be turned into a function. Before use the array size should be made to be dynamic.
     // In this case its used for the weather text description
 
     String message = model.getCurrentText() + " ";
