@@ -3,7 +3,7 @@
 
 Info Orbs is a desk display widget built on top of an ESP32 with the intention of creating a large library of widgets/functionality!
 
-Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://link.brett.tech/discord) | [Youtube Assembly/Flashing Video](https://link.brett.tech/orbsYT) 
+Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit) | [Discord](https://link.brett.tech/discord) | [Youtube Assembly/Flashing Video](https://link.brett.tech/orbsYT)
 <p>
     <img src="references/weather.png" alt="Weather Widget" style="width:30%;">
     <img src="references/time.png" alt="Clock Widget" style="width: 30%;">
@@ -12,31 +12,31 @@ Quick Links: [Get A Dev Kit Here](https://brett.tech/collections/electronics-pro
 
 ## First, a few housekeeping items for anyone interested in helping with this project, or building one for themselves
 
-- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://link.brett.tech/discord). Make sure to select you're there for info orbs when filling out the onboarding questionnaire in order to get placed in the right channels 
+- If you want to contribute and or need a hand with setup, please pop over to the [Discord](https://link.brett.tech/discord). Make sure to select you're there for info orbs when filling out the onboarding questionnaire in order to get placed in the right channels
 
 - I've put together dev kits consisting of all the parts you need to build this project [you can buy them here.](https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit)  They're $55 and will save you a bunch of time and hassle, and are a great way to support the project (:
 
 - I've put together a brief [Youtube Video](https://link.brett.tech/orbsYT) walking through the soldering and flashing for anyone that needs a hand assembling.
 ## Getting Up And Running
 
-### 1. Hardware/Wiring 
+### 1. Hardware/Wiring
 If you use the PCB soldering should be straight forward, however if you want to wire thing up yourself the pinouts are below:
 
     DSP-----ESP
-    SDA -> G17 
-    SCLK -> G23 
-    DC -> G19 
+    SDA -> G17
+    SCLK -> G23
+    DC -> G19
     RST -> G18
-    VCC - >5V/VCC 
+    VCC - >5V/VCC
     GND -> GND
     Screen1 CS -> G13
     Screen2 CS -> G33
-    Screen3 CS -> G32 
+    Screen3 CS -> G32
     Screen4 CS -> G25
     Screen5 CS -> G21
-   
+
    Lastly, three pushbuttons between `VCC/5V` and `G14,G26,G27.`
-Diagram can be seen below: 
+Diagram can be seen below:
 <img src="references/wiringDiag.png" alt="Wiring Diagram">
 
 
@@ -55,7 +55,7 @@ Lastly, open up the `config.h` file you just copied/renamed and adjust the below
 #define WIFI_SSID "WIFINAME" // wifi name (please use 2.4gz network)
 #define WIFI_PASS "WIFIPASS" // wifi password
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
-#define WEATHER_LOCAION "Victoria, BC" //city/state for the weather
+#define WEATHER_LOCATION "Victoria, BC" //city/state for the weather
 #define STOCK_TICKER_LIST "SPY,VT,GOOG,TSLA,GME" // Choose your 5 stokcs to display on the stock tracker
 #define WEATHER_UNITS_METRIC //Comment this line out(or delete it) if you want imperial units for the weather
 #define FORMAT_24_HOUR false // toggle 24 hour clock vs 12 hour clock, chnage between true/false
@@ -65,7 +65,7 @@ Lastly, open up the `config.h` file you just copied/renamed and adjust the below
 // ============= END CONFIG ==============================================================================
 ```
 
-    
+
 The code should now compile and flash to your ESP by clicking the flash button at the bottom of your IDE (:
 The left and right buttons will change between widgets, and the middle button will toggle the widgets "mode"(24/48 hour clock, high/low for weather, etc)
 

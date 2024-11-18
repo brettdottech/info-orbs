@@ -44,7 +44,7 @@ class WeatherWidget : public Widget {
 
     WeatherDataModel model;
 
-    String weatherLocation = WEATHER_LOCAION;
+    String weatherLocation = WEATHER_LOCATION;
 #ifdef WEATHER_UNITS_METRIC
     String weatherUnits = "metric";
 #else
