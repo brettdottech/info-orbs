@@ -22,6 +22,11 @@ void WifiWidget::setup() {
 
     WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
 
+#if(defined WIFI_SSID && defined WIFI_PASS)
+    m_hardCodedWiFi = true;
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+#endif
+
     // Remove unwanted buttons from the config portal
     std::vector<const char *> wm_menu  = {"wifi"};  // buttons: wifi, info, exit, update
     // Remove unwanted buttons from the Info page
@@ -36,7 +41,7 @@ void WifiWidget::setup() {
     // Set WiFiManager to non-blocking so status and info can be displayed
     wifimgr.setConfigPortalBlocking(false);
 
-    // If you want the conig portal to only be available for some many seconds
+    // If you want the config portal to only be available for so many seconds
     // wm.setConfigPortalTimeout(60);
 
     // Add the last 2 digits of the MAC address onto the end of the config portal SSID
@@ -44,17 +49,22 @@ void WifiWidget::setup() {
 		m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
 
     // WiFiManager automatically connects using saved credentials...
-    if(wifimgr.autoConnect(m_apssid.c_str())){
+    if (wifimgr.autoConnect(m_apssid.c_str())) {
       Serial.print("WifiManager connected.");
-    }
-      // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1.
-    else {
+    } else {  // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1
       m_configPortalRunning = true;
       Serial.println("Configuration portal running.");
+      m_manager.selectScreen(statusScreenIndex);
+      display.fillScreen(TFT_BLACK);
+      display.drawCentreString("Configure", ScreenCenterX, ScreenCenterY - lineHeight, 4);
       m_manager.selectScreen(statusScreenIndex + 1);
-      display.drawCentreString("Configure WiFi", ScreenCenterX, ScreenCenterY - lineHeight, 4);
-      display.drawCentreString("by browsing to", ScreenCenterX, ScreenCenterY, 4);
-      display.drawCentreString("192.168.4.1", ScreenCenterX, ScreenCenterY + lineHeight, 4);
+      display.drawCentreString("Connect", ScreenCenterX, ScreenCenterY - lineHeight * 2, 4);
+      display.drawCentreString("phone or PC", ScreenCenterX, ScreenCenterY - lineHeight, 4);
+      display.drawCentreString("to WiFi network:", ScreenCenterX, ScreenCenterY, 4);
+      display.setTextColor(TFT_SKYBLUE);
+      display.drawCentreString(m_apssid, ScreenCenterX, ScreenCenterY + lineHeight, 4);
+      display.setTextColor(TFT_GREENYELLOW);
+      display.drawCentreString("192.168.4.1", ScreenCenterX, ScreenCenterY + lineHeight * 2, 4);
     }
 }
 
@@ -77,7 +87,7 @@ void WifiWidget::update(bool force) {
         if (m_dotsString.length() > 9) {
             m_dotsString = "";
         }
-		if(m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
+		if (m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
             m_connectionFailed = true;
             connectionTimedOut();
         }

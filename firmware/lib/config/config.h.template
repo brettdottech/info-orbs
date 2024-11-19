@@ -3,6 +3,7 @@
 
 
 // ============= CONFIGURE THESE FIELDS BEFORE FLASHING ====================================================
+
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
 #define WEATHER_SCREEN_MODE Light // Can be either Light or Dark 
@@ -17,7 +18,16 @@
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
 #define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X ms, set to 0 to disable
 #define LOCALE EN // Language selection for Month and Weekday - values are EN, DE, FR
-// ============= END CONFIG ==============================================================================
+
+// OPTIONAL CONFIGURATION FIELDS
+// Normally WiFi should be configured using a smartphone or computer to connect to the Info-Orbs
+// configuration portal. But as a fall-back method, WiFi can be setup by uncommenting these 2 lines and
+// changing the SSID and password.
+
+//#define WIFI_SSID "MyWiFiRouter" // Wifi router SSID name (use only 2.4 GHz network)
+//#define WIFI_PASS "WiFiPassword" // Wifi router password
+
+// ============= END OF USER CONFIGURATION =================================================================
 
 
 #undef TFT_MOSI

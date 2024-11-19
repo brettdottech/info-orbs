@@ -22,7 +22,7 @@ private:
 
     bool m_isConnected{ false };
     bool m_connectionFailed{ false };
-
+    bool m_hardCodedWiFi{false};
     bool m_hasDisplayedError{ false };
     bool m_hasDisplayedSuccess{ false };
     bool m_configPortalRunning{ false }; 
