@@ -4,10 +4,21 @@
 #include <globalTime.h>
 #include <widget.h>
 
-#define CLOCK_FONT DSEG14
+#ifndef CLOCK_FONT
+#define CLOCK_FONT DSEG7
+#endif
+
+// Some fonts are not really centered, use this to compensate
+#ifndef CLOCK_OFFSET_X
 #define CLOCK_OFFSET_X -10
+#endif
+
 // Not all digits in DSEG7/14 are aligned identically, therefore we need to offset them
+#ifndef CLOCK_DIGITS_OFFSET
 #define CLOCK_DIGITS_OFFSET { {0, 0}, {1, -5}, {0, 0}, {1, 0}, {0, -5}, {0, 0}, {0, 0}, {0, -5}, {0, 0}, {0, 0} }
+// Use zero offset for other fonts (or adjust)
+// #define CLOCK_DIGITS_OFFSET { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
+#endif
 
 struct DigitOffset {
     int x;
