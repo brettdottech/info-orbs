@@ -11,6 +11,7 @@
 #include <icons.h>
 #include <config_helper.h>
 
+
 #ifdef STOCK_TICKER_LIST
   #include <widgets/stockWidget.h>
 #endif
@@ -85,6 +86,7 @@ void setup() {
   sm->getDisplay().fillScreen(TFT_BLACK);
   sm->reset();
   TFT_eSPI &display = sm->getDisplay();
+  display.setTextSize(1);
   display.setTextColor(TFT_WHITE);
 
   sm->selectScreen(0);
@@ -108,7 +110,7 @@ void setup() {
   #endif
 
   pinMode(BUSY_PIN, OUTPUT);
-  Serial.println("Connecting to: " + String(WIFI_SSID));
+  Serial.println("Connecting to WiFi");
 
   wifiWidget = new WifiWidget(*sm);
   wifiWidget->setup();
