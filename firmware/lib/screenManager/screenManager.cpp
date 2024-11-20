@@ -102,6 +102,9 @@ void ScreenManager::clearAllScreens() {
 
 // Clears one screens by resetting it to black
 void ScreenManager::clearScreen(int screen) {
+  if (screen >= 0) {
+    selectScreen(screen);
+  }
   fillScreen(TFT_BLACK);
 }
 

@@ -39,7 +39,7 @@ public:
     void setAlignment(Align align);
 
     void fillScreen(uint32_t color);
-    void clearScreen(int screen);
+    void clearScreen(int screen=-1);
 
     unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const char *str);
 
