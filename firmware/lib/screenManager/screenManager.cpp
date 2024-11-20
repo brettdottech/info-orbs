@@ -183,7 +183,7 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
   m_render.drawString(text, x, y - box.yMin, fgColor, bgColor);
 }
 
-void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize=0) {
+void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize) {
   drawString(text, x, y, fontSize, Align::MiddleCenter);
 }
 

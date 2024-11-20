@@ -5,7 +5,8 @@
 
 const int lineHeight = 40;
 const int statusScreenIndex = 3;
-const int fontSize = 25;
+const int fontSize = 26;
+const int messageDelay = 2000;
 
 WifiWidget::WifiWidget(ScreenManager& manager) : Widget(manager) {}
 
@@ -33,9 +34,13 @@ void WifiWidget::setup() {
     wifimgr.setShowInfoErase(false);
     wifimgr.setMenu(wm_menu);
   
-    // reset settings - wipe stored credentials for testing
+    // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
-    //wifimgr.resetSettings();
+    if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
+      wifimgr.resetSettings();
+      m_manager.drawCentreString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
+      delay(messageDelay);
+    }
 
     // Set WiFiManager to non-blocking so status and info can be displayed
     wifimgr.setConfigPortalBlocking(false);
@@ -106,15 +111,18 @@ void WifiWidget::draw(bool force) {
         m_manager.clearScreen();
         m_manager.drawCentreString("Success", ScreenCenterX, ScreenCenterY, fontSize);
         m_manager.selectScreen(statusScreenIndex + 1);
+        m_manager.clearScreen();
         m_manager.drawCentreString("IP Address", ScreenCenterX, ScreenCenterY - lineHeight, fontSize);
         m_manager.drawCentreString(m_ipaddress.c_str(), ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         Serial.println();
         Serial.println("Connected to WiFi");
         m_isConnected = true;
+        delay(messageDelay);
     } else if (m_connectionFailed && !m_hasDisplayedError) {
         m_hasDisplayedError = true;
         m_manager.fillRect(0, blankRectTop, ScreenWidth, ScreenHeight - blankRectTop, TFT_BLACK);
         m_manager.drawCentreString(m_connectionString.c_str(), ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
+        delay(messageDelay);
     }
 }
 

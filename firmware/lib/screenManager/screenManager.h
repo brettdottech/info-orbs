@@ -48,7 +48,7 @@ public:
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align);
     void drawString(const char *text, int x, int y);
 
-    void drawCentreString(const char *text, int x, int y, unsigned int fontSize);
+    void drawCentreString(const char *text, int x, int y, unsigned int fontSize=0);
 
     void drawFittedString(const char *text, int x, int y, int limit_w, int limit_h, Align align);
     void drawFittedString(const char *text, int x, int y, int limit_w, int limit_h);
