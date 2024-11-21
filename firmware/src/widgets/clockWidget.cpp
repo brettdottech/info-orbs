@@ -110,21 +110,21 @@ void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
-    if (digit.length() == 0) {
-        return {0, 0};
+    if (digit.length() > 0) {
+        char c = digit.charAt(0);
+        if (c >= '0' && c <= '9') {
+            // get digit offsets
+            return m_digitOffsets[c - '0'];
+        }
     }
-    char c = digit.charAt(0);
-    if (c >= 48 && c <= 57) {
-        return m_digitOffsets[c-48];
-    } else {
-        return {0, 0};
-    }
+    // not a valid digit
+    return {0, 0};
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing) {
     int fontSize = CLOCK_FONT_SIZE;
     char c = digit.charAt(0);
-    bool isDigit = c >= 48 && c <= 57;
+    bool isDigit = c >= '0' && c <= '9';
     int defaultX = SCREEN_SIZE / 2 + (isDigit ? CLOCK_OFFSET_X_DIGITS : CLOCK_OFFSET_X_COLON);
     int defaultY = SCREEN_SIZE / 2;
     DigitOffset digitOffset = getOffsetForDigit(digit);
