@@ -125,8 +125,8 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
 // Outputs
     m_manager.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
     m_manager.fillRect(0,111, screenWidth, 20, TFT_LIGHTGREY);  
-    int smallFontSize = 15;
-    int bigFontSize = 40;
+    int smallFontSize = 11;
+    int bigFontSize = 29;
     m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
     m_manager.drawCentreString("52 Week:", centre, 185, smallFontSize);
     m_manager.drawCentreString(("H: " + stock.getCurrencySymbol() + stock.getHighPrice()).c_str(), centre, 200, smallFontSize);

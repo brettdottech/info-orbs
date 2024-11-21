@@ -85,12 +85,12 @@ void setup() {
   sm->fillAllScreens(TFT_BLACK);
 
   sm->selectScreen(0);
-  sm->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 40);
+  sm->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
 
   sm->selectScreen(1);
-  sm->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 40, 30);
-  sm->drawCentreString("by", ScreenCenterX, ScreenCenterY, 30);
-  sm->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 40, 30);
+  sm->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 40, 22);
+  sm->drawCentreString("by", ScreenCenterX, ScreenCenterY, 22);
+  sm->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 40, 22);
 
   sm->selectScreen(2);
 
