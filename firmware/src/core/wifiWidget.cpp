@@ -6,7 +6,7 @@
 const int lineHeight = 40;
 const int statusScreenIndex = 3;
 const int fontSize = 26;
-const int messageDelay = 2000;
+const int messageDelay = 5000;
 
 WifiWidget::WifiWidget(ScreenManager& manager) : Widget(manager) {}
 

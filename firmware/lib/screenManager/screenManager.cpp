@@ -17,7 +17,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
   // I'm not sure which cache size is actually good.
   // Needs testing.
   m_render.setCacheSize(128, 128, 8192);
-  setFont(ROBOTO_REGULAR);
+  setFont(DEFAULT_FONT);
   m_render.setDrawer(m_tft);
 
   Serial.println("ScreenManager initialized");
@@ -158,7 +158,7 @@ unsigned int ScreenManager::calculateFitFontSize(uint32_t limit_width, uint32_t 
 
 void ScreenManager::drawString(const char *text, int x, int y) {
   // Use current font size and alignment
-  drawString(text, x, y, m_render.getFontSize(), m_render.getAlignment());
+  drawString(text, x, y, 0, m_render.getAlignment());
 }
 
 void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align) {
@@ -170,10 +170,12 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
   drawString(text, x, y, fontSize, align, fgColor, m_render.getBackgroundColor());
  }
 
-void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor) {
+void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale) {
   if (fontSize == 0) {
     // Keep current font size
     fontSize == m_render.getFontSize();
+  } else if (applyScale) {
+    fontSize = getScaledFontSize(fontSize);
   }
   // Dirty hack to correct misaligned Y
   // See https://github.com/takkaO/OpenFontRender/issues/38
@@ -189,7 +191,7 @@ void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned in
 
 void ScreenManager::drawFittedString(const char *text, int x, int y, int limit_w, int limit_h, Align align) {
   unsigned int fontSize = calculateFitFontSize(limit_w, limit_h, Layout::Horizontal, text);
-  drawString(text, x, y, fontSize, align);
+  drawString(text, x, y, fontSize, align, m_render.getFontColor(), m_render.getBackgroundColor(), false);
 }
 
 void ScreenManager::drawFittedString(const char *text, int x, int y, int limit_w, int limit_h) {
@@ -214,4 +216,13 @@ void ScreenManager::drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, u
 
 void ScreenManager::fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {
   m_tft.fillTriangle(x1, y1, x2, y2, x3, y3, color);
+}
+
+unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
+  for (TTF_FontScale fontScaleFactor : fontScaleFactors) {
+    if (fontScaleFactor.font == m_curFont) {
+      return round(fontScaleFactor.scale * fontSize);
+    }
+  }
+  return fontSize;
 }

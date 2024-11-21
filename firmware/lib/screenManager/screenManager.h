@@ -10,6 +10,10 @@
 
 #define NUM_SCREENS 5
 
+#ifndef DEFAULT_FONT
+#define DEFAULT_FONT ROBOTO_REGULAR
+#endif
+
 enum TTF_Font {
     NONE,
     ROBOTO_REGULAR,
@@ -17,6 +21,13 @@ enum TTF_Font {
     DSEG7,
     DSEG14
 };
+
+struct TTF_FontScale {
+    TTF_Font font;
+    float scale;
+};
+
+const TTF_FontScale fontScaleFactors[] = { { ROBOTO_REGULAR, 1.37 }, { DSEG14, 1}, { DSEG14, 1}, { FINAL_FRONTIER, 1.5 } };
 
 class ScreenManager {
 public:
@@ -43,7 +54,7 @@ public:
 
     unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const char *str);
 
-    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor);
+    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale=true);
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor);
     void drawString(const char *text, int x, int y, unsigned int fontSize, Align align);
     void drawString(const char *text, int x, int y);
@@ -61,13 +72,11 @@ public:
     void fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color);
 
 private:
+    unsigned int getScaledFontSize(unsigned int fontSize);
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& m_tft;
     OpenFontRender m_render;
     TTF_Font m_curFont = TTF_Font::NONE;
-    // Screen *m_screens[NUM_SCREENS];
-
-
 };
 
 #endif // SCREENMANAGER_H

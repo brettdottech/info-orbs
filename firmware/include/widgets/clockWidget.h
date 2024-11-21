@@ -8,9 +8,17 @@
 #define CLOCK_FONT DSEG7
 #endif
 
+#ifndef CLOCK_FONT_SIZE
+#define CLOCK_FONT_SIZE 200
+#endif
+
 // Some fonts are not really centered, use this to compensate
-#ifndef CLOCK_OFFSET_X
-#define CLOCK_OFFSET_X -10
+#ifndef CLOCK_OFFSET_X_DIGITS
+#define CLOCK_OFFSET_X_DIGITS -10
+#endif
+
+#ifndef CLOCK_OFFSET_X_COLON
+#define CLOCK_OFFSET_X_COLON 0
 #endif
 
 // Not all digits in DSEG7/14 are aligned identically, therefore we need to offset them

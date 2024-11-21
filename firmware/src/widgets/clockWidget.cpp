@@ -116,17 +116,18 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
         return {0, 0};
     }
     char c = digit.charAt(0);
-    int i = atoi(&c);
-    if (i >= 0 && i <= 9) {
-        return m_digitOffsets[i];
+    if (c >= 48 && c <= 57) {
+        return m_digitOffsets[c-48];
     } else {
         return {0, 0};
     }
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing) {
-    int fontSize = 200;
-    int defaultX = SCREEN_SIZE / 2 + CLOCK_OFFSET_X;
+    int fontSize = CLOCK_FONT_SIZE;
+    char c = digit.charAt(0);
+    bool isDigit = c >= 48 && c <= 57;
+    int defaultX = SCREEN_SIZE / 2 + (isDigit ? CLOCK_OFFSET_X_DIGITS : CLOCK_OFFSET_X_COLON);
     int defaultY = SCREEN_SIZE / 2;
     DigitOffset digitOffset = getOffsetForDigit(digit);
     DigitOffset lastDigitOffset = getOffsetForDigit(lastDigit);
