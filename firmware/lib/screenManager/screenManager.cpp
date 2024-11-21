@@ -144,6 +144,7 @@ void ScreenManager::selectAllScreens() {
   }
 }
 
+// Unselect all screens
 void ScreenManager::reset() {
   for (int i = 0; i < NUM_SCREENS; i++) {
     digitalWrite(m_screen_cs[i], HIGH);
