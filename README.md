@@ -80,3 +80,4 @@ A massive thank you to the community that has helped, this is my first open sour
 </a>
 
 
+Portions of this software are copyright © The FreeTypeProject (www.freetype.org). All rights reserved.
