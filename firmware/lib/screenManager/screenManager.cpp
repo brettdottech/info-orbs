@@ -41,6 +41,8 @@ void ScreenManager::setFont(TTF_Font font) {
     return;
   }
   m_render.unloadFont();
+  // Font is now unloaded
+  m_curFont = TTF_Font::NONE;
   if (font == TTF_Font::NONE) {
     // just unload
     return;
@@ -220,9 +222,9 @@ void ScreenManager::fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2,
 }
 
 unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
-  for (TTF_FontScale fontScaleFactor : fontScaleFactors) {
-    if (fontScaleFactor.font == m_curFont) {
-      return round(fontScaleFactor.scale * fontSize);
+  for (TTF_FontMetric metric : ttfFontMetrics) {
+    if (metric.font == m_curFont) {
+      return round(metric.scale * fontSize);
     }
   }
   return fontSize;

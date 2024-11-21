@@ -23,13 +23,13 @@ enum TTF_Font {
     DSEG14
 };
 
-struct TTF_FontScale {
+struct TTF_FontMetric {
     TTF_Font font;
     float scale;
 };
 
 // Set scaling factor for each font if necessary
-const TTF_FontScale fontScaleFactors[] = { { ROBOTO_REGULAR, 1.37 }, { FINAL_FRONTIER, 1.5 } };
+const TTF_FontMetric ttfFontMetrics[] = { { ROBOTO_REGULAR, 1.37 }, { FINAL_FRONTIER, 1.5 } };
 
 class ScreenManager {
 public:
