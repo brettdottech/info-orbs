@@ -45,6 +45,7 @@ void WeatherWidget::setup() {
 }
 
 void WeatherWidget::draw(bool force) {
+    m_manager.setFont(DEFAULT_FONT);
     m_time->updateTime();
     int clockStamp = getClockStamp();
     if (clockStamp != m_clockStamp || force) {

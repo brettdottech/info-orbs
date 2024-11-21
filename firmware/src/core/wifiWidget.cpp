@@ -15,6 +15,7 @@ WifiWidget::~WifiWidget() {}
 WiFiManager wifimgr;
 
 void WifiWidget::setup() {
+    m_manager.setFont(DEFAULT_FONT);
     m_manager.selectScreen(statusScreenIndex);
     m_manager.clearScreen();
     m_manager.setFontColor(TFT_WHITE);

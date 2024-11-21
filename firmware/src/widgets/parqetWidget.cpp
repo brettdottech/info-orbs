@@ -25,6 +25,7 @@ void ParqetWidget::setup()
 
 void ParqetWidget::draw(bool force)
 {
+    m_manager.setFont(DEFAULT_FONT);
     // Check if we need more than one page
     bool isMultiPage = m_portfolio.getHoldingsCount() > (m_showClock ? 4 : 5);
     // Do we need to update the screens because cycle time is expired
