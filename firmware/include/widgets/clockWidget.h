@@ -47,9 +47,7 @@ class ClockWidget : public Widget {
 
    private:
     void displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing);
-    // void displayDigit(int displayIndex, const String& digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color);
-    // void displayDigit(int displayIndex, const String& digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(uint32_t color);
     DigitOffset getOffsetForDigit(const String& digit);
@@ -60,9 +58,6 @@ class ClockWidget : public Widget {
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
     unsigned long m_secondTimer = 2000;  // This time is used to refressh/check the clock every second.
     unsigned long m_secondTimerPrev = 0;
-
-    // WiFiUDP m_udp;
-    // NTPClient* m_timeClient{ nullptr };
 
     int m_minuteSingle;
     int m_hourSingle;

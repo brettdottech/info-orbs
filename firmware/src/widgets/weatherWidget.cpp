@@ -303,27 +303,6 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
 
 }
 
-// int WeatherWidget::drawDegrees(const String& number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor) {
-//     TFT_eSPI &display = m_manager.getDisplay();
-
-//     display.setTextColor(textColor);
-//     display.setTextFont(font);
-//     display.setTextSize(size);
-//     display.setTextDatum(MC_DATUM);
-
-//     int16_t textWidth = display.textWidth(number);
-//     int16_t fontHeight = display.fontHeight(font);
-//     int offset = ceil(fontHeight * 0.15);
-//     int circleX = textWidth / 2 + x + offset;
-//     int circleY = y - fontHeight / 2 + floor(fontHeight / 10);
-
-//     display.drawString(number, x, y, font);
-//     display.fillCircle(circleX, circleY, outerRadius, textColor);
-//     display.fillCircle(circleX, circleY, innerRadius, backgroundColor);
-
-//     return textWidth + offset;
-// }
-
 int WeatherWidget::getClockStamp() {
     return m_time->getHour() * 60 + m_time->getMinute();
 }
