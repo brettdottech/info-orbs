@@ -137,13 +137,13 @@ void WeatherWidget::displayClock(int displayIndex) {
     m_manager.fillScreen(m_backgroundColor);
     m_manager.setFontColor(m_foregroundColor);
 
-    m_manager.drawCentreString(m_time->getDayAndMonth().c_str(), centre, dateY, 18);
+    m_manager.drawCentreString(m_time->getDayAndMonth(), centre, dateY, 18);
     const String weekDay = m_time->getWeekday();
-    m_manager.drawCentreString(weekDay.c_str(), centre, dayOfWeekY, 22);
+    m_manager.drawCentreString(weekDay, centre, dayOfWeekY, 22);
 
-    m_manager.drawString(m_time->getHourPadded().c_str(), centre - 10, clockY, 66, Align::MiddleRight);
+    m_manager.drawString(m_time->getHourPadded(), centre - 10, clockY, 66, Align::MiddleRight);
     m_manager.drawString(":", centre, clockY, 66, Align::MiddleCenter);
-    m_manager.drawString(m_time->getMinutePadded().c_str(), centre + 10, clockY, 66, Align::MiddleLeft);
+    m_manager.drawString(m_time->getMinutePadded(), centre + 10, clockY, 66, Align::MiddleLeft);
 }
 
 // Write an image to the screen from a hex array. 
@@ -199,7 +199,7 @@ void WeatherWidget::drawWeatherIcon(int displayIndex, const String& condition, i
 void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.selectScreen(displayIndex);
     m_manager.fillScreen(m_backgroundColor);
-    m_manager.drawCentreString(model.getCurrentTemperature(0).c_str(), centre, 90, 88);
+    m_manager.drawCentreString(model.getCurrentTemperature(0), centre, 90, 88);
 
     // No glaring white chunks in Dark mode
     if (m_screenMode == Light) {
@@ -212,8 +212,8 @@ void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.setBackgroundColor(m_invertedBackgroundColor);
     m_manager.drawCentreString("High", 80, 170, fontSize);
     m_manager.drawCentreString("Low", 160, 170, fontSize);
-    m_manager.drawCentreString(model.getTodayHigh(0).c_str(), 80, 210, fontSize);
-    m_manager.drawCentreString(model.getTodayLow(0).c_str(), 160, 210, fontSize);
+    m_manager.drawCentreString(model.getTodayHigh(0), 80, 210, fontSize);
+    m_manager.drawCentreString(model.getTodayLow(0), 160, 210, fontSize);
     m_manager.setFontColor(m_foregroundColor);
     m_manager.setBackgroundColor(m_backgroundColor);
 }
@@ -247,11 +247,11 @@ void WeatherWidget::weatherText(int displayIndex) {
     cityName.remove(cityName.indexOf(",", 0));
 
     m_manager.setFontColor(m_foregroundColor);
-    m_manager.drawFittedString(cityName.c_str(), centre, 80, 210, 50, Align::MiddleCenter);
+    m_manager.drawFittedString(cityName, centre, 80, 210, 50, Align::MiddleCenter);
 
     auto y = 125;
     for (auto i = 0; i < 4; i++) {
-        m_manager.drawCentreString(messageArr[i].c_str(), centre, y, 15);
+        m_manager.drawCentreString(messageArr[i], centre, y, 15);
         y += 25;
     }
 }
@@ -294,11 +294,11 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         const int x = (centre - columnSize) + i * columnSize;
 
         drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
-        m_manager.drawCentreString(temps[i].c_str(), x, 122, temperatureFontSize);
+        m_manager.drawCentreString(temps[i], x, 122, temperatureFontSize);
 
         String shortDayName = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
         shortDayName.remove(3);
-        m_manager.drawString(shortDayName.c_str(), x, 154, fontSize, Align::MiddleCenter);
+        m_manager.drawString(shortDayName, x, 154, fontSize, Align::MiddleCenter);
     }
 
 }

@@ -353,18 +353,18 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
 
     m_manager.fillScreen(background);
     m_manager.setFontColor(color);
-    m_manager.drawString(m_time->getDayAndMonth().c_str(), ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
+    m_manager.drawString(m_time->getDayAndMonth(), ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
 
-    m_manager.drawString(m_time->getHourPadded().c_str(), ScreenCenterX - 10, clky, 66, Align::MiddleRight);
-    m_manager.drawString(m_time->getMinutePadded().c_str(), ScreenCenterX + 10, clky, 66, Align::MiddleLeft);
+    m_manager.drawString(m_time->getHourPadded(), ScreenCenterX - 10, clky, 66, Align::MiddleRight);
+    m_manager.drawString(m_time->getMinutePadded(), ScreenCenterX + 10, clky, 66, Align::MiddleLeft);
     m_manager.drawString(":", ScreenCenterX, clky, 66, Align::MiddleCenter);
 
     m_manager.fillRect(0, 0, 240, 50, extraColor);
     m_manager.setBackgroundColor(extraColor);
-    m_manager.drawString(extra.c_str(), ScreenCenterX, 27, 18, Align::MiddleCenter);
+    m_manager.drawString(extra, ScreenCenterX, 27, 18, Align::MiddleCenter);
 
     m_manager.fillRect(0, 190, 240, 50, extraColor);
-    m_manager.drawString(getTimeframe().c_str(), ScreenCenterX, 212, 22, Align::MiddleCenter);
+    m_manager.drawString(getTimeframe(), ScreenCenterX, 212, 22, Align::MiddleCenter);
 }
 
 void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor)
@@ -374,16 +374,16 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     m_manager.fillScreen(backgroundColor);
     m_manager.setFontColor(textColor);
 
-    m_manager.drawString(stock.getCurrency().c_str(), ScreenCenterX, 27, 15, Align::MiddleCenter);
+    m_manager.drawString(stock.getCurrency(), ScreenCenterX, 27, 15, Align::MiddleCenter);
     if (stock.getId() != "total" || m_showTotalValue)
     {
         if (m_showValues)
         {
-            m_manager.drawString(stock.getCurrentValue(2).c_str(), ScreenCenterX, 58, 26, Align::MiddleCenter);
+            m_manager.drawString(stock.getCurrentValue(2), ScreenCenterX, 58, 26, Align::MiddleCenter);
         }
         else
         {
-            m_manager.drawString(stock.getCurrentPrice(2).c_str(), ScreenCenterX, 58, 26, Align::MiddleCenter);
+            m_manager.drawString(stock.getCurrentPrice(2), ScreenCenterX, 58, 26, Align::MiddleCenter);
         }
     }
     else
@@ -448,13 +448,13 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         {
             // Show minVal if the zero line is not interfering
             m_manager.drawLine(0, minAtY, 240, minAtY, TFT_DARKGREY);
-            m_manager.drawString((String(minVal) + "%").c_str(), 25, minAtY, 11, Align::BottomLeft);
+            m_manager.drawString(String(minVal) + "%", 25, minAtY, 11, Align::BottomLeft);
         }
         if (zeroAtY > maxAtY + 15 || zeroAtY < maxAtY)
         {
             // Show maxVal if the zero line is not interfering
             m_manager.drawLine(0, maxAtY, 240, maxAtY, TFT_DARKGREY);
-            m_manager.drawString((String(maxVal) + "%").c_str(), 25, maxAtY, 11, Align::TopLeft);
+            m_manager.drawString(String(maxVal) + "%", 25, maxAtY, 11, Align::TopLeft);
         }
     }
     else
@@ -474,7 +474,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         {
             // Lager font if we need less lines
             int fontSize = 17 + 6/lineCount;
-            m_manager.drawString(wrappedLines[i].c_str(), 120, yOffset + (height * i), fontSize, Align::MiddleCenter);
+            m_manager.drawString(wrappedLines[i], 120, yOffset + (height * i), fontSize, Align::MiddleCenter);
         }
     }
 
@@ -492,7 +492,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     m_manager.fillRect(0, 80, ScreenWidth, 5, stockColor);
     m_manager.fillRect(0, 176, ScreenWidth, 5, stockColor);
     m_manager.drawArc(120, 120, 120, 115, 0, 360, stockColor, backgroundColor);
-    m_manager.drawString((stock.getPercentChange(2) + "%").c_str(), ScreenCenterX, 205, 22, Align::MiddleCenter);
+    m_manager.drawString(stock.getPercentChange(2) + "%", ScreenCenterX, 205, 22, Align::MiddleCenter);
 }
 
 String ParqetWidget::getName()

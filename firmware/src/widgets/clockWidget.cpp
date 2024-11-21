@@ -59,7 +59,7 @@ void ClockWidget::displayAmPm(uint32_t color) {
     m_manager.selectScreen(2);
     m_manager.setFontColor(color, TFT_BLACK);
     String am_pm = time->isPM() ? "PM" : "AM";
-    m_manager.drawString(am_pm.c_str(), SCREEN_SIZE / 4 * 3, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
+    m_manager.drawString(am_pm, SCREEN_SIZE / 4 * 3, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
 }
 
 void ClockWidget::update(bool force) {
@@ -141,14 +141,14 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
         } else {
             // Other fonts can't be shadowed
             m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
-            m_manager.drawString(lastDigit.c_str(), defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);    
+            m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);    
         }
     } else {
         m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
-        m_manager.drawString(lastDigit.c_str(), defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
+        m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
     }
     m_manager.setFontColor(color, TFT_BLACK);
-    m_manager.drawString(digit.c_str(), defaultX + digitOffset.x, defaultY + digitOffset.y, fontSize, Align::MiddleCenter);
+    m_manager.drawString(digit, defaultX + digitOffset.x, defaultY + digitOffset.y, fontSize, Align::MiddleCenter);
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color) {

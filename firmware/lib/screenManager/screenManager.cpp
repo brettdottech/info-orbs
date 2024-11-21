@@ -153,27 +153,27 @@ void ScreenManager::reset() {
   }
 }
 
-unsigned int ScreenManager::calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const char *str) {
-  unsigned int calcFontSize = m_render.calculateFitFontSize(limit_width, limit_height, layout, str);
+unsigned int ScreenManager::calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const String &text) {
+  unsigned int calcFontSize = m_render.calculateFitFontSize(limit_width, limit_height, layout, text.c_str());
   // Serial.printf("calcFitFontSize: t=%s, w=%d, h=%d -> fs=%d\n", str, limit_width, limit_height, calcFontSize);
   return calcFontSize;
 }
 
-void ScreenManager::drawString(const char *text, int x, int y) {
+void ScreenManager::drawString(const String &text, int x, int y) {
   // Use current font size and alignment
   drawString(text, x, y, 0, m_render.getAlignment());
 }
 
-void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align) {
+void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align) {
   drawString(text, x, y, fontSize, align, m_render.getFontColor());
 }
 
-void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor) {
+void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor) {
   uint16_t bgColor = m_render.getBackgroundColor();
   drawString(text, x, y, fontSize, align, fgColor, m_render.getBackgroundColor());
  }
 
-void ScreenManager::drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale) {
+void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale) {
   if (fontSize == 0) {
     // Keep current font size
     fontSize == m_render.getFontSize();
@@ -182,22 +182,22 @@ void ScreenManager::drawString(const char *text, int x, int y, unsigned int font
   }
   // Dirty hack to correct misaligned Y
   // See https://github.com/takkaO/OpenFontRender/issues/38
-  FT_BBox box = m_render.calculateBoundingBox(0,0,fontSize,Align::TopLeft,Layout::Horizontal, text);
+  FT_BBox box = m_render.calculateBoundingBox(0,0,fontSize,Align::TopLeft,Layout::Horizontal, text.c_str());
   m_render.setAlignment(align);
   m_render.setFontSize(fontSize);
-  m_render.drawString(text, x, y - box.yMin, fgColor, bgColor);
+  m_render.drawString(text.c_str(), x, y - box.yMin, fgColor, bgColor);
 }
 
-void ScreenManager::drawCentreString(const char *text, int x, int y, unsigned int fontSize) {
+void ScreenManager::drawCentreString(const String &text, int x, int y, unsigned int fontSize) {
   drawString(text, x, y, fontSize, Align::MiddleCenter);
 }
 
-void ScreenManager::drawFittedString(const char *text, int x, int y, int limit_w, int limit_h, Align align) {
+void ScreenManager::drawFittedString(const String &text, int x, int y, int limit_w, int limit_h, Align align) {
   unsigned int fontSize = calculateFitFontSize(limit_w, limit_h, Layout::Horizontal, text);
   drawString(text, x, y, fontSize, align, m_render.getFontColor(), m_render.getBackgroundColor(), false);
 }
 
-void ScreenManager::drawFittedString(const char *text, int x, int y, int limit_w, int limit_h) {
+void ScreenManager::drawFittedString(const String &text, int x, int y, int limit_w, int limit_h) {
   drawFittedString(text, x, y, limit_w, limit_h, m_render.getAlignment());
 }
 

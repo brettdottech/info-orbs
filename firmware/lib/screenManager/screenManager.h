@@ -39,20 +39,20 @@ public:
     void setAlignment(Align align);
 
     // Helper functions
-    unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const char *str);
+    unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const String &text);
 
     // Draw string functions
-    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale=true);
-    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor);
-    void drawString(const char *text, int x, int y, unsigned int fontSize, Align align);
-    void drawString(const char *text, int x, int y);
+    void drawString(const String &text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale=true);
+    void drawString(const String &text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor);
+    void drawString(const String &text, int x, int y, unsigned int fontSize, Align align);
+    void drawString(const String &text, int x, int y);
 
     // Draw centered string
-    void drawCentreString(const char *text, int x, int y, unsigned int fontSize=0);
+    void drawCentreString(const String &text, int x, int y, unsigned int fontSize=0);
 
     // Draw string with a max width/height (auto-sizing)
-    void drawFittedString(const char *text, int x, int y, int limit_w, int limit_h, Align align);
-    void drawFittedString(const char *text, int x, int y, int limit_w, int limit_h);
+    void drawFittedString(const String &text, int x, int y, int limit_w, int limit_h, Align align);
+    void drawFittedString(const String &text, int x, int y, int limit_w, int limit_h);
 
     // Drawing stuff
     void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);

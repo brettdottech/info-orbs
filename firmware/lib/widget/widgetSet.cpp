@@ -66,7 +66,7 @@ void WidgetSet::showCenteredLine(int screen, const String& text) {
     m_screenManager->selectScreen(screen);
     m_screenManager->fillScreen(TFT_BLACK);
     m_screenManager->setFontColor(TFT_WHITE);
-    m_screenManager->drawCentreString(text.c_str(), ScreenCenterX, ScreenCenterY, 22);
+    m_screenManager->drawCentreString(text, ScreenCenterX, ScreenCenterY, 22);
 }
 
 
@@ -77,7 +77,7 @@ void WidgetSet::showLoading() {
 void WidgetSet::updateAll() {
   for (int8_t i; i<m_widgetCount; i++) {
     Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
-    showCenteredLine(4, m_widgets[i]->getName().c_str());
+    showCenteredLine(4, m_widgets[i]->getName());
     m_widgets[i]->update();
   }
 }
