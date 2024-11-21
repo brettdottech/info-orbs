@@ -14,28 +14,10 @@
 #define DEFAULT_FONT ROBOTO_REGULAR
 #endif
 
-// All available TTF fonts
-enum TTF_Font {
-    NONE,
-    ROBOTO_REGULAR,
-    FINAL_FRONTIER,
-    DSEG7,
-    DSEG14
-};
-
-struct TTF_FontMetric {
-    TTF_Font font;
-    float scale;
-};
-
-// Set scaling factor for each font if necessary
-const TTF_FontMetric ttfFontMetrics[] = { { ROBOTO_REGULAR, 1.37 }, { FINAL_FRONTIER, 1.5 } };
-
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
 
-    void setFont(TTF_Font font);
     TFT_eSPI& getDisplay();
     OpenFontRender &getRender();
 
@@ -49,6 +31,7 @@ public:
     void clearScreen(int screen=-1);
 
     // Set TTF parameters for next drawString()
+    void setFont(TTF_Font font);
     void setFontColor(uint32_t color);
     void setFontColor(uint32_t color, uint32_t background);
     void setBackgroundColor(uint32_t color);
