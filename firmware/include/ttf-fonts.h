@@ -1,5 +1,5 @@
-#ifndef TTFFONTS_H
-#define TTFFONTS_H
+#ifndef TTF_FONTS_H
+#define TTF_FONTS_H
 
 #include <Arduino.h>
 

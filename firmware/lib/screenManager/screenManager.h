@@ -6,7 +6,7 @@
 #include <TFT_eSPI.h>
 #include <SPI.h>
 #include <OpenFontRender.h>
-#include "../../include/ttffonts.h"
+#include "../../include/ttf-fonts.h"
 
 #define NUM_SCREENS 5
 
