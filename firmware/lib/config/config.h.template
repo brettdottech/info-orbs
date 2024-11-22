@@ -27,6 +27,10 @@
 //#define WIFI_SSID "MyWiFiRouter" // Wifi router SSID name (use only 2.4 GHz network)
 //#define WIFI_PASS "WiFiPassword" // Wifi router password
 
+// TRUETYPE FONT CONFIGURATION
+//#define DEFAULT_FONT ROBOTO_REGULAR
+//#define CLOCK_FONT DSEG7
+
 // ============= END OF USER CONFIGURATION =================================================================
 
 
