@@ -1,6 +1,7 @@
 // mqttWidget.cpp
 
 #include "widgets/mqttWidget.h"
+#include "ArduinoJson.h"
 
 // Initialize the static instance pointer
 MQTTWidget* MQTTWidget::instance = nullptr;
@@ -169,9 +170,22 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                         return;
                     }
 
-                    // Extract the specified JSON field
-                    if (dataDoc.containsKey(orb->jsonField)) {
-                        JsonVariant fieldValue = dataDoc[orb->jsonField];
+                    // Extract the specified JSON field using dynamic path traversal
+                    JsonVariant fieldValue = dataDoc.as<JsonVariant>();
+                    char path[50];
+                    strcpy(path, orb->jsonField.c_str());
+                    char* token = strtok(path, ".");
+
+                    // Traverse the path tokens to get the desired field value
+                    while (token != nullptr && !fieldValue.isNull()) {
+                        fieldValue = fieldValue[token];
+                        token = strtok(nullptr, ".");
+                    }
+
+                    // If we successfully extracted the value
+                    if (!fieldValue.isNull()) {
+                        Serial.println("fieldvalue: " + String(fieldValue.as<const char*>()));
+
                         // Convert the field value to String
                         String extractedValue;
                         if (fieldValue.is<float>()) {
@@ -181,9 +195,10 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                         } else if (fieldValue.is<const char*>()) {
                             extractedValue = String(fieldValue.as<const char*>());
                         } else {
-                            extractedValue = fieldValue.as<String>();
+                            extractedValue = String(fieldValue.as<String>());
                         }
 
+                        // Store the extracted value (if applicable)
                         it->second = extractedValue;
                         Serial.println("Parsed " + orb->jsonField + ": " + extractedValue);
                     } else {
@@ -370,7 +385,7 @@ void MQTTWidget::drawOrb(int orbid) {
     display.setTextSize(orb->orbsize);
     //display.setTextDatum(MC_DATUM); // Middle Center Datum
 
-    display.setTextColor(TFT_WHITE);
+//    display.setTextColor(TFT_WHITE);
 
     // Display orb description/title
     display.drawString(orb->orbdesc, centre, orb->xpostxt, orb->ypostxt);
