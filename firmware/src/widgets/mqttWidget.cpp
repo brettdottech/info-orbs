@@ -178,7 +178,25 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
 
                     // Traverse the path tokens to get the desired field value
                     while (token != nullptr && !fieldValue.isNull()) {
-                        fieldValue = fieldValue[token];
+                        // Check if the token contains an array index (e.g., "power_delivered[0]")
+                        char* arrayBracket = strchr(token, '[');
+                        if (arrayBracket) {
+                            // Split the token at the '[' to get the array key
+                            *arrayBracket = '\0'; // Null terminate to get the key part
+                            fieldValue = fieldValue[token]; // Access the array key
+
+                            // Extract the index part
+                            int index = atoi(arrayBracket + 1); // Get the number after '['
+                            if (fieldValue.is<JsonArray>()) {
+                                fieldValue = fieldValue[index]; // Access the array element by index
+                            } else {
+                                Serial.println("Error: Expected an array for " + String(token));
+                                return;
+                            }
+                        } else {
+                            // Regular object traversal
+                            fieldValue = fieldValue[token];
+                        }
                         token = strtok(nullptr, ".");
                     }
 
@@ -189,7 +207,7 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                         // Convert the field value to String
                         String extractedValue;
                         if (fieldValue.is<float>()) {
-                            extractedValue = String(fieldValue.as<float>(), 2); // 2 decimal places
+                            extractedValue = String(fieldValue.as<float>(), 3); // 3 decimal places
                         } else if (fieldValue.is<int>()) {
                             extractedValue = String(fieldValue.as<int>());
                         } else if (fieldValue.is<const char*>()) {
