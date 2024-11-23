@@ -14,6 +14,8 @@
 #define DEFAULT_FONT ROBOTO_REGULAR
 #endif
 
+#define TFT_BRIGHTNESS 128
+
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
@@ -58,7 +60,7 @@ public:
     void drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc = true);
     void drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool roundEnds = false);
     void fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color);
-
+    
 private:
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& m_tft;

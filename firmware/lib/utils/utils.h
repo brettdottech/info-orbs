@@ -23,6 +23,7 @@ public:
     static int32_t stringToColor(String color);
     static String formatFloat(float value, int8_t digits);
     static int32_t stringToAlignment(String alignment);
+    static uint16_t rgb565dim(uint16_t color, uint8_t brightness, bool swapBytes=false);
 };
 
 #endif
