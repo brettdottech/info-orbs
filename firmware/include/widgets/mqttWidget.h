@@ -25,6 +25,7 @@ struct OrbConfig {
     String orbvalunit;      // value unit
     int orbsize;            // font size
     String jsonField;       // JSON field to extract
+    std::map<String, String> lastValuesMap; // Store last values for fields
 };
 
 class MQTTWidget : public Widget {

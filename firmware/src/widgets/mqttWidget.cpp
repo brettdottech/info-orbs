@@ -130,8 +130,6 @@ void MQTTWidget::changeMode() {
 
 // Callback function for MQTT messages
 void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
-//    Serial.println("Inside callback method");
-    
     // Convert payload to String
     String message;
     for (unsigned int i = 0; i < length; i++) {
@@ -162,7 +160,7 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
             if (orb) {
                 if (orb->jsonField.length() > 0) {
                     // The orb expects a specific JSON field
-                    StaticJsonDocument<2048> dataDoc;
+                    StaticJsonDocument<3072> dataDoc;
                     DeserializationError dataError = deserializeJson(dataDoc, message);
                     if (dataError) {
                         Serial.print("Failed to parse data JSON: ");
@@ -172,7 +170,7 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
 
                     // Extract the specified JSON field using dynamic path traversal
                     JsonVariant fieldValue = dataDoc.as<JsonVariant>();
-                    char path[50];
+                    char path[100];
                     strcpy(path, orb->jsonField.c_str());
                     char* token = strtok(path, ".");
 
@@ -181,7 +179,6 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                         // Check if the token contains an array index (e.g., "power_delivered[0]")
                         char* arrayBracket = strchr(token, '[');
                         if (arrayBracket) {
-                            // Split the token at the '[' to get the array key
                             *arrayBracket = '\0'; // Null terminate to get the key part
                             fieldValue = fieldValue[token]; // Access the array key
 
@@ -202,9 +199,6 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
 
                     // If we successfully extracted the value
                     if (!fieldValue.isNull()) {
-                        Serial.println("fieldvalue: " + String(fieldValue.as<const char*>()));
-
-                        // Convert the field value to String
                         String extractedValue;
                         if (fieldValue.is<float>()) {
                             extractedValue = String(fieldValue.as<float>(), 3); // 3 decimal places
@@ -216,22 +210,34 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                             extractedValue = String(fieldValue.as<String>());
                         }
 
-                        // Store the extracted value (if applicable)
-                        it->second = extractedValue;
-                        Serial.println("Parsed " + orb->jsonField + ": " + extractedValue);
+                        // Compare with the stored value to decide if we need to update
+                        if (orb->lastValuesMap[orb->jsonField] != extractedValue) {
+                            // Store the new value
+                            orb->lastValuesMap[orb->jsonField] = extractedValue;
+
+                            // Update the display only if the value has actually changed
+                            it->second = extractedValue;
+                            Serial.println("Parsed " + orb->jsonField + ": " + extractedValue);
+
+                            // Redraw the orb with updated data
+                            drawOrb(orb->orbid);
+                        } else {
+                            Serial.println("No change detected for field: " + orb->jsonField);
+                        }
                     } else {
                         Serial.println("JSON field '" + orb->jsonField + "' not found in payload.");
-                        // Optionally, decide how to handle missing fields
                         return;
                     }
                 } else {
                     // The orb does not expect a JSON field; use the entire payload
-                    it->second = message;
-                    Serial.println("Updated data for " + receivedTopic + ": " + message);
+                    if (it->second != message) {
+                        it->second = message;
+                        Serial.println("Updated data for " + receivedTopic + ": " + message);
+                        drawOrb(orb->orbid);
+                    } else {
+                        Serial.println("No change detected for topic: " + receivedTopic);
+                    }
                 }
-
-                // Redraw the orb with updated data
-                drawOrb(orb->orbid);
             } else {
                 Serial.println("No orb configuration found for topic: " + receivedTopic);
             }
@@ -240,7 +246,6 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
         }
     }
 }
-
 
 // Handle setup message to configure orbs
 void MQTTWidget::handleSetupMessage(const String &message) {
