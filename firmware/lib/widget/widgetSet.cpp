@@ -110,6 +110,7 @@ void WidgetSet::updateBrightnessByTime(uint8_t hour24) {
   uint8_t brightness = isInDimRange ? DIM_BRIGHTNESS : TFT_BRIGHTNESS;
   if (m_screenManager->setBrightness(brightness)) {
     // brightness was changed -> update widget
+    m_screenManager->clearAllScreens();
     drawCurrent(true);
   }
 #endif
