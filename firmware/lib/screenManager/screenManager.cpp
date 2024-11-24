@@ -93,7 +93,7 @@ void ScreenManager::selectScreen(int screen) {
 // Fills all screens with a color
 void ScreenManager::fillAllScreens(uint32_t color) {
   selectAllScreens();
-  m_tft.fillScreen(color);
+  fillScreen(color);
   reset();
 }
 
@@ -164,21 +164,20 @@ void ScreenManager::drawString(const String &text, int x, int y) {
   drawString(text, x, y, 0, m_render.getAlignment());
 }
 
-void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align) {
-  drawString(text, x, y, fontSize, align, m_render.getFontColor());
-}
-
-void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor) {
-  uint16_t bgColor = m_render.getBackgroundColor();
-  drawString(text, x, y, fontSize, align, fgColor, m_render.getBackgroundColor());
- }
-
-void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, u_int16_t fgColor, uint16_t bgColor, bool applyScale) {
+void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, int32_t fgColor, int32_t bgColor, bool applyScale) {
   if (fontSize == 0) {
     // Keep current font size
     fontSize == m_render.getFontSize();
   } else if (applyScale) {
     fontSize = getScaledFontSize(fontSize);
+  }
+  if (fgColor == -1) {
+    // Keep current FG color
+    fgColor = m_render.getFontColor();
+  }
+  if (bgColor == -1) {
+    // Keep current BG color
+    bgColor = m_render.getBackgroundColor();
   }
   // Dirty hack to correct misaligned Y
   // See https://github.com/takkaO/OpenFontRender/issues/38
@@ -194,7 +193,7 @@ void ScreenManager::drawCentreString(const String &text, int x, int y, unsigned 
 
 void ScreenManager::drawFittedString(const String &text, int x, int y, int limit_w, int limit_h, Align align) {
   unsigned int fontSize = calculateFitFontSize(limit_w, limit_h, Layout::Horizontal, text);
-  drawString(text, x, y, fontSize, align, m_render.getFontColor(), m_render.getBackgroundColor(), false);
+  drawString(text, x, y, fontSize, align, -1, -1, false);
 }
 
 void ScreenManager::drawFittedString(const String &text, int x, int y, int limit_w, int limit_h) {
