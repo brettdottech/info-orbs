@@ -3,6 +3,8 @@
 
 #include <globalTime.h>
 #include <widget.h>
+#include <TJpg_Decoder.h>
+#include <nixie.h>
 
 #ifndef CLOCK_FONT
 #define CLOCK_FONT DSEG7
@@ -33,6 +35,11 @@ struct DigitOffset {
     int y;
 };
 
+enum class ClockType {
+    NORMAL,
+    NIXIE
+};
+
 class ClockWidget : public Widget {
    public:
     ClockWidget(ScreenManager& manager);
@@ -43,14 +50,17 @@ class ClockWidget : public Widget {
     void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
 
-    void changeMode();
-
    private:
+    void change24hMode();
     void displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(uint32_t color);
     DigitOffset getOffsetForDigit(const String& digit);
+    void displayNixie(int displayIndex, String digit);
+    void changeClockType();
+
+    ClockType m_type = ClockType::NORMAL;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
