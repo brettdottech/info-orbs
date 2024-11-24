@@ -74,6 +74,7 @@ private:
     uint8_t m_brightness = TFT_BRIGHTNESS;
 
     unsigned int getScaledFontSize(unsigned int fontSize);
+    uint16_t dim(uint16_t color);
 };
 
 #endif // SCREENMANAGER_H
