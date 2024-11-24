@@ -14,8 +14,6 @@
 #define DEFAULT_FONT ROBOTO_REGULAR
 #endif
 
-#define TFT_BRIGHTNESS 128
-
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
@@ -31,6 +29,9 @@ public:
     void clearAllScreens();
     void fillScreen(uint32_t color);
     void clearScreen(int screen=-1);
+
+    void setBrightness(uint8_t brightness);
+    uint8_t getBrightness();
 
     // Set TTF parameters for next drawString()
     void setFont(TTF_Font font);
@@ -66,6 +67,7 @@ private:
     TFT_eSPI& m_tft;
     OpenFontRender m_render;
     TTF_Font m_curFont = TTF_Font::NONE;
+    uint8_t m_brightness = 255;
 
     unsigned int getScaledFontSize(unsigned int fontSize);
 };

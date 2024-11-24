@@ -112,22 +112,30 @@ void ScreenManager::clearScreen(int screen) {
 }
 
 void ScreenManager::fillScreen(uint32_t color) {
-  m_tft.fillScreen(Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_tft.fillScreen(Utils::rgb565dim(color, m_brightness));
   // Set background for aliasing as well
-  m_render.setBackgroundColor(Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_render.setBackgroundColor(Utils::rgb565dim(color, m_brightness));
+}
+
+void ScreenManager::setBrightness(uint8_t brightness) {
+  m_brightness = brightness;
+}
+
+uint8_t ScreenManager::getBrightness() {
+  return m_brightness;
 }
 
 void ScreenManager::setFontColor(uint32_t color) {
-  m_render.setFontColor(Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_render.setFontColor(Utils::rgb565dim(color, m_brightness));
 }
 
 void ScreenManager::setFontColor(uint32_t color, uint32_t background) {
-  m_render.setFontColor(Utils::rgb565dim(color, TFT_BRIGHTNESS));
-  m_render.setBackgroundColor(Utils::rgb565dim(background, TFT_BRIGHTNESS));
+  m_render.setFontColor(Utils::rgb565dim(color, m_brightness));
+  m_render.setBackgroundColor(Utils::rgb565dim(background, m_brightness));
 }
 
 void ScreenManager::setBackgroundColor(uint32_t color) {
-  m_render.setBackgroundColor(Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_render.setBackgroundColor(Utils::rgb565dim(color, m_brightness));
 }
 
 void ScreenManager::setAlignment(Align align) {
@@ -176,13 +184,13 @@ void ScreenManager::drawString(const String &text, int x, int y, unsigned int fo
     // Keep current FG color
     fgColor = m_render.getFontColor();
   } else {
-    fgColor = Utils::rgb565dim(fgColor, TFT_BRIGHTNESS);
+    fgColor = Utils::rgb565dim(fgColor, m_brightness);
   }
   if (bgColor == -1) {
     // Keep current BG color
     bgColor = m_render.getBackgroundColor();
   } else {
-    bgColor = Utils::rgb565dim(bgColor, TFT_BRIGHTNESS);
+    bgColor = Utils::rgb565dim(bgColor, m_brightness);
   }
 
   // Dirty hack to correct misaligned Y
@@ -207,23 +215,23 @@ void ScreenManager::drawFittedString(const String &text, int x, int y, int limit
 }
 
 void ScreenManager::fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
-  m_tft.fillRect(x, y, w, h, Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_tft.fillRect(x, y, w, h, Utils::rgb565dim(color, m_brightness));
 }
 
 void ScreenManager::drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uint32_t color) {
-  m_tft.drawLine(xs, ys, xe, ye, Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_tft.drawLine(xs, ys, xe, ye, Utils::rgb565dim(color, m_brightness));
 }
 
 void ScreenManager::drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc) {
-  m_tft.drawArc(x, y, r, ir, startAngle, endAngle, Utils::rgb565dim(fg_color, TFT_BRIGHTNESS), Utils::rgb565dim(bg_color, TFT_BRIGHTNESS), smoothArc);
+  m_tft.drawArc(x, y, r, ir, startAngle, endAngle, Utils::rgb565dim(fg_color, m_brightness), Utils::rgb565dim(bg_color, m_brightness), smoothArc);
 }
 
 void ScreenManager::drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool roundEnds) {
-  m_tft.drawSmoothArc(x, y, r, ir, startAngle, endAngle, Utils::rgb565dim(fg_color, TFT_BRIGHTNESS), Utils::rgb565dim(bg_color, TFT_BRIGHTNESS), roundEnds);
+  m_tft.drawSmoothArc(x, y, r, ir, startAngle, endAngle, Utils::rgb565dim(fg_color, m_brightness), Utils::rgb565dim(bg_color, m_brightness), roundEnds);
 }
 
 void ScreenManager::fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {
-  m_tft.fillTriangle(x1, y1, x2, y2, x3, y3, Utils::rgb565dim(color, TFT_BRIGHTNESS));
+  m_tft.fillTriangle(x1, y1, x2, y2, x3, y3, Utils::rgb565dim(color, m_brightness));
 }
 
 unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
