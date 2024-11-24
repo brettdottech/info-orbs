@@ -11,7 +11,7 @@ class WidgetSet {
 public:
     WidgetSet(ScreenManager *sm);
     void add(Widget *widget);
-    void drawCurrent();
+    void drawCurrent(bool force=false);
     void updateCurrent();
     Widget *getCurrent();
     void next();
@@ -22,6 +22,7 @@ public:
     bool initialUpdateDone();
     void initializeAllWidgetsData();
     void setClearScreensOnDrawCurrent();
+    void updateBrightnessByTime(uint8_t hour24);
 
    private:
     void showCenteredLine(int screen, const String& text);

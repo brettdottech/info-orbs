@@ -18,6 +18,9 @@
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
 #define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN // Language selection for Month and Weekday - values are EN, DE, FR
+//#define DIM_START_HOUR 22 // Dim the screen at this time (24h format)
+//#define DIM_END_HOUR 7 // Undim the screen at this time (24h format)
+//#define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
 
 // OPTIONAL CONFIGURATION FIELDS
 // Normally WiFi should be configured using a smartphone or computer to connect to the Info-Orbs

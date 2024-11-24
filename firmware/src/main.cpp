@@ -188,12 +188,13 @@ void loop() {
       widgetSet->initializeAllWidgetsData();
     }
     globalTime->updateTime();
-
+    
     checkButtons();
 
     widgetSet->updateCurrent();
+    widgetSet->updateBrightnessByTime(globalTime->getHour24());
     widgetSet->drawCurrent();
-
+    
     checkCycleWidgets();
   }
 }

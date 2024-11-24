@@ -30,7 +30,7 @@ public:
     void fillScreen(uint32_t color);
     void clearScreen(int screen=-1);
 
-    void setBrightness(uint8_t brightness);
+    bool setBrightness(uint8_t brightness);
     uint8_t getBrightness();
 
     // Set TTF parameters for next drawString()

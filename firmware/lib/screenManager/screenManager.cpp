@@ -117,8 +117,14 @@ void ScreenManager::fillScreen(uint32_t color) {
   m_render.setBackgroundColor(Utils::rgb565dim(color, m_brightness));
 }
 
-void ScreenManager::setBrightness(uint8_t brightness) {
-  m_brightness = brightness;
+bool ScreenManager::setBrightness(uint8_t brightness) {
+  if (m_brightness != brightness) {
+    Serial.printf("Brightness set to %d\n", brightness);
+    m_brightness = brightness;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 uint8_t ScreenManager::getBrightness() {
