@@ -21,6 +21,7 @@
 #define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock
 #define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README-CustomClock.txt)
 #define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM
+//#define CLOCK_FONT DSEG7              // Define clock font (defaults to DSEG7, you can also try DSEG14 or FINAL_FRONTIER)
 
 // WEATHER CONFIGURATION
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
@@ -46,7 +47,6 @@
 
 // TRUETYPE FONT CONFIGURATION
 //#define DEFAULT_FONT ROBOTO_REGULAR
-//#define CLOCK_FONT DSEG7
 
 // ============= END OF USER CONFIGURATION =================================================================
 
