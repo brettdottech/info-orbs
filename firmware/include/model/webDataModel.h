@@ -39,7 +39,7 @@ class WebDataModel {
     void setInitializedStatus(bool initialized);
 
     void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground);
-    void draw(TFT_eSPI& display);
+    void draw(ScreenManager& manager);
 
    private:
     bool m_isInitialized = false;

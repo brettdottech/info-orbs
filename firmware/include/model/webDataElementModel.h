@@ -28,7 +28,7 @@ class WebDataElementModel {
     void setChangedStatus(bool changed);
 
     void parseData(JsonObject doc, int32_t defaultColor, int32_t defaultBackground);
-    void draw(TFT_eSPI& display);
+    void draw(ScreenManager& manager);
 
    private:
     WebDataElementModelTypes m_type = OTHER;

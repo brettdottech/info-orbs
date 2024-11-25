@@ -132,9 +132,9 @@ void WebDataElementCharacterModel::parseData(const JsonObject &doc, int32_t defa
     }
 }
 
-void WebDataElementCharacterModel::draw(TFT_eSPI &display) {
-    display.setTextDatum(getAlignment());
-    display.setTextSize(getSize());
-    display.setTextColor(getColor(), getBackgroundColor());
-    display.drawChar(getCharacter()[0], getX(), getY(), getFont());
+void WebDataElementCharacterModel::draw(ScreenManager& manager) {
+    manager.setLegacyTextDatum(getAlignment());
+    manager.setLegacyTextSize(getSize());
+    manager.setLegacyTextColor(getColor(), getBackgroundColor());
+    manager.drawLegacyChar(getCharacter()[0], getX(), getY(), getFont());
 }

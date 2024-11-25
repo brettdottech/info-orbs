@@ -24,7 +24,7 @@ class WebDataElementLineModel : public WebDataElement {
     int32_t getColor();
 
     void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) override;
-    void draw(TFT_eSPI& display) override;
+    void draw(ScreenManager& manager) override;
 
    private:
     int32_t m_x = 0;

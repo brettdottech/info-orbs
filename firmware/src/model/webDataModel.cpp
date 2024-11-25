@@ -153,34 +153,34 @@ void WebDataModel::setInitializedStatus(bool initialized) {
     m_isInitialized = initialized;
 }
 
-void WebDataModel::draw(TFT_eSPI &display) {
+void WebDataModel::draw(ScreenManager& manager) {
     if (!m_isInitialized || isFullDraw()) {
-        display.fillScreen(getBackgroundColor());
+        manager.fillScreen(getBackgroundColor());
         m_isInitialized = true;
     }
     if (getLabel()) {
-        display.setTextColor(getLabelColor());
-        display.setTextSize(2);
-        display.setTextDatum(MC_DATUM);
-        display.drawString(getLabel(), 120, 70, 2);
+        manager.setLegacyTextColor(getLabelColor());
+        manager.setLegacyTextSize(2);
+        manager.setLegacyTextDatum(MC_DATUM);
+        manager.drawLegacyString(getLabel(), 120, 70, 2);
     }
-    display.setTextDatum(MC_DATUM);
+    manager.setLegacyTextDatum(MC_DATUM);
 
     if (getElementsCount() > 0) {
         for (int i = 0; i < getElementsCount(); i++) {
             WebDataElementModel element = getElement(i);
-            element.draw(display);
+            element.draw(manager);
         }
     } else {
-        display.setTextColor(getDataColor(), getBackgroundColor());
+        manager.setLegacyTextColor(getDataColor(), getBackgroundColor());
 
         String wrappedLines[MAX_WRAPPED_LINES];
         String dataValues = getData();
         int yOffset = 110;
         int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 10);
-        int height = display.fontHeight() + 10;
+        int height = manager.getLegacyFontHeight() + 10;
         for (int i = 0; i < lineCount; i++) {
-            display.drawString(wrappedLines[i], 120, yOffset + (height * i), 2);
+            manager.drawLegacyString(wrappedLines[i], 120, yOffset + (height * i), 2);
         }
     }
 }
