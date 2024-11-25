@@ -220,6 +220,10 @@ void ScreenManager::drawFittedString(const String &text, int x, int y, int limit
   drawFittedString(text, x, y, limit_w, limit_h, m_render.getAlignment());
 }
 
+void ScreenManager::drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
+  m_tft.drawRect(x, y, w, h, dim(color));
+}
+
 void ScreenManager::fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
   m_tft.fillRect(x, y, w, h, dim(color));
 }
@@ -236,8 +240,20 @@ void ScreenManager::drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, u
   m_tft.drawSmoothArc(x, y, r, ir, startAngle, endAngle, dim(fg_color), dim(bg_color), roundEnds);
 }
 
+void ScreenManager::drawTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {
+  m_tft.drawTriangle(x1, y1, x2, y2, x3, y3, dim(color));
+}
+
 void ScreenManager::fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {
   m_tft.fillTriangle(x1, y1, x2, y2, x3, y3, dim(color));
+}
+
+void ScreenManager::drawCircle(int32_t x, int32_t y, int32_t r, uint32_t color) {
+  m_tft.drawCircle(x, y, r, dim(color));
+}
+
+void ScreenManager::fillCircle(int32_t x, int32_t y, int32_t r, uint32_t color) {
+  m_tft.fillCircle(x, y, r, dim(color));
 }
 
 unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
@@ -252,4 +268,40 @@ unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
 // get the dimmed color (using current brightness)
 uint16_t ScreenManager::dim(uint16_t color) {
   return Utils::rgb565dim(color, m_brightness);
+}
+
+int16_t ScreenManager::getLegacyFontHeight() {
+  return m_tft.fontHeight();
+}
+
+void ScreenManager::setLegacyTextColor(uint16_t color) {
+  m_tft.setTextColor(dim(color));
+}
+
+void ScreenManager::setLegacyTextColor(uint16_t fgcolor, uint16_t bgcolor, bool bgfill) {
+  m_tft.setTextColor(dim(fgcolor), dim(bgcolor), bgfill);
+}
+
+void ScreenManager::setLegacyTextDatum(uint8_t datum) {
+  m_tft.setTextDatum(datum);
+}
+
+void ScreenManager::setLegacyTextSize(uint8_t size) {
+  m_tft.setTextSize(size);
+}
+
+void ScreenManager::setLegacyTextFont(uint8_t font) {
+  m_tft.setTextFont(font);
+}
+
+void ScreenManager::drawLegacyString(const String& string, int32_t x, int32_t y) {
+  m_tft.drawString(string, x, y);
+}
+
+void ScreenManager::drawLegacyString(const String& string, int32_t x, int32_t y, uint8_t font) {
+  m_tft.drawString(string, x, y, font);
+}
+
+int16_t ScreenManager::drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font) {
+  return m_tft.drawChar(uniCode, x, y, font);
 }
