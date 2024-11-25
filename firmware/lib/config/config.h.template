@@ -25,7 +25,7 @@
 
 // WEATHER CONFIGURATION
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
-#define WEATHER_SCREEN_MODE Dark       // Can be either Light or Dark 
+#define WEATHER_SCREEN_MODE Dark        // Can be either Light or Dark 
 #define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather
 
 // STOCK TICKER CONFIGURATION
