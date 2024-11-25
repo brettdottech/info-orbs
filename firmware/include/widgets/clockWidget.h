@@ -45,6 +45,9 @@
 // #define CLOCK_DIGITS_OFFSET { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 #endif
 
+#ifndef DEFAULT_CLOCK
+#define DEFAULT_CLOCK ClockType::NORMAL
+#endif
 
 struct DigitOffset {
     int x;
@@ -79,7 +82,7 @@ class ClockWidget : public Widget {
     void displayCustom(int displayIndex, String digit);
     void changeClockType();
 
-    ClockType m_type = ClockType::NORMAL;
+    ClockType m_type = DEFAULT_CLOCK;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
