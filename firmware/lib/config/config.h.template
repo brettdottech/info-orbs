@@ -15,11 +15,12 @@
 //#define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
 
 // CLOCK CONFIGURATION
-#define FORMAT_24_HOUR false       // Toggle 24 hour clock vs 12 hour clock, change between true/false
-#define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
-#define SHOW_SECOND_TICKS true     // Ticking indicator on the centre clock
-#define USE_CLOCK_NIXIE true       // Set to true to enable Nixie style clock
-#define USE_CLOCK_CUSTOM false     // Set to true to enable custom clock (see images/ClockWidget/custom/README-CustomClock.txt)
+#define FORMAT_24_HOUR false            // Toggle 24 hour clock vs 12 hour clock, change between true/false
+#define SHOW_AM_PM_INDICATOR false      // AM/PM on the clock if using 12 hour
+#define SHOW_SECOND_TICKS true          // Ticking indicator on the centre clock
+#define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock
+#define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README-CustomClock.txt)
+#define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM
 
 // WEATHER CONFIGURATION
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
