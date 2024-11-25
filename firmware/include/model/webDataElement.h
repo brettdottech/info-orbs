@@ -2,7 +2,7 @@
 #define WEB_DATA_ELEMENT_H
 
 #include <ArduinoJson.h>
-#include <ScreenManager.h>
+#include <screenManager.h>
 
 class WebDataElement {
    public:
