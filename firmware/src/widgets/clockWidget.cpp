@@ -205,40 +205,40 @@ void ClockWidget::displayNixie(int displayIndex, String digit) {
     TJpgDec.setJpgScale(1);
     switch (digit.charAt(0)) {
     case '0':
-        TJpgDec.drawJpg(7, 0, nixie_0_start, nixie_0_end - nixie_0_start);
+        TJpgDec.drawJpg(0, 0, nixie_0_start, nixie_0_end - nixie_0_start);
         break;
     case '1':
-        TJpgDec.drawJpg(7, 0, nixie_1_start, nixie_1_end - nixie_1_start);
+        TJpgDec.drawJpg(0, 0, nixie_1_start, nixie_1_end - nixie_1_start);
         break;
     case '2':
-        TJpgDec.drawJpg(7, 0, nixie_2_start, nixie_2_end - nixie_2_start);
+        TJpgDec.drawJpg(0, 0, nixie_2_start, nixie_2_end - nixie_2_start);
         break;
     case '3':
-        TJpgDec.drawJpg(7, 0, nixie_3_start, nixie_3_end - nixie_3_start);
+        TJpgDec.drawJpg(0, 0, nixie_3_start, nixie_3_end - nixie_3_start);
         break;
     case '4':
-        TJpgDec.drawJpg(7, 0, nixie_4_start, nixie_4_end - nixie_4_start);
+        TJpgDec.drawJpg(0, 0, nixie_4_start, nixie_4_end - nixie_4_start);
         break;
     case '5':
-        TJpgDec.drawJpg(7, 0, nixie_5_start, nixie_5_end - nixie_5_start);
+        TJpgDec.drawJpg(0, 0, nixie_5_start, nixie_5_end - nixie_5_start);
         break;
     case '6':
-        TJpgDec.drawJpg(7, 0, nixie_6_start, nixie_6_end - nixie_6_start);
+        TJpgDec.drawJpg(0, 0, nixie_6_start, nixie_6_end - nixie_6_start);
         break;
     case '7':
-        TJpgDec.drawJpg(7, 0, nixie_7_start, nixie_7_end - nixie_7_start);
+        TJpgDec.drawJpg(0, 0, nixie_7_start, nixie_7_end - nixie_7_start);
         break;
     case '8':
-        TJpgDec.drawJpg(7, 0, nixie_8_start, nixie_8_end - nixie_8_start);
+        TJpgDec.drawJpg(0, 0, nixie_8_start, nixie_8_end - nixie_8_start);
         break;
     case '9':
-        TJpgDec.drawJpg(7, 0, nixie_9_start, nixie_9_end - nixie_9_start);
+        TJpgDec.drawJpg(0, 0, nixie_9_start, nixie_9_end - nixie_9_start);
         break;
     case ' ':
-        TJpgDec.drawJpg(7, 0, nixie_colon_off_start, nixie_colon_off_end - nixie_colon_off_start);
+        TJpgDec.drawJpg(0, 0, nixie_colon_off_start, nixie_colon_off_end - nixie_colon_off_start);
         break;
     case ':':
-        TJpgDec.drawJpg(7, 0, nixie_colon_on_start, nixie_colon_on_end - nixie_colon_on_start);
+        TJpgDec.drawJpg(0, 0, nixie_colon_on_start, nixie_colon_on_end - nixie_colon_on_start);
         break;
     }
 }
