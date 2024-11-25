@@ -108,10 +108,20 @@ void ClockWidget::changeClockType() {
     switch (m_type)
     {
     case ClockType::NORMAL:
-        m_type = ClockType::NIXIE;
-        break;
+        if (USE_CLOCK_NIXIE) {
+            // If nixie is enabled, use it, otherwise fall through
+            m_type = ClockType::NIXIE;
+            break;
+        }
     
     case ClockType::NIXIE:
+        if (USE_CLOCK_CUSTOM) {
+            // If custom is enabled, use it, otherwise fall through
+            m_type = ClockType::CUSTOM;
+            break;
+        }
+    
+    default:
         m_type = ClockType::NORMAL;
         break;
     }
@@ -140,12 +150,12 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing) {
-    if (m_type == ClockType::NIXIE) {
+    if (m_type == ClockType::NIXIE || m_type == ClockType::CUSTOM) {
         if (digit == ":" && color == BG_COLOR) {
             // Show colon off
-            displayNixie(displayIndex, " ");
+            displayImage(displayIndex, " ");
         } else {
-            displayNixie(displayIndex, digit);
+            displayImage(displayIndex, digit);
         }
     } else {
         // Normal clock
@@ -196,11 +206,24 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
     }
 }
 
+void ClockWidget::displayImage(int displayIndex, String digit) {
+    switch (m_type)
+    {
+    case ClockType::NIXIE:
+        displayNixie(displayIndex, digit);
+        break;
+    
+    case ClockType::CUSTOM:
+        displayCustom(displayIndex, digit);
+        break;
+    }
+}
+
 void ClockWidget::displayNixie(int displayIndex, String digit) {
+#if USE_CLOCK_NIXIE
     if (digit.length() != 1) {
         return;
     }
-    int m_digit;
     m_manager.selectScreen(displayIndex);
     TJpgDec.setJpgScale(1);
     switch (digit.charAt(0)) {
@@ -241,6 +264,55 @@ void ClockWidget::displayNixie(int displayIndex, String digit) {
         TJpgDec.drawJpg(0, 0, nixie_colon_on_start, nixie_colon_on_end - nixie_colon_on_start);
         break;
     }
+#endif
+}
+
+void ClockWidget::displayCustom(int displayIndex, String digit) {
+#if USE_CLOCK_CUSTOM
+    if (digit.length() != 1) {
+        return;
+    }
+    m_manager.selectScreen(displayIndex);
+    TJpgDec.setJpgScale(1);
+    switch (digit.charAt(0)) {
+    case '0':
+        TJpgDec.drawJpg(0, 0, clock_custom_0_start, clock_custom_0_end - clock_custom_0_start);
+        break;
+    case '1':
+        TJpgDec.drawJpg(0, 0, clock_custom_1_start, clock_custom_1_end - clock_custom_1_start);
+        break;
+    case '2':
+        TJpgDec.drawJpg(0, 0, clock_custom_2_start, clock_custom_2_end - clock_custom_2_start);
+        break;
+    case '3':
+        TJpgDec.drawJpg(0, 0, clock_custom_3_start, clock_custom_3_end - clock_custom_3_start);
+        break;
+    case '4':
+        TJpgDec.drawJpg(0, 0, clock_custom_4_start, clock_custom_4_end - clock_custom_4_start);
+        break;
+    case '5':
+        TJpgDec.drawJpg(0, 0, clock_custom_5_start, clock_custom_5_end - clock_custom_5_start);
+        break;
+    case '6':
+        TJpgDec.drawJpg(0, 0, clock_custom_6_start, clock_custom_6_end - clock_custom_6_start);
+        break;
+    case '7':
+        TJpgDec.drawJpg(0, 0, clock_custom_7_start, clock_custom_7_end - clock_custom_7_start);
+        break;
+    case '8':
+        TJpgDec.drawJpg(0, 0, clock_custom_8_start, clock_custom_8_end - clock_custom_8_start);
+        break;
+    case '9':
+        TJpgDec.drawJpg(0, 0, clock_custom_9_start, clock_custom_9_end - clock_custom_9_start);
+        break;
+    case ' ':
+        TJpgDec.drawJpg(0, 0, clock_custom_colon_off_start, clock_custom_colon_off_end - clock_custom_colon_off_start);
+        break;
+    case ':':
+        TJpgDec.drawJpg(0, 0, clock_custom_colon_on_start, clock_custom_colon_on_end - clock_custom_colon_on_start);
+        break;
+    }
+#endif
 }
 
 String ClockWidget::getName() {
