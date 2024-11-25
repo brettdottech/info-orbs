@@ -9,9 +9,9 @@
 #define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN                                 // Language selection for Month and Weekday - possible values are EN, DE, FR
 
-// NIGHTTIME DIM
-//#define DIM_START_HOUR 22  // Dim the screen at this time (24h format)
-//#define DIM_END_HOUR 7     // Undim the screen at this time (24h format)
+// NIGHTTIME DIMMING
+//#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)
+//#define DIM_END_HOUR 7     // Undim the screens at this time (24h format)
 //#define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
 
 // CLOCK CONFIGURATION
