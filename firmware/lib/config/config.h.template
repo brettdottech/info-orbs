@@ -1,32 +1,45 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-
 // ============= CONFIGURE THESE FIELDS BEFORE FLASHING ====================================================
 
+// MAIN CONFIGURATION
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
-#define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
-#define WEATHER_SCREEN_MODE Light // Can be either Light or Dark 
-#define WEATHER_UNITS_METRIC // Comment this line out (or delete it) if you want imperial units for the weather
-#define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,SPY,APC&country=Germany" // Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on "&country=Canada" to narrow down to your ticker)
-//#define PARQET_PORTFOLIO_ID "" // set the id of your parqet.com portfolio. Make sure the portfolio is set to public!
-#define FORMAT_24_HOUR false // Toggle 24 hour clock vs 12 hour clock, change between true/false
-#define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
-#define SHOW_SECOND_TICKS true // Ticking indicator on the centre clock
-#define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
-//#define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
-//#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
-#define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X seconds, set to 0 to disable
-#define LOCALE EN // Language selection for Month and Weekday - values are EN, DE, FR
-//#define DIM_START_HOUR 22 // Dim the screen at this time (24h format)
-//#define DIM_END_HOUR 7 // Undim the screen at this time (24h format)
+#define INVERTED_ORBS false                       // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
+#define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
+#define LOCALE EN                                 // Language selection for Month and Weekday - possible values are EN, DE, FR
+
+// NIGHTTIME DIM
+//#define DIM_START_HOUR 22  // Dim the screen at this time (24h format)
+//#define DIM_END_HOUR 7     // Undim the screen at this time (24h format)
 //#define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
 
-// OPTIONAL CONFIGURATION FIELDS
+// CLOCK CONFIGURATION
+#define FORMAT_24_HOUR false       // Toggle 24 hour clock vs 12 hour clock, change between true/false
+#define SHOW_AM_PM_INDICATOR false // AM/PM on the clock if using 12 hour
+#define SHOW_SECOND_TICKS true     // Ticking indicator on the centre clock
+#define USE_CLOCK_NIXIE true       // Set to true to enable Nixie style clock
+#define USE_CLOCK_CUSTOM false     // Set to true to enable custom clock (see images/ClockWidget/custom/README-CustomClock.txt)
+
+// WEATHER CONFIGURATION
+#define WEATHER_LOCATION "Victoria, BC" // City/state for the weather
+#define WEATHER_SCREEN_MODE Dark       // Can be either Light or Dark 
+#define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather
+
+// STOCK TICKER CONFIGURATION
+#define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,SPY,APC&country=Germany" // Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on "&country=Canada" to narrow down to your ticker)
+
+// PARQET.COM PORTFOLIO CONFIGURATION
+//#define PARQET_PORTFOLIO_ID "" // set the id of your parqet.com portfolio. Make sure the portfolio is set to public!
+
+// WEB DATA CONFIGURATION
+//#define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
+//#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
+
+// WIFI CONFIGURATION
 // Normally WiFi should be configured using a smartphone or computer to connect to the Info-Orbs
 // configuration portal. But as a fall-back method, WiFi can be setup by uncommenting these 2 lines and
 // changing the SSID and password.
-
 //#define WIFI_SSID "MyWiFiRouter" // Wifi router SSID name (use only 2.4 GHz network)
 //#define WIFI_PASS "WiFiPassword" // Wifi router password
 
