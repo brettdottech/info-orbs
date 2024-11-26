@@ -120,12 +120,10 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     int centre = 120;
     int arrowOffsetX = 0;
     int arrowOffsetY = -109;
- 
 
-
-// Outputs
-    m_manager.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
-    m_manager.fillRect(0,111, screenWidth, 20, TFT_LIGHTGREY);  
+    // Outputs
+    m_manager.fillRect(0, 70, screenWidth, 49, TFT_WHITE);
+    m_manager.fillRect(0, 111, screenWidth, 20, TFT_LIGHTGREY);
     int smallFontSize = 11;
     int bigFontSize = 29;
     m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
@@ -151,7 +149,6 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
 
     m_manager.drawString(stock.getCurrencySymbol() + stock.getCurrentPrice(2), centre, 155, bigFontSize, Align::MiddleCenter);
-  
 }
 
 String StockWidget::getName() {
