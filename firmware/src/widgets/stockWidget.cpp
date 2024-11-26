@@ -7,9 +7,17 @@
 #include <iomanip>
 
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
-#ifdef STOCK_TICKER_LIST
-    char stockList[strlen(STOCK_TICKER_LIST) + 1];
-    strcpy(stockList, STOCK_TICKER_LIST);
+    String readstocks;
+
+    readstocks = "";
+    readstocks = ReadData("stockticker");
+    Serial.println(readstocks);
+    if (readstocks == ""){
+        readstocks = stocklistconfig;
+    }
+
+    char stockList[strlen(readstocks.c_str()) + 1];
+    strcpy(stockList, readstocks.c_str());
 
     char *symbol = strtok(stockList, ",");
     m_stockCount = 0;
@@ -23,7 +31,15 @@ StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
             break;
         }
     } while (symbol = strtok(nullptr, ","));
-#endif
+}
+
+String StockWidget::ReadData(const char* val){
+  Preferences orbspref;
+
+  orbspref.begin("info-orbs",false);
+  String ret = orbspref.getString(val);
+  orbspref.end();
+  return ret;
 }
 
 void StockWidget::setup() {

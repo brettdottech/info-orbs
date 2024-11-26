@@ -35,6 +35,15 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         changeMode();
 }
 
+String WeatherWidget::ReadData(const char* val){
+  Preferences orbspref;
+
+  orbspref.begin("info-orbs",false);
+  String ret = orbspref.getString(val);
+  orbspref.end();
+  return ret;
+}
+
 void WeatherWidget::setup() {
     m_time = GlobalTime::getInstance();
 #ifdef WEATHER_SCREEN_MODE
@@ -78,7 +87,17 @@ void WeatherWidget::update(bool force) {
 
 bool WeatherWidget::getWeatherData() {
     HTTPClient http;
-    http.begin(httpRequestAddress);
+    String httpComplete;
+    String readlocation;
+
+    readlocation = "";
+    readlocation = ReadData("weather_loc");
+    Serial.println(readlocation);
+    if (readlocation == ""){
+        readlocation = weatherLocation;
+    }
+    httpComplete = httpRequestAddress1 + readlocation + httpRequestAddress2;
+    http.begin(httpComplete);
     int httpCode = http.GET();
     if (httpCode > 0) { 
         // Check for the return code   TODO: factor out
@@ -230,14 +249,14 @@ void WeatherWidget::weatherText(int displayIndex) {
     String message = model.getCurrentText() + " ";
     String messageArr[4];
     int variableRangeS = 0;
-    int variableRangeE = 18;
+    int variableRangeE = 24;
     for (int i = 0; i < 4; i++) {
         while (message.substring(variableRangeE - 1, variableRangeE) != " ") {
             variableRangeE--;
         }
         messageArr[i] = message.substring(variableRangeS, variableRangeE);
         variableRangeS = variableRangeE;
-        variableRangeE = variableRangeS + 18;
+        variableRangeE = variableRangeS + 24;
     }
     //=== OVERFLOW END ==============================
 
@@ -248,7 +267,7 @@ void WeatherWidget::weatherText(int displayIndex) {
     m_manager.setFontColor(m_foregroundColor);
     m_manager.drawFittedString(cityName, centre, 80, 210, 50, Align::MiddleCenter);
 
-    auto y = 125;
+    auto y = 115;
     for (auto i = 0; i < 4; i++) {
         m_manager.drawCentreString(messageArr[i], centre, y, 15);
         y += 25;
