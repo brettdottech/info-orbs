@@ -36,11 +36,11 @@ private:
     GlobalTime* m_time;
     int8_t m_mode;
 
-    ScreenMode m_screenMode = Light;
-    int16_t m_foregroundColor;
-    int16_t m_backgroundColor;
-    int16_t m_invertedForegroundColor;
-    int16_t m_invertedBackgroundColor;
+    ScreenMode m_screenMode = Dark;
+    uint16_t m_foregroundColor;
+    uint16_t m_backgroundColor;
+    uint16_t m_invertedForegroundColor;
+    uint16_t m_invertedBackgroundColor;
 
     const long m_updateDelay = 600000;  // Weather refresh rate
     unsigned long m_lastUpdate = 0;
