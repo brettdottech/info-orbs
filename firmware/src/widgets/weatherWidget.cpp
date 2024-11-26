@@ -67,7 +67,7 @@ void WeatherWidget::update(bool force) {
         if (force) {
             int retry = 0;
             while (!getWeatherData() && retry++ < MAX_RETRIES)
-                ;
+                {}
         } else {
             getWeatherData();
         }

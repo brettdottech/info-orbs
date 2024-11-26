@@ -9,7 +9,7 @@ StockDataModel &StockDataModel::setCurrencySymbol(String currencySymbol) {
         if (currencySymbol == "EUR"){
             m_currencySymbol = m_currencySymbolEUR;
         } else if (currencySymbol == "GBP"){
-            m_currencySymbol = m_currencySymbolGBP ;
+            m_currencySymbol = m_currencySymbolGBP;
         } else if (getSymbol().indexOf("/EUR") != -1){
             m_currencySymbol = m_currencySymbolEUR;
         } else if (getSymbol().indexOf("/GBP") != -1){
