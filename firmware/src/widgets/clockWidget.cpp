@@ -59,6 +59,9 @@ void ClockWidget::displayAmPm(uint32_t color) {
     m_manager.selectScreen(2);
     m_manager.setFontColor(color, TFT_BLACK);
     String am_pm = time->isPM() ? "PM" : "AM";
+    if (CLOCK_FONT == DSEG7) {
+        m_manager.setFont(DSEG14);
+    }
     m_manager.drawString(am_pm, SCREEN_SIZE / 4 * 3, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
 }
 
@@ -161,7 +164,7 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
         // Normal clock
         int fontSize = CLOCK_FONT_SIZE;
         char c = digit.charAt(0);
-        bool isDigit = c >= '0' && c <= '9';
+        bool isDigit = c >= '0' && c <= '9' || c == ' ';
         int defaultX = SCREEN_SIZE / 2 + (isDigit ? CLOCK_OFFSET_X_DIGITS : CLOCK_OFFSET_X_COLON);
         int defaultY = SCREEN_SIZE / 2;
         DigitOffset digitOffset = getOffsetForDigit(digit);
