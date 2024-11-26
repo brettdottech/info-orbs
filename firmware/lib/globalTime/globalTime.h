@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <config_helper.h>
+#include <Preferences.h>
 
 // Define locales
 #define EN 0
@@ -56,6 +57,7 @@ class GlobalTime {
    private:
     GlobalTime();
     ~GlobalTime();
+    String ReadData(const char* val);
 
     static GlobalTime *m_instance;
 
@@ -82,6 +84,8 @@ class GlobalTime {
     bool m_format24hour{FORMAT_24_HOUR};
 
     void getTimeZoneOffsetFromAPI();
+
+    const String timezoneconfig = TIMEZONE_API_LOCATION;
 };
 
 #endif

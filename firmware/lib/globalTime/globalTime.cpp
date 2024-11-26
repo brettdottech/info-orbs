@@ -22,6 +22,15 @@ GlobalTime *GlobalTime::getInstance() {
     return m_instance;
 }
 
+String GlobalTime::ReadData(const char* val){
+  Preferences orbspref;
+
+  orbspref.begin("info-orbs",false);
+  String ret = orbspref.getString(val);
+  orbspref.end();
+  return ret;
+}
+
 void GlobalTime::updateTime() {
     if (millis() - m_updateTimer > m_oneSecond) {
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
@@ -131,8 +140,17 @@ bool GlobalTime::isPM() {
 }
 
 void GlobalTime::getTimeZoneOffsetFromAPI() {
+    String readtimezone;
+
+    readtimezone = "";
+    readtimezone = ReadData("timezone");
+    Serial.println(readtimezone);
+    if (readtimezone == ""){
+        readtimezone = timezoneconfig;
+    }
+
     HTTPClient http;
-    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + String(TIMEZONE_API_LOCATION));
+    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + readtimezone);
     int httpCode = http.GET();
 
     if (httpCode > 0) {
