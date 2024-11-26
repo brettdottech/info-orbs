@@ -21,35 +21,35 @@ void ClockWidget::draw(bool force) {
     GlobalTime* time = GlobalTime::getInstance();
     
     if (m_lastDisplay1Digit != m_display1Digit || force) {
-        displayDigit(0, m_lastDisplay1Digit, m_display1Digit, FOREGROUND_COLOR);
+        displayDigit(0, m_lastDisplay1Digit, m_display1Digit, CLOCK_COLOR);
         m_lastDisplay1Digit = m_display1Digit;
     }
     if (m_lastDisplay2Digit != m_display2Digit || force) {
-        displayDigit(1, m_lastDisplay2Digit, m_display2Digit, FOREGROUND_COLOR);
+        displayDigit(1, m_lastDisplay2Digit, m_display2Digit, CLOCK_COLOR);
         m_lastDisplay2Digit = m_display2Digit;
     }
     if (m_lastDisplay4Digit != m_display4Digit || force) {
-        displayDigit(3, m_lastDisplay4Digit, m_display4Digit, FOREGROUND_COLOR);
+        displayDigit(3, m_lastDisplay4Digit, m_display4Digit, CLOCK_COLOR);
         m_lastDisplay4Digit = m_display4Digit;
     }
     if (m_lastDisplay5Digit != m_display5Digit || force) {
-        displayDigit(4, m_lastDisplay5Digit, m_display5Digit, FOREGROUND_COLOR);
+        displayDigit(4, m_lastDisplay5Digit, m_display5Digit, CLOCK_COLOR);
         m_lastDisplay5Digit = m_display5Digit;
     }
 
     if (m_secondSingle != m_lastSecondSingle || force) {
         if (m_secondSingle % 2 == 0) {
-            displayDigit(2, "", ":", FOREGROUND_COLOR, false);
+            displayDigit(2, "", ":", CLOCK_COLOR, false);
         } else {
-            displayDigit(2, "", ":", BG_COLOR, false);
+            displayDigit(2, "", ":", CLOCK_SHADOW_COLOR, false);
         }
 #if SHOW_SECOND_TICKS == true
         displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
-        displaySeconds(2, m_secondSingle, FOREGROUND_COLOR);
+        displaySeconds(2, m_secondSingle, CLOCK_COLOR);
 #endif
         m_lastSecondSingle = m_secondSingle;
         if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
-            displayAmPm(FOREGROUND_COLOR);
+            displayAmPm(CLOCK_COLOR);
         }
     }
 }
@@ -154,7 +154,7 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 
 void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing) {
     if (m_type == ClockType::NIXIE || m_type == ClockType::CUSTOM) {
-        if (digit == ":" && color == BG_COLOR) {
+        if (digit == ":" && color == CLOCK_SHADOW_COLOR) {
             // Show colon off
             displayImage(displayIndex, " ");
         } else {
@@ -171,7 +171,7 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
         DigitOffset lastDigitOffset = getOffsetForDigit(lastDigit);
         m_manager.selectScreen(displayIndex);
         if (shadowing) {
-            m_manager.setFontColor(BG_COLOR, TFT_BLACK);
+            m_manager.setFontColor(CLOCK_SHADOW_COLOR, TFT_BLACK);
             if (CLOCK_FONT == DSEG14) {
                 // DSEG14 (from DSEGstended) uses # to fill all segments
                 m_manager.drawString("#", defaultX, defaultY, fontSize, Align::MiddleCenter);
@@ -193,11 +193,11 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color) {
-    displayDigit(displayIndex, lastDigit, digit, color, SHADOWING);
+    displayDigit(displayIndex, lastDigit, digit, color, CLOCK_SHADOWING);
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (m_type == ClockType::NIXIE && color == FOREGROUND_COLOR) {
+    if (m_type == ClockType::NIXIE && color == CLOCK_COLOR) {
         // Special color (orange) for nixie
         color = 0xfd40;
     }
