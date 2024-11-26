@@ -10,6 +10,9 @@
 #include <utils.h>
 #include <icons.h>
 #include <config_helper.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <Preferences.h>
 
 
 #ifdef STOCK_TICKER_LIST
@@ -75,6 +78,92 @@ void setupButtons() {
   attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
 }
 
+bool restart_orb{false};
+AsyncWebServer server(80);
+Preferences preferences;
+
+const char* PARAM_INPUT_1 = "Timezone";
+const char* PARAM_INPUT_2 = "Location";
+const char* PARAM_INPUT_3 = "Stockticker";
+const char* PARAM_INPUT_4 = "Widgetcycle";
+
+Preferences htmlpref;
+String html_timezone;
+String html_location;
+String html_stockticker;
+String html_widgetcycle;
+
+// HTML web page to handle 3 input fields (input1, input2, input3)
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html><head>
+  <title>Info-Orbs Configuration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+  <form action="/get">
+    Timezone (current value %TIMEZONE_HTML%): <input type="text" name="Timezone">
+    <input type="submit" value="Submit">
+  </form><br>
+  <form action="/get">
+    Location (current value %LOCATION_HTML%): <input type="text" name="Location">
+    <input type="submit" value="Submit">
+  </form><br>
+  <form action="/get">
+    Stockticker (current value %STOCKTICKER_HTML%): <input type="text" name="Stockticker">
+    <input type="submit" value="Submit">
+  </form><br>
+  <form action="/get">
+    Widget Cycle in seconds (current value %WIDGETCYCLE_HTML% - set to 0 to disable): <input type="text" name="Widgetcycle">
+    <input type="submit" value="Submit">
+  </form><br>
+  </body></html>)rawliteral";
+
+void notFound(AsyncWebServerRequest *request) {
+  request->send(404, "text/plain", "Not found");
+}
+
+void StoreData(const char* key, const char* val){
+  preferences.begin("info-orbs",false);
+  preferences.putString(key, val);
+  preferences.end();
+}
+
+// Replaces placeholder with stored values
+String processor(const String& var){
+    if(var == "TIMEZONE_HTML"){
+      if (html_timezone != ""){
+          return html_timezone;  
+      }
+      else {
+          return ("");
+      }
+    }
+    else if(var == "LOCATION_HTML"){
+      if (html_location != ""){
+          return html_location;  
+      }
+      else {
+          return ("");
+      }
+    }
+    else if(var == "STOCKTICKER_HTML"){
+      if (html_stockticker != ""){
+          return html_stockticker;  
+      }
+      else {
+          return ("");
+      }
+    }
+    else if(var == "WIDGETCYCLE_HTML"){
+      if (html_widgetcycle != ""){
+          return html_widgetcycle;  
+      }
+      else {
+          return ("0");
+      }
+    }
+    return String();
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -134,6 +223,68 @@ void setup() {
 #endif
 
   m_widgetCycleDelayPrev = millis();
+
+  htmlpref.begin("info-orbs",false);
+  html_timezone = htmlpref.getString("timezone");
+  html_location = htmlpref.getString("weather_loc");
+  html_stockticker = htmlpref.getString("stockticker");
+  html_widgetcycle = htmlpref.getString("widgetcycle");
+  htmlpref.end();
+
+  if (html_widgetcycle != "")
+  {
+      m_widgetCycleDelay = html_widgetcycle.toInt() * 1000;
+  }
+
+// Send web page with input fields to client
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, processor);
+  });
+  
+  // Send a GET request to <ESP_IP>/get?input1=<inputMessage>
+  server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    String inputParam;
+    // GET input1 value on <ESP_IP>/get?input1=<inputMessage>
+    if (request->hasParam(PARAM_INPUT_1)) {
+      inputMessage = request->getParam(PARAM_INPUT_1)->value();
+      inputParam = PARAM_INPUT_1;
+      StoreData("timezone",inputMessage.c_str());
+      restart_orb = true;
+    }
+    // GET input2 value on <ESP_IP>/get?input2=<inputMessage>
+    else if (request->hasParam(PARAM_INPUT_2)) {
+      inputMessage = request->getParam(PARAM_INPUT_2)->value();
+      inputParam = PARAM_INPUT_2;
+      StoreData("weather_loc",inputMessage.c_str());
+      restart_orb = true;
+    }
+    // GET input3 value on <ESP_IP>/get?input3=<inputMessage>
+    else if (request->hasParam(PARAM_INPUT_3)) {
+      inputMessage = request->getParam(PARAM_INPUT_3)->value();
+      inputParam = PARAM_INPUT_3;
+      StoreData("stockticker",inputMessage.c_str());
+      restart_orb = true;
+    }
+    // GET input4 value on <ESP_IP>/get?input4=<inputMessage>
+    else if (request->hasParam(PARAM_INPUT_4)) {
+      inputMessage = request->getParam(PARAM_INPUT_4)->value();
+      inputParam = PARAM_INPUT_4;
+      StoreData("widgetcycle",inputMessage.c_str());
+      restart_orb = true;
+    }
+    else {
+      inputMessage = "No message sent";
+      inputParam = "none";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/html", "<script> function goBack() {window.history.back();}setTimeout(goBack, 10000);</script>Data sent to your ESP on input field (" 
+                                     + inputParam + ") with value: " + inputMessage +
+                                     "<br><a href=\"/\">Return to Home Page or wait 10 seconds</a>");
+                                     
+  });
+  server.onNotFound(notFound);
+  server.begin();
 }
 
 void checkCycleWidgets() {
@@ -196,5 +347,10 @@ void loop() {
     widgetSet->drawCurrent();
     
     checkCycleWidgets();
+
+    if (restart_orb == true){
+      delay(1000);
+      ESP.restart();
+    }
   }
 }
