@@ -4,7 +4,22 @@
 #include <globalTime.h>
 #include <widget.h>
 #include <TJpg_Decoder.h>
+
+#ifndef USE_CLOCK_NIXIE
+#define USE_CLOCK_NIXIE true
+#endif
+
+#ifndef USE_CLOCK_CUSTOM
+#define USE_CLOCK_CUSTOM false
+#endif
+
+#if USE_CLOCK_NIXIE
 #include <nixie.h>
+#endif
+
+#if USE_CLOCK_CUSTOM
+#include <clock-custom.h>
+#endif
 
 #ifndef CLOCK_FONT
 #define CLOCK_FONT DSEG7
@@ -30,6 +45,10 @@
 // #define CLOCK_DIGITS_OFFSET { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 #endif
 
+#ifndef DEFAULT_CLOCK
+#define DEFAULT_CLOCK ClockType::NORMAL
+#endif
+
 struct DigitOffset {
     int x;
     int y;
@@ -37,7 +56,8 @@ struct DigitOffset {
 
 enum class ClockType {
     NORMAL,
-    NIXIE
+    NIXIE,
+    CUSTOM
 };
 
 class ClockWidget : public Widget {
@@ -57,10 +77,12 @@ class ClockWidget : public Widget {
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(uint32_t color);
     DigitOffset getOffsetForDigit(const String& digit);
+    void displayImage(int displayIndex, String digit);
     void displayNixie(int displayIndex, String digit);
+    void displayCustom(int displayIndex, String digit);
     void changeClockType();
 
-    ClockType m_type = ClockType::NORMAL;
+    ClockType m_type = DEFAULT_CLOCK;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
