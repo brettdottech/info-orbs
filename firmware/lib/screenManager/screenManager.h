@@ -22,9 +22,6 @@ class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
 
-    TFT_eSPI& getDisplay();
-    OpenFontRender &getRender();
-
     void selectScreen(int screen);
     void selectAllScreens();
     void reset();
@@ -88,6 +85,8 @@ private:
     TTF_Font m_curFont = TTF_Font::NONE;
     uint8_t m_brightness = TFT_BRIGHTNESS;
 
+    TFT_eSPI& getDisplay();
+    OpenFontRender &getRender();
     unsigned int getScaledFontSize(unsigned int fontSize);
     uint16_t dim(uint16_t color);
 };
