@@ -51,7 +51,7 @@ void WifiWidget::setup() {
 
     // Add the last 2 digits of the MAC address onto the end of the config portal SSID
     // so each Info-Orbs has a unique SSID
-		m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
+    m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
 
     // WiFiManager automatically connects using saved credentials...
     if (wifimgr.autoConnect(m_apssid.c_str())) {
@@ -92,7 +92,7 @@ void WifiWidget::update(bool force) {
         if (m_dotsString.length() > 9) {
             m_dotsString = "";
         }
-		if (m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
+        if (m_connectionTimer > m_connectionTimeout && !m_configPortalRunning) {
             m_connectionFailed = true;
             connectionTimedOut();
         }
