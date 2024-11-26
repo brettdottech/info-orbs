@@ -80,8 +80,8 @@ void WebDataElementModel::parseData(JsonObject doc, int32_t defaultColor, int32_
     }
 }
 
-void WebDataElementModel::draw(TFT_eSPI& display) {
+void WebDataElementModel::draw(ScreenManager& manager) {
     if (m_element != nullptr && getType() != OTHER) {
-        m_element->draw(display);
+        m_element->draw(manager);
     }
 }

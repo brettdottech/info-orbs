@@ -13,12 +13,15 @@ void WidgetSet::add(Widget *widget) {
   m_widgetCount++;
 }
 
-void WidgetSet::drawCurrent() {
+void WidgetSet::drawCurrent(bool force) {
   if (m_clearScreensOnDrawCurrent) {
     m_screenManager->clearAllScreens();
     m_clearScreensOnDrawCurrent = false;
+    m_widgets[m_currentWidget]->draw(true);
+  } else {
+    m_widgets[m_currentWidget]->draw(force);
   }
-  m_widgets[m_currentWidget]->draw();
+  
 }
 
 void WidgetSet::updateCurrent() {
@@ -90,4 +93,25 @@ void WidgetSet::initializeAllWidgetsData() {
   showLoading();
   updateAll();
   m_initialized = true;
+}
+
+void WidgetSet::updateBrightnessByTime(uint8_t hour24) {
+#if defined(DIM_START_HOUR) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
+  bool isInDimRange;
+
+  if (DIM_START_HOUR < DIM_END_HOUR) {
+      // Normal case: the range does not cross midnight
+      isInDimRange = (hour24 >= DIM_START_HOUR && hour24 < DIM_END_HOUR);
+  } else {
+      // Case where the range crosses midnight
+      isInDimRange = (hour24 >= DIM_START_HOUR || hour24 < DIM_END_HOUR);
+  }
+
+  uint8_t brightness = isInDimRange ? DIM_BRIGHTNESS : TFT_BRIGHTNESS;
+  if (m_screenManager->setBrightness(brightness)) {
+    // brightness was changed -> update widget
+    m_screenManager->clearAllScreens();
+    drawCurrent(true);
+  }
+#endif
 }

@@ -2,7 +2,7 @@
 #define WEB_DATA_ELEMENT_H
 
 #include <ArduinoJson.h>
-#include <TFT_eSPI.h>
+#include <screenManager.h>
 
 class WebDataElement {
    public:
@@ -13,7 +13,7 @@ class WebDataElement {
 
     virtual void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground);
 
-    virtual void draw(TFT_eSPI& display);
+    virtual void draw(ScreenManager& manager);
 
    protected:
     bool m_changed = false;

@@ -1,5 +1,6 @@
 #include "screenManager.h"
 #include <Arduino.h>
+#include <utils.h>
 
 ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
 
@@ -111,22 +112,36 @@ void ScreenManager::clearScreen(int screen) {
 }
 
 void ScreenManager::fillScreen(uint32_t color) {
-  m_tft.fillScreen(color);
+  m_tft.fillScreen(dim(color));
   // Set background for aliasing as well
-  m_render.setBackgroundColor(color);
+  m_render.setBackgroundColor(dim(color));
+}
+
+bool ScreenManager::setBrightness(uint8_t brightness) {
+  if (m_brightness != brightness) {
+    Serial.printf("Brightness set to %d\n", brightness);
+    m_brightness = brightness;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+uint8_t ScreenManager::getBrightness() {
+  return m_brightness;
 }
 
 void ScreenManager::setFontColor(uint32_t color) {
-  m_render.setFontColor(color);
+  m_render.setFontColor(dim(color));
 }
 
 void ScreenManager::setFontColor(uint32_t color, uint32_t background) {
-  m_render.setFontColor(color);
-  m_render.setBackgroundColor(background);
+  m_render.setFontColor(dim(color));
+  m_render.setBackgroundColor(dim(background));
 }
 
 void ScreenManager::setBackgroundColor(uint32_t color) {
-  m_render.setBackgroundColor(color);
+  m_render.setBackgroundColor(dim(color));
 }
 
 void ScreenManager::setAlignment(Align align) {
@@ -174,11 +189,16 @@ void ScreenManager::drawString(const String &text, int x, int y, unsigned int fo
   if (fgColor == -1) {
     // Keep current FG color
     fgColor = m_render.getFontColor();
+  } else {
+    fgColor = dim(fgColor);
   }
   if (bgColor == -1) {
     // Keep current BG color
     bgColor = m_render.getBackgroundColor();
+  } else {
+    bgColor = dim(bgColor);
   }
+
   // Dirty hack to correct misaligned Y
   // See https://github.com/takkaO/OpenFontRender/issues/38
   FT_BBox box = m_render.calculateBoundingBox(0,0,fontSize,Align::TopLeft,Layout::Horizontal, text.c_str());
@@ -200,24 +220,40 @@ void ScreenManager::drawFittedString(const String &text, int x, int y, int limit
   drawFittedString(text, x, y, limit_w, limit_h, m_render.getAlignment());
 }
 
+void ScreenManager::drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
+  m_tft.drawRect(x, y, w, h, dim(color));
+}
+
 void ScreenManager::fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color) {
-  m_tft.fillRect(x, y, w, h, color);
+  m_tft.fillRect(x, y, w, h, dim(color));
 }
 
 void ScreenManager::drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uint32_t color) {
-  m_tft.drawLine(xs, ys, xe, ye, color);
+  m_tft.drawLine(xs, ys, xe, ye, dim(color));
 }
 
 void ScreenManager::drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc) {
-  m_tft.drawArc(x, y, r, ir, startAngle, endAngle, fg_color, bg_color, smoothArc);
+  m_tft.drawArc(x, y, r, ir, startAngle, endAngle, dim(fg_color), dim(bg_color), smoothArc);
 }
 
 void ScreenManager::drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool roundEnds) {
-  m_tft.drawSmoothArc(x, y, r, ir, startAngle, endAngle, fg_color, bg_color, roundEnds);
+  m_tft.drawSmoothArc(x, y, r, ir, startAngle, endAngle, dim(fg_color), dim(bg_color), roundEnds);
+}
+
+void ScreenManager::drawTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {
+  m_tft.drawTriangle(x1, y1, x2, y2, x3, y3, dim(color));
 }
 
 void ScreenManager::fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color) {
-  m_tft.fillTriangle(x1, y1, x2, y2, x3, y3, color);
+  m_tft.fillTriangle(x1, y1, x2, y2, x3, y3, dim(color));
+}
+
+void ScreenManager::drawCircle(int32_t x, int32_t y, int32_t r, uint32_t color) {
+  m_tft.drawCircle(x, y, r, dim(color));
+}
+
+void ScreenManager::fillCircle(int32_t x, int32_t y, int32_t r, uint32_t color) {
+  m_tft.fillCircle(x, y, r, dim(color));
 }
 
 unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
@@ -227,4 +263,45 @@ unsigned int ScreenManager::getScaledFontSize(unsigned int fontSize) {
     }
   }
   return fontSize;
+}
+
+// get the dimmed color (using current brightness)
+uint16_t ScreenManager::dim(uint16_t color) {
+  return Utils::rgb565dim(color, m_brightness);
+}
+
+int16_t ScreenManager::getLegacyFontHeight() {
+  return m_tft.fontHeight();
+}
+
+void ScreenManager::setLegacyTextColor(uint16_t color) {
+  m_tft.setTextColor(dim(color));
+}
+
+void ScreenManager::setLegacyTextColor(uint16_t fgcolor, uint16_t bgcolor, bool bgfill) {
+  m_tft.setTextColor(dim(fgcolor), dim(bgcolor), bgfill);
+}
+
+void ScreenManager::setLegacyTextDatum(uint8_t datum) {
+  m_tft.setTextDatum(datum);
+}
+
+void ScreenManager::setLegacyTextSize(uint8_t size) {
+  m_tft.setTextSize(size);
+}
+
+void ScreenManager::setLegacyTextFont(uint8_t font) {
+  m_tft.setTextFont(font);
+}
+
+void ScreenManager::drawLegacyString(const String& string, int32_t x, int32_t y) {
+  m_tft.drawString(string, x, y);
+}
+
+void ScreenManager::drawLegacyString(const String& string, int32_t x, int32_t y, uint8_t font) {
+  m_tft.drawString(string, x, y, font);
+}
+
+int16_t ScreenManager::drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font) {
+  return m_tft.drawChar(uniCode, x, y, font);
 }

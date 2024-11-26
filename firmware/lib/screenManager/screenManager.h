@@ -14,6 +14,10 @@
 #define DEFAULT_FONT ROBOTO_REGULAR
 #endif
 
+#ifndef TFT_BRIGHTNESS
+#define TFT_BRIGHTNESS 255
+#endif
+
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI& tft);
@@ -29,6 +33,9 @@ public:
     void clearAllScreens();
     void fillScreen(uint32_t color);
     void clearScreen(int screen=-1);
+
+    bool setBrightness(uint8_t brightness);
+    uint8_t getBrightness();
 
     // Set TTF parameters for next drawString()
     void setFont(TTF_Font font);
@@ -53,19 +60,36 @@ public:
     void drawFittedString(const String &text, int x, int y, int limit_w, int limit_h);
 
     // Drawing stuff
+    void drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
     void fillRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color);
     void drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uint32_t color);
     void drawArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool smoothArc = true);
     void drawSmoothArc(int32_t x, int32_t y, int32_t r, int32_t ir, uint32_t startAngle, uint32_t endAngle, uint32_t fg_color, uint32_t bg_color, bool roundEnds = false);
+    void drawTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color);
     void fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color);
+    void drawCircle(int32_t x, int32_t y, int32_t r, uint32_t color);
+    void fillCircle(int32_t x, int32_t y, int32_t r, uint32_t color);
 
+    // Legacy text function (not using TTF)
+    int16_t getLegacyFontHeight();
+    void setLegacyTextColor(uint16_t color);
+    void setLegacyTextColor(uint16_t fgcolor, uint16_t bgcolor, bool bgfill = false);
+    void setLegacyTextDatum(uint8_t datum);
+    void setLegacyTextSize(uint8_t size);
+    void setLegacyTextFont(uint8_t font);
+    void drawLegacyString(const String& string, int32_t x, int32_t y);
+    void drawLegacyString(const String& string, int32_t x, int32_t y, uint8_t font);
+    int16_t drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font);
+    
 private:
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI& m_tft;
     OpenFontRender m_render;
     TTF_Font m_curFont = TTF_Font::NONE;
+    uint8_t m_brightness = TFT_BRIGHTNESS;
 
     unsigned int getScaledFontSize(unsigned int fontSize);
+    uint16_t dim(uint16_t color);
 };
 
 #endif // SCREENMANAGER_H

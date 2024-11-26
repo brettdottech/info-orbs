@@ -43,16 +43,20 @@ int connectionTimer{0};
 const int connectionTimeout{10000};
 bool isConnected{true};
 
-bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
-    if (y >= tft.height())
-        return 0;
-    tft.pushImage(x, y, w, h, bitmap);
-    return 1;
-}
-
 ScreenManager* sm;
 WidgetSet* widgetSet;
 
+// This function should probably be moved somewhere else
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
+    if (y >= tft.height())
+        return 0;
+    // Dim bitmap
+    for (int i=0; i < w*h; i++) {
+      bitmap[i] = Utils::rgb565dim(bitmap[i], sm->getBrightness(), true);
+    }
+    tft.pushImage(x, y, w, h, bitmap);
+    return 1;
+}
 
 /**
  * The ISR handlers must be static
@@ -76,13 +80,13 @@ void setup() {
   Serial.println();
   Serial.println("Starting up...");
 
-
   TJpgDec.setSwapBytes(true); // JPEG rendering setup
   TJpgDec.setCallback(tft_output);
   setupButtons();
 
   sm = new ScreenManager(tft);
   sm->fillAllScreens(TFT_BLACK);
+  sm->setFontColor(TFT_WHITE);
 
   sm->selectScreen(0);
   sm->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
@@ -184,12 +188,13 @@ void loop() {
       widgetSet->initializeAllWidgetsData();
     }
     globalTime->updateTime();
-
+    
     checkButtons();
 
     widgetSet->updateCurrent();
+    widgetSet->updateBrightnessByTime(globalTime->getHour24());
     widgetSet->drawCurrent();
-
+    
     checkCycleWidgets();
   }
 }

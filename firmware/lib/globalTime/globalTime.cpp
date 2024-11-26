@@ -36,6 +36,7 @@ void GlobalTime::updateTime() {
         } else {
             m_hour = hourFormat12(m_unixEpoch);
         }
+        m_hour24 = hour(m_unixEpoch);
         m_second = second(m_unixEpoch);
 
         m_day = day(m_unixEpoch);
@@ -54,6 +55,10 @@ void GlobalTime::getHourAndMinute(int &hour, int &minute) {
 
 int GlobalTime::getHour() {
     return m_hour;
+}
+
+int GlobalTime::getHour24() {
+    return m_hour24;
 }
 
 String GlobalTime::getHourPadded() {

@@ -27,7 +27,7 @@ void WebDataWidget::draw(bool force) {
         }
         if (data->isChanged() || force) {
             m_manager.selectScreen(i);
-            data->draw(m_manager.getDisplay());
+            data->draw(m_manager);
 
             data->setChangedStatus(false);
         }

@@ -78,10 +78,10 @@ void WebDataElementCircleModel::parseData(const JsonObject& doc, int32_t default
     }
 }
 
-void WebDataElementCircleModel::draw(TFT_eSPI& display) {
+void WebDataElementCircleModel::draw(ScreenManager& manager) {
     if (getFilled()) {
-        display.fillCircle(getX(), getY(), getRadius(), getColor());
+        manager.fillCircle(getX(), getY(), getRadius(), getColor());
     } else {
-        display.drawCircle(getX(), getY(), getRadius(), getColor());
+        manager.drawCircle(getX(), getY(), getRadius(), getColor());
     }
 }

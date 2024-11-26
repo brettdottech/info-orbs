@@ -127,6 +127,6 @@ void WebDataElementArcModel::parseData(const JsonObject& doc, int32_t defaultCol
     }
 }
 
-void WebDataElementArcModel::draw(TFT_eSPI& display) {
-    display.drawArc(getX(), getY(), getRadius(), getInnerRadius(), getAngleStart(), getAngleEnd(), getColor(), getBackgroundColor(), true);
+void WebDataElementArcModel::draw(ScreenManager& manager) {
+    manager.drawArc(getX(), getY(), getRadius(), getInnerRadius(), getAngleStart(), getAngleEnd(), getColor(), getBackgroundColor(), true);
 }

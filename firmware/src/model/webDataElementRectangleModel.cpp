@@ -106,10 +106,10 @@ void WebDataElementRectangleModel::parseData(const JsonObject& doc, int32_t defa
     }
 }
 
-void WebDataElementRectangleModel::draw(TFT_eSPI& display) {
+void WebDataElementRectangleModel::draw(ScreenManager& manager) {
     if (getFilled()) {
-        display.fillRect(getX(), getY(), getWidth(), getHeight(), getColor());
+        manager.fillRect(getX(), getY(), getWidth(), getHeight(), getColor());
     } else {
-        display.drawRect(getX(), getY(), getWidth(), getHeight(), getColor());
+        manager.drawRect(getX(), getY(), getWidth(), getHeight(), getColor());
     }
 }

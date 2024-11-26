@@ -36,6 +36,7 @@ class GlobalTime {
     void updateTime();
     void getHourAndMinute(int &hour, int &minute);
     int getHour();
+    int getHour24();
     String getHourPadded();
     int getMinute();
     String getMinutePadded();
@@ -60,6 +61,7 @@ class GlobalTime {
 
     time_t m_unixEpoch;
     int m_hour = 0;
+    int m_hour24 = 0;
     int m_minute = 0;
     int m_second = 0;
     int m_day = 0;
