@@ -18,6 +18,9 @@
 #define FORMAT_24_HOUR false            // Toggle 24 hour clock vs 12 hour clock, change between true/false
 #define SHOW_AM_PM_INDICATOR false      // AM/PM on the clock if using 12 hour
 #define SHOW_SECOND_TICKS true          // Ticking indicator on the centre clock
+#define CLOCK_COLOR 0xfc80              // Orange for clock
+#define CLOCK_SHADOW_COLOR 0x20a1       // Clock shadow color (Light brown)
+#define CLOCK_SHADOWING true            // Use clock shadow (set to false to disable)
 #define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock
 #define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README-CustomClock.txt)
 #define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM
@@ -109,14 +112,9 @@
 #define SMOOTH_FONT
 #define SPI_FREQUENCY 27000000
 
-#define SHADOWING 1
-
 #define TIMEZONE_API_KEY "97R9WKDPBLIO"
 #define TIMEZONE_API_URL "http://api.timezonedb.com/v2.1/get-time-zone"
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
-
-#define BG_COLOR 0x20a1         // Clock shadow color (Light brown)
-#define FOREGROUND_COLOR 0xfc80  // Orange for clock
 
 #define MAX_RETRIES 3
 

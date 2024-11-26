@@ -45,6 +45,18 @@
 // #define CLOCK_DIGITS_OFFSET { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 #endif
 
+#ifndef CLOCK_COLOR
+#define CLOCK_COLOR FOREGROUND_COLOR
+#endif
+
+#ifndef CLOCK_SHADOW_COLOR
+#define CLOCK_SHADOW_COLOR BG_COLOR
+#endif
+
+#ifndef CLOCK_SHADOWING
+#define CLOCK_SHADOWING SHADOWING
+#endif
+
 #ifndef DEFAULT_CLOCK
 #define DEFAULT_CLOCK ClockType::NORMAL
 #endif
