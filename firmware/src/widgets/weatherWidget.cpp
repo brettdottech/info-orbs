@@ -299,7 +299,6 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         shortDayName.remove(3);
         m_manager.drawString(shortDayName, x, 154, fontSize, Align::MiddleCenter);
     }
-
 }
 
 int WeatherWidget::getClockStamp() {
