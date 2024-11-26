@@ -10,6 +10,7 @@
 #include <widget.h>
 #include <utils.h>
 #include "model/weatherDataModel.h"
+#include <Preferences.h>
 
 class WeatherWidget : public Widget {
    public:
@@ -32,6 +33,7 @@ private:
     bool getWeatherData();
     int getClockStamp();
     void configureColors();
+    String ReadData(const char* val);
 
     GlobalTime* m_time;
     int8_t m_mode;
@@ -64,9 +66,16 @@ private:
 #endif
     const String weatherApiKey = WEATHER_API_KEY;
 
-    const String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
-                                      weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                      "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
+#if LOCALE==DE  // German
+    const String httpRequestAddress1 = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
+    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=de";
+#elif LOCALE==FR // French
+    const String httpRequestAddress1 = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
+    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=fr";
+#else // English
+    const String httpRequestAddress1 = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
+    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=en";
+#endif
 
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;

@@ -7,6 +7,7 @@
 
 #include "model/stockDataModel.h"
 #include "widget.h"
+#include <Preferences.h>
 
 #define MAX_STOCKS 5
 
@@ -24,6 +25,7 @@ class StockWidget : public Widget {
    private:
     void getStockData(StockDataModel &stock);
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
+    String ReadData(const char* val);
 
 
     unsigned long m_stockDelay = 900000;  //default to 15m between updates
@@ -31,5 +33,7 @@ class StockWidget : public Widget {
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
+
+    const String stocklistconfig = STOCK_TICKER_LIST;
 };
 #endif  // STOCK_WIDGET_H
