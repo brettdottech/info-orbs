@@ -36,7 +36,6 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void WeatherWidget::setup() {
-    m_lastUpdate = millis() - m_updateDelay + 1000;
     m_time = GlobalTime::getInstance();
 #ifdef WEATHER_SCREEN_MODE
     m_screenMode = WEATHER_SCREEN_MODE;
@@ -63,7 +62,7 @@ void WeatherWidget::draw(bool force) {
 }
 
 void WeatherWidget::update(bool force) {
-    if (force || m_lastUpdate == 0 || (millis() - m_lastUpdate) >= m_updateDelay) {
+    if (force || m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
         setBusy(true);
         if (force) {
             int retry = 0;
@@ -73,7 +72,7 @@ void WeatherWidget::update(bool force) {
             getWeatherData();
         }
         setBusy(false);
-        m_lastUpdate = millis();
+        m_weatherDelayPrev = millis();
     }
 }
 
