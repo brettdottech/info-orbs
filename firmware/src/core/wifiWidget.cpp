@@ -34,7 +34,7 @@ void WifiWidget::setup() {
     wifimgr.setShowInfoUpdate(false);
     wifimgr.setShowInfoErase(false);
     wifimgr.setMenu(wm_menu);
-  
+
     // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {

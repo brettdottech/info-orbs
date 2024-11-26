@@ -19,7 +19,7 @@ void ClockWidget::setup() {
 void ClockWidget::draw(bool force) {
     m_manager.setFont(CLOCK_FONT);
     GlobalTime* time = GlobalTime::getInstance();
-    
+
     if (m_lastDisplay1Digit != m_display1Digit || force) {
         displayDigit(0, m_lastDisplay1Digit, m_display1Digit, CLOCK_COLOR);
         m_lastDisplay1Digit = m_display1Digit;
@@ -116,14 +116,14 @@ void ClockWidget::changeClockType() {
             m_type = ClockType::NIXIE;
             break;
         }
-    
+
     case ClockType::NIXIE:
         if (USE_CLOCK_CUSTOM) {
             // If custom is enabled, use it, otherwise fall through
             m_type = ClockType::CUSTOM;
             break;
         }
-    
+
     default:
         m_type = ClockType::NORMAL;
         break;
@@ -181,7 +181,7 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
             } else {
                 // Other fonts can't be shadowed
                 m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
-                m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);    
+                m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
             }
         } else {
             m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
@@ -215,7 +215,7 @@ void ClockWidget::displayImage(int displayIndex, String digit) {
     case ClockType::NIXIE:
         displayNixie(displayIndex, digit);
         break;
-    
+
     case ClockType::CUSTOM:
         displayCustom(displayIndex, digit);
         break;

@@ -74,7 +74,7 @@ void ParqetDataModel::getChartDataScale(uint8_t maxY, float &scale, float &minVa
         if (m_chartdata[i] < _minVal)
             _minVal = m_chartdata[i];
         if (m_chartdata[i] > _maxVal)
-            _maxVal = m_chartdata[i];            
+            _maxVal = m_chartdata[i];
     }
     float zero = 0;
     // the chart will always show zero, we need to take that into account for our scale
