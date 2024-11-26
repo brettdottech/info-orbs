@@ -42,8 +42,8 @@ private:
     uint16_t m_invertedForegroundColor;
     uint16_t m_invertedBackgroundColor;
 
-    const long m_updateDelay = 600000;  // Weather refresh rate
-    unsigned long m_lastUpdate = 0;
+    const long m_weatherDelay = 600000;  // Weather refresh rate
+    unsigned long m_weatherDelayPrev = 0;
 
     const int centre = 120;  // Centre location of the screen(240x240)
 
