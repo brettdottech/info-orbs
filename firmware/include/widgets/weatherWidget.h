@@ -33,8 +33,6 @@ private:
     int getClockStamp();
     void configureColors();
 
-    int drawDegrees(const String& number, int x, int y, uint8_t font, uint8_t size, uint8_t outerRadius, uint8_t innerRadius, int16_t textColor, int16_t backgroundColor);
-
     GlobalTime* m_time;
     int8_t m_mode;
 
@@ -68,7 +66,7 @@ private:
 
     const String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
                                       weatherLocation + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                      "&include=days,current&iconSet=icons1";
+                                      "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;

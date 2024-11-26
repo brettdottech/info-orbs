@@ -23,7 +23,7 @@
 TFT_eSPI tft = TFT_eSPI();
 
 #ifdef WIDGET_CYCLE_DELAY
-unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY;  // Automatically cycle widgets every X ms, set to 0 to disable
+unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY * 1000;  // Automatically cycle widgets every X seconds, set to 0 to disable
 #else
 unsigned long m_widgetCycleDelay = 0;
 #endif
@@ -82,21 +82,18 @@ void setup() {
   setupButtons();
 
   sm = new ScreenManager(tft);
-  sm->selectAllScreens();
-  sm->getDisplay().fillScreen(TFT_BLACK);
-  sm->reset();
-  TFT_eSPI &display = sm->getDisplay();
-  display.setTextSize(1);
-  display.setTextColor(TFT_WHITE);
+  sm->fillAllScreens(TFT_BLACK);
 
   sm->selectScreen(0);
-  display.drawCentreString("welcome", ScreenCenterX, ScreenCenterY, 4);
+  sm->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
+
   sm->selectScreen(1);
-  display.drawCentreString("info-Orbs", ScreenCenterX, ScreenCenterY - 30, 4);
-  display.drawCentreString("by", ScreenCenterX, ScreenCenterY, 4);
-  display.drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 4);
+  sm->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 40, 22);
+  sm->drawCentreString("by", ScreenCenterX, ScreenCenterY, 22);
+  sm->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 40, 22);
 
   sm->selectScreen(2);
+
   TJpgDec.setJpgScale(1);
   TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
 

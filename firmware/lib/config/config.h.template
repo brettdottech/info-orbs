@@ -16,7 +16,7 @@
 #define INVERTED_ORBS false // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
 //#define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
-#define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X ms, set to 0 to disable
+#define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN // Language selection for Month and Weekday - values are EN, DE, FR
 
 // OPTIONAL CONFIGURATION FIELDS
@@ -26,6 +26,10 @@
 
 //#define WIFI_SSID "MyWiFiRouter" // Wifi router SSID name (use only 2.4 GHz network)
 //#define WIFI_PASS "WiFiPassword" // Wifi router password
+
+// TRUETYPE FONT CONFIGURATION
+//#define DEFAULT_FONT ROBOTO_REGULAR
+//#define CLOCK_FONT DSEG7
 
 // ============= END OF USER CONFIGURATION =================================================================
 

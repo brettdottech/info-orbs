@@ -25,6 +25,7 @@ void ParqetWidget::setup()
 
 void ParqetWidget::draw(bool force)
 {
+    m_manager.setFont(DEFAULT_FONT);
     // Check if we need more than one page
     bool isMultiPage = m_portfolio.getHoldingsCount() > (m_showClock ? 4 : 5);
     // Do we need to update the screens because cycle time is expired
@@ -210,8 +211,8 @@ void ParqetWidget::updatePortfolio()
                 }
                 else
                 {
-                    String id = holding["_id"].as<String>();
-                    Serial.printf("Invalid type: %s, id: %s\n", type.c_str(), id.c_str());
+                    // String id = holding["_id"].as<String>();
+                    // Serial.printf("Invalid type: %s, id: %s\n", type.c_str(), id.c_str());
                 }
             }
             // Add total
@@ -340,75 +341,54 @@ void ParqetWidget::updatePortfolioChart()
 void ParqetWidget::clearScreen(int8_t displayIndex, int32_t background)
 {
     m_manager.selectScreen(displayIndex);
-    TFT_eSPI &display = m_manager.getDisplay();
-    display.fillScreen(background);
+    m_manager.fillScreen(background);
 }
 
 void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32_t color, String extra, uint32_t extraColor)
 {
-    Serial.printf("displayClock at screen %d\n", displayIndex);
+    // Serial.printf("displayClock at screen %d\n", displayIndex);
     m_manager.selectScreen(displayIndex);
 
-    TFT_eSPI &display = m_manager.getDisplay();
-
     int clky = 105;
-    int center = 120;
 
-    display.setTextSize(1);
-    display.fillScreen(background);
-    display.setTextColor(color);
-    display.setTextDatum(MC_DATUM);
+    m_manager.fillScreen(background);
+    m_manager.setFontColor(color);
+    m_manager.drawString(m_time->getDayAndMonth(), ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
 
-    display.drawString(m_time->getDayAndMonth(), center, clky + 60, 4);
+    m_manager.drawString(m_time->getHourPadded(), ScreenCenterX - 10, clky, 66, Align::MiddleRight);
+    m_manager.drawString(m_time->getMinutePadded(), ScreenCenterX + 10, clky, 66, Align::MiddleLeft);
+    m_manager.drawString(":", ScreenCenterX, clky, 66, Align::MiddleCenter);
 
-    display.setTextDatum(MR_DATUM);
-    display.drawString(m_time->getHourPadded(), center - 5, clky, 8);
+    m_manager.fillRect(0, 0, 240, 50, extraColor);
+    m_manager.setBackgroundColor(extraColor);
+    m_manager.drawString(extra, ScreenCenterX, 27, 18, Align::MiddleCenter);
 
-    display.setTextDatum(ML_DATUM);
-    display.drawString(m_time->getMinutePadded(), center + 5, clky, 8);
-
-    display.setTextDatum(MC_DATUM);
-    display.drawString(":", center, clky, 8);
-
-    display.fillRect(0, 0, 240, 50, extraColor);
-    display.setTextDatum(MC_DATUM);
-    display.drawString(extra, center, 27, 4);
-
-    display.fillRect(0, 190, 240, 50, extraColor);
-    display.drawString(getTimeframe(), center, 210, 4);
+    m_manager.fillRect(0, 190, 240, 50, extraColor);
+    m_manager.drawString(getTimeframe(), ScreenCenterX, 212, 22, Align::MiddleCenter);
 }
 
 void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor)
 {
-    Serial.printf("displayStock(): display=%d, stock=%s\n", displayIndex, stock.getName().c_str());
+    // Serial.printf("displayStock(): display=%d, stock=%s\n", displayIndex, stock.getName().c_str());
     m_manager.selectScreen(displayIndex);
+    m_manager.fillScreen(backgroundColor);
+    m_manager.setFontColor(textColor);
 
-    TFT_eSPI &display = m_manager.getDisplay();
-
-    display.fillScreen(backgroundColor);
-    display.setTextColor(textColor);
-    display.setTextSize(1);
-    display.setTextDatum(MC_DATUM);
-
-    // Calculate center positions
-    int screenWidth = display.width();
-    int center = 120;
-
-    display.drawString(stock.getCurrency(), center, 30, 4);
+    m_manager.drawString(stock.getCurrency(), ScreenCenterX, 27, 15, Align::MiddleCenter);
     if (stock.getId() != "total" || m_showTotalValue)
     {
         if (m_showValues)
         {
-            display.drawString(stock.getCurrentValue(2), center, 62, 4);
+            m_manager.drawString(stock.getCurrentValue(2), ScreenCenterX, 58, 26, Align::MiddleCenter);
         }
         else
         {
-            display.drawString(stock.getCurrentPrice(2), center, 62, 4);
+            m_manager.drawString(stock.getCurrentPrice(2), ScreenCenterX, 58, 26, Align::MiddleCenter);
         }
     }
     else
     {
-        display.drawString("Portfolio", center, 62, 4);
+        m_manager.drawString("Portfolio", ScreenCenterX, 58, 26, Align::MiddleCenter);
     }
 
     if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() >= 7)
@@ -424,7 +404,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         int xOffset = (240 - (spaceInBetween + 1) * (chartDataCount - 1)) / 2;
         m_portfolio.getChartDataScale(chartHeight, scale, minVal, maxVal, chartMinVal);
         int zeroAtY = endLine + round(chartMinVal * scale);
-        Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
+        // Serial.printf("Scale: %f, minVal: %f, maxVal: %f, zeroAtY: %d, siB=%d, xOff=%d\n", scale, minVal, maxVal, zeroAtY, spaceInBetween, xOffset);
         for (int i = 0; i < chartDataCount; i++)
         {
             int x = (spaceInBetween + 1) * i + xOffset;
@@ -434,13 +414,13 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
             if (spaceInBetween == 0)
             {
                 // Draw one line
-                display.drawLine(x, zeroAtY, x, y, positive ? TFT_DARKGREEN : TFT_RED);
+                m_manager.drawLine(x, zeroAtY, x, y, positive ? TFT_DARKGREEN : TFT_RED);
             }
             else if (spaceInBetween == 1)
             {
                 // Draw two lines
-                display.drawLine(x, zeroAtY, x, y, positive ? TFT_DARKGREEN : TFT_RED);
-                display.drawLine(x + 1, zeroAtY, x + 1, y, positive ? TFT_DARKGREEN : TFT_RED);
+                m_manager.drawLine(x, zeroAtY, x, y, positive ? TFT_DARKGREEN : TFT_RED);
+                m_manager.drawLine(x + 1, zeroAtY, x + 1, y, positive ? TFT_DARKGREEN : TFT_RED);
             }
             else
             {
@@ -456,37 +436,33 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
                     myY -= h;
                 }
                 // Serial.printf("Drawing rect %d, v=%f, @ %d/%d/%d/%d\n", i, chartData[i], x - spaceInBetween/2, myY, spaceInBetween, h);
-                display.fillRect(x - spaceInBetween / 2, myY, spaceInBetween, h, positive ? TFT_DARKGREEN : TFT_RED);
+                m_manager.fillRect(x - spaceInBetween / 2, myY, spaceInBetween, h, positive ? TFT_DARKGREEN : TFT_RED);
             }
         }
         // display.drawLine(0, zeroAtY, 240, zeroAtY, TFT_WHITE);
-        display.fillRect(0, zeroAtY - 1, 240, 3, TFT_WHITE);
+        m_manager.fillRect(0, zeroAtY - 1, 240, 3, TFT_WHITE);
         int minAtY = zeroAtY - round(minVal * scale);
         int maxAtY = zeroAtY - round(maxVal * scale);
-        Serial.printf("min/max lines would be at %d/%d\n", minAtY, maxAtY);
+        // Serial.printf("min/max lines would be at %d/%d\n", minAtY, maxAtY);
         if (zeroAtY < minAtY - 15 || zeroAtY > minAtY)
         {
             // Show minVal if the zero line is not interfering
-            display.drawLine(0, minAtY, 240, minAtY, TFT_DARKGREY);
-            display.setTextDatum(BL_DATUM);
-            display.drawString(String(minVal) + "%", 25, minAtY, 2);
+            m_manager.drawLine(0, minAtY, 240, minAtY, TFT_DARKGREY);
+            m_manager.drawString(String(minVal) + "%", 25, minAtY, 11, Align::BottomLeft);
         }
         if (zeroAtY > maxAtY + 15 || zeroAtY < maxAtY)
         {
             // Show maxVal if the zero line is not interfering
-            display.drawLine(0, maxAtY, 240, maxAtY, TFT_DARKGREY);
-            display.setTextDatum(TL_DATUM);
-            display.drawString(String(maxVal) + "%", 25, maxAtY, 2);
+            m_manager.drawLine(0, maxAtY, 240, maxAtY, TFT_DARKGREY);
+            m_manager.drawString(String(maxVal) + "%", 25, maxAtY, 11, Align::TopLeft);
         }
     }
     else
     {
         // Draw stock data (multiline)
-        display.setTextSize(1);
-
         String wrappedLines[MAX_WRAPPED_LINES];
         String dataValues = stock.getName();
-        int yOffset = 102;
+        int yOffset = 100;
         int lineCount = Utils::getWrappedLines(wrappedLines, dataValues, 14);
         if (lineCount > PARQET_MAX_STOCKNAME_LINES)
         {
@@ -496,11 +472,11 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         yOffset += (PARQET_MAX_STOCKNAME_LINES - lineCount) * height / 2;
         for (int i = 0; i < lineCount; i++)
         {
-            display.drawString(wrappedLines[i], 120, yOffset + (height * i), 4);
+            // Lager font if we need less lines
+            int fontSize = 17 + 6/lineCount;
+            m_manager.drawString(wrappedLines[i], 120, yOffset + (height * i), fontSize, Align::MiddleCenter);
         }
     }
-
-    display.setTextDatum(MC_DATUM);
 
     uint32_t stockColor = TFT_DARKGREY;
     if (stock.getPercentChange() < 0)
@@ -512,11 +488,11 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
         stockColor = TFT_DARKGREEN;
     }
 
-    display.setTextColor(stockColor);
-    display.fillRect(0, 80, screenWidth, 5, stockColor);
-    display.fillRect(0, 176, screenWidth, 5, stockColor);
-    display.drawArc(120, 120, 120, 115, 0, 360, stockColor, backgroundColor);
-    display.drawString(stock.getPercentChange(2) + "%", center, 203, 4);
+    m_manager.setFontColor(stockColor);
+    m_manager.fillRect(0, 80, ScreenWidth, 5, stockColor);
+    m_manager.fillRect(0, 176, ScreenWidth, 5, stockColor);
+    m_manager.drawArc(120, 120, 120, 115, 0, 360, stockColor, backgroundColor);
+    m_manager.drawString(stock.getPercentChange(2) + "%", ScreenCenterX, 205, 22, Align::MiddleCenter);
 }
 
 String ParqetWidget::getName()

@@ -34,6 +34,7 @@ void StockWidget::setup() {
 }
 
 void StockWidget::draw(bool force) {
+    m_manager.setFont(DEFAULT_FONT);
     for (int8_t i = 0; i < m_stockCount; i++) {
         if (m_stocks[i].isChanged() || force) {
             displayStock(i, m_stocks[i], TFT_WHITE, TFT_BLACK);
@@ -109,13 +110,13 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     }
     m_manager.selectScreen(displayIndex);
 
-    TFT_eSPI &display = m_manager.getDisplay();
+    // TFT_eSPI &display = m_manager.getDisplay();
 
-    display.fillScreen(TFT_BLACK);
+    m_manager.fillScreen(TFT_BLACK);
 
 
     // Calculate center positions
-    int screenWidth = display.width();
+    int screenWidth = SCREEN_SIZE;
     int centre = 120;
     int arrowOffsetX = 0;
     int arrowOffsetY = -109;
@@ -123,35 +124,33 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
 
 
 // Outputs
-    display.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
-    display.fillRect(0,111, screenWidth, 15, TFT_LIGHTGREY);  
-    display.setTextSize(1);  
-    display.setTextColor(TFT_WHITE);
-    display.drawString("52 Week:", centre, 188, 1);
-    display.setTextDatum(ML_DATUM);
-    display.drawString("H: " + stock.getCurrencySymbol() + stock.getHighPrice(), 89, 201, 1);
-    display.drawString("L: " + stock.getCurrencySymbol() + stock.getLowPrice(), 89, 211, 1);
-    display.setTextDatum(CC_DATUM);
-    display.setTextColor(TFT_BLACK);
-    display.drawString(stock.getCompany(), centre, 118, 1);
-    display.setTextSize(4); 
+    m_manager.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
+    m_manager.fillRect(0,111, screenWidth, 20, TFT_LIGHTGREY);  
+    int smallFontSize = 11;
+    int bigFontSize = 29;
+    m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
+    m_manager.drawCentreString("52 Week:", centre, 185, smallFontSize);
+    m_manager.drawCentreString("H: " + stock.getCurrencySymbol() + stock.getHighPrice(), centre, 200, smallFontSize);
+    m_manager.drawCentreString("L: " + stock.getCurrencySymbol() + stock.getLowPrice(), centre, 215, smallFontSize);
+    m_manager.setFontColor(TFT_BLACK, TFT_LIGHTGREY);
+    m_manager.drawString(stock.getCompany(), centre, 121, smallFontSize, Align::MiddleCenter);
     if (stock.getPercentChange() < 0.0) {
-        display.setTextColor(TFT_RED, TFT_BLACK);
-        display.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
-        display.drawArc (centre, centre, 120, 118, 0, 360, TFT_RED, TFT_RED);
+        m_manager.setFontColor(TFT_RED, TFT_BLACK);
+        m_manager.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
+        m_manager.drawArc (centre, centre, 120, 118, 0, 360, TFT_RED, TFT_RED);
     } else {
-        display.setTextColor(TFT_GREEN, TFT_BLACK);
-        display.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
-        display.drawArc (centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
+        m_manager.setFontColor(TFT_GREEN, TFT_BLACK);
+        m_manager.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
+        m_manager.drawArc (centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
     }
-    display.drawString(stock.getPercentChange(2) + "%", centre, 49, 1);
+    m_manager.drawString(stock.getPercentChange(2) + "%", centre, 48, bigFontSize, Align::MiddleCenter);
     // Draw stock data
-    display.setTextColor(TFT_BLACK);
+    m_manager.setFontColor(TFT_BLACK, TFT_WHITE);
 
-    display.drawString(stock.getTicker(), centre, 93, 1);
-    display.setTextColor(TFT_WHITE);
+    m_manager.drawString(stock.getTicker(), centre, 92, bigFontSize, Align::MiddleCenter);
+    m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
 
-    display.drawString(stock.getCurrencySymbol() + stock.getCurrentPrice(2), centre, 155, 1);
+    m_manager.drawString(stock.getCurrencySymbol() + stock.getCurrentPrice(2), centre, 155, bigFontSize, Align::MiddleCenter);
   
 }
 
