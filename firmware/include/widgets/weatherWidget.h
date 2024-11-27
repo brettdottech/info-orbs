@@ -66,16 +66,8 @@ private:
 #endif
     const String weatherApiKey = WEATHER_API_KEY;
 
-#if LOCALE==DE  // German
     const String httpRequestAddress1 = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
-    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=de";
-#elif LOCALE==FR // French
-    const String httpRequestAddress1 = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
-    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=fr";
-#else // English
-    const String httpRequestAddress1 = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
-    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=en";
-#endif
+    const String httpRequestAddress2 = "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
