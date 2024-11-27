@@ -9,10 +9,8 @@
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
     String readstocks;
 
-    readstocks = "";
     readstocks = ReadData("stockticker");
-    Serial.println(readstocks);
-    if (readstocks == ""){
+    if (readstocks == "empty"){
         readstocks = stocklistconfig;
     }
 
@@ -37,7 +35,7 @@ String StockWidget::ReadData(const char* val){
   Preferences orbspref;
 
   orbspref.begin("info-orbs",false);
-  String ret = orbspref.getString(val);
+  String ret = orbspref.getString(val,"empty");
   orbspref.end();
   return ret;
 }
