@@ -130,7 +130,7 @@ void StoreData(const char* key, const char* val){
 // Replaces placeholder with stored values
 String processor(const String& var){
     if(var == "TIMEZONE_HTML"){
-      if (html_timezone != ""){
+      if (html_timezone != "empty"){
           return html_timezone;  
       }
       else {
@@ -138,7 +138,7 @@ String processor(const String& var){
       }
     }
     else if(var == "LOCATION_HTML"){
-      if (html_location != ""){
+      if (html_location != "empty"){
           return html_location;  
       }
       else {
@@ -146,7 +146,7 @@ String processor(const String& var){
       }
     }
     else if(var == "STOCKTICKER_HTML"){
-      if (html_stockticker != ""){
+      if (html_stockticker != "empty"){
           return html_stockticker;  
       }
       else {
@@ -154,7 +154,7 @@ String processor(const String& var){
       }
     }
     else if(var == "WIDGETCYCLE_HTML"){
-      if (html_widgetcycle != ""){
+      if (html_widgetcycle != "empty"){
           return html_widgetcycle;  
       }
       else {
@@ -233,12 +233,27 @@ void setup() {
   }
 
   htmlpref.begin("info-orbs",false);
-  html_timezone = htmlpref.getString("timezone");
-  html_location = htmlpref.getString("weather_loc");
-  html_stockticker = htmlpref.getString("stockticker");
-  html_widgetcycle = htmlpref.getString("widgetcycle");
+  html_timezone = htmlpref.getString("timezone","empty");
+  html_location = htmlpref.getString("weather_loc","empty");
+  html_stockticker = htmlpref.getString("stockticker","empty");
+  html_widgetcycle = htmlpref.getString("widgetcycle","empty");
+  htmlpref.end();
 
-  if (html_widgetcycle != "")
+  if (html_timezone == "empty"){
+      StoreData("timezone",TIMEZONE_API_LOCATION);
+  }
+  if (html_location == "empty"){
+      StoreData("weather_loc",WEATHER_LOCATION);
+  }
+  if (html_stockticker == "empty"){
+      StoreData("stockticker",STOCK_TICKER_LIST);
+  }
+  if (html_widgetcycle == "empty"){
+      int i_widgetcylce = WIDGET_CYCLE_DELAY;
+      StoreData("widgetcycle",String(i_widgetcylce).c_str());
+  }
+  
+  if (html_widgetcycle != "empty")
   {
       m_widgetCycleDelay = html_widgetcycle.toInt() * 1000;
   }
@@ -356,7 +371,6 @@ void loop() {
     checkCycleWidgets();
 
     if (restart_orb == true){
-      delay(1000);
       ESP.restart();
     }
   }
