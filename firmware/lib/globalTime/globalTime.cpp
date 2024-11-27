@@ -26,7 +26,7 @@ String GlobalTime::ReadData(const char* val){
   Preferences orbspref;
 
   orbspref.begin("info-orbs",false);
-  String ret = orbspref.getString(val);
+  String ret = orbspref.getString(val,"empty");
   orbspref.end();
   return ret;
 }
@@ -142,10 +142,8 @@ bool GlobalTime::isPM() {
 void GlobalTime::getTimeZoneOffsetFromAPI() {
     String readtimezone;
 
-    readtimezone = "";
     readtimezone = ReadData("timezone");
-    Serial.println(readtimezone);
-    if (readtimezone == ""){
+    if (readtimezone == "empty"){
         readtimezone = timezoneconfig;
     }
 
