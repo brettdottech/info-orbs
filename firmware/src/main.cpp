@@ -134,7 +134,7 @@ String processor(const String& var){
           return html_timezone;  
       }
       else {
-          return ("");
+          return (TIMEZONE_API_LOCATION);
       }
     }
     else if(var == "LOCATION_HTML"){
@@ -142,7 +142,7 @@ String processor(const String& var){
           return html_location;  
       }
       else {
-          return ("");
+          return (WEATHER_LOCATION);
       }
     }
     else if(var == "STOCKTICKER_HTML"){
@@ -150,7 +150,7 @@ String processor(const String& var){
           return html_stockticker;  
       }
       else {
-          return ("");
+          return (STOCK_TICKER_LIST);
       }
     }
     else if(var == "WIDGETCYCLE_HTML"){
@@ -158,7 +158,7 @@ String processor(const String& var){
           return html_widgetcycle;  
       }
       else {
-          return ("0");
+          return (String(WIDGET_CYCLE_DELAY));
       }
     }
     return String();
@@ -224,12 +224,19 @@ void setup() {
 
   m_widgetCycleDelayPrev = millis();
 
+  // Hold left button when connecting to power to reset preferences
+  // these are stored by Preferences in the namespace info-orbs
+  if (digitalRead(BUTTON_LEFT) == Button::PRESSED_LEVEL) {
+    htmlpref.begin("info-orbs",false);
+    htmlpref.clear();
+    htmlpref.end();
+  }
+
   htmlpref.begin("info-orbs",false);
   html_timezone = htmlpref.getString("timezone");
   html_location = htmlpref.getString("weather_loc");
   html_stockticker = htmlpref.getString("stockticker");
   html_widgetcycle = htmlpref.getString("widgetcycle");
-  htmlpref.end();
 
   if (html_widgetcycle != "")
   {
