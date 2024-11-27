@@ -1,8 +1,8 @@
 #ifndef CLOCKWIDGET_H
 #define CLOCKWIDGET_H
 
-#include <GlobalTime.h>
-#include <Widget.h>
+#include "GlobalTime.h"
+#include "Widget.h"
 #include <TJpg_Decoder.h>
 
 #ifndef USE_CLOCK_NIXIE
