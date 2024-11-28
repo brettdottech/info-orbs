@@ -93,29 +93,37 @@ String html_location;
 String html_stockticker;
 String html_widgetcycle;
 
-// HTML web page to handle 3 input fields (input1, input2, input3)
+// HTML web page to handle 4 input fields (input1, input2, input3, input4)
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html><head>
-  <title>Info-Orbs Configuration</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  </head><body>
-  <form action="/get">
-    Timezone (current value %TIMEZONE_HTML%): <input type="text" name="Timezone">
-    <input type="submit" value="Submit">
-  </form><br>
-  <form action="/get">
-    Location (current value %LOCATION_HTML%): <input type="text" name="Location">
-    <input type="submit" value="Submit">
-  </form><br>
-  <form action="/get">
-    Stockticker (current value %STOCKTICKER_HTML%): <input type="text" name="Stockticker">
-    <input type="submit" value="Submit">
-  </form><br>
-  <form action="/get">
-    Widget Cycle in seconds (current value %WIDGETCYCLE_HTML% - set to 0 to disable): <input type="text" name="Widgetcycle">
-    <input type="submit" value="Submit">
-  </form><br>
-  </body></html>)rawliteral";
+<title>Info-Orbs Configuration</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head><body>
+<table >
+<tbody>
+<tr>
+<td><form action="/get">Timezone <a title="" href="https://timezonedb.com/time-zones" target="_blank">(Lookup timezones here)</a> (current value %TIMEZONE_HTML%):</td>
+<td> <input type="text" name="Timezone"></td>
+<td><input type="submit" value="Submit"></form></td>
+</tr>
+<tr>
+<td><form action="/get">Location (current value %LOCATION_HTML%):</td>
+<td><input type="text" name="Location"></td>
+<td><input type="submit" value="Submit"></form></td>
+</tr>
+<tr>
+<td><form action="/get">Stockticker (current value %STOCKTICKER_HTML%):</td>
+<td><input type="text" name="Stockticker"></td>
+<td><input type="submit" value="Submit"></form></td>
+</tr>
+<tr>
+<td><form action="/get">Widget Cycle in seconds (current value %WIDGETCYCLE_HTML% - set to 0 to disable):</td>
+<td><input type="text" name="Widgetcycle"></td>
+<td><input type="submit" value="Submit"></form></td>
+</tr>
+</tbody>
+</table>
+</body></html>)rawliteral";
 
 void notFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
@@ -371,6 +379,7 @@ void loop() {
     checkCycleWidgets();
 
     if (restart_orb == true){
+      delay(1000);
       ESP.restart();
     }
   }
