@@ -1,4 +1,5 @@
 // mqttWidget.cpp
+#ifdef MQTT_WIDGET_HOST
 
 #include "mqttWidget.h"
 #include "ArduinoJson.h"
@@ -429,3 +430,4 @@ void MQTTWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
 }
+#endif

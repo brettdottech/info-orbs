@@ -49,7 +49,9 @@ ScreenManager *sm;
 WidgetSet *widgetSet;
 
 // Instantiate MQTTWidget pointer globally if needed
+#ifdef MQTT_WIDGET_HOST
 MQTTWidget *mqttWidgetInstance = nullptr;
+#endif
 
 // This function should probably be moved somewhere else
 bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
