@@ -1,15 +1,15 @@
 #ifndef WEB_DATA_WIDGET_H
 #define WEB_DATA_WIDGET_H
 
+#include "Widget.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include "Widget.h"
 
-#include "WebDataModel.h"
 #include "Utils.h"
+#include "WebDataModel.h"
 
 class WebDataWidget : public Widget {
-   public:
+public:
     WebDataWidget(ScreenManager &manager, String url);
     ~WebDataWidget() override;
     void setup() override;
@@ -18,7 +18,7 @@ class WebDataWidget : public Widget {
     void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
 
-   private:
+private:
     unsigned long m_lastUpdate = 0;
     unsigned long m_updateDelay = 1000;
     String httpRequestAddress;
@@ -26,4 +26,4 @@ class WebDataWidget : public Widget {
     int32_t m_defaultColor = TFT_WHITE;
     int32_t m_defaultBackground = TFT_BLACK;
 };
-#endif  // WEB_DATA_WIDGET_H
+#endif // WEB_DATA_WIDGET_H
