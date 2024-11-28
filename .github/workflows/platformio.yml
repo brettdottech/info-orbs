@@ -29,7 +29,7 @@ jobs:
 
       - name: Create config.h
         working-directory: ./firmware
-        run: cp lib/config/config.h.template lib/config/config.h
+        run: cp config/config.h.template config/config.h
 
       - name: Build PlatformIO Project
         run: pio run

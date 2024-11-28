@@ -1,22 +1,22 @@
-#include "core/wifiWidget.h"
-#include "widgetSet.h"
-#include "screenManager.h"
-#include "widgets/clockWidget.h"
-#include "widgets/weatherWidget.h"
-#include "widgets/webDataWidget.h"
+#include "config_helper.h"
+#include "wifiwidget/WifiWidget.h"
+#include "WidgetSet.h"
+#include "ScreenManager.h"
+#include "clockwidget/ClockWidget.h"
+#include "weatherwidget/WeatherWidget.h"
+#include "webdatawidget/WebDataWidget.h"
 #include <Arduino.h>
-#include <Button.h>
-#include <globalTime.h>
-#include <utils.h>
-#include <icons.h>
-#include <config_helper.h>
+#include "Button.h"
+#include "GlobalTime.h"
+#include "Utils.h"
+#include "icons.h"
 
 
 #ifdef STOCK_TICKER_LIST
-  #include <widgets/stockWidget.h>
+  #include "stockwidget/StockWidget.h"
 #endif
 #ifdef PARQET_PORTFOLIO_ID
-  #include <widgets/parqetWidget.h>
+  #include "parqetwidget/ParqetWidget.h"
 #endif
 
 
