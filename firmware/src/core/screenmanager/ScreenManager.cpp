@@ -182,7 +182,7 @@ void ScreenManager::drawString(const String &text, int x, int y) {
 void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, int32_t fgColor, int32_t bgColor, bool applyScale) {
   if (fontSize == 0) {
     // Keep current font size
-    fontSize == m_render.getFontSize();
+    fontSize = m_render.getFontSize();
   } else if (applyScale) {
     fontSize = getScaledFontSize(fontSize);
   }
