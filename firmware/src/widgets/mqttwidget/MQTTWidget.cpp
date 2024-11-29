@@ -161,7 +161,7 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
             if (orb) {
                 if (orb->jsonField.length() > 0) {
                     // The orb expects a specific JSON field
-                    StaticJsonDocument<3072> dataDoc;
+                    JsonDocument dataDoc;
                     DeserializationError dataError = deserializeJson(dataDoc, message);
                     if (dataError) {
                         Serial.print("Failed to parse data JSON: ");
@@ -253,7 +253,7 @@ void MQTTWidget::handleSetupMessage(const String &message) {
 //    Serial.println("Handling setup message...");
 
     // Parse JSON configuration
-    StaticJsonDocument<2048> doc;
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, message);
 
     if (error) {
@@ -283,7 +283,7 @@ void MQTTWidget::handleSetupMessage(const String &message) {
         String textColorStr = orbObj["orb-textcol"].as<String>();
 
         // Parse "jsonfield" (optional)
-        if (orbObj.containsKey("jsonfield")) {
+        if (orbObj["jsonfield"].is<String>()) {
             config.jsonField = orbObj["jsonfield"].as<String>();
         } else {
             config.jsonField = ""; // Default to empty if not provided
