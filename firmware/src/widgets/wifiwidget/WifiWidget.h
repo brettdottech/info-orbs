@@ -12,6 +12,7 @@ public:
     void update(bool force = false) override;
     void draw(bool force = false) override;
     void buttonPressed(uint8_t buttonId, ButtonState state) override;
+    void processWebPortalRequests();
     String getName() override;
 
     bool isConnected() { return m_isConnected; }
