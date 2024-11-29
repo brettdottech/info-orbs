@@ -2,7 +2,7 @@
 
 #include "config_helper.h"
 
-ClockWidget::ClockWidget(ScreenManager& manager) : Widget(manager) {
+ClockWidget::ClockWidget(ScreenManager &manager) : Widget(manager) {
 }
 
 ClockWidget::~ClockWidget() {
@@ -17,8 +17,8 @@ void ClockWidget::setup() {
 
 void ClockWidget::draw(bool force) {
     m_manager.setFont(CLOCK_FONT);
-    GlobalTime* time = GlobalTime::getInstance();
-    
+    GlobalTime *time = GlobalTime::getInstance();
+
     if (m_lastDisplay1Digit != m_display1Digit || force) {
         displayDigit(0, m_lastDisplay1Digit, m_display1Digit, CLOCK_COLOR);
         m_lastDisplay1Digit = m_display1Digit;
@@ -54,7 +54,7 @@ void ClockWidget::draw(bool force) {
 }
 
 void ClockWidget::displayAmPm(uint32_t color) {
-    GlobalTime* time = GlobalTime::getInstance();
+    GlobalTime *time = GlobalTime::getInstance();
     m_manager.selectScreen(2);
     m_manager.setFontColor(color, TFT_BLACK);
     String am_pm = time->isPM() ? "PM" : "AM";
@@ -69,7 +69,7 @@ void ClockWidget::update(bool force) {
         return;
     }
 
-    GlobalTime* time = GlobalTime::getInstance();
+    GlobalTime *time = GlobalTime::getInstance();
     m_hourSingle = time->getHour();
 
     m_minuteSingle = time->getMinute();
@@ -83,7 +83,7 @@ void ClockWidget::update(bool force) {
                 m_display1Digit = " ";
             }
         } else {
-            m_display1Digit = int(m_hourSingle/10);
+            m_display1Digit = int(m_hourSingle / 10);
         }
         m_display2Digit = m_hourSingle % 10;
 
@@ -101,28 +101,27 @@ void ClockWidget::update(bool force) {
 }
 
 void ClockWidget::change24hMode() {
-    GlobalTime* time = GlobalTime::getInstance();
-    time->setFormat24Hour( !time->getFormat24Hour() );
+    GlobalTime *time = GlobalTime::getInstance();
+    time->setFormat24Hour(!time->getFormat24Hour());
     draw(true);
 }
 
 void ClockWidget::changeClockType() {
-    switch (m_type)
-    {
+    switch (m_type) {
     case ClockType::NORMAL:
         if (USE_CLOCK_NIXIE) {
             // If nixie is enabled, use it, otherwise fall through
             m_type = ClockType::NIXIE;
             break;
         }
-    
+
     case ClockType::NIXIE:
         if (USE_CLOCK_CUSTOM) {
             // If custom is enabled, use it, otherwise fall through
             m_type = ClockType::CUSTOM;
             break;
         }
-    
+
     default:
         m_type = ClockType::NORMAL;
         break;
@@ -151,7 +150,7 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
     return {0, 0};
 }
 
-void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color, bool shadowing) {
+void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
     if (m_type == ClockType::NIXIE || m_type == ClockType::CUSTOM) {
         if (digit == ":" && color == CLOCK_SHADOW_COLOR) {
             // Show colon off
@@ -180,7 +179,7 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
             } else {
                 // Other fonts can't be shadowed
                 m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
-                m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);    
+                m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
             }
         } else {
             m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
@@ -191,7 +190,7 @@ void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const 
     }
 }
 
-void ClockWidget::displayDigit(int displayIndex, const String& lastDigit, const String& digit, uint32_t color) {
+void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color) {
     displayDigit(displayIndex, lastDigit, digit, color, CLOCK_SHADOWING);
 }
 
@@ -209,12 +208,11 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
 }
 
 void ClockWidget::displayImage(int displayIndex, String digit) {
-    switch (m_type)
-    {
+    switch (m_type) {
     case ClockType::NIXIE:
         displayNixie(displayIndex, digit);
         break;
-    
+
     case ClockType::CUSTOM:
         displayCustom(displayIndex, digit);
         break;

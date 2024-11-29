@@ -153,7 +153,7 @@ void WebDataModel::setInitializedStatus(bool initialized) {
     m_isInitialized = initialized;
 }
 
-void WebDataModel::draw(ScreenManager& manager) {
+void WebDataModel::draw(ScreenManager &manager) {
     if (!m_isInitialized || isFullDraw()) {
         manager.fillScreen(getBackgroundColor());
         m_isInitialized = true;

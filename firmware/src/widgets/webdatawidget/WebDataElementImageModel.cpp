@@ -37,14 +37,14 @@ void WebDataElementImageModel::setImage(String image) {
     }
 }
 
-void WebDataElementImageModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataElementImageModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
     if (doc["y"].is<int32_t>()) {
         setY(doc["y"].as<int32_t>());
     }
-    if (const char* image = doc["image"]) {
+    if (const char *image = doc["image"]) {
         setImage(image);
     }
     // if (const char* imageUrl = doc["imageUrl"]) {
@@ -55,7 +55,7 @@ void WebDataElementImageModel::parseData(const JsonObject& doc, int32_t defaultC
     // }
 }
 
-void WebDataElementImageModel::draw(ScreenManager& manager) {
+void WebDataElementImageModel::draw(ScreenManager &manager) {
     // TODO implement displaying an image
     //  display.drawImage(getImage(), getX(), getY());
 }
@@ -101,7 +101,7 @@ bool getFile(String url, String filename) {
                 uint8_t buff[128] = {0};
 
                 // Get tcp stream
-                WiFiClient* stream = http.getStreamPtr();
+                WiFiClient *stream = http.getStreamPtr();
 
                 // Read all data from server
                 while (http.connected() && (len > 0 || len == -1)) {
@@ -131,5 +131,5 @@ bool getFile(String url, String filename) {
         }
         http.end();
     }
-    return 1;  // File was fetched from web
+    return 1; // File was fetched from web
 }

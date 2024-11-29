@@ -11,7 +11,7 @@
 #define MAX_STOCKS 5
 
 class StockWidget : public Widget {
-   public:
+public:
     StockWidget(ScreenManager &manager);
     void setup() override;
     void update(bool force = false) override;
@@ -21,15 +21,14 @@ class StockWidget : public Widget {
 
     void changeMode();
 
-   private:
+private:
     void getStockData(StockDataModel &stock);
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
-
-    unsigned long m_stockDelay = 900000;  //default to 15m between updates
+    unsigned long m_stockDelay = 900000; // default to 15m between updates
     unsigned long m_stockDelayPrev = 0;
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
 };
-#endif  // STOCK_WIDGET_H
+#endif // STOCK_WIDGET_H

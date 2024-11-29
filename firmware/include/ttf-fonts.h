@@ -18,8 +18,7 @@ struct TTF_FontMetric {
 };
 
 // Set scaling factor for each font if necessary
-const TTF_FontMetric ttfFontMetrics[] = { { ROBOTO_REGULAR, 1.37 }, { FINAL_FRONTIER, 1.5 } };
-
+const TTF_FontMetric ttfFontMetrics[] = {{ROBOTO_REGULAR, 1.37}, {FINAL_FRONTIER, 1.5}};
 
 // These symbols are generated from the files specified in platformio.ini under 'board_build.embed_files'
 // See https://docs.platformio.org/en/latest/platforms/espressif32.html#embedding-binary-data for more info

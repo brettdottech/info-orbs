@@ -1,11 +1,11 @@
-// TODO: 
+// TODO:
 // 1
 // factor out a selectDisplay that selects the dispay and returns the workable object,
 // so we don't have this select, getDisplay crap all over the place
 // 2
 // make high/low an enum, if we even keep it (I strongly suggest just switching back
 // and forth between high and low every 10 seconds or something)
-// 3 
+// 3
 // factor out the JSON error handling (come on now)
 // 4
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
@@ -80,7 +80,7 @@ bool WeatherWidget::getWeatherData() {
     HTTPClient http;
     http.begin(httpRequestAddress);
     int httpCode = http.GET();
-    if (httpCode > 0) { 
+    if (httpCode > 0) {
         // Check for the return code   TODO: factor out
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, http.getString());
@@ -102,18 +102,18 @@ bool WeatherWidget::getWeatherData() {
         } else {
             // Handle JSON deserialization error
             switch (error.code()) {
-                case DeserializationError::Ok:
-                    Serial.print(F("Deserialization succeeded"));
-                    break;
-                case DeserializationError::InvalidInput:
-                    Serial.print(F("Invalid input!"));
-                    break;
-                case DeserializationError::NoMemory:
-                    Serial.print(F("Not enough memory"));
-                    break;
-                default:
-                    Serial.print(F("Deserialization failed"));
-                    break;
+            case DeserializationError::Ok:
+                Serial.print(F("Deserialization succeeded"));
+                break;
+            case DeserializationError::InvalidInput:
+                Serial.print(F("Invalid input!"));
+                break;
+            case DeserializationError::NoMemory:
+                Serial.print(F("Not enough memory"));
+                break;
+            default:
+                Serial.print(F("Deserialization failed"));
+                break;
             }
 
             return false;
@@ -145,7 +145,7 @@ void WeatherWidget::displayClock(int displayIndex) {
     m_manager.drawString(m_time->getMinutePadded(), centre + 10, clockY, 66, Align::MiddleLeft);
 }
 
-// Write an image to the screen from a hex array. 
+// Write an image to the screen from a hex array.
 // scale of the image (1=full size, then multiples of 2 to scale down)
 // getting the byte array size is very annoying as it's computed on compile, so you can't do it dynamically.
 void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[], int jpgDataSize, int scale) {
@@ -158,7 +158,7 @@ void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[]
 }
 
 // Take the text output from the weather API and map it to a icon/byte array, then display it
-void WeatherWidget::drawWeatherIcon(int displayIndex, const String& condition, int x, int y, int scale) {
+void WeatherWidget::drawWeatherIcon(int displayIndex, const String &condition, int x, int y, int scale) {
     const byte *iconStart = NULL;
     const byte *iconEnd = NULL;
 
@@ -193,7 +193,7 @@ void WeatherWidget::drawWeatherIcon(int displayIndex, const String& condition, i
     }
 }
 
-// Displays the current temperature on a single screen. 
+// Displays the current temperature on a single screen.
 // doesn't round deg, just removes all text after the decimal
 void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.selectScreen(displayIndex);
@@ -274,8 +274,8 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     // Reset colors
     m_manager.setFontColor(m_foregroundColor);
     m_manager.setBackgroundColor(m_backgroundColor);
-    
-    int temperatureFontSize = fontSize;  // 0-9 only
+
+    int temperatureFontSize = fontSize; // 0-9 only
     // Look up all the temperatures, and if any of them are more than 2 digits, we need
     // to scale down the font -- or it won't look right on the screen.
     String temps[days];
@@ -283,7 +283,7 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         temps[i] = m_mode == MODE_HIGHS ? model.getDayHigh(i, 0) : model.getDayLow(i, 0);
         if (temps[i].length() > 4) {
             // We've got a nutty 3-digit temperature (plus degree sign), scale down
-            temperatureFontSize = fontSize-4; // smaller
+            temperatureFontSize = fontSize - 4; // smaller
         }
     }
 
@@ -295,11 +295,10 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
         drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
         m_manager.drawCentreString(temps[i], x, 122, temperatureFontSize);
 
-        String shortDayName = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1)))-1];
+        String shortDayName = LOC_WEEKDAY[weekday(m_time->getUnixEpoch() + (86400 * (i + 1))) - 1];
         shortDayName.remove(3);
         m_manager.drawString(shortDayName, x, 154, fontSize, Align::MiddleCenter);
     }
-
 }
 
 int WeatherWidget::getClockStamp() {

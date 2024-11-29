@@ -20,19 +20,19 @@ enum WebDataElementModelTypes {
 };
 
 class WebDataElementModel {
-   public:
-    void setType(const String& type);
+public:
+    void setType(const String &type);
     WebDataElementModelTypes getType();
 
     bool isChanged();
     void setChangedStatus(bool changed);
 
     void parseData(JsonObject doc, int32_t defaultColor, int32_t defaultBackground);
-    void draw(ScreenManager& manager);
+    void draw(ScreenManager &manager);
 
-   private:
+private:
     WebDataElementModelTypes m_type = OTHER;
-    WebDataElement* m_element = nullptr;
+    WebDataElement *m_element = nullptr;
 
     bool m_changed = false;
 };

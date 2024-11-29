@@ -96,7 +96,7 @@ int32_t WebDataElementArcModel::getColor() {
     return m_color;
 }
 
-void WebDataElementArcModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataElementArcModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
@@ -115,18 +115,18 @@ void WebDataElementArcModel::parseData(const JsonObject& doc, int32_t defaultCol
     if (doc["angleEnd"].is<int32_t>()) {
         setAngleEnd(doc["angleEnd"].as<int32_t>());
     }
-    if (const char* color = doc["color"]) {
+    if (const char *color = doc["color"]) {
         setColor(color);
     } else {
         setColor(defaultColor);
     }
-    if (const char* background = doc["background"]) {
+    if (const char *background = doc["background"]) {
         setBackgroundColor(background);
     } else {
         setBackgroundColor(defaultBackground);
     }
 }
 
-void WebDataElementArcModel::draw(ScreenManager& manager) {
+void WebDataElementArcModel::draw(ScreenManager &manager) {
     manager.drawArc(getX(), getY(), getRadius(), getInnerRadius(), getAngleStart(), getAngleEnd(), getColor(), getBackgroundColor(), true);
 }
