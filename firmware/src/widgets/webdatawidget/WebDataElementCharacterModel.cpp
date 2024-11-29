@@ -132,7 +132,7 @@ void WebDataElementCharacterModel::parseData(const JsonObject &doc, int32_t defa
     }
 }
 
-void WebDataElementCharacterModel::draw(ScreenManager &manager) {
+void WebDataElementCharacterModel::draw(ScreenManager& manager) {
     manager.setLegacyTextDatum(getAlignment());
     manager.setLegacyTextSize(getSize());
     manager.setLegacyTextColor(getColor(), getBackgroundColor());

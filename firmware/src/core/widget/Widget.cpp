@@ -1,6 +1,7 @@
 #include "Widget.h"
 
-Widget::Widget(ScreenManager &manager) : m_manager(manager) {}
+Widget::Widget(ScreenManager &manager): m_manager(manager) 
+{}
 
 void Widget::setBusy(bool busy) {
     if (busy) {

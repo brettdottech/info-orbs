@@ -92,7 +92,7 @@ int32_t WebDataElementTriangleModel::getColor() {
     return m_color;
 }
 
-void WebDataElementTriangleModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataElementTriangleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc["x1"].is<int32_t>()) {
         setX(doc["x1"].as<int32_t>());
     } else if (doc["x"].is<int32_t>()) {
@@ -118,14 +118,14 @@ void WebDataElementTriangleModel::parseData(const JsonObject &doc, int32_t defau
     if (doc["filled"].is<bool>()) {
         setFilled(doc["filled"].as<bool>());
     }
-    if (const char *color = doc["color"]) {
+    if (const char* color = doc["color"]) {
         setColor(color);
     } else {
         setColor(defaultColor);
     }
 }
 
-void WebDataElementTriangleModel::draw(ScreenManager &manager) {
+void WebDataElementTriangleModel::draw(ScreenManager& manager) {
     if (getFilled()) {
         manager.fillTriangle(getX(), getY(), getX2(), getY2(), getX3(), getY3(), getColor());
     } else {

@@ -1,9 +1,9 @@
 #ifndef WIDGET_SET_H
 #define WIDGET_SET_H
 
+#include "Widget.h"
 #include "ScreenManager.h"
 #include "Utils.h"
-#include "Widget.h"
 
 #define MAX_WIDGETS 5
 
@@ -11,7 +11,7 @@ class WidgetSet {
 public:
     WidgetSet(ScreenManager *sm);
     void add(Widget *widget);
-    void drawCurrent(bool force = false);
+    void drawCurrent(bool force=false);
     void updateCurrent();
     Widget *getCurrent();
     void next();
@@ -24,8 +24,8 @@ public:
     void setClearScreensOnDrawCurrent();
     void updateBrightnessByTime(uint8_t hour24);
 
-private:
-    void showCenteredLine(int screen, const String &text);
+   private:
+    void showCenteredLine(int screen, const String& text);
     ScreenManager *m_screenManager;
     bool m_clearScreensOnDrawCurrent = true;
     Widget *m_widgets[MAX_WIDGETS];

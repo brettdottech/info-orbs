@@ -1,19 +1,20 @@
 #ifndef PARQET_WIDGET_H
 #define PARQET_WIDGET_H
 
-#include "GlobalTime.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <TFT_eSPI.h>
+#include "GlobalTime.h"
 
 #include "ParqetDataModel.h"
-#include "Utils.h"
 #include "Widget.h"
+#include "Utils.h"
 
 #define PARQET_MODE_COUNT 10
 #define PARQET_MAX_STOCKNAME_LINES 3
 
-class ParqetWidget : public Widget {
+class ParqetWidget : public Widget
+{
 public:
     ParqetWidget(ScreenManager &manager);
     void setup() override;
@@ -45,12 +46,12 @@ private:
     String m_modes[PARQET_MODE_COUNT] = {"today", "1w", "1m", "3m", "6m", "1y", "3y", "mtd", "ytd", "max"}; // Possible timeframes: today, 1w, 1m, 3m, 6m, 1y, 3y, mtd, ytd, max
     int8_t m_curMode = 0;
 
-    boolean m_showClock = true; // Show clock on first screen
-    boolean m_showTotalScreen = true; // Show a total portfolio screen
-    boolean m_showTotalValue = false; // Show your total portfolio value
-    boolean m_showTotalChart = true; // Show performance chart for total (if we have more than 7 datapoints, ie. not for "today")
+    boolean m_showClock = true;              // Show clock on first screen
+    boolean m_showTotalScreen = true;        // Show a total portfolio screen
+    boolean m_showTotalValue = false;        // Show your total portfolio value
+    boolean m_showTotalChart = true;         // Show performance chart for total (if we have more than 7 datapoints, ie. not for "today")
     String m_overrideTotalChartToday = "1w"; // Show this chart for "today" to have a chart there as well, set to empty string to disable
-    boolean m_showValues = false; // Show current price (false) or value in portfolio (true)
+    boolean m_showValues = false;            // Show current price (false) or value in portfolio (true)
 
     ParqetDataModel m_portfolio;
     int m_holdingsDisplayFrom = 0;

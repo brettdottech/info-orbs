@@ -70,7 +70,7 @@ int32_t WebDataElementRectangleModel::getColor() {
     return m_color;
 }
 
-void WebDataElementRectangleModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataElementRectangleModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc["x1"].is<int32_t>()) {
         setX(doc["x1"].as<int32_t>());
     } else if (doc["x"].is<int32_t>()) {
@@ -99,14 +99,14 @@ void WebDataElementRectangleModel::parseData(const JsonObject &doc, int32_t defa
     if (doc["filled"].is<bool>()) {
         setFilled(doc["filled"].as<bool>());
     }
-    if (const char *color = doc["color"]) {
+    if (const char* color = doc["color"]) {
         setColor(color);
     } else {
         setColor(defaultColor);
     }
 }
 
-void WebDataElementRectangleModel::draw(ScreenManager &manager) {
+void WebDataElementRectangleModel::draw(ScreenManager& manager) {
     if (getFilled()) {
         manager.fillRect(getX(), getY(), getWidth(), getHeight(), getColor());
     } else {

@@ -1,32 +1,31 @@
 #ifndef WEATHERWIDGET_H
 #define WEATHERWIDGET_H
 
-#include "GlobalTime.h"
-#include "Utils.h"
-#include "WeatherDataModel.h"
-#include "Widget.h"
-#include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <TJpg_Decoder.h>
+#include "config_helper.h"
+#include "GlobalTime.h"
 #include <math.h>
+#include "Widget.h"
+#include "Utils.h"
+#include "WeatherDataModel.h"
 
 class WeatherWidget : public Widget {
-public:
-    WeatherWidget(ScreenManager &manager);
+   public:
+    WeatherWidget(ScreenManager& manager);
     ~WeatherWidget() override;
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
     void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
-
 private:
     void displayClock(int displayIndex);
     void changeMode();
     void displayClock(int displayIndex, uint32_t background, uint32_t textColor);
     void showJPG(int displayIndex, int x, int y, const byte jpgData[], int size, int scale);
-    void drawWeatherIcon(int displayIndex, const String &condition, int x, int y, int scale);
+    void drawWeatherIcon(int displayIndex, const String& condition, int x, int y, int scale);
     void singleWeatherDeg(int displayIndex);
     void weatherText(int displayIndex);
     void threeDayWeather(int displayIndex);
@@ -34,7 +33,7 @@ private:
     int getClockStamp();
     void configureColors();
 
-    GlobalTime *m_time;
+    GlobalTime* m_time;
     int8_t m_mode;
 
     ScreenMode m_screenMode = Dark;
@@ -43,10 +42,10 @@ private:
     uint16_t m_invertedForegroundColor;
     uint16_t m_invertedBackgroundColor;
 
-    const long m_weatherDelay = 600000; // Weather refresh rate
+    const long m_weatherDelay = 600000;  // Weather refresh rate
     unsigned long m_weatherDelayPrev = 0;
 
-    const int centre = 120; // Centre location of the screen(240x240)
+    const int centre = 120;  // Centre location of the screen(240x240)
 
     int m_clockStamp = 0;
 
@@ -72,4 +71,4 @@ private:
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 };
-#endif // WEATHERWIDGET_H
+#endif  // WEATHERWIDGET_H

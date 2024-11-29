@@ -59,7 +59,7 @@ int32_t WebDataElementLineModel::getColor() {
     return m_color;
 }
 
-void WebDataElementLineModel::parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) {
+void WebDataElementLineModel::parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) {
     if (doc["x"].is<int32_t>()) {
         setX(doc["x"].as<int32_t>());
     }
@@ -72,13 +72,13 @@ void WebDataElementLineModel::parseData(const JsonObject &doc, int32_t defaultCo
     if (doc["y2"].is<int32_t>()) {
         setY2(doc["y2"].as<int32_t>());
     }
-    if (const char *color = doc["color"]) {
+    if (const char* color = doc["color"]) {
         setColor(color);
     } else {
         setColor(defaultColor);
     }
 }
 
-void WebDataElementLineModel::draw(ScreenManager &manager) {
+void WebDataElementLineModel::draw(ScreenManager& manager) {
     manager.drawLine(getX(), getY(), getX2(), getY2(), getColor());
 }

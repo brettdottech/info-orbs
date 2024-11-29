@@ -6,7 +6,7 @@
 #include <iomanip>
 
 class StockDataModel {
-public:
+   public:
     StockDataModel();
     StockDataModel &setCurrencySymbol(String currencySymbol);
     String getCurrencySymbol();
@@ -34,7 +34,7 @@ public:
     bool isChanged();
     StockDataModel &setChangedStatus(bool changed);
 
-private:
+   private:
     String m_symbol = "";
     String m_ticker = "";
     String m_company = "";
@@ -44,10 +44,10 @@ private:
     float m_currentPrice = 0.0;
     float m_volume = 0.0;
     float m_highPrice = 0.0;
-    float m_lowPrice = 0.0;
+    float m_lowPrice = 0.0; 
     float m_priceChange = 0.0;
     float m_percentChange = 0.0;
     bool m_changed = false;
 };
 
-#endif // STOCK_DATA_MODEL_H
+#endif  // STOCK_DATA_MODEL_H

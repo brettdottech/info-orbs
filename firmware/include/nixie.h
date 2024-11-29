@@ -6,6 +6,7 @@
 // These symbols are generated from the files specified in platformio.ini under 'board_build.embed_files'
 // See https://docs.platformio.org/en/latest/platforms/espressif32.html#embedding-binary-data for more info
 
+
 // Choose either with or without holes here and remember to also adjust platformio.ini
 // *************************************************************************************
 

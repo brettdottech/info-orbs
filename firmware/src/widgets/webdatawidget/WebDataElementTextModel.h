@@ -8,7 +8,7 @@
 #include "WebDataElement.h"
 
 class WebDataElementTextModel : public WebDataElement {
-public:
+   public:
     int32_t getX();
     void setX(int32_t x);
     int32_t getY();
@@ -35,10 +35,10 @@ public:
     void setColor(String color);
     int32_t getColor();
 
-    void parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) override;
-    void draw(ScreenManager &manager) override;
+    void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) override;
+    void draw(ScreenManager& manager) override;
 
-private:
+   private:
     int32_t m_x = 0;
     int32_t m_y = 0;
     String m_text;

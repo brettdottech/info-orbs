@@ -8,7 +8,7 @@
 #include "WebDataElement.h"
 
 class WebDataElementImageModel : public WebDataElement {
-public:
+   public:
     int32_t getX();
     void setX(int32_t x);
     int32_t getY();
@@ -17,10 +17,10 @@ public:
     void setImage(String image);
     String getImage();
 
-    void parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground) override;
-    void draw(ScreenManager &manager) override;
+    void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground) override;
+    void draw(ScreenManager& manager) override;
 
-private:
+   private:
     int32_t m_x = 0;
     int32_t m_y = 0;
     String m_image = "";

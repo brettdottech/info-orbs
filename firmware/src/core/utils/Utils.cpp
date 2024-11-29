@@ -130,7 +130,8 @@ int32_t Utils::stringToColor(String color) {
     }
 }
 
-String Utils::formatFloat(float value, int8_t digits) {
+String Utils::formatFloat(float value, int8_t digits)
+{
     char tmp[30] = {};
     dtostrf(value, 1, digits, tmp);
     return tmp;

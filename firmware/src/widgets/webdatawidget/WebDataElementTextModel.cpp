@@ -132,7 +132,7 @@ void WebDataElementTextModel::parseData(const JsonObject &doc, int32_t defaultCo
     }
 }
 
-void WebDataElementTextModel::draw(ScreenManager &manager) {
+void WebDataElementTextModel::draw(ScreenManager& manager) {
     manager.setLegacyTextFont(getFont());
     manager.setLegacyTextDatum(getAlignment());
     manager.setLegacyTextSize(getSize());

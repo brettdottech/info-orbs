@@ -1,7 +1,7 @@
 #include "GlobalTime.h"
 
-#include "config_helper.h"
 #include <TimeLib.h>
+#include "config_helper.h"
 
 GlobalTime *GlobalTime::m_instance = nullptr;
 
@@ -41,9 +41,9 @@ void GlobalTime::updateTime() {
 
         m_day = day(m_unixEpoch);
         m_month = month(m_unixEpoch);
-        m_monthName = LOC_MONTH[m_month - 1];
+        m_monthName = LOC_MONTH[m_month-1];
         m_year = year(m_unixEpoch);
-        m_weekday = LOC_WEEKDAY[(weekday(m_unixEpoch)) - 1];
+        m_weekday = LOC_WEEKDAY[(weekday(m_unixEpoch))-1];
         m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
     }
 }
@@ -145,7 +145,7 @@ void GlobalTime::getTimeZoneOffsetFromAPI() {
                 m_nextTimeZoneUpdate = 0;
             } else {
                 // Timezone uses DST, update when necessary
-                m_nextTimeZoneUpdate = doc["zoneEnd"].as<unsigned long>() + random(5 * 60); // Randomize update by 5 minutes to avoid flooding the API
+                m_nextTimeZoneUpdate = doc["zoneEnd"].as<unsigned long>() + random(5*60); // Randomize update by 5 minutes to avoid flooding the API
             }
             Serial.print("Timezone Offset from API: ");
             Serial.println(m_timeZoneOffset);

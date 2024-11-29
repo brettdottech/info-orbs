@@ -40,7 +40,7 @@ void WebDataWidget::update(bool force) {
         http.begin(httpRequestAddress);
         int httpCode = http.GET();
 
-        if (httpCode > 0) { // Check for the returning code
+        if (httpCode > 0) {  // Check for the returning code
             JsonDocument doc;
             DeserializationError error = deserializeJson(doc, http.getString());
             if (!error) {

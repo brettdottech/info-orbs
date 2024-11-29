@@ -6,17 +6,17 @@ StockDataModel::StockDataModel() {
 }
 
 StockDataModel &StockDataModel::setCurrencySymbol(String currencySymbol) {
-    if (currencySymbol == "EUR") {
-        m_currencySymbol = m_currencySymbolEUR;
-    } else if (currencySymbol == "GBP") {
-        m_currencySymbol = m_currencySymbolGBP;
-    } else if (getSymbol().indexOf("/EUR") != -1) {
-        m_currencySymbol = m_currencySymbolEUR;
-    } else if (getSymbol().indexOf("/GBP") != -1) {
-        m_currencySymbol = m_currencySymbolGBP;
-    } else {
-        m_currencySymbol = "$";
-    }
+        if (currencySymbol == "EUR"){
+            m_currencySymbol = m_currencySymbolEUR;
+        } else if (currencySymbol == "GBP"){
+            m_currencySymbol = m_currencySymbolGBP ;
+        } else if (getSymbol().indexOf("/EUR") != -1){
+            m_currencySymbol = m_currencySymbolEUR;
+        } else if (getSymbol().indexOf("/GBP") != -1){
+            m_currencySymbol = m_currencySymbolGBP;
+        } else {
+            m_currencySymbol =  "$";
+        }
     return *this;
 }
 
@@ -45,6 +45,7 @@ StockDataModel &StockDataModel::setTicker(String ticker) {
 String StockDataModel::getTicker() {
     return m_ticker;
 }
+
 
 StockDataModel &StockDataModel::setCompany(String company) {
     if (m_company != company) {
@@ -86,6 +87,8 @@ String StockDataModel::getHighPrice(int8_t digits) {
     return Utils::formatFloat(m_highPrice, digits);
 }
 
+
+
 StockDataModel &StockDataModel::setLowPrice(float lowPrice) {
     if (m_lowPrice != lowPrice) {
         m_lowPrice = lowPrice;
@@ -101,6 +104,7 @@ float StockDataModel::getLowPrice() {
 String StockDataModel::getLowPrice(int8_t digits) {
     return Utils::formatFloat(m_lowPrice, digits);
 }
+
 
 StockDataModel &StockDataModel::setPriceChange(float priceChange) {
     if (m_priceChange != priceChange) {
@@ -128,7 +132,7 @@ float StockDataModel::getPercentChange() {
 }
 
 String StockDataModel::getPercentChange(int8_t digits) {
-    return Utils::formatFloat(m_percentChange * 100, digits);
+    return Utils::formatFloat(m_percentChange*100, digits);
 }
 
 bool StockDataModel::isChanged() {
