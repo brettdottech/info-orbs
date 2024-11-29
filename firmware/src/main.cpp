@@ -187,5 +187,7 @@ void loop() {
         widgetSet->drawCurrent();
 
         checkCycleWidgets();
+
+        wifiWidget->processWebPortalRequests();
     }
 }
