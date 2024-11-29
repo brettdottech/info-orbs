@@ -18,7 +18,9 @@
 #ifdef PARQET_PORTFOLIO_ID
   #include "parqetwidget/ParqetWidget.h"
 #endif
-
+#ifdef MQTT_WIDGET_HOST
+  #include "mqttwidget/mqttWidget.h"
+#endif
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -131,6 +133,9 @@ void setup() {
 #endif
 #ifdef WEB_DATA_STOCK_WIDGET_URL
   widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
+#endif
+#ifdef MQTT_WIDGET_HOST
+  widgetSet->add(new MQTTWidget(*sm, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
 #endif
 
   m_widgetCycleDelayPrev = millis();

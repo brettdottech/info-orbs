@@ -41,6 +41,13 @@
 //#define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
 //#define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
 
+//MQTT config section
+//#define MQTT_WIDGET_HOST "192.168.3.40" // MQTT broker host
+//#define MQTT_WIDGET_PORT 1883 // MQTT broker port
+//#define MQTT_SETUP_TOPIC "info-orbs/setup/orbs" // Setup topic
+//#define MQTT_WIDGET_USER "mqttuser" // Leave empty if authentication is not required
+//#define MQTT_WIDGET_PASS "mqttuser" // Leave empty if authentication is not required
+
 // WIFI CONFIGURATION
 // Normally WiFi should be configured using a smartphone or computer to connect to the Info-Orbs
 // configuration portal. But as a fall-back method, WiFi can be setup by uncommenting these 2 lines and
