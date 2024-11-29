@@ -157,7 +157,9 @@ void WifiWidget::connectionTimedOut() {
 }
 
 void WifiWidget::processWebPortalRequests() {
-    wifimgr.process();
+    if (wifimgr.getWebPortalActive()) {
+        wifimgr.process();
+    }
 }
 
 String WifiWidget::getName() {
