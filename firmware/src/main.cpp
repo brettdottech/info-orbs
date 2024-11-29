@@ -19,7 +19,7 @@
   #include "parqetwidget/ParqetWidget.h"
 #endif
 #ifdef MQTT_WIDGET_HOST
-  #include "mqttwidget/mqttWidget.h"
+  #include "mqttwidget/MQTTWidget.h"
 #endif
 
 TFT_eSPI tft = TFT_eSPI();
