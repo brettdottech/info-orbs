@@ -1,6 +1,6 @@
 #include "ConfigManager.h"
 
-ConfigManager::ConfigManager() {
+ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
     Serial.println("Constructing ConfigManager");
     if (!preferences.begin("config", false)) {
         Serial.println("Failed to initialize NVS in ConfigManager");
@@ -17,26 +17,26 @@ ConfigManager::~ConfigManager() {
     preferences.end();
 }
 
-void ConfigManager::setupWiFiManager(WiFiManager& wm) {
+void ConfigManager::setupWiFiManager() {
     WiFiManagerParameter *startLabel = new WiFiManagerParameter(Utils::copyString("<H1>InfoOrbs Configuration</H1>"));
-    wm.addParameter(startLabel);
+    m_wm.addParameter(startLabel);
     char lastClassName[30];
     for (auto& param : parameters) {
         if (!Utils::compareCharArrays(lastClassName, param.className)) {
             // New class variables -> add a separator
             WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<HR><H2>", param.className, "</H2>"));
             Serial.printf("New area: %s\n", param.className);
-            wm.addParameter(classLabel);
+            m_wm.addParameter(classLabel);
             // WiFiManagerParameter *newLine = new WiFiManagerParameter("<br/>");
             // wm.addParameter(newLine);
             strcpy(lastClassName, param.className);
         }
-        wm.addParameter(param.parameter);
+        m_wm.addParameter(param.parameter);
     }
     WiFiManagerParameter *endLabel = new WiFiManagerParameter(Utils::copyString("<HR><BR><H3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></H3>"));
-    wm.addParameter(endLabel);
+    m_wm.addParameter(endLabel);
 
-    wm.setSaveParamsCallback([this]() {
+    m_wm.setSaveParamsCallback([this]() {
         saveAllConfigs();
         // Restart to apply new config
         ESP.restart();
@@ -44,9 +44,9 @@ void ConfigManager::setupWiFiManager(WiFiManager& wm) {
 }
 
 void ConfigManager::loadAllConfigs() {
-    for (auto& param : parameters) {
-        param.saveCallback(); // Load values into variables
-    }
+    // for (auto& param : parameters) {
+    //     param.saveCallback(); // Load values into variables
+    // }
 }
 
 void ConfigManager::saveAllConfigs() {
@@ -140,9 +140,16 @@ void ConfigManager::addConfigBool(const std::string& className, const std::strin
     Serial.printf("%s loaded: %d (%d)\n", varNameBuffer, *var, var);
     BoolParameter* param = new BoolParameter(varNameBuffer, descBuffer, *var);
     parameters.push_back({param, classNameBuffer, varNameBuffer, [this, classNameBuffer, varNameBuffer, var, param]() {
-        *var = param->getValue();
+        // if (this->m_wm.server->uri() == "/paramsave") {
+        //     // We are trying to save the variable
+
+        // }
+        *var =  this->m_wm.server->hasArg(varNameBuffer);
+        // *var = param->getValue();
         preferences.putBool(varNameBuffer, *var);
         Serial.printf("%s saved: %d (%d)\n", varNameBuffer, *var, var);
+        // Serial.println(this->m_wm.server->hasArg(varNameBuffer));
+        // Serial.println(this->m_wm.server->uri());
         triggerChangeCallbacks(classNameBuffer, varNameBuffer);
     }});
 }

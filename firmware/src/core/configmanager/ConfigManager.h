@@ -13,10 +13,10 @@
 
 class ConfigManager {
 public:
-    ConfigManager();
+    ConfigManager(WiFiManager &wm);
     ~ConfigManager();
 
-    void setupWiFiManager(WiFiManager& wm);
+    void setupWiFiManager();
     void loadAllConfigs();
     void saveAllConfigs();
 
@@ -46,6 +46,7 @@ private:
         std::function<void()> saveCallback;
     };
 
+    WiFiManager &m_wm;
     Preferences preferences;
     std::vector<Parameter> parameters;
 

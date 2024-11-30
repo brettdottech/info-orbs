@@ -33,7 +33,9 @@ public:
         : WiFiManagerParameter("") {
         Serial.printf("creating bool param: %s %d\n", id, value);
         const char *checkboxHtml = value ? "type='checkbox' checked" : "type='checkbox'";
-        init(id, placeholder, String(value).c_str(), length, checkboxHtml, WFM_LABEL_AFTER);
+        // We use 1 as value here and check later if the argument was passed back when submitting the form
+        // If the checkbox is checked, the argument will be there
+        init(id, placeholder, "1", length, checkboxHtml, WFM_LABEL_AFTER);
     }
 
     bool getValue() {
