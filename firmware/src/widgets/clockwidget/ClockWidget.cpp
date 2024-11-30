@@ -3,12 +3,12 @@
 #include "config_helper.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
-    m_config.addConfigBool("ClockWidget", "format24h", &m_format24h, "12h or 24h mode (0=12h, 1=24h)");
-    m_config.addConfigBool("ClockWidget", "showAmPm", &m_showAmPm, "Show AM/PM in 12h mode (0=no, 1=yes)");
-    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show second ticks (0=no, 1=yes)");
-    m_config.addOnChangeCallback("ClockWidget", [this](const std::string &className, const std::string &varName) {
-        Serial.printf("ClockWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
-    });
+    m_config.addConfigBool("ClockWidget", "format24h", &m_format24h, "24h mode (on) or 12h mode (off)");
+    m_config.addConfigBool("ClockWidget", "showAmPm", &m_showAmPm, "Show AM/PM in 12h mode");
+    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show second ticks");
+    // m_config.addOnChangeCallback("ClockWidget", [this](const std::string& className, const std::string& varName) {
+    //     Serial.printf("ClockWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
+    // });
 }
 
 ClockWidget::~ClockWidget() {

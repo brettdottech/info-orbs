@@ -29,12 +29,15 @@ public:
 
 class BoolParameter : public WiFiManagerParameter {
 public:
-    BoolParameter(const char *id, const char *placeholder, bool value, const uint8_t length = 10)
+    BoolParameter(const char *id, const char *placeholder, bool value, const uint8_t length = 2)
         : WiFiManagerParameter("") {
-        init(id, placeholder, String(value).c_str(), length, "", WFM_LABEL_BEFORE);
+        Serial.printf("creating bool param: %s %d\n", id, value);
+        const char *checkboxHtml = value ? "type='checkbox' checked" : "type='checkbox'";
+        init(id, placeholder, String(value).c_str(), length, checkboxHtml, WFM_LABEL_AFTER);
     }
 
     bool getValue() {
+        Serial.printf("bool get val %s %d\n", WiFiManagerParameter::getID(), *WiFiManagerParameter::getValue());
         return String(WiFiManagerParameter::getValue()).toInt() == 1;
     }
 };

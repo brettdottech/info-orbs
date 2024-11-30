@@ -18,11 +18,13 @@ ConfigManager::~ConfigManager() {
 }
 
 void ConfigManager::setupWiFiManager(WiFiManager& wm) {
-    char lastClassName[20];
+    WiFiManagerParameter *startLabel = new WiFiManagerParameter(Utils::copyString("<H1>InfoOrbs Configuration</H1>"));
+    wm.addParameter(startLabel);
+    char lastClassName[30];
     for (auto& param : parameters) {
         if (!Utils::compareCharArrays(lastClassName, param.className)) {
             // New class variables -> add a separator
-            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<H1>", param.className, "</H1>"));
+            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<HR><H2>", param.className, "</H2>"));
             Serial.printf("New area: %s\n", param.className);
             wm.addParameter(classLabel);
             // WiFiManagerParameter *newLine = new WiFiManagerParameter("<br/>");
@@ -31,9 +33,13 @@ void ConfigManager::setupWiFiManager(WiFiManager& wm) {
         }
         wm.addParameter(param.parameter);
     }
+    WiFiManagerParameter *endLabel = new WiFiManagerParameter(Utils::copyString("<HR><BR><H3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></H3>"));
+    wm.addParameter(endLabel);
 
     wm.setSaveParamsCallback([this]() {
         saveAllConfigs();
+        // Restart to apply new config
+        ESP.restart();
     });
 }
 

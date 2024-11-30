@@ -14,13 +14,13 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     parqet.setPortfolioId(PARQET_PORTFOLIO_ID);
 #endif
     m_portfolio = parqet;
-    m_config.addConfigBool("ParqetWidget", "showClock", &m_showClock, "Show clock on first screen (0=no, 1=yes)");
-    m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen (0=no, 1=yes)");
-    m_config.addConfigBool("ParqetWidget", "showTotalVal", &m_showTotalValue, "Show total value (0=no, 1=yes)");
-    m_config.addConfigBool("ParqetWidget", "showValues", &m_showValues, "Show current price (0) or value in portfolio (1)");
-    m_config.addOnChangeCallback("ParqetWidget", [this](const std::string &className, const std::string &varName) {
-        Serial.printf("ParqetWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
-    });
+    m_config.addConfigBool("ParqetWidget", "showClock", &m_showClock, "Show clock on first screen");
+    m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen");
+    m_config.addConfigBool("ParqetWidget", "showTotalVal", &m_showTotalValue, "Show total portfolio value");
+    m_config.addConfigBool("ParqetWidget", "showValues", &m_showValues, "Show current price (off) or value in portfolio (on)");
+    // m_config.addOnChangeCallback("ParqetWidget", [this](const std::string& className, const std::string& varName) {
+    //     Serial.printf("ParqetWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
+    // });
 }
 
 void ParqetWidget::setup() {
