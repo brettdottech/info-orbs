@@ -47,6 +47,7 @@ bool isConnected{true};
 
 ScreenManager *sm;
 ConfigManager *config;
+WiFiManager *wifiManager;
 WidgetSet *widgetSet;
 
 /**
@@ -71,7 +72,9 @@ void setup() {
     Serial.println();
     Serial.println("Starting up...");
 
-    config = new ConfigManager();
+    wifiManager = new WiFiManager();
+    config = new ConfigManager(*wifiManager);
+
     setupButtons();
 
     sm = new ScreenManager(tft);
@@ -104,7 +107,7 @@ void setup() {
     pinMode(BUSY_PIN, OUTPUT);
     Serial.println("Connecting to WiFi");
 
-    wifiWidget = new WifiWidget(*sm, *config);
+    wifiWidget = new WifiWidget(*sm, *config, *wifiManager);
     wifiWidget->setup();
 
     globalTime = GlobalTime::getInstance();
@@ -127,7 +130,7 @@ void setup() {
     widgetSet->add(new MQTTWidget(*sm, *config, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
 #endif
 
-    config->setupWiFiManager(wifiWidget->getWiFiManager());
+    config->setupWiFiManager();
     config->loadAllConfigs();
 
     m_widgetCycleDelayPrev = millis();

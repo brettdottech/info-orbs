@@ -8,11 +8,9 @@ const int statusScreenIndex = 3;
 const int fontSize = 19;
 const int messageDelay = 5000;
 
-WifiWidget::WifiWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {}
+WifiWidget::WifiWidget(ScreenManager &manager, ConfigManager &config, WiFiManager &wifiManager) : Widget(manager, config), m_wifiManager(wifiManager) {}
 
 WifiWidget::~WifiWidget() {}
-
-WiFiManager wifimgr;
 
 void WifiWidget::setup() {
     m_manager.setFont(DEFAULT_FONT);
@@ -31,21 +29,21 @@ void WifiWidget::setup() {
     // Remove unwanted buttons from the config portal
     std::vector<const char *> wm_menu = {"wifi", "param", "info", "restart"}; // buttons: wifi, info, exit, update
     // Remove unwanted buttons from the Info page
-    wifimgr.setShowInfoUpdate(false);
-    wifimgr.setShowInfoErase(false);
-    wifimgr.setMenu(wm_menu);
-    wifimgr.setClass("invert");
+    m_wifiManager.setShowInfoUpdate(false);
+    m_wifiManager.setShowInfoErase(false);
+    m_wifiManager.setMenu(wm_menu);
+    m_wifiManager.setClass("invert");
 
     // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
-        wifimgr.resetSettings();
+        m_wifiManager.resetSettings();
         m_manager.drawCentreString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         delay(messageDelay);
     }
 
     // Set WiFiManager to non-blocking so status and info can be displayed
-    wifimgr.setConfigPortalBlocking(false);
+    m_wifiManager.setConfigPortalBlocking(false);
 
     // If you want the config portal to only be available for so many seconds
     // wm.setConfigPortalTimeout(60);
@@ -54,12 +52,14 @@ void WifiWidget::setup() {
     // so each Info-Orbs has a unique SSID
     m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
 
-    wifimgr.setCleanConnect(true);
-    wifimgr.setConnectRetries(5);
+    m_wifiManager.setCleanConnect(true);
+    m_wifiManager.setConnectRetries(5);
 
     // WiFiManager automatically connects using saved credentials...
-    if (wifimgr.autoConnect(m_apssid.c_str())) {
+    if (m_wifiManager.autoConnect(m_apssid.c_str())) {
         Serial.print("WifiManager connected.");
+        // Start the WebPortal
+        m_wifiManager.startWebPortal();
     } else { // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1
         m_configPortalRunning = true;
         Serial.println("Configuration portal running.");
@@ -81,7 +81,7 @@ void WifiWidget::update(bool force) {
     // Force is currently unhandled due to not knowing what behavior it would change
 
     // If WiFiManager is non-blocking, this keeps the configuration portal running
-    wifimgr.process();
+    m_wifiManager.process();
 
     if (WiFi.status() == WL_CONNECTED) {
         m_isConnected = true;
@@ -158,8 +158,8 @@ void WifiWidget::connectionTimedOut() {
 }
 
 void WifiWidget::processWebPortalRequests() {
-    if (wifimgr.getWebPortalActive()) {
-        wifimgr.process();
+    if (m_wifiManager.getWebPortalActive()) {
+        m_wifiManager.process();
     }
 }
 
@@ -168,5 +168,5 @@ String WifiWidget::getName() {
 }
 
 WiFiManager &WifiWidget::getWiFiManager() {
-    return wifimgr;
+    return m_wifiManager;
 }
