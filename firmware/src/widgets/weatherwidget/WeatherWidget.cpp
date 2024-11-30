@@ -15,7 +15,7 @@
 
 #include "config_helper.h"
 
-WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_mode = MODE_HIGHS;
 }
 

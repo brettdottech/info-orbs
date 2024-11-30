@@ -15,7 +15,7 @@
 
 class StockWidget : public Widget {
 public:
-    StockWidget(ScreenManager &manager);
+    StockWidget(ScreenManager &manager, ConfigManager &config);
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;

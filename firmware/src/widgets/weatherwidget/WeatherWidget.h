@@ -13,7 +13,7 @@
 
 class WeatherWidget : public Widget {
 public:
-    WeatherWidget(ScreenManager &manager);
+    WeatherWidget(ScreenManager &manager, ConfigManager &config);
     ~WeatherWidget() override;
     void setup() override;
     void update(bool force = false) override;

@@ -27,6 +27,18 @@ public:
     }
 };
 
+class BoolParameter : public WiFiManagerParameter {
+public:
+    BoolParameter(const char *id, const char *placeholder, bool value, const uint8_t length = 10)
+        : WiFiManagerParameter("") {
+        init(id, placeholder, String(value).c_str(), length, "", WFM_LABEL_BEFORE);
+    }
+
+    bool getValue() {
+        return String(WiFiManagerParameter::getValue()).toInt() == 1;
+    }
+};
+
 class FloatParameter : public WiFiManagerParameter {
 public:
     FloatParameter(const char *id, const char *placeholder, float value, const uint8_t length = 10)

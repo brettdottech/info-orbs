@@ -2,7 +2,13 @@
 
 #include "config_helper.h"
 
-ClockWidget::ClockWidget(ScreenManager &manager) : Widget(manager) {
+ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
+    m_config.addConfigBool("ClockWidget", "format24h", &m_format24h, "12h or 24h mode (0=12h, 1=24h)");
+    m_config.addConfigBool("ClockWidget", "showAmPm", &m_showAmPm, "Show AM/PM in 12h mode (0=no, 1=yes)");
+    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show second ticks (0=no, 1=yes)");
+    m_config.addOnChangeCallback("ClockWidget", [this](const std::string &className, const std::string &varName) {
+        Serial.printf("ClockWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
+    });
 }
 
 ClockWidget::~ClockWidget() {
@@ -42,10 +48,10 @@ void ClockWidget::draw(bool force) {
         } else {
             displayDigit(2, "", ":", CLOCK_SHADOW_COLOR, false);
         }
-#if SHOW_SECOND_TICKS == true
-        displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
-        displaySeconds(2, m_secondSingle, CLOCK_COLOR);
-#endif
+        if (m_showSecondTicks) {
+            displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
+            displaySeconds(2, m_secondSingle, CLOCK_COLOR);
+        }
         m_lastSecondSingle = m_secondSingle;
         if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
             if (m_amPm != m_lastAmPm) {
@@ -90,7 +96,7 @@ void ClockWidget::update(bool force) {
 
     if (m_lastHourSingle != m_hourSingle || force) {
         if (m_hourSingle < 10) {
-            if (FORMAT_24_HOUR) {
+            if (m_format24h) {
                 m_display1Digit = "0";
             } else {
                 m_display1Digit = " ";

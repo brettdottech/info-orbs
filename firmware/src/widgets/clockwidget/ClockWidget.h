@@ -77,7 +77,7 @@ enum class ClockType {
 
 class ClockWidget : public Widget {
 public:
-    ClockWidget(ScreenManager &manager);
+    ClockWidget(ScreenManager &manager, ConfigManager &config);
     ~ClockWidget() override;
     void setup() override;
     void update(bool force = false) override;
@@ -98,6 +98,11 @@ private:
     void changeClockType();
 
     ClockType m_type = DEFAULT_CLOCK;
+
+    bool m_format24h;
+    bool m_showAmPm;
+    bool m_showSecondTicks;
+    String m_test;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;

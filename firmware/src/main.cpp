@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "ConfigManager.h"
 #include "GlobalTime.h"
 #include "ScreenManager.h"
 #include "Utils.h"
@@ -45,6 +46,7 @@ const int connectionTimeout{10000};
 bool isConnected{true};
 
 ScreenManager *sm;
+ConfigManager *config;
 WidgetSet *widgetSet;
 
 /**
@@ -69,6 +71,7 @@ void setup() {
     Serial.println();
     Serial.println("Starting up...");
 
+    config = new ConfigManager();
     setupButtons();
 
     sm = new ScreenManager(tft);
@@ -101,28 +104,31 @@ void setup() {
     pinMode(BUSY_PIN, OUTPUT);
     Serial.println("Connecting to WiFi");
 
-    wifiWidget = new WifiWidget(*sm);
+    wifiWidget = new WifiWidget(*sm, *config);
     wifiWidget->setup();
 
     globalTime = GlobalTime::getInstance();
 
-    widgetSet->add(new ClockWidget(*sm));
+    widgetSet->add(new ClockWidget(*sm, *config));
 #ifdef PARQET_PORTFOLIO_ID
-    widgetSet->add(new ParqetWidget(*sm));
+    widgetSet->add(new ParqetWidget(*sm, *config));
 #endif
 #ifdef STOCK_TICKER_LIST
-    widgetSet->add(new StockWidget(*sm));
+    widgetSet->add(new StockWidget(*sm, *config));
 #endif
-    widgetSet->add(new WeatherWidget(*sm));
+    widgetSet->add(new WeatherWidget(*sm, *config));
 #ifdef WEB_DATA_WIDGET_URL
-    widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
+    widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_WIDGET_URL));
 #endif
 #ifdef WEB_DATA_STOCK_WIDGET_URL
-    widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
+    widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_STOCK_WIDGET_URL));
 #endif
 #ifdef MQTT_WIDGET_HOST
-    widgetSet->add(new MQTTWidget(*sm, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
+    widgetSet->add(new MQTTWidget(*sm, *config, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
 #endif
+
+    config->setupWiFiManager(wifiWidget->getWiFiManager());
+    config->loadAllConfigs();
 
     m_widgetCycleDelayPrev = millis();
 }

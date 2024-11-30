@@ -35,7 +35,7 @@ public:
      * @param host MQTT broker host address.
      * @param port MQTT broker port number.
      */
-    MQTTWidget(ScreenManager &manager, const String &host, uint16_t port);
+    MQTTWidget(ScreenManager &manager, ConfigManager &config, const String &host, uint16_t port);
 
     /**
      * @brief Initializes the MQTT connection and subscribes to the setup topic.
