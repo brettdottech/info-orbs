@@ -29,7 +29,7 @@ void WifiWidget::setup() {
 #endif
 
     // Remove unwanted buttons from the config portal
-    std::vector<const char *> wm_menu = {"wifi", "param", "info"}; // buttons: wifi, info, exit, update
+    std::vector<const char *> wm_menu = {"wifi", "param", "info", "restart"}; // buttons: wifi, info, exit, update
     // Remove unwanted buttons from the Info page
     wifimgr.setShowInfoUpdate(false);
     wifimgr.setShowInfoErase(false);
