@@ -6,7 +6,7 @@
 
 class WifiWidget : public Widget {
 public:
-    WifiWidget(ScreenManager &manager);
+    WifiWidget(ScreenManager &manager, ConfigManager &config);
     ~WifiWidget() override;
     void setup() override;
     void update(bool force = false) override;
@@ -16,6 +16,7 @@ public:
     String getName() override;
 
     bool isConnected() { return m_isConnected; }
+    WiFiManager &getWiFiManager();
 
 private:
     void connectionTimedOut();

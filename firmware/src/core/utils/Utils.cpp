@@ -292,3 +292,36 @@ void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targe
         pixels565[i] = grayscaleToTargetColor(grayscale, targetR8, targetG8, targetB8, brightness, swapBytes);
     }
 }
+
+char *Utils::copyString(const std::string &originalString) {
+    // Allocate enough memory for the string and the null-terminator
+    char *buffer = new char[originalString.size() + 1];
+    std::strcpy(buffer, originalString.c_str()); // Copy the string contents
+    return buffer; // Return the pointer to this new string
+}
+
+bool Utils::compareCharArrays(const char *str1, const char *str2) {
+    while (*str1 && (*str1 == *str2)) {
+        str1++;
+        str2++;
+    }
+    return *str1 == *str2;
+}
+
+char *Utils::createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix) {
+    // Calculate lengths
+    size_t prefixLen = strlen(prefix);
+    size_t originalLen = strlen(original);
+    size_t postfixLen = strlen(postfix);
+
+    // Allocate memory for new string (including null terminator)
+    size_t totalLen = prefixLen + originalLen + postfixLen + 1; // +1 for '\0'
+    char *result = new char[totalLen];
+
+    // Construct the new string
+    strcpy(result, prefix); // Copy prefix
+    strcat(result, original); // Append original string
+    strcat(result, postfix); // Append postfix
+
+    return result;
+}

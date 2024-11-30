@@ -2,12 +2,13 @@
 #define WIDGET_H
 
 #include "Button.h"
+#include "ConfigManager.h"
 #include "ScreenManager.h"
 #include "config_helper.h"
 
 class Widget {
 public:
-    Widget(ScreenManager &manager);
+    Widget(ScreenManager &manager, ConfigManager &config);
     virtual ~Widget() = default;
     virtual void setup() = 0;
     virtual void update(bool force = false) = 0;
@@ -18,5 +19,6 @@ public:
 
 protected:
     ScreenManager &m_manager;
+    ConfigManager &m_config;
 };
 #endif // WIDGET_H

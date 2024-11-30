@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
+#include <cstring>
 
 #define MAX_WRAPPED_LINES 10
 
@@ -29,6 +30,9 @@ public:
     static uint16_t rgb888ToRgb565(uint32_t rgb888, bool swapBytes = false);
     static uint16_t grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes = false);
     static void colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor888, float brightness, bool swapBytes = true);
+    static char *copyString(const std::string &originalString);
+    static bool compareCharArrays(const char *str1, const char *str2);
+    static char *createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix);
 };
 
 #endif

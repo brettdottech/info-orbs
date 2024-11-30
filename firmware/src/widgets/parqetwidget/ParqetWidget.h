@@ -15,7 +15,7 @@
 
 class ParqetWidget : public Widget {
 public:
-    ParqetWidget(ScreenManager &manager);
+    ParqetWidget(ScreenManager &manager, ConfigManager &config);
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;

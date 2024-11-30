@@ -8,7 +8,7 @@ const int statusScreenIndex = 3;
 const int fontSize = 19;
 const int messageDelay = 5000;
 
-WifiWidget::WifiWidget(ScreenManager &manager) : Widget(manager) {}
+WifiWidget::WifiWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {}
 
 WifiWidget::~WifiWidget() {}
 
@@ -29,11 +29,12 @@ void WifiWidget::setup() {
 #endif
 
     // Remove unwanted buttons from the config portal
-    std::vector<const char *> wm_menu = {"wifi"}; // buttons: wifi, info, exit, update
+    std::vector<const char *> wm_menu = {"wifi", "param", "info"}; // buttons: wifi, info, exit, update
     // Remove unwanted buttons from the Info page
     wifimgr.setShowInfoUpdate(false);
     wifimgr.setShowInfoErase(false);
     wifimgr.setMenu(wm_menu);
+    wifimgr.setClass("invert");
 
     // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
@@ -164,4 +165,8 @@ void WifiWidget::processWebPortalRequests() {
 
 String WifiWidget::getName() {
     return "WiFi";
+}
+
+WiFiManager &WifiWidget::getWiFiManager() {
+    return wifimgr;
 }
