@@ -9,6 +9,7 @@ GlobalTime::GlobalTime() {
     m_timeClient = new NTPClient(m_udp);
     m_timeClient->begin();
     m_timeClient->setPoolServerName(NTP_SERVER);
+    m_format24hour = ConfigManager::getInstance().getConfigBool("format24h", m_format24hour);
 }
 
 GlobalTime::~GlobalTime() {

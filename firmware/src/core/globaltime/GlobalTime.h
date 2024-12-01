@@ -1,6 +1,7 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include "ConfigManager.h"
 #include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
@@ -79,7 +80,7 @@ private:
     unsigned long m_oneSecond = 1000;
     unsigned long m_updateTimer = 0;
 
-    bool m_format24hour{FORMAT_24_HOUR};
+    bool m_format24hour;
 
     void getTimeZoneOffsetFromAPI();
 };
