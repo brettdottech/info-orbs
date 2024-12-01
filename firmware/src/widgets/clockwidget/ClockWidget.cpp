@@ -6,6 +6,9 @@ ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget
     m_config.addConfigBool("ClockWidget", "format24h", &m_format24h, "24h mode (on) or 12h mode (off)");
     m_config.addConfigBool("ClockWidget", "showAmPm", &m_showAmPm, "Show AM/PM in 12h mode");
     m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show second ticks");
+    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock color");
+    m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing");
+    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock shadow color");
     // m_config.addOnChangeCallback("ClockWidget", [this](const std::string& className, const std::string& varName) {
     //     Serial.printf("ClockWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
     // });
@@ -26,31 +29,31 @@ void ClockWidget::draw(bool force) {
     GlobalTime *time = GlobalTime::getInstance();
 
     if (m_lastDisplay1Digit != m_display1Digit || force) {
-        displayDigit(0, m_lastDisplay1Digit, m_display1Digit, CLOCK_COLOR);
+        displayDigit(0, m_lastDisplay1Digit, m_display1Digit, m_fgColor);
         m_lastDisplay1Digit = m_display1Digit;
     }
     if (m_lastDisplay2Digit != m_display2Digit || force) {
-        displayDigit(1, m_lastDisplay2Digit, m_display2Digit, CLOCK_COLOR);
+        displayDigit(1, m_lastDisplay2Digit, m_display2Digit, m_fgColor);
         m_lastDisplay2Digit = m_display2Digit;
     }
     if (m_lastDisplay4Digit != m_display4Digit || force) {
-        displayDigit(3, m_lastDisplay4Digit, m_display4Digit, CLOCK_COLOR);
+        displayDigit(3, m_lastDisplay4Digit, m_display4Digit, m_fgColor);
         m_lastDisplay4Digit = m_display4Digit;
     }
     if (m_lastDisplay5Digit != m_display5Digit || force) {
-        displayDigit(4, m_lastDisplay5Digit, m_display5Digit, CLOCK_COLOR);
+        displayDigit(4, m_lastDisplay5Digit, m_display5Digit, m_fgColor);
         m_lastDisplay5Digit = m_display5Digit;
     }
 
     if (m_secondSingle != m_lastSecondSingle || force) {
         if (m_secondSingle % 2 == 0) {
-            displayDigit(2, "", ":", CLOCK_COLOR, false);
+            displayDigit(2, "", ":", m_fgColor, false);
         } else {
-            displayDigit(2, "", ":", CLOCK_SHADOW_COLOR, false);
+            displayDigit(2, "", ":", m_shadowColor, false);
         }
         if (m_showSecondTicks) {
             displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
-            displaySeconds(2, m_secondSingle, CLOCK_COLOR);
+            displaySeconds(2, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
         if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
@@ -59,7 +62,7 @@ void ClockWidget::draw(bool force) {
                 displayAmPm(m_lastAmPm, TFT_BLACK);
                 m_lastAmPm = m_amPm;
             }
-            displayAmPm(m_amPm, CLOCK_COLOR);
+            displayAmPm(m_amPm, m_fgColor);
         }
     }
 }
@@ -171,7 +174,7 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
     if (m_type == ClockType::NIXIE || m_type == ClockType::CUSTOM) {
-        if (digit == ":" && color == CLOCK_SHADOW_COLOR) {
+        if (digit == ":" && color == m_shadowColor) {
             // Show colon off
             displayImage(displayIndex, " ");
         } else {
@@ -188,7 +191,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
         DigitOffset lastDigitOffset = getOffsetForDigit(lastDigit);
         m_manager.selectScreen(displayIndex);
         if (shadowing) {
-            m_manager.setFontColor(CLOCK_SHADOW_COLOR, TFT_BLACK);
+            m_manager.setFontColor(m_shadowColor, TFT_BLACK);
             if (CLOCK_FONT == DSEG14) {
                 // DSEG14 (from DSEGstended) uses # to fill all segments
                 m_manager.drawString("#", defaultX, defaultY, fontSize, Align::MiddleCenter);
@@ -210,7 +213,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color) {
-    displayDigit(displayIndex, lastDigit, digit, color, CLOCK_SHADOWING);
+    displayDigit(displayIndex, lastDigit, digit, color, m_shadowing);
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {

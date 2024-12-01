@@ -102,7 +102,9 @@ private:
     bool m_format24h;
     bool m_showAmPm;
     bool m_showSecondTicks;
-    String m_test;
+    int m_fgColor = CLOCK_COLOR;
+    int m_shadowColor = CLOCK_SHADOW_COLOR;
+    bool m_shadowing = CLOCK_SHADOWING;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
