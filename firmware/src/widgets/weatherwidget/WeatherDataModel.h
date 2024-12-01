@@ -6,7 +6,7 @@
 
 #define NaN -1024.0
 class WeatherDataModel {
-   public:
+public:
     WeatherDataModel();
     WeatherDataModel &setCityName(String city);
     String getCityName();
@@ -44,18 +44,18 @@ class WeatherDataModel {
     bool isChanged();
     WeatherDataModel &setChangedStatus(bool changed);
 
-   private:
+private:
     String m_cityName;
-    String m_currentWeatherText = "";  // Weather Description
-    String m_currentWeatherIcon = "";  // Text refrence for weather icon
+    String m_currentWeatherText = ""; // Weather Description
+    String m_currentWeatherIcon = ""; // Text refrence for weather icon
     float m_currentWeatherDeg = 0.0;
     float m_todayHigh = 0.0;
     float m_todayLow = 0.0;
 
-    String m_daysIcons[3] = { "", "", "" };
-    float m_daysHigh[3] = { NaN, NaN, NaN };
-    float m_daysLow[3] = { NaN, NaN, NaN };
+    String m_daysIcons[3] = {"", "", ""};
+    float m_daysHigh[3] = {NaN, NaN, NaN};
+    float m_daysLow[3] = {NaN, NaN, NaN};
 
     bool m_changed = false;
 };
-#endif  // WEAHTER_DATA_MODEL_H
+#endif // WEAHTER_DATA_MODEL_H

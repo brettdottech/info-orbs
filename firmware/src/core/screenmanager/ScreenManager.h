@@ -3,24 +3,24 @@
 
 // Include any necessary libraries here
 #include "config_helper.h"
-#include <TFT_eSPI.h>
-#include <SPI.h>
-#include <OpenFontRender.h>
 #include "ttf-fonts.h"
+#include <OpenFontRender.h>
+#include <SPI.h>
+#include <TFT_eSPI.h>
 
 #define NUM_SCREENS 5
 
 #ifndef DEFAULT_FONT
-#define DEFAULT_FONT ROBOTO_REGULAR
+    #define DEFAULT_FONT ROBOTO_REGULAR
 #endif
 
 #ifndef TFT_BRIGHTNESS
-#define TFT_BRIGHTNESS 255
+    #define TFT_BRIGHTNESS 255
 #endif
 
 class ScreenManager {
 public:
-    ScreenManager(TFT_eSPI& tft);
+    ScreenManager(TFT_eSPI &tft);
 
     void selectScreen(int screen);
     void selectAllScreens();
@@ -29,7 +29,7 @@ public:
     void fillAllScreens(uint32_t color);
     void clearAllScreens();
     void fillScreen(uint32_t color);
-    void clearScreen(int screen=-1);
+    void clearScreen(int screen = -1);
 
     bool setBrightness(uint8_t brightness);
     uint8_t getBrightness();
@@ -46,11 +46,11 @@ public:
     unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const String &text);
 
     // Draw string functions
-    void drawString(const String &text, int x, int y, unsigned int fontSize, Align align, int32_t fgColor=-1, int32_t bgColor=-1, bool applyScale=true);
+    void drawString(const String &text, int x, int y, unsigned int fontSize, Align align, int32_t fgColor = -1, int32_t bgColor = -1, bool applyScale = true);
     void drawString(const String &text, int x, int y);
 
     // Draw centered string
-    void drawCentreString(const String &text, int x, int y, unsigned int fontSize=0);
+    void drawCentreString(const String &text, int x, int y, unsigned int fontSize = 0);
 
     // Draw string with a max width/height (auto-sizing)
     void drawFittedString(const String &text, int x, int y, int limit_w, int limit_h, Align align);
@@ -74,18 +74,18 @@ public:
     void setLegacyTextDatum(uint8_t datum);
     void setLegacyTextSize(uint8_t size);
     void setLegacyTextFont(uint8_t font);
-    void drawLegacyString(const String& string, int32_t x, int32_t y);
-    void drawLegacyString(const String& string, int32_t x, int32_t y, uint8_t font);
+    void drawLegacyString(const String &string, int32_t x, int32_t y);
+    void drawLegacyString(const String &string, int32_t x, int32_t y, uint8_t font);
     int16_t drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font);
-    
+
 private:
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
-    TFT_eSPI& m_tft;
+    TFT_eSPI &m_tft;
     OpenFontRender m_render;
     TTF_Font m_curFont = TTF_Font::NONE;
     uint8_t m_brightness = TFT_BRIGHTNESS;
 
-    TFT_eSPI& getDisplay();
+    TFT_eSPI &getDisplay();
     OpenFontRender &getRender();
     unsigned int getScaledFontSize(unsigned int fontSize);
     uint16_t dim(uint16_t color);

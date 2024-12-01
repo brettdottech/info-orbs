@@ -1,13 +1,12 @@
 #ifdef MQTT_WIDGET_HOST
 
-#include "MQTTWidget.h"
+    #include "MQTTWidget.h"
 
 // Initialize the static instance pointer
-MQTTWidget* MQTTWidget::instance = nullptr;
-
+MQTTWidget *MQTTWidget::instance = nullptr;
 
 // Static callback proxy to forward MQTT messages to the class instance
-void MQTTWidget::staticCallback(char* topic, byte* payload, unsigned int length) {
+void MQTTWidget::staticCallback(char *topic, byte *payload, unsigned int length) {
     if (instance) {
         instance->callback(topic, payload, length);
     }
@@ -16,7 +15,7 @@ void MQTTWidget::staticCallback(char* topic, byte* payload, unsigned int length)
 // Constructor
 MQTTWidget::MQTTWidget(ScreenManager &manager, const String &host, uint16_t port)
     : Widget(manager), mqttHost(host), mqttPort(port), mqttClient(wifiClient) {
-    
+
     // Assign the current instance to the static pointer
     instance = this;
 
@@ -86,24 +85,23 @@ uint16_t MQTTWidget::getColorFromString(const String &colorStr) {
 
 // Setup method
 void MQTTWidget::setup() {
-//    Serial.println("Inside setup method");
-/*
-    // Initialize MQTT connection
-    reconnect();
+    //    Serial.println("Inside setup method");
+    /*
+        // Initialize MQTT connection
+        reconnect();
 
-    // Subscribe to the setup topic
-    if (mqttClient.connected()) {
-        mqttClient.subscribe(MQTT_SETUP_TOPIC);
-        Serial.println("Subscribed to setup topic1: " + String(MQTT_SETUP_TOPIC));
-    }
-    // Additional setup (e.g., initializing display elements) can be added here
-*/
-
+        // Subscribe to the setup topic
+        if (mqttClient.connected()) {
+            mqttClient.subscribe(MQTT_SETUP_TOPIC);
+            Serial.println("Subscribed to setup topic1: " + String(MQTT_SETUP_TOPIC));
+        }
+        // Additional setup (e.g., initializing display elements) can be added here
+    */
 }
 
 // Update method
 void MQTTWidget::update(bool force) {
-//    Serial.println("Inside update method - " + String(mqttClient.connected()));
+    //    Serial.println("Inside update method - " + String(mqttClient.connected()));
 
     if (!mqttClient.connected()) {
         reconnect();
@@ -114,9 +112,8 @@ void MQTTWidget::update(bool force) {
 // Draw method: Draws all orbs (can be used for initial drawing or full refresh)
 void MQTTWidget::draw(bool force) {
     m_manager.setFont(DEFAULT_FONT);
-        
-    if (force)
-    {
+
+    if (force) {
         for (const auto &orb : orbConfigs) {
             drawOrb(orb.orbid);
         }
@@ -130,11 +127,11 @@ void MQTTWidget::changeMode() {
 }
 
 // Callback function for MQTT messages
-void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
+void MQTTWidget::callback(char *topic, byte *payload, unsigned int length) {
     // Convert payload to String
     String message;
     for (unsigned int i = 0; i < length; i++) {
-        message += (char)payload[i];
+        message += (char) payload[i];
     }
 
     String receivedTopic = String(topic);
@@ -150,7 +147,7 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
         auto it = orbDataMap.find(receivedTopic);
         if (it != orbDataMap.end()) {
             // Identify the orb configuration associated with this topic
-            OrbConfig* orb = nullptr;
+            OrbConfig *orb = nullptr;
             for (auto &o : orbConfigs) {
                 if (o.topicSrc.equals(receivedTopic)) {
                     orb = &o;
@@ -173,12 +170,12 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                     JsonVariant fieldValue = dataDoc.as<JsonVariant>();
                     char path[100];
                     strcpy(path, orb->jsonField.c_str());
-                    char* token = strtok(path, ".");
+                    char *token = strtok(path, ".");
 
                     // Traverse the path tokens to get the desired field value
                     while (token != nullptr && !fieldValue.isNull()) {
                         // Check if the token contains an array index (e.g., "power_delivered[0]")
-                        char* arrayBracket = strchr(token, '[');
+                        char *arrayBracket = strchr(token, '[');
                         if (arrayBracket) {
                             *arrayBracket = '\0'; // Null terminate to get the key part
                             fieldValue = fieldValue[token]; // Access the array key
@@ -205,8 +202,8 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
                             extractedValue = String(fieldValue.as<float>(), 3); // 3 decimal places
                         } else if (fieldValue.is<int>()) {
                             extractedValue = String(fieldValue.as<int>());
-                        } else if (fieldValue.is<const char*>()) {
-                            extractedValue = String(fieldValue.as<const char*>());
+                        } else if (fieldValue.is<const char *>()) {
+                            extractedValue = String(fieldValue.as<const char *>());
                         } else {
                             extractedValue = String(fieldValue.as<String>());
                         }
@@ -250,7 +247,7 @@ void MQTTWidget::callback(char* topic, byte* payload, unsigned int length) {
 
 // Handle setup message to configure orbs
 void MQTTWidget::handleSetupMessage(const String &message) {
-//    Serial.println("Handling setup message...");
+    //    Serial.println("Handling setup message...");
 
     // Parse JSON configuration
     JsonDocument doc;
@@ -307,10 +304,9 @@ void MQTTWidget::handleSetupMessage(const String &message) {
     draw(true);
 }
 
-
 // Subscribe to all orb topics
 void MQTTWidget::subscribeToOrbs() {
-//    Serial.println("Inside subscribeToOrbs method");
+    //    Serial.println("Inside subscribeToOrbs method");
 
     for (const auto &orb : orbConfigs) {
         bool success = mqttClient.subscribe(orb.topicSrc.c_str());
@@ -324,7 +320,7 @@ void MQTTWidget::subscribeToOrbs() {
 
 // Handle MQTT reconnection
 void MQTTWidget::reconnect() {
-//    Serial.println("Inside reconnect method");
+    //    Serial.println("Inside reconnect method");
 
     // Loop until reconnected
     while (!mqttClient.connected()) {
@@ -368,13 +364,13 @@ void MQTTWidget::reconnect() {
 
 // New method to draw a single orb based on orbid
 void MQTTWidget::drawOrb(int orbid) {
-//    Serial.println("Inside drawOrb method");
+    //    Serial.println("Inside drawOrb method");
 
     // Select the screen corresponding to the orbid
     m_manager.selectScreen(orbid);
 
     // Find the orb configuration
-    OrbConfig* orb = nullptr;
+    OrbConfig *orb = nullptr;
     for (auto &o : orbConfigs) {
         if (o.orbid == orbid) {
             orb = &o;
@@ -392,30 +388,28 @@ void MQTTWidget::drawOrb(int orbid) {
     // Define the position and size of the orb (adjust as needed)
     int x = 0; // Starting X position
     int y = 0; // Starting Y position
-    int width = 240;  // Width of the orb
-    int height = 240;  // Height of the orb
+    int width = 240; // Width of the orb
+    int height = 240; // Height of the orb
     int centre = 120;
     int screenWidth = SCREEN_SIZE;
-    //int screenHeight = display.height();
+    // int screenHeight = display.height();
 
     // Clear the display area with the background color
-   // display.fillRect(x, y, screenWidth, screenHeight, orb->orbBgColor);
+    // display.fillRect(x, y, screenWidth, screenHeight, orb->orbBgColor);
 
     // Set text properties
     m_manager.setFontColor(orb->orbTextColor, orb->orbBgColor);
-    //m_manager.setTextSize(orb->orbsize);
+    // m_manager.setTextSize(orb->orbsize);
 
     // Display orb description/title
-    //display.drawString(orb->orbdesc, centre, orb->xpostxt, orb->ypostxt);
- //   m_manager.drawString(orb->orbdesc, orb->xpostxt, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
+    // display.drawString(orb->orbdesc, centre, orb->xpostxt, orb->ypostxt);
+    //   m_manager.drawString(orb->orbdesc, orb->xpostxt, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
     m_manager.drawString(orb->orbdesc, centre, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
-   
 
     // Display orb data
     String data = orbDataMap[orb->topicSrc];
-    //display.drawString(data + orb->orbvalunit, centre, orb->xposval, orb->yposval);
+    // display.drawString(data + orb->orbvalunit, centre, orb->xposval, orb->yposval);
     m_manager.drawString(data + orb->orbvalunit, orb->xposval, orb->yposval, orb->orbsize, Align::MiddleCenter);
-
 }
 
 String MQTTWidget::getName() {

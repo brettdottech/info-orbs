@@ -59,7 +59,7 @@ String ParqetHoldingDataModel::getShares(int8_t digits) {
 }
 float ParqetHoldingDataModel::getPercentChange() {
     // return 100 * (m_currentPrice-m_purchasePrice)/m_purchasePrice;
-    return 100 * (m_currentValue/m_purchaseValue - 1);
+    return 100 * (m_currentValue / m_purchaseValue - 1);
 }
 String ParqetHoldingDataModel::getPercentChange(int8_t digits) {
     return Utils::formatFloat(getPercentChange(), digits);
