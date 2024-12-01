@@ -40,7 +40,7 @@ void WifiWidget::setup() {
     m_wifiManager.setShowInfoUpdate(false);
     m_wifiManager.setShowInfoErase(false);
     m_wifiManager.setMenu(wm_menu);
-    m_wifiManager.setClass("invert");
+    m_wifiManager.setClass("invert"); // Dark mode
 
     // Set WiFiManager to non-blocking so status and info can be displayed
     m_wifiManager.setConfigPortalBlocking(false);
@@ -58,8 +58,6 @@ void WifiWidget::setup() {
     // WiFiManager automatically connects using saved credentials...
     if (m_wifiManager.autoConnect(m_apssid.c_str())) {
         Serial.print("WifiManager connected.");
-        // Start the WebPortal
-        m_wifiManager.startWebPortal();
     } else { // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1
         m_configPortalRunning = true;
         Serial.println("Configuration portal running.");
@@ -89,6 +87,8 @@ void WifiWidget::update(bool force) {
         m_ipaddress = WiFi.localIP().toString();
         Serial.print("IP address: ");
         Serial.println(m_ipaddress);
+        // Start the WebPortal
+        m_wifiManager.startWebPortal();
     } else {
         m_connectionTimer += 500;
         m_dotsString += " . ";
@@ -121,7 +121,6 @@ void WifiWidget::draw(bool force) {
         m_manager.drawCentreString(m_ipaddress, ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         Serial.println();
         Serial.println("Connected to WiFi");
-        m_isConnected = true;
         delay(messageDelay);
     } else if (m_connectionFailed && !m_hasDisplayedError) {
         m_hasDisplayedError = true;
