@@ -7,14 +7,14 @@
 #include "WebDataElementModel.h"
 
 class WebDataModel {
-   public:
+public:
     virtual ~WebDataModel() = default;
     String getLabel();
     void setLabel(String label);
     String getData();
     void setData(String data, int32_t defaultColor, int32_t defaultBackground);
     void setData(JsonArray data, int32_t defaultColor, int32_t defaultBackground);
-    const WebDataElementModel& getElement(int index);
+    const WebDataElementModel &getElement(int index);
     int32_t getElementsCount();
     void setElementsCount(int32_t elementsCount);
     void initElements(int32_t count);
@@ -38,14 +38,14 @@ class WebDataModel {
     bool isInitialized();
     void setInitializedStatus(bool initialized);
 
-    void parseData(const JsonObject& doc, int32_t defaultColor, int32_t defaultBackground);
-    void draw(ScreenManager& manager);
+    void parseData(const JsonObject &doc, int32_t defaultColor, int32_t defaultBackground);
+    void draw(ScreenManager &manager);
 
-   private:
+private:
     bool m_isInitialized = false;
     String m_label = "";
     String m_data = "";
-    WebDataElementModel* m_elements = nullptr;
+    WebDataElementModel *m_elements = nullptr;
     int m_elementsCount = 0;
     int32_t m_labelColor = -1;
     int32_t m_color = -1;

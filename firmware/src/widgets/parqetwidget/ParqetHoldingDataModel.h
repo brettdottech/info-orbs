@@ -6,7 +6,7 @@
 #include <iomanip>
 
 class ParqetHoldingDataModel {
-   public:
+public:
     ParqetHoldingDataModel();
 
     void setId(String id);
@@ -31,7 +31,7 @@ class ParqetHoldingDataModel {
     String getPercentChange(int8_t digits);
     String getCurrency();
 
-   private:
+private:
     String m_id = "";
     String m_name = "";
     float m_purchasePrice = 0;
@@ -40,7 +40,6 @@ class ParqetHoldingDataModel {
     float m_currentValue = 0;
     float m_shares = 0;
     String m_currency = "";
-    
 };
 
-#endif  // PARQET_HOLDING_DATA_MODEL_H
+#endif // PARQET_HOLDING_DATA_MODEL_H

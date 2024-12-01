@@ -21,3 +21,5 @@ firmware/config/config.h
 .vscode/
 
 .vscode/extensions.json
+
+megalinter-reports/

@@ -1,8 +1,8 @@
 #include "StockWidget.h"
 
+#include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include "config_helper.h"
 
 #include <iomanip>
 
@@ -63,7 +63,6 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         changeMode();
 }
 
-
 void StockWidget::getStockData(StockDataModel &stock) {
     String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
 
@@ -71,7 +70,7 @@ void StockWidget::getStockData(StockDataModel &stock) {
     http.begin(httpRequestAddress);
     int httpCode = http.GET();
 
-    if (httpCode > 0) {  // Check for the returning code
+    if (httpCode > 0) { // Check for the returning code
         String payload = http.getString();
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, payload);
@@ -80,7 +79,7 @@ void StockWidget::getStockData(StockDataModel &stock) {
             float currentPrice = doc["close"].as<float>();
             if (currentPrice > 0.0) {
                 stock.setCurrentPrice(doc["close"].as<float>());
-                stock.setPercentChange(doc["percent_change"].as<float>()/100);
+                stock.setPercentChange(doc["percent_change"].as<float>() / 100);
                 stock.setPriceChange(doc["change"].as<float>());
                 stock.setHighPrice(doc["fifty_two_week"]["high"].as<float>());
                 stock.setLowPrice(doc["fifty_two_week"]["low"].as<float>());
@@ -114,18 +113,15 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
 
     m_manager.fillScreen(TFT_BLACK);
 
-
     // Calculate center positions
     int screenWidth = SCREEN_SIZE;
     int centre = 120;
     int arrowOffsetX = 0;
     int arrowOffsetY = -109;
- 
 
-
-// Outputs
-    m_manager.fillRect(0,70, screenWidth, 49, TFT_WHITE); 
-    m_manager.fillRect(0,111, screenWidth, 20, TFT_LIGHTGREY);  
+    // Outputs
+    m_manager.fillRect(0, 70, screenWidth, 49, TFT_WHITE);
+    m_manager.fillRect(0, 111, screenWidth, 20, TFT_LIGHTGREY);
     int smallFontSize = 11;
     int bigFontSize = 29;
     m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
@@ -137,11 +133,11 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     if (stock.getPercentChange() < 0.0) {
         m_manager.setFontColor(TFT_RED, TFT_BLACK);
         m_manager.fillTriangle(110 + arrowOffsetX, 120 + arrowOffsetY, 130 + arrowOffsetX, 120 + arrowOffsetY, 120 + arrowOffsetX, 132 + arrowOffsetY, TFT_RED);
-        m_manager.drawArc (centre, centre, 120, 118, 0, 360, TFT_RED, TFT_RED);
+        m_manager.drawArc(centre, centre, 120, 118, 0, 360, TFT_RED, TFT_RED);
     } else {
         m_manager.setFontColor(TFT_GREEN, TFT_BLACK);
         m_manager.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
-        m_manager.drawArc (centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
+        m_manager.drawArc(centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
     }
     m_manager.drawString(stock.getPercentChange(2) + "%", centre, 48, bigFontSize, Align::MiddleCenter);
     // Draw stock data
@@ -151,7 +147,6 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
 
     m_manager.drawString(stock.getCurrencySymbol() + stock.getCurrentPrice(2), centre, 155, bigFontSize, Align::MiddleCenter);
-  
 }
 
 String StockWidget::getName() {
