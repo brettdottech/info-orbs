@@ -90,11 +90,11 @@ private:
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
-    void displayAmPm(uint32_t color);
+    void displayAmPm(String &amPm, uint32_t color);
     DigitOffset getOffsetForDigit(const String &digit);
-    void displayImage(int displayIndex, String digit);
-    void displayNixie(int displayIndex, String digit);
-    void displayCustom(int displayIndex, String digit);
+    void displayImage(int displayIndex, const String &digit);
+    void displayNixie(int displayIndex, const String &digit);
+    void displayCustom(int displayIndex, const String &digit);
     void changeClockType();
 
     ClockType m_type = DEFAULT_CLOCK;
@@ -124,6 +124,9 @@ private:
     String m_lastDisplay4Digit{""};
     String m_display5Digit;
     String m_lastDisplay5Digit{""};
+
+    String m_amPm;
+    String m_lastAmPm{""};
 
     DigitOffset m_digitOffsets[10] = CLOCK_DIGITS_OFFSET;
 };

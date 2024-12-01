@@ -48,20 +48,32 @@ void ClockWidget::draw(bool force) {
 #endif
         m_lastSecondSingle = m_secondSingle;
         if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
-            displayAmPm(CLOCK_COLOR);
+            if (m_amPm != m_lastAmPm) {
+                // Clear old AM/PM
+                displayAmPm(m_lastAmPm, TFT_BLACK);
+                m_lastAmPm = m_amPm;
+            }
+            displayAmPm(m_amPm, CLOCK_COLOR);
         }
     }
 }
 
-void ClockWidget::displayAmPm(uint32_t color) {
-    GlobalTime *time = GlobalTime::getInstance();
+void ClockWidget::displayAmPm(String &amPm, uint32_t color) {
     m_manager.selectScreen(2);
     m_manager.setFontColor(color, TFT_BLACK);
-    String am_pm = time->isPM() ? "PM" : "AM";
-    if (CLOCK_FONT == DSEG7) {
-        m_manager.setFont(DSEG14);
+    // Workaround for 12h AM/PM problem
+    // The colon is slightly offset and that's a problem because to remove them, we paint over them
+    // I think this is related to the TTF cache
+    // The problem disappears if we reload the font here
+    if (CLOCK_FONT == TTF_Font::DSEG7) {
+        // We set a new font anyway
+        m_manager.setFont(TTF_Font::DSEG14);
+    } else {
+        // Force reloading the font
+        m_manager.setFont(TTF_Font::NONE);
+        m_manager.setFont(CLOCK_FONT);
     }
-    m_manager.drawString(am_pm, SCREEN_SIZE / 4 * 3, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
+    m_manager.drawString(amPm, SCREEN_SIZE / 5 * 4, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
 }
 
 void ClockWidget::update(bool force) {
@@ -70,10 +82,11 @@ void ClockWidget::update(bool force) {
     }
 
     GlobalTime *time = GlobalTime::getInstance();
-    m_hourSingle = time->getHour();
 
+    m_hourSingle = time->getHour();
     m_minuteSingle = time->getMinute();
     m_secondSingle = time->getSecond();
+    m_amPm = time->isPM() ? "PM" : "AM";
 
     if (m_lastHourSingle != m_hourSingle || force) {
         if (m_hourSingle < 10) {
@@ -207,7 +220,7 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
     }
 }
 
-void ClockWidget::displayImage(int displayIndex, String digit) {
+void ClockWidget::displayImage(int displayIndex, const String &digit) {
     switch (m_type) {
     case ClockType::NIXIE:
         displayNixie(displayIndex, digit);
@@ -219,7 +232,7 @@ void ClockWidget::displayImage(int displayIndex, String digit) {
     }
 }
 
-void ClockWidget::displayNixie(int displayIndex, String digit) {
+void ClockWidget::displayNixie(int displayIndex, const String &digit) {
 #if USE_CLOCK_NIXIE
     if (digit.length() != 1) {
         return;
@@ -267,7 +280,7 @@ void ClockWidget::displayNixie(int displayIndex, String digit) {
 #endif
 }
 
-void ClockWidget::displayCustom(int displayIndex, String digit) {
+void ClockWidget::displayCustom(int displayIndex, const String &digit) {
 #if USE_CLOCK_CUSTOM
     if (digit.length() != 1) {
         return;
