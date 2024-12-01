@@ -19,21 +19,6 @@ void WifiWidget::setup() {
     m_manager.setFontColor(TFT_WHITE);
     m_manager.drawCentreString("Connecting", ScreenCenterX, ScreenCenterY - lineHeight, fontSize);
 
-    WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
-
-#if (defined WIFI_SSID && defined WIFI_PASS)
-    m_hardCodedWiFi = true;
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-#endif
-
-    // Remove unwanted buttons from the config portal
-    std::vector<const char *> wm_menu = {"wifi", "param", "info", "restart"}; // buttons: wifi, info, exit, update
-    // Remove unwanted buttons from the Info page
-    m_wifiManager.setShowInfoUpdate(false);
-    m_wifiManager.setShowInfoErase(false);
-    m_wifiManager.setMenu(wm_menu);
-    m_wifiManager.setClass("invert");
-
     // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
@@ -41,6 +26,21 @@ void WifiWidget::setup() {
         m_manager.drawCentreString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         delay(messageDelay);
     }
+
+    WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
+
+#if (defined WIFI_SSID && defined WIFI_PASS)
+    // Preload credentials from config.h
+    m_wifiManager.preloadWiFi(WIFI_SSID, WIFI_PASS);
+#endif
+
+    // Remove unwanted buttons from the config portal
+    std::vector<const char *> wm_menu = {"wifi", "param", "info", "update", "restart"}; // buttons: wifi, info, exit, update
+    // Remove unwanted buttons from the Info page
+    m_wifiManager.setShowInfoUpdate(false);
+    m_wifiManager.setShowInfoErase(false);
+    m_wifiManager.setMenu(wm_menu);
+    m_wifiManager.setClass("invert");
 
     // Set WiFiManager to non-blocking so status and info can be displayed
     m_wifiManager.setConfigPortalBlocking(false);
