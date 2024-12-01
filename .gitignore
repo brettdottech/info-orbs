@@ -24,3 +24,8 @@ firmware/config/config.h
 .idea/
 
 megalinter-reports/
+
+# May be present if running mega-linter-runner locally
+node_modules
+package.json
+package-lock.json
