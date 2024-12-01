@@ -1,5 +1,7 @@
 #include "ConfigManager.h"
 
+ConfigManager *ConfigManager::m_instance = nullptr;
+
 ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
     Serial.println("Constructing ConfigManager");
     if (!preferences.begin("config", false)) {
@@ -8,6 +10,7 @@ ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
         Serial.println("NVS initialized successfully in ConfigManager");
     }
     Serial.println("ConfigManager initialized");
+    m_instance = this;
 }
 
 ConfigManager::~ConfigManager() {
@@ -15,6 +18,10 @@ ConfigManager::~ConfigManager() {
         delete param.parameter;
     }
     preferences.end();
+}
+
+ConfigManager &ConfigManager::getInstance() {
+    return *m_instance;
 }
 
 void ConfigManager::setupWiFiManager() {
@@ -152,6 +159,11 @@ void ConfigManager::addConfigBool(const std::string& className, const std::strin
         // Serial.println(this->m_wm.server->uri());
         triggerChangeCallbacks(classNameBuffer, varNameBuffer);
     }});
+}
+
+bool ConfigManager::getConfigBool(const std::string &varName, bool defaultValue) {
+    bool val = preferences.getBool(varName.c_str(), defaultValue);
+    return val;
 }
 
 void ConfigManager::addOnChangeCallback(

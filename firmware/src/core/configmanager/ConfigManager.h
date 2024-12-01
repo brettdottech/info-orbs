@@ -16,6 +16,8 @@ public:
     ConfigManager(WiFiManager &wm);
     ~ConfigManager();
 
+    static ConfigManager &getInstance();
+
     void setupWiFiManager();
     void loadAllConfigs();
     void saveAllConfigs();
@@ -26,6 +28,9 @@ public:
     void addConfigFloat(const std::string& className, const std::string& varName, float* var, const std::string& description);
     void addConfigIP(const std::string& className, const std::string& varName, IPAddress* var, const std::string& description);
     void addConfigBool(const std::string& className, const std::string& varName, bool* var, const std::string& description);
+
+    // Get stored values
+    bool getConfigBool(const std::string &varName, bool defaultValue);
 
     // Register callbacks for changes
     void addOnChangeCallback(
@@ -45,6 +50,8 @@ private:
         const char *variableName;
         std::function<void()> saveCallback;
     };
+
+    static ConfigManager *m_instance;
 
     WiFiManager &m_wm;
     Preferences preferences;
