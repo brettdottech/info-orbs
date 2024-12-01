@@ -179,32 +179,31 @@ void ScreenManager::drawString(const String &text, int x, int y) {
 
 void ScreenManager::drawString(const String &text, int x, int y, unsigned int fontSize, Align align, int32_t fgColor, int32_t bgColor, bool applyScale) {
 
-  if (fontSize == 0) {
-    // Keep current font size
-    fontSize = m_render.getFontSize();
-  } else if (applyScale) {
-    fontSize = getScaledFontSize(fontSize);
-  }
-  if (fgColor == -1) {
-    // Keep current FG color
-    fgColor = m_render.getFontColor();
-  } else {
-    fgColor = dim(fgColor);
-  }
-  if (bgColor == -1) {
-    // Keep current BG color
-    bgColor = m_render.getBackgroundColor();
-  } else {
-    bgColor = dim(bgColor);
-  }
+    if (fontSize == 0) {
+        // Keep current font size
+        fontSize = m_render.getFontSize();
+    } else if (applyScale) {
+        fontSize = getScaledFontSize(fontSize);
+    }
+    if (fgColor == -1) {
+        // Keep current FG color
+        fgColor = m_render.getFontColor();
+    } else {
+        fgColor = dim(fgColor);
+    }
+    if (bgColor == -1) {
+        // Keep current BG color
+        bgColor = m_render.getBackgroundColor();
+    } else {
+        bgColor = dim(bgColor);
+    }
 
-  // Dirty hack to correct misaligned Y
-  // See https://github.com/takkaO/OpenFontRender/issues/38
-  FT_BBox box = m_render.calculateBoundingBox(0,0,fontSize,Align::TopLeft,Layout::Horizontal, text.c_str());
-  m_render.setAlignment(align);
-  m_render.setFontSize(fontSize);
-  m_render.drawString(text.c_str(), x, y - box.yMin, fgColor, bgColor);
-
+    // Dirty hack to correct misaligned Y
+    // See https://github.com/takkaO/OpenFontRender/issues/38
+    FT_BBox box = m_render.calculateBoundingBox(0, 0, fontSize, Align::TopLeft, Layout::Horizontal, text.c_str());
+    m_render.setAlignment(align);
+    m_render.setFontSize(fontSize);
+    m_render.drawString(text.c_str(), x, y - box.yMin, fgColor, bgColor);
 }
 
 void ScreenManager::drawCentreString(const String &text, int x, int y, unsigned int fontSize) {
