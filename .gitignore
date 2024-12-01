@@ -20,6 +20,7 @@ firmware/config/config.h
 # VS Code
 .vscode/
 
-.vscode/extensions.json
+# Jetbrains IDE
+.idea/
 
 megalinter-reports/
