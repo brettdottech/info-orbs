@@ -109,8 +109,6 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     }
     m_manager.selectScreen(displayIndex);
 
-    // TFT_eSPI &display = m_manager.getDisplay();
-
     m_manager.fillScreen(TFT_BLACK);
 
     // Calculate center positions

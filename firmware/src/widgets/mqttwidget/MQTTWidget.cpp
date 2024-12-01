@@ -369,9 +369,6 @@ void MQTTWidget::drawOrb(int orbid) {
     // Select the screen corresponding to the orbid
     m_manager.selectScreen(orbid);
 
-    // Access the display
-    // TFT_eSPI &display = m_manager.getDisplay();
-
     // Find the orb configuration
     OrbConfig *orb = nullptr;
     for (auto &o : orbConfigs) {
