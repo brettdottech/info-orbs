@@ -27,7 +27,7 @@ void WeatherWidget::changeMode() {
     if (m_mode > MODE_LOWS) {
         m_mode = MODE_HIGHS;
     }
-    draw(true);
+    threeDayWeather(4);
 }
 
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
