@@ -53,6 +53,9 @@ void WifiWidget::setup() {
     // so each Info-Orbs has a unique SSID
     m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
 
+    wifimgr.setCleanConnect(true);
+    wifimgr.setConnectRetries(5);
+
     // WiFiManager automatically connects using saved credentials...
     if (wifimgr.autoConnect(m_apssid.c_str())) {
         Serial.print("WifiManager connected.");
