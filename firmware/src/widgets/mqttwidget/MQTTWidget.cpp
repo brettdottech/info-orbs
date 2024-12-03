@@ -403,8 +403,8 @@ void MQTTWidget::drawOrb(int orbid) {
 
     // Display orb description/title
     // display.drawString(orb->orbdesc, centre, orb->xpostxt, orb->ypostxt);
-    //   m_manager.drawString(orb->orbdesc, orb->xpostxt, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
-    m_manager.drawString(orb->orbdesc, centre, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
+    m_manager.drawString(orb->orbdesc, orb->xpostxt, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
+    // m_manager.drawString(orb->orbdesc, centre, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
 
     // Display orb data
     String data = orbDataMap[orb->topicSrc];
