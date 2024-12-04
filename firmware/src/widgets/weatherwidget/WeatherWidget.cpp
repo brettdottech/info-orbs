@@ -59,6 +59,14 @@ void WeatherWidget::draw(bool force) {
         threeDayWeather(4);
         model.setChangedStatus(false);
     }
+    if ((m_time->getSecond() % 10) == 0){
+        m_mode++;
+        if (m_mode > MODE_LOWS) {
+            m_mode = MODE_HIGHS;
+        }
+        threeDayWeather(4);
+        delay(1000);
+    }
 }
 
 void WeatherWidget::update(bool force) {
