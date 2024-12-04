@@ -41,6 +41,7 @@ void WeatherWidget::setup() {
     m_screenMode = WEATHER_SCREEN_MODE;
 #endif
     configureColors();
+    prevMillisSwitch = millis();
 }
 
 void WeatherWidget::draw(bool force) {
@@ -59,13 +60,15 @@ void WeatherWidget::draw(bool force) {
         threeDayWeather(4);
         model.setChangedStatus(false);
     }
-    if ((m_time->getSecond() % 10) == 0){
+
+    currentSwitchMillis = millis();
+    if (currentSwitchMillis - prevMillisSwitch >= switchinterval) {
+        prevMillisSwitch = currentSwitchMillis;
         m_mode++;
         if (m_mode > MODE_LOWS) {
             m_mode = MODE_HIGHS;
         }
         threeDayWeather(4);
-        delay(1000);
     }
 }
 
