@@ -134,25 +134,33 @@ void ParqetWidget::updatePortfolio() {
 
     // Check for the returning code
     if (httpCode == 200) {
+        Serial.print("PU A1");
         Stream &rawStream = http.getStream();
+        Serial.print(", A2");
         ChunkDecodingStream decodedStream(http.getStream());
+        Serial.print(", A3");
 
         // Choose the right stream depending on the Transfer-Encoding header
         // Parqet might send chunked responses
         Stream &response =
             http.header("Transfer-Encoding") == "chunked" ? decodedStream : rawStream;
 
+        Serial.print(", A4");
         // Parse response
         JsonDocument doc;
         JsonDocument filter;
+        Serial.print(", A5");
         // Filter the response to save memory
         filter["holdings"] = true;
         filter["performance"] = true;
 
+        Serial.print(", A6");
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+        Serial.println(", A7");
 
         if (!error) {
             JsonArray holdings = doc["holdings"];
+            Serial.print("PU B1");
             // Initialize a new array (reserver one extra element for totals)
             ParqetHoldingDataModel *holdingArray = new ParqetHoldingDataModel[holdings.size() + 1];
             int count = 0;
@@ -189,6 +197,7 @@ void ParqetWidget::updatePortfolio() {
                     // Serial.printf("Invalid type: %s, id: %s\n", type.c_str(), id.c_str());
                 }
             }
+            Serial.print(", B2");
             // Add total
             if (m_showTotalScreen) {
                 JsonVariant perf = doc["performance"];
@@ -207,7 +216,9 @@ void ParqetWidget::updatePortfolio() {
                 }
                 holdingArray[count++] = h;
             }
+            Serial.print(", B3");
             m_portfolio.setHoldings(holdingArray, count);
+            Serial.println(", B4");
         } else {
             // Handle JSON deserialization error
             Serial.println("deserializeJson() failed");
