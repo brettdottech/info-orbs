@@ -24,10 +24,11 @@ public:
     static String formatFloat(float value, int8_t digits);
     static int32_t stringToAlignment(String alignment);
     static uint16_t rgb565dim(uint16_t rgb565, uint8_t brightness, bool swapBytes = false);
-    static uint32_t rgb565ToRgb888(uint16_t rgb565, bool swapBytes);
-    static uint16_t rgb888ToRgb565(uint32_t rgb888, bool swapBytes);
-    static uint16_t grayscaleToTargetColor(uint8_t grayscale, uint32_t targetColor888, float brightness, bool swapBytes);
-    static void colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor888, float brightness, bool swapBytes);
+    static void rgb565dimBitmap(uint16_t *pixel565, size_t length, uint8_t brightness, bool swapBytes = true);
+    static uint32_t rgb565ToRgb888(uint16_t rgb565, bool swapBytes = false);
+    static uint16_t rgb888ToRgb565(uint32_t rgb888, bool swapBytes = false);
+    static uint16_t grayscaleToTargetColor(uint8_t grayscale, uint32_t targetColor888, float brightness, bool swapBytes = false);
+    static void colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor888, float brightness, bool swapBytes = true);
 };
 
 #endif

@@ -339,9 +339,7 @@ bool ScreenManager::tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint
     }
     if (brightness != 255) {
         // Dim bitmap
-        for (int i = 0; i < w * h; i++) {
-            bitmap[i] = Utils::rgb565dim(bitmap[i], brightness, true);
-        }
+        Utils::rgb565dimBitmap(bitmap, w * h, brightness, true);
     }
     tft.pushImage(x, y, w, h, bitmap);
     return true;

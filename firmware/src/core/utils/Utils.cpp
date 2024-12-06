@@ -212,6 +212,12 @@ uint16_t Utils::rgb565dim(uint16_t rgb565, uint8_t brightness, bool swapBytes) {
     return result;
 }
 
+void Utils::rgb565dimBitmap(uint16_t *pixel565, size_t length, uint8_t brightness, bool swapBytes = true) {
+    for (int i = 0; i < length; i++) {
+        pixel565[i] = rgb565dim(pixel565[i], brightness, swapBytes);
+    }
+}
+
 // Function to extract R, G, B from a 16-bit RGB565 pixel
 uint32_t Utils::rgb565ToRgb888(uint16_t rgb565, bool swapBytes) {
     uint8_t r, g, b;
