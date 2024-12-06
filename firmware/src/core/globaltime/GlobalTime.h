@@ -30,6 +30,10 @@ const String LOC_FORMAT_DAYMONTH = "%d %B"; // in strftime format, this will be 
 const String LOC_LANG = "en";
 #endif
 
+#define CLOCK_FORMAT_24_HOUR 0
+#define CLOCK_FORMAT_12_HOUR 1
+#define CLOCK_FORMAT_12_HOUR_AMPM 2
+
 class GlobalTime {
 public:
     static GlobalTime *getInstance();
