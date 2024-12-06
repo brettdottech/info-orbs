@@ -255,28 +255,29 @@ uint16_t Utils::rgb888ToRgb565(uint32_t rgb888, bool swapBytes) {
 }
 
 // Function to apply grayscale and map to target color
-uint16_t Utils::grayscaleToTargetColor(uint8_t grayscale, uint32_t targetColor565, float brightness, bool swapBytes) {
-    uint32_t targetColor888 = rgb565ToRgb888(targetColor565, false);
-    // Extract target R, G, B
-    uint8_t targetR = (targetColor888 >> 16) & 0xFF;
-    uint8_t targetG = (targetColor888 >> 8) & 0xFF;
-    uint8_t targetB = targetColor888 & 0xFF;
-
+uint16_t Utils::grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes) {
     // Apply brightness enhancement
     int scaledGrayscale = grayscale * brightness;
     if (scaledGrayscale > 255)
         scaledGrayscale = 255; // Clamp to 255
 
     // Map grayscale to target color
-    uint8_t r = (targetR * scaledGrayscale) / 255;
-    uint8_t g = (targetG * scaledGrayscale) / 255;
-    uint8_t b = (targetB * scaledGrayscale) / 255;
+    uint8_t r = (targetR8 * scaledGrayscale) / 255;
+    uint8_t g = (targetG8 * scaledGrayscale) / 255;
+    uint8_t b = (targetB8 * scaledGrayscale) / 255;
 
     return rgb888ToRgb565((r << 16) | (g << 8) | b, swapBytes);
 }
 
 // Function to colorize image data
 void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor565, float brightness, bool swapBytes) {
+    uint32_t targetColor888 = rgb565ToRgb888(targetColor565, false);
+
+    // Extract target R, G, B
+    uint8_t targetR8 = (targetColor888 >> 16) & 0xFF;
+    uint8_t targetG8 = (targetColor888 >> 8) & 0xFF;
+    uint8_t targetB8 = targetColor888 & 0xFF;
+
     for (size_t i = 0; i < length; i++) {
         // Convert RGB565 to RGB888
         uint32_t color888 = rgb565ToRgb888(pixels565[i], true);
@@ -288,6 +289,6 @@ void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targe
         uint8_t grayscale = (r * 30 + g * 59 + b * 11) / 100;
 
         // Map grayscale to the target color
-        pixels565[i] = grayscaleToTargetColor(grayscale, targetColor565, brightness, swapBytes);
+        pixels565[i] = grayscaleToTargetColor(grayscale, targetR8, targetG8, targetB8, brightness, swapBytes);
     }
 }
