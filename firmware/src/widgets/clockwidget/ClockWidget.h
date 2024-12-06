@@ -5,6 +5,10 @@
 #include "Widget.h"
 #include <TJpg_Decoder.h>
 
+#ifndef CLOCK_FORMAT
+    #define CLOCK_FORMAT CLOCK_FORMAT_24_HOUR
+#endif
+
 #ifndef USE_CLOCK_NIXIE
     #define USE_CLOCK_NIXIE true
 #endif
@@ -93,7 +97,7 @@ public:
     String getName() override;
 
 private:
-    void change24hMode();
+    void changeFormat();
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
@@ -106,8 +110,7 @@ private:
 
     ClockType m_type = DEFAULT_CLOCK;
 
-    bool m_format24h;
-    bool m_showAmPm;
+    int m_format = CLOCK_FORMAT;
     bool m_showSecondTicks;
     int m_fgColor = CLOCK_COLOR;
     int m_shadowColor = CLOCK_SHADOW_COLOR;

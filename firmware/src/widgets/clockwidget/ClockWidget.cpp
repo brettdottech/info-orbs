@@ -3,8 +3,8 @@
 #include "config_helper.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
-    m_config.addConfigBool("ClockWidget", "format24h", &m_format24h, "24h mode (on) or 12h mode (off)");
-    m_config.addConfigBool("ClockWidget", "showAmPm", &m_showAmPm, "Show AM/PM in 12h mode");
+    String optFormats[] = {"24h mode", "12h mode", "12h mode (with am/pm)"};
+    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, optFormats, 3, "Clock format");
     m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show second ticks");
     m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock color");
     m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing");
@@ -58,7 +58,7 @@ void ClockWidget::draw(bool force) {
             displaySeconds(2, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
-        if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
+        if (m_format == CLOCK_FORMAT_12_HOUR_AMPM && m_type != ClockType::NIXIE) {
             if (m_amPm != m_lastAmPm) {
                 // Clear old AM/PM
                 displayAmPm(m_lastAmPm, TFT_BLACK);
@@ -101,7 +101,7 @@ void ClockWidget::update(bool force) {
 
     if (m_lastHourSingle != m_hourSingle || force) {
         if (m_hourSingle < 10) {
-            if (m_format24h) {
+            if (m_format == CLOCK_FORMAT_24_HOUR) {
                 m_display1Digit = "0";
             } else {
                 m_display1Digit = " ";
@@ -124,9 +124,17 @@ void ClockWidget::update(bool force) {
     }
 }
 
-void ClockWidget::change24hMode() {
+void ClockWidget::changeFormat() {
     GlobalTime *time = GlobalTime::getInstance();
-    time->setFormat24Hour(!time->getFormat24Hour());
+    m_format++;
+    if (m_format > 2) {
+        m_format = 0;
+    }
+    if (m_format == CLOCK_FORMAT_24_HOUR) {
+        time->setFormat24Hour(true);
+    } else {
+        time->setFormat24Hour(false);
+    }
     draw(true);
 }
 
@@ -158,7 +166,7 @@ void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT) {
         changeClockType();
     } else if (buttonId == BUTTON_OK && state == BTN_MEDIUM) {
-        change24hMode();
+        changeFormat();
     }
 }
 
