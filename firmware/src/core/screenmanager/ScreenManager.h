@@ -7,6 +7,7 @@
 #include <OpenFontRender.h>
 #include <SPI.h>
 #include <TFT_eSPI.h>
+#include <TJpg_Decoder.h>
 
 #define NUM_SCREENS 5
 
@@ -21,6 +22,7 @@
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI &tft);
+    static ScreenManager *getInstance();
 
     void selectScreen(int screen);
     void selectAllScreens();
@@ -78,7 +80,13 @@ public:
     void drawLegacyString(const String &string, int32_t x, int32_t y, uint8_t font);
     int16_t drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font);
 
+    // Image functions
+    static bool tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
+    JRESULT drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale = 1);
+
 private:
+    static ScreenManager *m_instance;
+
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI &m_tft;
     OpenFontRender m_render;

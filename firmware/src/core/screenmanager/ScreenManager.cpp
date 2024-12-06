@@ -2,6 +2,8 @@
 #include "Utils.h"
 #include <Arduino.h>
 
+ScreenManager *ScreenManager::m_instance = nullptr;
+
 ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
 
     for (int i = 0; i < NUM_SCREENS; i++) {
@@ -14,6 +16,11 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
+
+    // Init TJpg_Decode
+    TJpgDec.setSwapBytes(true); // JPEG rendering setup
+    TJpgDec.setJpgScale(1);
+    TJpgDec.setCallback(tftOutput);
 
     // I'm not sure which cache size is actually good.
     // Needs testing.
@@ -33,6 +40,15 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     Serial.println("SCREEN_3_CS:" + String(SCREEN_3_CS));
     Serial.println("SCREEN_4_CS:" + String(SCREEN_4_CS));
     Serial.println("SCREEN_5_CS:" + String(SCREEN_5_CS));
+
+    m_instance = this;
+}
+
+ScreenManager *ScreenManager::getInstance() {
+    if (m_instance == nullptr) {
+        Serial.println("ERR: ScreenManager==nullptr in getInstance()");
+    }
+    return m_instance;
 }
 
 void ScreenManager::setFont(TTF_Font font) {
@@ -303,4 +319,28 @@ void ScreenManager::drawLegacyString(const String &string, int32_t x, int32_t y,
 
 int16_t ScreenManager::drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font) {
     return m_tft.drawChar(uniCode, x, y, font);
+}
+
+// Static function to be used in TJpgDec callback
+bool ScreenManager::tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
+    ScreenManager *sm = getInstance();
+    if (sm == nullptr) {
+        Serial.println("TFT_Output not possible, ScreenManager instance not initialized");
+        return false;
+    }
+    TFT_eSPI &tft = sm->getDisplay();
+    if (y >= tft.height())
+        return 0;
+    // Dim bitmap
+    uint8_t brightness = sm->getBrightness();
+    for (int i = 0; i < w * h; i++) {
+        bitmap[i] = Utils::rgb565dim(bitmap[i], brightness, true);
+    }
+    tft.pushImage(x, y, w, h, bitmap);
+    return true;
+}
+
+JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale) {
+    TJpgDec.setJpgScale(scale);
+    return TJpgDec.drawJpg(x, y, jpeg_data, data_size);
 }
