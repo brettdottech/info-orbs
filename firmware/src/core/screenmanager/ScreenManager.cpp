@@ -333,7 +333,7 @@ bool ScreenManager::tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint
     TFT_eSPI &tft = sm->getDisplay();
     if (y >= tft.height() || x >= tft.width())
         return 0;
-    if (imageColor != TFT_BLACK) {
+    if (imageColor != 0) {
         // We have an image color set, let's use it
         Utils::colorizeImageData(bitmap, w * h, imageColor, 1.25, true);
     }
@@ -354,6 +354,6 @@ JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], 
     m_imageColor = imageColor;
     JRESULT result = TJpgDec.drawJpg(x, y, jpeg_data, data_size);
     // Reset image color
-    m_imageColor = TFT_BLACK;
+    m_imageColor = 0;
     return result;
 }

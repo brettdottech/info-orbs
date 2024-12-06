@@ -82,7 +82,7 @@ public:
 
     // Image functions
     static bool tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
-    JRESULT drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale = 1, uint32_t imageColor = TFT_BLACK);
+    JRESULT drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale = 1, uint32_t imageColor = 0);
 
 private:
     static ScreenManager *m_instance;
@@ -92,7 +92,7 @@ private:
     OpenFontRender m_render;
     TTF_Font m_curFont = TTF_Font::NONE;
     uint8_t m_brightness = TFT_BRIGHTNESS;
-    uint32_t m_imageColor = TFT_BLACK;
+    uint32_t m_imageColor = 0;
 
     TFT_eSPI &getDisplay();
     OpenFontRender &getRender();
