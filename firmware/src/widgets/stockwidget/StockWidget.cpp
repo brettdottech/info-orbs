@@ -13,6 +13,11 @@ void StockWidget::taskGetStockData(void *pvParameters) {
     }
     widget->setBusy(false);
     widget->m_stockDelayPrev = millis();
+    
+    UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
+    Serial.print("Stock Widget: Remaining task stack space: ");
+    Serial.println(highWater);
+    
     vTaskDelete(NULL); 
 }
 
@@ -71,7 +76,7 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
+    String httpRequestAddress = "http://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
 
     HTTPClient http;
     http.begin(httpRequestAddress);
