@@ -9,6 +9,8 @@ ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget
     m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock color");
     m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing");
     m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock shadow color");
+    m_config.addConfigBool("ClockWidget", "clkOvrNixCol", &m_overrideNixieColorEnabled, "Override Nixie color");
+    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "New Nixie color");
     // m_config.addOnChangeCallback("ClockWidget", [this](const std::string& className, const std::string& varName) {
     //     Serial.printf("ClockWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
     // });
@@ -217,14 +219,14 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (m_type == ClockType::NIXIE && color == CLOCK_COLOR) {
-#ifdef CLOCK_NIXIE_COLOR
-        // Selected color for nixie
-        color = CLOCK_NIXIE_COLOR;
-#else
-        // Special color (orange) for nixie
-        color = 0xfd40;
-#endif
+    if (m_type == ClockType::NIXIE && color == m_fgColor) {
+        if (m_overrideNixieColorEnabled) {
+            // Selected color for nixie
+            color = m_overrideNixieColor;
+        } else {
+            // Special color (orange) for nixie
+            color = 0xfd40;
+        }
     }
     m_manager.selectScreen(displayIndex);
     if (seconds < 30) {
@@ -248,11 +250,10 @@ void ClockWidget::displayImage(int displayIndex, const String &digit) {
 
 void ClockWidget::displayNixie(int displayIndex, const String &digit) {
 #if USE_CLOCK_NIXIE
-    #ifdef CLOCK_NIXIE_COLOR
-    uint32_t color = CLOCK_NIXIE_COLOR;
-    #else
-    uint32_t color = 0;
-    #endif
+    int color = 0;
+    if (m_overrideNixieColorEnabled) {
+        color = m_overrideNixieColor;
+    }
     if (digit.length() != 1) {
         return;
     }
