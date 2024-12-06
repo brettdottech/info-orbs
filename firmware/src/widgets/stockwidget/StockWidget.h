@@ -5,10 +5,15 @@
 #include <HTTPClient.h>
 #include <TFT_eSPI.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
 #include "StockDataModel.h"
 #include "Widget.h"
 
 #define MAX_STOCKS 5
+
+void taskGetStockData(void *pvParameters);
 
 class StockWidget : public Widget {
 public:
@@ -30,5 +35,8 @@ private:
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
+
+    friend void taskGetStockData(void *pvParameters);
 };
+
 #endif // STOCK_WIDGET_H

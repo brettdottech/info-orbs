@@ -6,6 +6,16 @@
 
 #include <iomanip>
 
+void taskGetStockData(void *pvParameters) {
+    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
+    for (int8_t i = 0; i < widget->m_stockCount; i++) {
+        widget->getStockData(widget->m_stocks[i]);
+    }
+    widget->setBusy(false);
+    widget->m_stockDelayPrev = millis();
+    vTaskDelete(NULL); 
+}
+
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
 #ifdef STOCK_TICKER_LIST
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
@@ -46,11 +56,8 @@ void StockWidget::draw(bool force) {
 void StockWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
         setBusy(true);
-        for (int8_t i = 0; i < m_stockCount; i++) {
-            getStockData(m_stocks[i]);
-        }
-        setBusy(false);
-        m_stockDelayPrev = millis();
+        // Create a task to handle all stock updates
+        xTaskCreate(taskGetStockData, "StockDataTask", 8192, this, 1, NULL);
     }
 }
 
