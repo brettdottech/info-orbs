@@ -27,6 +27,7 @@ public:
 private:
     void getStockData(StockDataModel &stock);
     static void taskGetStockData(void *pvParameters);
+    TaskHandle_t m_taskHandle;
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
     unsigned long m_stockDelay = 900000; // default to 15m between updates
