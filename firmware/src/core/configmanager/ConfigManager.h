@@ -36,6 +36,7 @@ public:
     void addConfigIP(const std::string &className, const std::string &varName, IPAddress *var, const std::string &description);
     void addConfigBool(const std::string &className, const std::string &varName, bool *var, const std::string &description);
     void addConfigColor(const std::string &className, const std::string &varName, int *var, const std::string &description);
+    void addConfigComboBox(const std::string &className, const std::string &varName, int *var, String options[], int numOptions, const std::string &description);
 
     // Get stored values
     bool getConfigBool(const std::string &varName, bool defaultValue);

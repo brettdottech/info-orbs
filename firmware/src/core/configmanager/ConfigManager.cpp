@@ -152,16 +152,10 @@ void ConfigManager::addConfigBool(const std::string &className, const std::strin
     Serial.printf("%s loaded: %d (%d)\n", varNameBuffer, *var, var);
     BoolParameter *param = new BoolParameter(varNameBuffer, descBuffer, *var);
     parameters.push_back({param, CM_PARAM_TYPE_BOOL, classNameBuffer, varNameBuffer, [this, classNameBuffer, varNameBuffer, var, param]() {
-                              // if (this->m_wm.server->uri() == "/paramsave") {
-                              //     // We are trying to save the variable
-
-                              // }
+                              // We can't use .getValue(), but we have to check the server return parameters
                               *var = this->m_wm.server->hasArg(varNameBuffer);
-                              // *var = param->getValue();
                               preferences.putBool(varNameBuffer, *var);
                               Serial.printf("%s saved: %d (%d)\n", varNameBuffer, *var, var);
-                              // Serial.println(this->m_wm.server->hasArg(varNameBuffer));
-                              // Serial.println(this->m_wm.server->uri());
                               triggerChangeCallbacks(classNameBuffer, varNameBuffer);
                           }});
 }
@@ -175,6 +169,26 @@ void ConfigManager::addConfigColor(const std::string &className, const std::stri
     ColorParameter *param = new ColorParameter(varNameBuffer, descBuffer, *var);
     parameters.push_back({param, CM_PARAM_TYPE_COLOR, classNameBuffer, varNameBuffer, [this, classNameBuffer, varNameBuffer, var, param]() {
                               *var = param->getValue();
+                              preferences.putInt(varNameBuffer, *var);
+                              Serial.printf("%s saved: %d (%d)\n", varNameBuffer, *var, var);
+                              triggerChangeCallbacks(classNameBuffer, varNameBuffer);
+                          }});
+}
+
+void ConfigManager::addConfigComboBox(const std::string &className, const std::string &varName, int *var, String options[], int numOptions, const std::string &description) {
+    char *classNameBuffer = Utils::copyString(className);
+    char *varNameBuffer = Utils::copyString(varName);
+    char *descBuffer = Utils::copyString(description);
+    *var = preferences.getInt(varNameBuffer, *var);
+    Serial.printf("%s loaded: %d (%d)\n", varNameBuffer, *var, var);
+    ComboBoxParameter *param = new ComboBoxParameter(varNameBuffer, descBuffer, options, numOptions, *var);
+    parameters.push_back({param, CM_PARAM_TYPE_COLOR, classNameBuffer, varNameBuffer, [this, classNameBuffer, varNameBuffer, var, param]() {
+                              // We can't use .getValue(), but we have to check the server return parameters
+                              if (this->m_wm.server->hasArg(varNameBuffer)) {
+                                  String arg = this->m_wm.server->arg(varNameBuffer);
+                                  Serial.println(arg);
+                                  *var = arg.toInt();
+                              };
                               preferences.putInt(varNameBuffer, *var);
                               Serial.printf("%s saved: %d (%d)\n", varNameBuffer, *var, var);
                               triggerChangeCallbacks(classNameBuffer, varNameBuffer);
