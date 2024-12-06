@@ -22,7 +22,6 @@
 class ScreenManager {
 public:
     ScreenManager(TFT_eSPI &tft);
-    static ScreenManager *getInstance();
 
     void selectScreen(int screen);
     void selectAllScreens();
@@ -85,7 +84,7 @@ public:
     JRESULT drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale = 1, uint32_t imageColor = 0);
 
 private:
-    static ScreenManager *m_instance;
+    static ScreenManager *instance;
 
     uint8_t m_screen_cs[5] = {SCREEN_1_CS, SCREEN_2_CS, SCREEN_3_CS, SCREEN_4_CS, SCREEN_5_CS};
     TFT_eSPI &m_tft;

@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include <Arduino.h>
 
-ScreenManager *ScreenManager::m_instance = nullptr;
+ScreenManager *ScreenManager::instance = nullptr;
 
 ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
 
@@ -41,14 +41,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     Serial.println("SCREEN_4_CS:" + String(SCREEN_4_CS));
     Serial.println("SCREEN_5_CS:" + String(SCREEN_5_CS));
 
-    m_instance = this;
-}
-
-ScreenManager *ScreenManager::getInstance() {
-    if (m_instance == nullptr) {
-        Serial.println("ERR: ScreenManager==nullptr in getInstance()");
-    }
-    return m_instance;
+    instance = this;
 }
 
 void ScreenManager::setFont(TTF_Font font) {
@@ -323,14 +316,13 @@ int16_t ScreenManager::drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, ui
 
 // Static function to be used in TJpgDec callback
 bool ScreenManager::tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
-    ScreenManager *sm = getInstance();
-    if (sm == nullptr) {
+    if (instance == nullptr) {
         Serial.println("TFT_Output not possible, ScreenManager instance not initialized");
         return false;
     }
-    uint8_t brightness = sm->getBrightness();
-    uint32_t imageColor = sm->m_imageColor;
-    TFT_eSPI &tft = sm->getDisplay();
+    uint8_t brightness = instance->getBrightness();
+    uint32_t imageColor = instance->m_imageColor;
+    TFT_eSPI &tft = instance->getDisplay();
     if (y >= tft.height() || x >= tft.width())
         return 0;
     if (imageColor != 0) {
