@@ -47,18 +47,6 @@ bool isConnected{true};
 ScreenManager *sm;
 WidgetSet *widgetSet;
 
-// // This function should probably be moved somewhere else
-// bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
-//     if (y >= tft.height())
-//         return 0;
-//     // Dim bitmap
-//     for (int i = 0; i < w * h; i++) {
-//         bitmap[i] = Utils::rgb565dim(bitmap[i], sm->getBrightness(), true);
-//     }
-//     tft.pushImage(x, y, w, h, bitmap);
-//     return 1;
-// }
-
 /**
  * The ISR handlers must be static
  */

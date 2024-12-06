@@ -328,19 +328,32 @@ bool ScreenManager::tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint
         Serial.println("TFT_Output not possible, ScreenManager instance not initialized");
         return false;
     }
-    TFT_eSPI &tft = sm->getDisplay();
-    if (y >= tft.height())
-        return 0;
-    // Dim bitmap
     uint8_t brightness = sm->getBrightness();
-    for (int i = 0; i < w * h; i++) {
-        bitmap[i] = Utils::rgb565dim(bitmap[i], brightness, true);
+    uint32_t imageColor = sm->m_imageColor;
+    TFT_eSPI &tft = sm->getDisplay();
+    if (y >= tft.height() || x >= tft.width())
+        return 0;
+    if (imageColor != TFT_BLACK) {
+        // We have an image color set, let's use it
+        Utils::colorizeImageData(bitmap, w * h, imageColor, 1.25, true);
+    }
+    if (brightness != 255) {
+        // Dim bitmap
+        for (int i = 0; i < w * h; i++) {
+            bitmap[i] = Utils::rgb565dim(bitmap[i], brightness, true);
+        }
     }
     tft.pushImage(x, y, w, h, bitmap);
     return true;
 }
 
-JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale) {
+JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale, uint32_t imageColor) {
+    // Set scale
     TJpgDec.setJpgScale(scale);
-    return TJpgDec.drawJpg(x, y, jpeg_data, data_size);
+    // Set image color
+    m_imageColor = imageColor;
+    JRESULT result = TJpgDec.drawJpg(x, y, jpeg_data, data_size);
+    // Reset image color
+    m_imageColor = TFT_BLACK;
+    return result;
 }
