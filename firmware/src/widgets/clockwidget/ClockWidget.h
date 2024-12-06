@@ -21,6 +21,13 @@
     #include "clock-custom.h"
 #endif
 
+#ifndef CLOCK_NIXIE_COLOR
+    #define CLOCK_NIXIE_COLOR 0
+    #define CLOCK_NIXIE_OVERRIDE_COLOR false
+#else
+    #define CLOCK_NIXIE_OVERRIDE_COLOR true
+#endif
+
 #ifndef CLOCK_FONT
     #define CLOCK_FONT DSEG7
 #endif
@@ -105,6 +112,8 @@ private:
     int m_fgColor = CLOCK_COLOR;
     int m_shadowColor = CLOCK_SHADOW_COLOR;
     bool m_shadowing = CLOCK_SHADOWING;
+    bool m_overrideNixieColorEnabled = CLOCK_NIXIE_OVERRIDE_COLOR;
+    int m_overrideNixieColor = CLOCK_NIXIE_COLOR;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
