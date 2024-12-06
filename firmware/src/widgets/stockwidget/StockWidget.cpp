@@ -6,7 +6,7 @@
 
 #include <iomanip>
 
-void taskGetStockData(void *pvParameters) {
+void StockWidget::taskGetStockData(void *pvParameters) {
     StockWidget *widget = static_cast<StockWidget*>(pvParameters);
     for (int8_t i = 0; i < widget->m_stockCount; i++) {
         widget->getStockData(widget->m_stocks[i]);
