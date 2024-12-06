@@ -11,17 +11,18 @@ void StockWidget::taskGetStockData(void *pvParameters) {
     for (int8_t i = 0; i < widget->m_stockCount; i++) {
         widget->getStockData(widget->m_stocks[i]);
     }
-    widget->setBusy(false);
-    widget->m_stockDelayPrev = millis();
     
     UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
     Serial.print("Stock Widget: Remaining task stack space: ");
     Serial.println(highWater);
     
+    widget->setBusy(false);
+    widget->m_stockDelayPrev = millis();
+    widget->m_taskHandle = NULL;     
     vTaskDelete(NULL); 
 }
 
-StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
+StockWidget::StockWidget(ScreenManager &manager) : Widget(manager), m_taskHandle(NULL) {
 #ifdef STOCK_TICKER_LIST
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
     strcpy(stockList, STOCK_TICKER_LIST);
@@ -60,9 +61,18 @@ void StockWidget::draw(bool force) {
 
 void StockWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
-        setBusy(true);
-        // Create a task to handle all stock updates
-        xTaskCreate(taskGetStockData, "StockDataTask", 8192, this, 1, NULL);
+        if (m_taskHandle == NULL) { // Check if task is not already running
+            setBusy(true);
+            // Create a task to handle all stock updates
+            if (xTaskCreate(taskGetStockData, "StockDataTask", 8192, this, 1, &m_taskHandle) == pdPASS) {
+                Serial.println("StockDataTask created");
+            } else {
+                Serial.println("Failed to create StockDataTask");
+                setBusy(false);
+            }
+        } else {
+            Serial.println("StockDataTask is already running");
+        }
     }
 }
 
