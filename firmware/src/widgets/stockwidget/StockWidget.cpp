@@ -6,22 +6,6 @@
 
 #include <iomanip>
 
-void StockWidget::taskGetStockData(void *pvParameters) {
-    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
-    for (int8_t i = 0; i < widget->m_stockCount; i++) {
-        widget->getStockData(widget->m_stocks[i]);
-    }
-    
-    UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
-    Serial.print("Stock Widget: Remaining task stack space: ");
-    Serial.println(highWater);
-    
-    widget->setBusy(false);
-    widget->m_stockDelayPrev = millis();
-    widget->m_taskHandle = NULL;     
-    vTaskDelete(NULL); 
-}
-
 StockWidget::StockWidget(ScreenManager &manager) : Widget(manager), m_taskHandle(NULL) {
 #ifdef STOCK_TICKER_LIST
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
@@ -121,6 +105,22 @@ void StockWidget::getStockData(StockDataModel &stock) {
     }
 
     http.end();
+}
+
+void StockWidget::taskGetStockData(void *pvParameters) {
+    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
+    for (int8_t i = 0; i < widget->m_stockCount; i++) {
+        widget->getStockData(widget->m_stocks[i]);
+    }
+    
+    UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
+    Serial.print("Stock Widget: Remaining task stack space: ");
+    Serial.println(highWater);
+    
+    widget->setBusy(false);
+    widget->m_stockDelayPrev = millis();
+    widget->m_taskHandle = NULL;     
+    vTaskDelete(NULL); 
 }
 
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
