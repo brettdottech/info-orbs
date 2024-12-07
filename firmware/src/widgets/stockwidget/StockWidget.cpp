@@ -71,7 +71,7 @@ void StockWidget::update(bool force) {
                 setBusy(false);
             }
         } else {
-            Serial.println("StockDataTask is already running");
+            // Serial.println("StockDataTask is already running");
         }
     }
 }
