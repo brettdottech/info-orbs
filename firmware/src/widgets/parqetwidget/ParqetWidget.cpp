@@ -8,16 +8,13 @@
 #include <iomanip>
 
 ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
-    Serial.println("Constructing ParqetWidget");
-    ParqetDataModel parqet = ParqetDataModel();
-#ifdef PARQET_PORTFOLIO_ID
-    parqet.setPortfolioId(PARQET_PORTFOLIO_ID);
-#endif
-    m_portfolio = parqet;
+    Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
+    m_config.addConfigString("ParqetWidget", "portfolioId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
     m_config.addConfigBool("ParqetWidget", "showClock", &m_showClock, "Show clock on first screen");
     m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen");
     m_config.addConfigBool("ParqetWidget", "showTotalVal", &m_showTotalValue, "Show total portfolio value");
-    m_config.addConfigBool("ParqetWidget", "showValues", &m_showValues, "Show current price (off) or value in portfolio (on)");
+    String options[] = {"Show current price", "Show current value"};
+    m_config.addConfigComboBox("ParqetWidget", "showValues", &m_showValues, options, 2, "Show stock or price/value");
     // m_config.addOnChangeCallback("ParqetWidget", [this](const std::string& className, const std::string& varName) {
     //     Serial.printf("ParqetWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
     // });
@@ -118,7 +115,10 @@ ParqetDataModel ParqetWidget::getPortfolio() {
 }
 
 void ParqetWidget::updatePortfolio() {
-    String portfolioId = m_portfolio.getPortfolioId();
+    String portfolioId = String(m_portfolioId.c_str());
+    if (portfolioId.isEmpty()) {
+        return;
+    }
     Serial.printf("Parqet: Update Portfolio %s\n", portfolioId.c_str());
     String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble";
     String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"timeframe\": \"" + getTimeframe() + "\"}";
@@ -233,7 +233,10 @@ void ParqetWidget::updatePortfolio() {
 }
 
 void ParqetWidget::updatePortfolioChart() {
-    String portfolioId = m_portfolio.getPortfolioId();
+    String portfolioId = String(m_portfolioId.c_str());
+    if (portfolioId.isEmpty()) {
+        return;
+    }
     String timeframe = getTimeframe();
     Serial.printf("Parqet: Update Portfolio Chart %s\n", portfolioId.c_str());
     if (!m_showTotalChart || (timeframe == "today" && m_overrideTotalChartToday == "")) {
