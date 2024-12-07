@@ -131,7 +131,6 @@ void setup() {
 #endif
 
     config->setupWiFiManager();
-    config->loadAllConfigs();
 
     m_widgetCycleDelayPrev = millis();
 }
