@@ -46,7 +46,10 @@ public:
     void addConfigComboBox(const std::string &className, const std::string &varName, int *var, String options[], int numOptions, const std::string &description);
 
     // Get stored values
+    String getConfigString(const std::string &varName, String defaultValue);
     bool getConfigBool(const std::string &varName, bool defaultValue);
+    int getConfigInt(const std::string &varName, int defaultValue);
+    float getConfigFloat(const std::string &varName, float defaultValue);
 
     // Register callbacks for changes
     void addOnChangeCallback(

@@ -188,8 +188,23 @@ void ConfigManager::addConfigComboBox(const std::string &className, const std::s
     );
 }
 
+String ConfigManager::getConfigString(const std::string &varName, String defaultValue) {
+    String val = preferences.getString(varName.c_str(), defaultValue);
+    return val;
+}
+
 bool ConfigManager::getConfigBool(const std::string &varName, bool defaultValue) {
     bool val = preferences.getBool(varName.c_str(), defaultValue);
+    return val;
+}
+
+int ConfigManager::getConfigInt(const std::string &varName, int defaultValue) {
+    int val = preferences.getInt(varName.c_str(), defaultValue);
+    return val;
+}
+
+float ConfigManager::getConfigFloat(const std::string &varName, float defaultValue) {
+    float val = preferences.getFloat(varName.c_str(), defaultValue);
     return val;
 }
 
