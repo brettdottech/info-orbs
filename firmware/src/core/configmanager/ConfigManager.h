@@ -1,8 +1,10 @@
 #ifndef CONFIG_MANAGER_H
 #define CONFIG_MANAGER_H
 
+#include "Button.h"
 #include "Utils.h"
 #include "WifiManagerCustomParameters.h"
+#include "config_helper.h"
 #include "nvs_flash.h"
 #include <Preferences.h>
 #include <WiFiManager.h>
@@ -16,7 +18,10 @@
 #define CM_PARAM_TYPE_BOOL 2
 #define CM_PARAM_TYPE_FLOAT 3
 #define CM_PARAM_TYPE_COLOR 4
-#define CM_PARAM_TYPE_IP 5
+#define CM_PARAM_TYPE_COMBOBOX 5
+
+// Uncomment to show debug output
+#define CM_DEBUG
 
 class ConfigManager {
 public:
@@ -26,11 +31,13 @@ public:
     static ConfigManager &getInstance();
 
     void setupWiFiManager();
-    void loadAllConfigs();
     void saveAllConfigs();
 
     // Register different types of variables with descriptions
-    void addConfigString(const std::string &className, const std::string &varName, char *var, size_t length, const std::string &description);
+    template <typename T, typename ParameterType, typename... Args>
+    void addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description,
+                   std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
+    void addConfigString(const std::string &className, const std::string &varName, std::string *var, size_t length, const std::string &description);
     void addConfigInt(const std::string &className, const std::string &varName, int *var, const std::string &description);
     void addConfigFloat(const std::string &className, const std::string &varName, float *var, const std::string &description);
     void addConfigIP(const std::string &className, const std::string &varName, IPAddress *var, const std::string &description);

@@ -8,6 +8,17 @@ const char checkboxHtmlChecked[] = "type='checkbox' checked";
 const char colorHtml[] = "type='color'";
 const char numberHtml[] = "type='number'";
 
+class StringParameter : public WiFiManagerParameter {
+public:
+    StringParameter(const char *id, const char *placeholder, std::string value, const uint8_t length = 30)
+        : WiFiManagerParameter(id, placeholder, value.c_str(), length) {
+    }
+
+    std::string getValue() {
+        return WiFiManagerParameter::getValue();
+    }
+};
+
 class IPAddressParameter : public WiFiManagerParameter {
 public:
     IPAddressParameter(const char *id, const char *placeholder, IPAddress address)
@@ -41,10 +52,9 @@ public:
         init(id, placeholder, "1", length, value ? checkboxHtmlChecked : checkboxHtml, WFM_LABEL_AFTER);
     }
 
-    bool getValue() {
-        // This is just a dummy return value. We actually check the return value in ConfigManager
-        return false;
-        // return String(WiFiManagerParameter::getValue()).toInt() == 1;
+    bool getValue(WiFiManager &wm) {
+        // If the checkbox is selected, the call to "/paramsave" will have an argument with our id
+        return wm.server->hasArg(_id);
     }
 };
 
@@ -67,7 +77,7 @@ class ComboBoxParameter : public WiFiManagerParameter {
 public:
     ComboBoxParameter(const char *id, const char *placeholder, String options[], int numOptions, int value, const uint8_t length = 10)
         : WiFiManagerParameter("") {
-        String html = "<label for='" + String(id) + "'>" + String(placeholder) + "</label><br/><select id='" + String(id) + "' name='" + String(id) + "'>";
+        String html = "<br><label for='" + String(id) + "'>" + String(placeholder) + "</label><br/><select id='" + String(id) + "' name='" + String(id) + "'>";
         for (int i = 0; i < numOptions; i++) {
             html += "<option value='" + String(i) + "'" + (value == i ? " selected>" : ">") + options[i] + "</option>";
         }
@@ -76,8 +86,14 @@ public:
         init(NULL, NULL, nullptr, 0, Utils::copyString(html.c_str()), WFM_LABEL_AFTER);
     }
 
-    int getValue() {
-        // This is just a dummy return value. We actually check the return value in ConfigManager
+    int getValue(WiFiManager &wm) {
+        // The combobox will return its value via "/paramsave" argument
+        if (wm.server->hasArg(_id)) {
+            String arg = wm.server->arg(_id);
+            Serial.println(arg);
+            return arg.toInt();
+        }
+        // Fallback to 0
         return 0;
     }
 };
