@@ -50,6 +50,7 @@ void StockWidget::update(bool force) {
             // Create a task to handle all stock updates
             if (xTaskCreate(taskGetStockData, "StockDataTask", 8192, this, 1, &m_taskHandle) == pdPASS) {
                 Serial.println("StockDataTask created");
+                m_stockDelayPrev = millis();
             } else {
                 Serial.println("Failed to create StockDataTask");
                 setBusy(false);
@@ -118,7 +119,6 @@ void StockWidget::taskGetStockData(void *pvParameters) {
     Serial.println(highWater);
     
     widget->setBusy(false);
-    widget->m_stockDelayPrev = millis();
     widget->m_taskHandle = NULL;     
     vTaskDelete(NULL); 
 }
