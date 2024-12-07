@@ -83,13 +83,15 @@ public:
         }
         html += "</select>";
         Serial.println(html);
-        init(NULL, NULL, nullptr, 0, Utils::copyString(html.c_str()), WFM_LABEL_AFTER);
+        // Set id as label here, otherwise WifiMgr will show an input
+        init(NULL, id, nullptr, 0, Utils::copyString(html.c_str()), WFM_LABEL_AFTER);
     }
 
     int getValue(WiFiManager &wm) {
+        Serial.println(_label);
         // The combobox will return its value via "/paramsave" argument
-        if (wm.server->hasArg(_id)) {
-            String arg = wm.server->arg(_id);
+        if (wm.server->hasArg(_label)) {
+            String arg = wm.server->arg(_label);
             Serial.println(arg);
             return arg.toInt();
         }

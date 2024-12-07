@@ -62,6 +62,13 @@ void ConfigManager::setupWiFiManager() {
     m_wm.addParameter(endLabel);
 
     m_wm.setSaveParamsCallback([this]() {
+#ifdef CM_DEBUG
+        Serial.println("Variables saved in WebPortal");
+        int count = m_wm.server->args();
+        for (int i = 0; i < count; i++) {
+            Serial.printf("Arg %d: %s = %s\n", i, m_wm.server->argName(i).c_str(), m_wm.server->arg(i).c_str());
+        }
+#endif
         saveAllConfigs();
         // Restart to apply new config
         Serial.println("New config values saved. Restarting ESP now.");
@@ -123,7 +130,7 @@ void ConfigManager::addConfig(int paramType, const std::string &className, const
         saveToPreferences(*var);
 #ifdef CM_DEBUG
         // Debugging output
-        Serial.printf("%s saved (@%p)\n", varNameBuffer, *var, var);
+        Serial.printf("%s saved %d (@%p)\n", varNameBuffer, *var, var);
 #endif
     };
 
