@@ -57,8 +57,8 @@ void ConfigManager::setupWiFiManager() {
             m_wm.addParameter(classLabel);
             strcpy(lastClassName, param.className);
         }
-        if (param.type == CM_PARAM_TYPE_COLOR) {
-            // Add extra <BR> for ColorParameters
+        if (param.type != CM_PARAM_TYPE_BOOL) {
+            // Add extra <BR> for Parameters
             WiFiManagerParameter *brLabel = new WiFiManagerParameter("<BR>");
             m_wm.addParameter(brLabel);
         }
