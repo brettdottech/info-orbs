@@ -111,7 +111,7 @@ private:
     ClockType m_type = DEFAULT_CLOCK;
 
     int m_format = CLOCK_FORMAT;
-    bool m_showSecondTicks;
+    bool m_showSecondTicks = SHOW_SECOND_TICKS;
     int m_fgColor = CLOCK_COLOR;
     int m_shadowColor = CLOCK_SHADOW_COLOR;
     bool m_shadowing = CLOCK_SHADOWING;
