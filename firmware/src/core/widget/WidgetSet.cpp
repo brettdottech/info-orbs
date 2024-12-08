@@ -4,7 +4,7 @@ WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager
     config.addConfigInt("General", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
     config.addConfigBool("General", "nightmode", &m_nightMode, "Enable Nighttime mode");
     config.addConfigInt("General", "dimStartHour", &m_dimStartHour, "Nighttime Start Hour [0-23]");
-    config.addConfigInt("General", "dimEndHour", &m_dimEndHour, "Nighttime Start Hour [0-23]");
+    config.addConfigInt("General", "dimEndHour", &m_dimEndHour, "Nighttime End Hour [0-23]");
     config.addConfigInt("General", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-128]");
 }
 
