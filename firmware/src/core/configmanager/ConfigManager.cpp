@@ -110,7 +110,7 @@ void ConfigManager::triggerChangeCallbacks(const std::string &className, const s
 }
 
 template <typename T, typename ParameterType, typename... Args>
-void ConfigManager::addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description,
+void ConfigManager::addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description, uint8_t length,
                               std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences,
                               Args... args) {
 
@@ -127,7 +127,7 @@ void ConfigManager::addConfig(int paramType, const std::string &className, const
 #endif
 
     // Create parameter with additional arguments if needed
-    ParameterType *param = new ParameterType(varNameBuffer, descBuffer, args..., *var);
+    ParameterType *param = new ParameterType(varNameBuffer, descBuffer, args..., *var, length);
 
     auto saveLambda = [this, classNameBuffer, varNameBuffer, var, param, setParameterValue, saveToPreferences]() {
         // Set parameter value
@@ -145,7 +145,7 @@ void ConfigManager::addConfig(int paramType, const std::string &className, const
 
 void ConfigManager::addConfigString(const std::string &className, const std::string &varName, std::string *var, size_t length, const std::string &description) {
     addConfig<std::string, StringParameter>(
-        CM_PARAM_TYPE_STRING, className, varName, var, description,
+        CM_PARAM_TYPE_STRING, className, varName, var, description, length,
         [this, varName](std::string &var) { var = preferences.getString(varName.c_str(), var.c_str()).c_str(); },
         [](StringParameter *param, std::string &var) { var = param->getValue(); },
         [this, varName](std::string &var) { preferences.putString(varName.c_str(), var.c_str()); });
@@ -153,7 +153,7 @@ void ConfigManager::addConfigString(const std::string &className, const std::str
 
 void ConfigManager::addConfigInt(const std::string &className, const std::string &varName, int *var, const std::string &description) {
     addConfig<int, IntParameter>(
-        CM_PARAM_TYPE_INT, className, varName, var, description,
+        CM_PARAM_TYPE_INT, className, varName, var, description, 10,
         [this, varName](int &var) { var = preferences.getInt(varName.c_str(), var); },
         [](IntParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName.c_str(), var); });
@@ -161,7 +161,7 @@ void ConfigManager::addConfigInt(const std::string &className, const std::string
 
 void ConfigManager::addConfigBool(const std::string &className, const std::string &varName, bool *var, const std::string &description) {
     addConfig<bool, BoolParameter>(
-        CM_PARAM_TYPE_BOOL, className, varName, var, description,
+        CM_PARAM_TYPE_BOOL, className, varName, var, description, 2,
         [this, varName](bool &var) { var = preferences.getBool(varName.c_str(), var); },
         [this](BoolParameter *param, bool &var) { var = param->getValue(this->m_wm); },
         [this, varName](bool &var) { preferences.putBool(varName.c_str(), var); });
@@ -169,7 +169,7 @@ void ConfigManager::addConfigBool(const std::string &className, const std::strin
 
 void ConfigManager::addConfigFloat(const std::string &className, const std::string &varName, float *var, const std::string &description) {
     addConfig<float, FloatParameter>(
-        CM_PARAM_TYPE_FLOAT, className, varName, var, description,
+        CM_PARAM_TYPE_FLOAT, className, varName, var, description, 10,
         [this, varName](float &var) { var = preferences.getFloat(varName.c_str(), var); },
         [](FloatParameter *param, float &var) { var = param->getValue(); },
         [this, varName](float &var) { preferences.putFloat(varName.c_str(), var); });
@@ -177,7 +177,7 @@ void ConfigManager::addConfigFloat(const std::string &className, const std::stri
 
 void ConfigManager::addConfigColor(const std::string &className, const std::string &varName, int *var, const std::string &description) {
     addConfig<int, ColorParameter>(
-        CM_PARAM_TYPE_COLOR, className, varName, var, description,
+        CM_PARAM_TYPE_COLOR, className, varName, var, description, 10,
         [this, varName](int &var) { var = preferences.getInt(varName.c_str(), var); },
         [](ColorParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName.c_str(), var); });
@@ -185,7 +185,7 @@ void ConfigManager::addConfigColor(const std::string &className, const std::stri
 
 void ConfigManager::addConfigComboBox(const std::string &className, const std::string &varName, int *var, String options[], int numOptions, const std::string &description) {
     addConfig<int, ComboBoxParameter>(
-        CM_PARAM_TYPE_COMBOBOX, className, varName, var, description,
+        CM_PARAM_TYPE_COMBOBOX, className, varName, var, description, 2,
         [this, varName](int &var) { var = preferences.getInt(varName.c_str(), var); },
         [this](ComboBoxParameter *param, int &var) { var = param->getValue(this->m_wm); },
         [this, varName](int &var) { preferences.putInt(varName.c_str(), var); },
