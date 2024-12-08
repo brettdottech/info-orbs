@@ -4,12 +4,12 @@
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     String optFormats[] = {"24h mode", "12h mode", "12h mode (with am/pm)"};
-    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, optFormats, 3, "Clock format");
-    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show second ticks");
-    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock color");
+    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, optFormats, 3, "Clock Format");
+    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show Second Ticks");
+    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock Color");
     m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing");
-    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock shadow color");
-    m_config.addConfigBool("ClockWidget", "clkOvrNixCol", &m_overrideNixieColorEnabled, "Override Nixie color");
+    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock Shadow Color");
+    m_config.addConfigBool("ClockWidget", "clkOvrNixCol", &m_overrideNixieColorEnabled, "Override Nixie Color");
     m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "New Nixie color");
     // m_config.addOnChangeCallback("ClockWidget", [this](const std::string& className, const std::string& varName) {
     //     Serial.printf("ClockWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
