@@ -41,6 +41,7 @@ void WifiWidget::setup() {
     m_wifiManager.setShowInfoErase(false);
     m_wifiManager.setMenu(wm_menu);
     m_wifiManager.setClass("invert"); // Dark mode
+    m_wifiManager.setShowStaticFields(true);
 
     // Set WiFiManager to non-blocking so status and info can be displayed
     m_wifiManager.setConfigPortalBlocking(false);
