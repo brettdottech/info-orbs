@@ -28,15 +28,12 @@ public:
     ConfigManager(WiFiManager &wm);
     ~ConfigManager();
 
-    static ConfigManager &getInstance();
+    static ConfigManager *getInstance();
 
     void setupWiFiManager();
     void saveAllConfigs();
 
     // Register different types of variables with descriptions
-    template <typename T, typename ParameterType, typename... Args>
-    void addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description,
-                   std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
     void addConfigString(const std::string &className, const std::string &varName, std::string *var, size_t length, const std::string &description);
     void addConfigInt(const std::string &className, const std::string &varName, int *var, const std::string &description);
     void addConfigFloat(const std::string &className, const std::string &varName, float *var, const std::string &description);
@@ -74,8 +71,11 @@ private:
     WiFiManager &m_wm;
     Preferences preferences;
     std::vector<Parameter> parameters;
-
     std::unordered_map<std::string, std::vector<std::function<void(const std::string &className, const std::string &varName)>>> changeCallbacks;
+
+    template <typename T, typename ParameterType, typename... Args>
+    void addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description,
+                   std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
 
     std::string makeKey(const std::string &className, const std::string &varName);
     void triggerChangeCallbacks(const std::string &className, const std::string &varName = "");
