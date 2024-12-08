@@ -35,8 +35,11 @@ ConfigManager::~ConfigManager() {
     preferences.end();
 }
 
-ConfigManager &ConfigManager::getInstance() {
-    return *m_instance;
+ConfigManager *ConfigManager::getInstance() {
+    if (m_instance == nullptr) {
+        Serial.println("ERR in ConfigManager.getInstance(): not initialized");
+    }
+    return m_instance;
 }
 
 void ConfigManager::setupWiFiManager() {
@@ -44,6 +47,9 @@ void ConfigManager::setupWiFiManager() {
     m_wm.addParameter(startLabel);
     char lastClassName[30];
     for (auto &param : parameters) {
+#ifdef CM_DEBUG
+        Serial.printf("Adding WebPortal parameter: %s, %s\n", param.className, param.variableName);
+#endif
         if (!Utils::compareCharArrays(lastClassName, param.className)) {
             // New class variables -> add a separator
             WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<HR><H2 style='margin-block-end: 0;'>", param.className, "</H2>"));

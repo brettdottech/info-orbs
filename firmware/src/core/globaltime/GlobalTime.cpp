@@ -9,7 +9,10 @@ GlobalTime::GlobalTime() {
     m_timeClient = new NTPClient(m_udp);
     m_timeClient->begin();
     m_timeClient->setPoolServerName(NTP_SERVER);
-    int clockFormat = ConfigManager::getInstance().getConfigInt("clockFormat", 0);
+    ConfigManager *cm = ConfigManager::getInstance();
+    cm->addConfigString("General", "timezoneLoc", &m_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
+    int clockFormat = cm->getConfigInt("clockFormat", 0); // config added in ClockWidget
+    Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d\n", m_timezoneLocation.c_str(), clockFormat);
     if (clockFormat == CLOCK_FORMAT_24_HOUR) {
         m_format24hour = true;
     }
@@ -136,7 +139,7 @@ bool GlobalTime::isPM() {
 
 void GlobalTime::getTimeZoneOffsetFromAPI() {
     HTTPClient http;
-    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + String(TIMEZONE_API_LOCATION));
+    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + String(m_timezoneLocation.c_str()));
     int httpCode = http.GET();
 
     if (httpCode > 0) {
