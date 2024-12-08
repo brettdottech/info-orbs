@@ -1,11 +1,11 @@
 #include "WidgetSet.h"
 
 WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager(sm), m_configManager(config) {
-    config.addConfigInt("General", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
-    config.addConfigBool("General", "nightmode", &m_nightMode, "Enable Nighttime mode");
-    config.addConfigInt("General", "dimStartHour", &m_dimStartHour, "Nighttime Start Hour [0-23]");
-    config.addConfigInt("General", "dimEndHour", &m_dimEndHour, "Nighttime End Hour [0-23]");
-    config.addConfigInt("General", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-128]");
+    config.addConfigInt("TFT Settings", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
+    config.addConfigBool("TFT Settings", "nightmode", &m_nightMode, "Enable Nighttime mode");
+    config.addConfigInt("TFT Settings", "dimStartHour", &m_dimStartHour, "Nighttime Start Hour [0-23]");
+    config.addConfigInt("TFT Settings", "dimEndHour", &m_dimEndHour, "Nighttime End Hour [0-23]");
+    config.addConfigInt("TFT Settings", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-128]");
 }
 
 void WidgetSet::add(Widget *widget) {

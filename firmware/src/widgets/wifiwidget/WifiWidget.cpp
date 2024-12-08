@@ -90,7 +90,7 @@ void WifiWidget::update(bool force) {
         // Start the WebPortal
         m_wifiManager.startWebPortal();
         // Initialize mDNS
-        String mDNSname = WiFi.macAddress().substring(15) + ".local";
+        String mDNSname = m_apssid + "-" + WiFi.macAddress().substring(15) + ".local";
         if (!MDNS.begin(m_apssid)) {
             Serial.println("Error setting up MDNS responder!");
         } else {
