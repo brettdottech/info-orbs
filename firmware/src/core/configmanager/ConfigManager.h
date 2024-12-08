@@ -74,7 +74,7 @@ private:
     std::unordered_map<std::string, std::vector<std::function<void(const std::string &className, const std::string &varName)>>> changeCallbacks;
 
     template <typename T, typename ParameterType, typename... Args>
-    void addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description,
+    void addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description, uint8_t length,
                    std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
 
     std::string makeKey(const std::string &className, const std::string &varName);
