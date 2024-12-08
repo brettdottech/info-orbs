@@ -77,7 +77,7 @@ class ComboBoxParameter : public WiFiManagerParameter {
 public:
     ComboBoxParameter(const char *id, const char *placeholder, String options[], int numOptions, int value, const uint8_t length = 10)
         : WiFiManagerParameter("") {
-        String html = "<br><label for='" + String(id) + "'>" + String(placeholder) + "</label><br/><select id='" + String(id) + "' name='" + String(id) + "'>";
+        String html = "<label for='" + String(id) + "'>" + String(placeholder) + "</label><br/><select id='" + String(id) + "' name='" + String(id) + "'>";
         for (int i = 0; i < numOptions; i++) {
             html += "<option value='" + String(i) + "'" + (value == i ? " selected>" : ">") + options[i] + "</option>";
         }
