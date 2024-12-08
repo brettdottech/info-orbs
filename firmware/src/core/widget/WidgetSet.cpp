@@ -7,7 +7,7 @@ WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager
                          "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
     config.addConfigComboBox("TFT Settings", "dimStartHour", &m_dimStartHour, optHours, 24, "Nighttime Start [24h format]");
     config.addConfigComboBox("TFT Settings", "dimEndHour", &m_dimEndHour, optHours, 24, "Nighttime End [24h format]");
-    config.addConfigInt("TFT Settings", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-128]");
+    config.addConfigInt("TFT Settings", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-255]");
 }
 
 void WidgetSet::add(Widget *widget) {
