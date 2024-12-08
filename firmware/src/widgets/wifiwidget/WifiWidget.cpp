@@ -48,9 +48,8 @@ void WifiWidget::setup() {
     // If you want the config portal to only be available for so many seconds
     // wm.setConfigPortalTimeout(60);
 
-    // Add the last 2 digits of the MAC address onto the end of the config portal SSID
-    // so each Info-Orbs has a unique SSID
-    m_apssid = "InfoOrbs-" + WiFi.macAddress().substring(15);
+    // Use a static SSID to be able to show a static QR Code
+    m_apssid = "InfoOrbs";
 
     m_wifiManager.setCleanConnect(true);
     m_wifiManager.setConnectRetries(5);
@@ -90,7 +89,7 @@ void WifiWidget::update(bool force) {
         // Start the WebPortal
         m_wifiManager.startWebPortal();
         // Initialize mDNS
-        String mDNSname = m_apssid + ".local";
+        String mDNSname = WiFi.macAddress().substring(15) + ".local";
         if (!MDNS.begin(m_apssid)) {
             Serial.println("Error setting up MDNS responder!");
         } else {
