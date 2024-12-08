@@ -18,6 +18,8 @@ public:
     bool pressedLong();
     ButtonState getState();
     void isrButtonChange();
+    static uint8_t stringToButtonId(const String &buttonName);
+    static ButtonState stringToButtonState(const String &buttonState);
 
 #if BUTTON_MODE == INPUT_PULLDOWN
     const static bool PRESSED_LEVEL = HIGH;

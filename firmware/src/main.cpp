@@ -74,6 +74,30 @@ void setupConfig() {
     tft.setRotation(m_invertedOrbs ? 2 : 0);
 }
 
+// Forward declaration
+void buttonPressed(uint8_t buttonId, ButtonState state);
+
+void handleEndpointButton() {
+    if (wifiManager->server->hasArg("name") && wifiManager->server->hasArg("state")) {
+        String inButton = wifiManager->server->arg("name");
+        String inState = wifiManager->server->arg("state");
+        uint8_t buttonId = Button::stringToButtonId(inButton);
+        ButtonState state = Button::stringToButtonState(inState);
+
+        if (buttonId != 0 && state != BTN_NOTHING) {
+            buttonPressed(buttonId, state);
+            wifiManager->server->send(200, "text/plain", "OK " + inButton + "/" + inState + " -> " + String(buttonId) + "/" + String(state));
+            return;
+        }
+    }
+    wifiManager->server->send(500, "text/plain", "ERR");
+}
+
+void setupWebPortalEndpoints() {
+    // To simulate button presses call e.g. http://<ip>/button?name=right&state=short
+    wifiManager->server->on("/button", handleEndpointButton);
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -150,37 +174,52 @@ void checkCycleWidgets() {
     }
 }
 
-void checkButtons() {
+void buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (state == BTN_NOTHING) {
+        // nothing to do
+        return;
+    }
     // Reset cycle timer whenever a button is pressed
-    if (buttonLeft.pressedShort()) {
+    if (buttonId == BUTTON_LEFT && state == BTN_SHORT) {
         // Left short press cycles widgets backward
         Serial.println("Left button short pressed -> switch to prev Widget");
         m_widgetCycleDelayPrev = millis();
         widgetSet->prev();
-    } else if (buttonRight.pressedShort()) {
+    } else if (buttonId == BUTTON_RIGHT && state == BTN_SHORT) {
         // Right short press cycles widgets forward
         Serial.println("Right button short pressed -> switch to next Widget");
         m_widgetCycleDelayPrev = millis();
         widgetSet->next();
     } else {
-        ButtonState leftState = buttonLeft.getState();
-        ButtonState middleState = buttonOK.getState();
-        ButtonState rightState = buttonRight.getState();
-
         // Everying else that is not BTN_NOTHING will be forwarded to the current widget
-        if (leftState != BTN_NOTHING) {
-            Serial.printf("Left button pressed, state=%d\n", leftState);
+        if (buttonId == BUTTON_LEFT) {
+            Serial.printf("Left button pressed, state=%d\n", state);
             m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_LEFT, leftState);
-        } else if (middleState != BTN_NOTHING) {
-            Serial.printf("Middle button pressed, state=%d\n", middleState);
+            widgetSet->buttonPressed(BUTTON_LEFT, state);
+        } else if (buttonId == BUTTON_OK) {
+            Serial.printf("Middle button pressed, state=%d\n", state);
             m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_OK, middleState);
-        } else if (rightState != BTN_NOTHING) {
-            Serial.printf("Right button pressed, state=%d\n", rightState);
+            widgetSet->buttonPressed(BUTTON_OK, state);
+        } else if (buttonId == BUTTON_RIGHT) {
+            Serial.printf("Right button pressed, state=%d\n", state);
             m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+            widgetSet->buttonPressed(BUTTON_RIGHT, state);
         }
+    }
+}
+
+void checkButtons() {
+    ButtonState leftState = buttonLeft.getState();
+    if (leftState != BTN_NOTHING) {
+        buttonPressed(BUTTON_LEFT, leftState);
+    }
+    ButtonState middleState = buttonOK.getState();
+    if (middleState != BTN_NOTHING) {
+        buttonPressed(BUTTON_OK, middleState);
+    }
+    ButtonState rightState = buttonRight.getState();
+    if (rightState != BTN_NOTHING) {
+        buttonPressed(BUTTON_RIGHT, rightState);
     }
 }
 
@@ -193,6 +232,7 @@ void loop() {
     } else {
         if (!widgetSet->initialUpdateDone()) {
             widgetSet->initializeAllWidgetsData();
+            setupWebPortalEndpoints();
         }
         globalTime->updateTime();
 
