@@ -8,8 +8,8 @@
 #define MAX_WRAPPED_LINES 10
 
 enum ScreenMode {
-    Light = 1,
-    Dark = 2
+    Light = 0,
+    Dark = 1
 };
 
 #define ScreenWidth 240
