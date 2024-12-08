@@ -7,9 +7,9 @@
 #include <iomanip>
 
 StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config), m_taskHandle(NULL) {
-#ifdef STOCK_TICKER_LIST
-    char stockList[strlen(STOCK_TICKER_LIST) + 1];
-    strcpy(stockList, STOCK_TICKER_LIST);
+    config.addConfigString("StockWidget", "stockList", &m_stockList, 200, "Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on '&country = Canada' to narrow down to your ticker)");
+    char stockList[m_stockList.size()];
+    strcpy(stockList, m_stockList.c_str());
 
     char *symbol = strtok(stockList, ",");
     m_stockCount = 0;
@@ -23,7 +23,6 @@ StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget
             break;
         }
     } while (symbol = strtok(nullptr, ","));
-#endif
 }
 
 void StockWidget::setup() {

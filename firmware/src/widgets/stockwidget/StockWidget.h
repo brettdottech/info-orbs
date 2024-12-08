@@ -33,6 +33,12 @@ private:
     unsigned long m_stockDelay = 900000; // default to 15m between updates
     unsigned long m_stockDelayPrev = 0;
 
+#ifdef STOCK_TICKER_LIST
+    std::string m_stockList = STOCK_TICKER_LIST;
+#else
+    std::string m_stockList = "";
+#endif
+
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
 
