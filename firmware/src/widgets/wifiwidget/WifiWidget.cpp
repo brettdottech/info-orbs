@@ -50,7 +50,7 @@ void WifiWidget::setup() {
 
     // Add the last 2 digits of the MAC address onto the end of the config portal SSID
     // so each Info-Orbs has a unique SSID
-    m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
+    m_apssid = "InfoOrbs-" + WiFi.macAddress().substring(15);
 
     m_wifiManager.setCleanConnect(true);
     m_wifiManager.setConnectRetries(5);
@@ -89,6 +89,13 @@ void WifiWidget::update(bool force) {
         Serial.println(m_ipaddress);
         // Start the WebPortal
         m_wifiManager.startWebPortal();
+        // Initialize mDNS
+        String mDNSname = m_apssid + ".local";
+        if (!MDNS.begin(m_apssid)) {
+            Serial.println("Error setting up MDNS responder!");
+        } else {
+            Serial.printf("mDNS responder started. You should find this device at http://%s\n", mDNSname.c_str());
+        }
     } else {
         m_connectionTimer += 500;
         m_dotsString += " . ";
