@@ -30,6 +30,7 @@ int m_widgetCycleDelay = WIDGET_CYCLE_DELAY; // Automatically cycle widgets ever
 int m_widgetCycleDelay = 0;
 #endif
 unsigned long m_widgetCycleDelayPrev = 0;
+bool m_invertedOrbs = INVERTED_ORBS;
 
 Button buttonLeft(BUTTON_LEFT);
 Button buttonOK(BUTTON_OK);
@@ -69,6 +70,8 @@ void setupButtons() {
 
 void setupConfig() {
     config->addConfigInt("General", "widgetCycDelay", &m_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
+    config->addConfigBool("General", "invertedOrbs", &m_invertedOrbs, "Inverted Orbs (enable if using InfoOrbs upside down)");
+    tft.setRotation(m_invertedOrbs ? 2 : 0);
 }
 
 void setup() {
