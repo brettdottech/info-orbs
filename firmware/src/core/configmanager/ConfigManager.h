@@ -21,7 +21,7 @@
 #define CM_PARAM_TYPE_COMBOBOX 5
 
 // Uncomment to show debug output
-#define CM_DEBUG
+// #define CM_DEBUG
 
 class ConfigManager {
 public:

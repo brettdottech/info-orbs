@@ -3,8 +3,10 @@
 WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager(sm), m_configManager(config) {
     config.addConfigInt("TFT Settings", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
     config.addConfigBool("TFT Settings", "nightmode", &m_nightMode, "Enable Nighttime mode");
-    config.addConfigInt("TFT Settings", "dimStartHour", &m_dimStartHour, "Nighttime Start Hour [0-23]");
-    config.addConfigInt("TFT Settings", "dimEndHour", &m_dimEndHour, "Nighttime End Hour [0-23]");
+    String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
+                         "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
+    config.addConfigComboBox("TFT Settings", "dimStartHour", &m_dimStartHour, optHours, 24, "Nighttime Start [24h format]");
+    config.addConfigComboBox("TFT Settings", "dimEndHour", &m_dimEndHour, optHours, 24, "Nighttime End [24h format]");
     config.addConfigInt("TFT Settings", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-128]");
 }
 
