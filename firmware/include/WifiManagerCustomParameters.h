@@ -49,7 +49,7 @@ public:
         : WiFiManagerParameter("") {
         // We use 1 as value here and check later if the argument was passed back when submitting the form
         // If the checkbox is checked, the argument will be there
-        init(id, placeholder, "1", length, value ? checkboxHtmlChecked : checkboxHtml, WFM_LABEL_AFTER);
+        init(id, placeholder, "1", length, value ? checkboxHtmlChecked : checkboxHtml, WFM_LABEL_BEFORE);
     }
 
     bool getValue(WiFiManager &wm) {

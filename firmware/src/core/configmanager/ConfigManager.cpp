@@ -57,12 +57,18 @@ void ConfigManager::setupWiFiManager() {
             m_wm.addParameter(classLabel);
             strcpy(lastClassName, param.className);
         }
-        if (param.type != CM_PARAM_TYPE_BOOL) {
-            // Add extra <BR> for Parameters
-            WiFiManagerParameter *brLabel = new WiFiManagerParameter("<BR>");
-            m_wm.addParameter(brLabel);
-        }
+        // if (param.type != CM_PARAM_TYPE_BOOL) {
+        //     // Add extra <BR> for Parameters
+        //     WiFiManagerParameter *brLabel = new WiFiManagerParameter("<BR>");
+        //     m_wm.addParameter(brLabel);
+        // }
+        // Add extra <BR> for Parameters
+        // m_wm.addParameter(brLabel);
+        WiFiManagerParameter *divStart = new WiFiManagerParameter("<DIV>");
+        WiFiManagerParameter *divEnd = new WiFiManagerParameter("</DIV>");
+        m_wm.addParameter(divStart);
         m_wm.addParameter(param.parameter);
+        m_wm.addParameter(divEnd);
     }
     WiFiManagerParameter *endLabel = new WiFiManagerParameter(Utils::copyString("<HR><BR><H3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></H3>"));
     m_wm.addParameter(endLabel);
