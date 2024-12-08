@@ -1,7 +1,13 @@
 #include "WidgetSet.h"
 
-WidgetSet::WidgetSet(ScreenManager *sm) : m_screenManager(sm) {
+WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager(sm), m_configManager(config) {
+    config.addConfigInt("General", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
+    config.addConfigBool("General", "nightmode", &m_nightMode, "Enable Nighttime mode");
+    config.addConfigInt("General", "dimStartHour", &m_dimStartHour, "Nighttime Start Hour [0-23]");
+    config.addConfigInt("General", "dimEndHour", &m_dimEndHour, "Nighttime Start Hour [0-23]");
+    config.addConfigInt("General", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-128]");
 }
+
 void WidgetSet::add(Widget *widget) {
     if (m_widgetCount == MAX_WIDGETS) {
         Serial.println("MAX WIDGETS UNABLE TO ADD");
@@ -93,22 +99,24 @@ void WidgetSet::initializeAllWidgetsData() {
 }
 
 void WidgetSet::updateBrightnessByTime(uint8_t hour24) {
-#if defined(DIM_START_HOUR) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
-    bool isInDimRange;
-
-    if (DIM_START_HOUR < DIM_END_HOUR) {
-        // Normal case: the range does not cross midnight
-        isInDimRange = (hour24 >= DIM_START_HOUR && hour24 < DIM_END_HOUR);
+    uint8_t newBrightness;
+    if (m_nightMode) {
+        bool isInDimRange;
+        if (m_dimStartHour < m_dimEndHour) {
+            // Normal case: the range does not cross midnight
+            isInDimRange = (hour24 >= m_dimStartHour && hour24 < m_dimEndHour);
+        } else {
+            // Case where the range crosses midnight
+            isInDimRange = (hour24 >= m_dimStartHour || hour24 < m_dimEndHour);
+        }
+        newBrightness = isInDimRange ? m_dimBrightness : m_tftBrightness;
     } else {
-        // Case where the range crosses midnight
-        isInDimRange = (hour24 >= DIM_START_HOUR || hour24 < DIM_END_HOUR);
+        newBrightness = m_tftBrightness;
     }
 
-    uint8_t brightness = isInDimRange ? DIM_BRIGHTNESS : TFT_BRIGHTNESS;
-    if (m_screenManager->setBrightness(brightness)) {
+    if (m_screenManager->setBrightness(newBrightness)) {
         // brightness was changed -> update widget
         m_screenManager->clearAllScreens();
         drawCurrent(true);
     }
-#endif
 }

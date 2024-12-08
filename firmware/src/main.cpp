@@ -25,9 +25,9 @@
 TFT_eSPI tft = TFT_eSPI();
 
 #ifdef WIDGET_CYCLE_DELAY
-unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY * 1000; // Automatically cycle widgets every X seconds, set to 0 to disable
+int m_widgetCycleDelay = WIDGET_CYCLE_DELAY; // Automatically cycle widgets every X seconds, set to 0 to disable
 #else
-unsigned long m_widgetCycleDelay = 0;
+int m_widgetCycleDelay = 0;
 #endif
 unsigned long m_widgetCycleDelayPrev = 0;
 
@@ -67,6 +67,10 @@ void setupButtons() {
     attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
 }
 
+void setupConfig() {
+    config->addConfigInt("General", "widgetCycDelay", &m_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -75,6 +79,7 @@ void setup() {
     wifiManager = new WiFiManager();
     config = new ConfigManager(*wifiManager);
 
+    setupConfig();
     setupButtons();
 
     sm = new ScreenManager(tft);
@@ -95,7 +100,7 @@ void setup() {
 
     sm->drawJpg(0, 0, logo_start, logo_end - logo_start);
 
-    widgetSet = new WidgetSet(sm);
+    widgetSet = new WidgetSet(sm, *config);
 
 #ifdef GC9A01_DRIVER
     Serial.println("GC9A01 Driver");
@@ -136,7 +141,7 @@ void setup() {
 }
 
 void checkCycleWidgets() {
-    if (m_widgetCycleDelay > 0 && (m_widgetCycleDelayPrev == 0 || (millis() - m_widgetCycleDelayPrev) >= m_widgetCycleDelay)) {
+    if (m_widgetCycleDelay > 0 && (m_widgetCycleDelayPrev == 0 || (millis() - m_widgetCycleDelayPrev) >= m_widgetCycleDelay * 1000)) {
         widgetSet->next();
         m_widgetCycleDelayPrev = millis();
     }
