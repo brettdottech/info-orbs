@@ -14,7 +14,7 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen");
     m_config.addConfigBool("ParqetWidget", "showTotalVal", &m_showTotalValue, "Show total portfolio value");
     String options[] = {"Show current price", "Show current value"};
-    m_config.addConfigComboBox("ParqetWidget", "showValues", &m_showValues, options, 2, "Show stock or price/value");
+    m_config.addConfigComboBox("ParqetWidget", "showValues", &m_showValues, options, 2, "Show price or value for stocks");
     // m_config.addOnChangeCallback("ParqetWidget", [this](const std::string& className, const std::string& varName) {
     //     Serial.printf("ParqetWidget.addOnChangeCallback %s/%s\n", className.c_str(), varName.c_str());
     // });
