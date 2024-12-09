@@ -29,6 +29,29 @@ ConfigManager *config{nullptr};
 WiFiManager *wifiManager{nullptr};
 WidgetSet *widgetSet{nullptr};
 
+void addWidgets() {
+    // Always add clock
+    widgetSet->add(new ClockWidget(*sm, *config));
+#ifdef INCLUDE_PARQET
+    widgetSet->add(new ParqetWidget(*sm, *config));
+#endif
+#ifdef INCLUDE_STOCK
+    widgetSet->add(new StockWidget(*sm, *config));
+#endif
+    widgetSet->add(new WeatherWidget(*sm, *config));
+#ifdef INCLUDE_WEBDATA
+    #ifdef WEB_DATA_WIDGET_URL
+    widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_WIDGET_URL));
+    #endif
+    #ifdef WEB_DATA_STOCK_WIDGET_URL
+    widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_STOCK_WIDGET_URL));
+    #endif
+#endif
+#ifdef INCLUDE_MQTT
+    widgetSet->add(new MQTTWidget(*sm, *config));
+#endif
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -55,28 +78,9 @@ void setup() {
 
     globalTime = GlobalTime::getInstance();
 
-    widgetSet->add(new ClockWidget(*sm, *config));
-#ifdef INCLUDE_PARQET
-    widgetSet->add(new ParqetWidget(*sm, *config));
-#endif
-#ifdef INCLUDE_STOCK
-    widgetSet->add(new StockWidget(*sm, *config));
-#endif
-    widgetSet->add(new WeatherWidget(*sm, *config));
-#ifdef INCLUDE_WEBDATA
-    #ifdef WEB_DATA_WIDGET_URL
-    widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_WIDGET_URL));
-    #endif
-    #ifdef WEB_DATA_STOCK_WIDGET_URL
-    widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_STOCK_WIDGET_URL));
-    #endif
-#endif
-#ifdef INCLUDE_MQTT
-    widgetSet->add(new MQTTWidget(*sm, *config));
-#endif
+    addWidgets();
 
     config->setupWiFiManager();
-
     MainHelper::resetCycleTimer();
 }
 
