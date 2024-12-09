@@ -75,9 +75,9 @@ void ConfigManager::setupWebPortal() {
         }
 #endif
         saveAllConfigs();
+        Serial.println("New config values saved.");
         // Restart to apply new config
-        Serial.println("New config values saved. Restarting ESP now.");
-        ESP.restart();
+        requiresRestart = true;
     });
 }
 

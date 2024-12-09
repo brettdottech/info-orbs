@@ -106,4 +106,8 @@ void loop() {
 #ifdef MEMORY_DEBUG
     MainHelper::showMemoryUsage();
 #endif
+    if (config->isRequiresRestart()) {
+        Serial.println("Restarting ESP now");
+        ESP.restart();
+    }
 }
