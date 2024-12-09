@@ -42,7 +42,7 @@ ConfigManager *ConfigManager::getInstance() {
     return m_instance;
 }
 
-void ConfigManager::setupWiFiManager() {
+void ConfigManager::setupWebPortal() {
     WiFiManagerParameter *startLabel = new WiFiManagerParameter(Utils::copyString("<H1>InfoOrbs Configuration</H1>"));
     m_wm.addParameter(startLabel);
     char lastSection[30];
