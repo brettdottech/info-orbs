@@ -103,4 +103,7 @@ void loop() {
         MainHelper::checkCycleWidgets();
         wifiWidget->processWebPortalRequests();
     }
+#ifdef MEMORY_DEBUG
+    MainHelper::showMemoryUsage();
+#endif
 }

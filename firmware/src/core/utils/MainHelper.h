@@ -31,6 +31,8 @@ public:
     static void showWelcome(ScreenManager *screenManager);
     static void resetCycleTimer();
 
+    static void showMemoryUsage(bool force = false);
+
 private:
     static WiFiManager *s_wifiManager;
     static ConfigManager *s_configManager;
@@ -39,6 +41,7 @@ private:
     static int s_widgetCycleDelay;
     static unsigned long s_widgetCycleDelayPrev;
     static bool s_invertedOrbs;
+    static unsigned long s_lastMemoryInfo;
 };
 
 #endif
