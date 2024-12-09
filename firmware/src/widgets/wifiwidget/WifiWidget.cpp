@@ -94,7 +94,7 @@ void WifiWidget::update(bool force) {
         m_wifiManager.startWebPortal();
         // Initialize mDNS
         String mDNSname = m_apssid + "-" + WiFi.macAddress().substring(15) + ".local";
-        if (!MDNS.begin(m_apssid)) {
+        if (!MDNS.begin(mDNSname)) {
             Serial.println("Error setting up MDNS responder!");
         } else {
             Serial.printf("mDNS responder started. You should find this device at http://%s\n", mDNSname.c_str());
