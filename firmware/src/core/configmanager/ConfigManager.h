@@ -30,7 +30,7 @@ public:
 
     static ConfigManager *getInstance();
 
-    void setupWiFiManager();
+    void setupWebPortal();
     void saveAllConfigs();
 
     // Register different types of variables with descriptions

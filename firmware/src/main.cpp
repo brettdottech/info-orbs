@@ -66,23 +66,18 @@ void setup() {
 
     // Pass references to MainHelper
     MainHelper::init(wifiManager, config, widgetSet);
-
     MainHelper::setupConfig();
     MainHelper::setupButtons();
-
     MainHelper::showWelcome(sm);
 
     pinMode(BUSY_PIN, OUTPUT);
     Serial.println("Connecting to WiFi");
-
     wifiWidget = new WifiWidget(*sm, *config, *wifiManager);
     wifiWidget->setup();
 
     globalTime = GlobalTime::getInstance();
-
     addWidgets();
-
-    config->setupWiFiManager();
+    config->setupWebPortal();
     MainHelper::resetCycleTimer();
 }
 
@@ -106,7 +101,6 @@ void loop() {
         widgetSet->drawCurrent();
 
         MainHelper::checkCycleWidgets();
-
         wifiWidget->processWebPortalRequests();
     }
 }
