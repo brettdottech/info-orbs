@@ -96,7 +96,7 @@ void handleEndpointButton() {
 
 // Show button web page
 void handleEndpointButtons() {
-    String msg = "<html><body><table>";
+    String msg = "<html><body style='background: black';><table>";
     String buttons[] = {"left", "middle", "right"};
     String states[] = {"short", "medium", "long"};
     int numButtons = 3; // number of buttons
