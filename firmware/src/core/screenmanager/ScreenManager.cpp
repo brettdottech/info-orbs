@@ -12,6 +12,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     }
 
     m_tft.init();
+    m_tft.setRotation(ConfigManager::getInstance()->getConfigBool("invertedOrbs", INVERTED_ORBS) ? 2 : 0);
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();

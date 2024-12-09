@@ -7,7 +7,6 @@ Button buttonRight(BUTTON_RIGHT);
 // initialize static members
 WiFiManager *MainHelper::s_wifiManager = nullptr;
 ConfigManager *MainHelper::s_configManager = nullptr;
-TFT_eSPI *MainHelper::s_tft = nullptr;
 WidgetSet *MainHelper::s_widgetSet = nullptr;
 #ifdef WIDGET_CYCLE_DELAY
 int MainHelper::s_widgetCycleDelay = WIDGET_CYCLE_DELAY; // Automatically cycle widgets every X seconds, set to 0 to disable
@@ -17,10 +16,9 @@ int MainHelper::s_widgetCycleDelay = 0;
 unsigned long MainHelper::s_widgetCycleDelayPrev = 0;
 bool MainHelper::s_invertedOrbs = INVERTED_ORBS;
 
-void MainHelper::init(WiFiManager *wm, ConfigManager *cm, TFT_eSPI &tft, WidgetSet *ws) {
+void MainHelper::init(WiFiManager *wm, ConfigManager *cm, WidgetSet *ws) {
     s_wifiManager = wm;
     s_configManager = cm;
-    s_tft = &tft;
     s_widgetSet = ws;
 }
 
@@ -44,7 +42,6 @@ void MainHelper::setupButtons() {
 void MainHelper::setupConfig() {
     s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
     s_configManager->addConfigBool("General", "invertedOrbs", &s_invertedOrbs, "Inverted Orbs (enable if using InfoOrbs upside down)");
-    s_tft->setRotation(s_invertedOrbs ? 2 : 0);
 }
 
 void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {
