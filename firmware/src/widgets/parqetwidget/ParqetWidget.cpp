@@ -151,8 +151,14 @@ void ParqetWidget::updatePortfolio() {
         JsonDocument filter;
         Serial.print(", A5");
         // Filter the response to save memory
-        filter["holdings"] = true;
-        filter["performance"] = true;
+        filter["holdings"][0]["assetType"] = true;
+        filter["holdings"][0]["currency"] = true;
+        filter["holdings"][0]["asset"] = true;
+        filter["holdings"][0]["sharedAsset"]["name"] = true;
+        filter["holdings"][0]["performance"] = true;
+        filter["holdings"][0]["position"] = true;
+        filter["performance"]["purchaseValueForInterval"] = true;
+        filter["performance"]["portfolioValue"] = true;
 
         Serial.print(", A6");
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
