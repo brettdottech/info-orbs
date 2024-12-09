@@ -34,13 +34,13 @@ public:
     void saveAllConfigs();
 
     // Register different types of variables with descriptions
-    void addConfigString(const std::string &className, const std::string &varName, std::string *var, size_t length, const std::string &description);
-    void addConfigInt(const std::string &className, const std::string &varName, int *var, const std::string &description);
-    void addConfigFloat(const std::string &className, const std::string &varName, float *var, const std::string &description);
-    void addConfigIP(const std::string &className, const std::string &varName, IPAddress *var, const std::string &description);
-    void addConfigBool(const std::string &className, const std::string &varName, bool *var, const std::string &description);
-    void addConfigColor(const std::string &className, const std::string &varName, int *var, const std::string &description);
-    void addConfigComboBox(const std::string &className, const std::string &varName, int *var, String options[], int numOptions, const std::string &description);
+    void addConfigString(const std::string &section, const std::string &varName, std::string *var, size_t length, const std::string &description);
+    void addConfigInt(const std::string &section, const std::string &varName, int *var, const std::string &description);
+    void addConfigFloat(const std::string &section, const std::string &varName, float *var, const std::string &description);
+    void addConfigIP(const std::string &section, const std::string &varName, IPAddress *var, const std::string &description);
+    void addConfigBool(const std::string &section, const std::string &varName, bool *var, const std::string &description);
+    void addConfigColor(const std::string &section, const std::string &varName, int *var, const std::string &description);
+    void addConfigComboBox(const std::string &section, const std::string &varName, int *var, String options[], int numOptions, const std::string &description);
 
     // Get stored values
     String getConfigString(const std::string &varName, String defaultValue);
@@ -50,18 +50,18 @@ public:
 
     // Register callbacks for changes
     void addOnChangeCallback(
-        const std::string &className,
+        const std::string &section,
         const std::string &varName,
-        const std::function<void(const std::string &className, const std::string &varName)> &callback);
+        const std::function<void(const std::string &section, const std::string &varName)> &callback);
     void addOnChangeCallback(
-        const std::string &className,
-        const std::function<void(const std::string &className, const std::string &varName)> &callback);
+        const std::string &section,
+        const std::function<void(const std::string &section, const std::string &varName)> &callback);
 
 private:
     struct Parameter {
         WiFiManagerParameter *parameter;
         const int type;
-        const char *className;
+        const char *section;
         const char *variableName;
         std::function<void()> saveCallback;
     };
@@ -71,14 +71,14 @@ private:
     WiFiManager &m_wm;
     Preferences preferences;
     std::vector<Parameter> parameters;
-    std::unordered_map<std::string, std::vector<std::function<void(const std::string &className, const std::string &varName)>>> changeCallbacks;
+    std::unordered_map<std::string, std::vector<std::function<void(const std::string &section, const std::string &varName)>>> changeCallbacks;
 
     template <typename T, typename ParameterType, typename... Args>
-    void addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description, uint8_t length,
+    void addConfig(int paramType, const std::string &section, const std::string &varName, T *var, const std::string &description, uint8_t length,
                    std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
 
-    std::string makeKey(const std::string &className, const std::string &varName);
-    void triggerChangeCallbacks(const std::string &className, const std::string &varName = "");
+    std::string makeKey(const std::string &section, const std::string &varName);
+    void triggerChangeCallbacks(const std::string &section, const std::string &varName = "");
 };
 
 #endif // CONFIG_MANAGER_H
