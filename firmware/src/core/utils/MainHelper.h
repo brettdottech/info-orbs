@@ -12,7 +12,7 @@
 
 class MainHelper {
 public:
-    static void init(WiFiManager *wm, ConfigManager *cm, TFT_eSPI &tft, WidgetSet *ws);
+    static void init(WiFiManager *wm, ConfigManager *cm, WidgetSet *ws);
     static void isrButtonChangeLeft();
     static void isrButtonChangeMiddle();
     static void isrButtonChangeRight();
@@ -34,7 +34,6 @@ public:
 private:
     static WiFiManager *s_wifiManager;
     static ConfigManager *s_configManager;
-    static TFT_eSPI *s_tft;
     static WidgetSet *s_widgetSet;
 
     static int s_widgetCycleDelay;

@@ -47,7 +47,7 @@ void setup() {
     widgetSet = new WidgetSet(sm, *config);
 
     // Pass references to MainHelper
-    MainHelper::init(wifiManager, config, tft, widgetSet);
+    MainHelper::init(wifiManager, config, widgetSet);
 
     MainHelper::setupConfig();
     MainHelper::setupButtons();
