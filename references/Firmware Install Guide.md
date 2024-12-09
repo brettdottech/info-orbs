@@ -2,7 +2,7 @@
 Tip: If you're coming from the youtube video, skip to step 11, as all the earlier steps for installing all the prerequisites are the sam. The install process is still very similar, just some conifg settings and file locations have changed
 
 
-1\. Download, unzip and install the CP210x drivers needed to connect the device to you computer from <https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads>\
+1\. Download, unzip and install the CP210x drivers needed to connect the device to you computer from <https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads>
 
 Ensure to select the correct operating system for the computer you're using.
 
