@@ -3,6 +3,7 @@
 #include "config_helper.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
+    m_enabled = true; // Always enabled, do not add a config setting for it
     String optFormats[] = {"24h mode", "12h mode", "12h mode (with am/pm)"};
     m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, optFormats, 3, "Clock Format");
     m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show Second Ticks");

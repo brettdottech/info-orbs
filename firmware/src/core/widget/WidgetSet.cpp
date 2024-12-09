@@ -51,7 +51,12 @@ void WidgetSet::next() {
     if (m_currentWidget >= m_widgetCount) {
         m_currentWidget = 0;
     }
-    switchWidget();
+    if (!getCurrent()->isEnabled()) {
+        // Recursive call to next()
+        next();
+    } else {
+        switchWidget();
+    }
 }
 
 void WidgetSet::prev() {
@@ -59,7 +64,12 @@ void WidgetSet::prev() {
     if (m_currentWidget < 0) {
         m_currentWidget = m_widgetCount - 1;
     }
-    switchWidget();
+    if (!getCurrent()->isEnabled()) {
+        // Recursive call to next()
+        prev();
+    } else {
+        switchWidget();
+    }
 }
 
 void WidgetSet::switchWidget() {
@@ -84,9 +94,11 @@ void WidgetSet::showLoading() {
 
 void WidgetSet::updateAll() {
     for (int8_t i; i < m_widgetCount; i++) {
-        Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
-        showCenteredLine(4, m_widgets[i]->getName());
-        m_widgets[i]->update();
+        if (m_widgets[i]->isEnabled()) {
+            Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
+            showCenteredLine(4, m_widgets[i]->getName());
+            m_widgets[i]->update();
+        }
     }
 }
 
