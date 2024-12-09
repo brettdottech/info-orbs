@@ -99,7 +99,6 @@ void setup() {
     sm->setFontColor(TFT_RED);
     sm->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 14);
 
-
     sm->selectScreen(2);
 
     TJpgDec.setJpgScale(1);
