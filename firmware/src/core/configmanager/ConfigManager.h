@@ -57,6 +57,9 @@ public:
         const std::string &section,
         const std::function<void(const std::string &section, const std::string &varName)> &callback);
 
+    // Check if a restart is required
+    bool isRequiresRestart() { return requiresRestart; }
+
 private:
     struct Parameter {
         WiFiManagerParameter *parameter;
@@ -72,6 +75,7 @@ private:
     Preferences preferences;
     std::vector<Parameter> parameters;
     std::unordered_map<std::string, std::vector<std::function<void(const std::string &section, const std::string &varName)>>> changeCallbacks;
+    bool requiresRestart = false;
 
     template <typename T, typename ParameterType, typename... Args>
     void addConfig(int paramType, const std::string &section, const std::string &varName, T *var, const std::string &description, uint8_t length,
