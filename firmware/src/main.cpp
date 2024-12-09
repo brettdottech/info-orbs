@@ -26,7 +26,7 @@ WifiWidget *wifiWidget{nullptr};
 
 ScreenManager *sm{nullptr};
 ConfigManager *config{nullptr};
-WiFiManager *wifiManager{nullptr};
+OrbsWiFiManager *wifiManager{nullptr};
 WidgetSet *widgetSet{nullptr};
 
 void addWidgets() {
@@ -59,7 +59,7 @@ void setup() {
     Serial.println();
     Serial.println("Starting up...");
 
-    wifiManager = new WiFiManager();
+    wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
     sm = new ScreenManager(tft);
     widgetSet = new WidgetSet(sm, *config);
