@@ -135,7 +135,7 @@ void ParqetWidget::updatePortfolio() {
         Serial.print("PU A1");
         Stream &rawStream = http.getStream();
         Serial.print(", A2");
-        ChunkDecodingStream decodedStream(http.getStream());
+        ChunkDecodingStream decodedStream(rawStream);
         Serial.print(", A3");
 
         // Choose the right stream depending on the Transfer-Encoding header
@@ -267,7 +267,7 @@ void ParqetWidget::updatePortfolioChart() {
     // Check for the returning code
     if (httpCode == 200) {
         Stream &rawStream = http.getStream();
-        ChunkDecodingStream decodedStream(http.getStream());
+        ChunkDecodingStream decodedStream(rawStream);
 
         // Choose the right stream depending on the Transfer-Encoding header
         // Parqet might send chunked responses
