@@ -77,42 +77,42 @@ Once you're done this, you can flash the firmware to your orbs by holding the "b
 ### 3. Widget Options & Configuration
 **Basic Setup Fields**
 - Wifi is now configured on device using WifiManager by connected to the devices access point upon boot. However if this does not work, you may manually configure your wifi details using the fields in the config file (only do this as a last resort.)
-`//#define WIFI_SSID "MyWiFiRouter" // Wifi router SSID name (use only 2.4 GHz network)
-//#define WIFI_PASS "WiFiPassword" // Wifi router password`
+`//#define WIFI_SSID "MyWiFiRouter" // Wifi router SSID name (use only 2.4 GHz network)`
+`//#define WIFI_PASS "WiFiPassword" // Wifi router password`
 
 - Timezone configuration, you will need to change the below field to your local timezone, or timezone you want displayed on the devices clock(s). Please copy/paste the exact timezone as outline in this list <https://timezonedb.com/time-zones>
 ` #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
 `
 
 - If you want your orbs to automatically cycle widgets, you can change the number from 0 in the below line of code for how many seconds you want to wait between switching, and this will enable that functionality
-`#define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
+`#define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X seconds, set to 0 to disable
 `
 
 - If you want your orbs to "dim" at certain hours of the day you need to uncomment (remove the `//`  at the beginning of the below three lines of code then adjust the starting hour, ending hour, and brightness which you want the dimming to occur.
-`//#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)
-//#define DIM_END_HOUR 7     // Undim the screens at this time (24h format)
-//#define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
+`//#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)`
+`//#define DIM_END_HOUR 7     // Undim the screens at this time (24h format)`
+`//#define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
 `
 
 **Widgets & Widget Settings**
 1. **Clock** (Enabled By Default) - this will show the time on the orbs with multiple means of customization. The default settings for the clock will switch between the default and "nixie" style clock upon a short press of the middle button. It will switch between 12/24 hours by a medium press(~0.5 seconds) of the same middle button. The clock has many other configureable elements that can be found in config.h as shown below, feel free to mess around with them to make it your own (:
-`// CLOCK CONFIGURATION
-# define FORMAT_24_HOUR false            // Toggle 24 hour clock vs 12 hour clock, change between true/false
-# define SHOW_AM_PM_INDICATOR false      // AM/PM on the clock if using 12 hour
-# define SHOW_SECOND_TICKS true          // Ticking indicator on the centre clock
-# define CLOCK_COLOR 0xfc80              // Orange for clock
-# define CLOCK_SHADOW_COLOR 0x20a1       // Clock shadow color (Light brown)
-# define CLOCK_SHADOWING true            // Use clock shadow (set to false to disable)
-# define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock
-# define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README.md)
-//#define CLOCK_NIXIE_COLOR 0x001f        // Override Nixie color
-# define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM
-//#define CLOCK_FONT DSEG7              // Define clock font (defaults to DSEG7, you can also try DSEG14 or FINAL_FRONTIER)`
+`// CLOCK CONFIGURATION`
+`# define FORMAT_24_HOUR false            // Toggle 24 hour clock vs 12 hour clock, change between true/false`
+`# define SHOW_AM_PM_INDICATOR false      // AM/PM on the clock if using 12 hour`
+`# define SHOW_SECOND_TICKS true          // Ticking indicator on the centre clock`
+`# define CLOCK_COLOR 0xfc80              // Orange for clock`
+`# define CLOCK_SHADOW_COLOR 0x20a1       // Clock shadow color (Light brown)`
+`# define CLOCK_SHADOWING true            // Use clock shadow (set to false to disable)`
+`# define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock`
+`# define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README.md)`
+`//#define CLOCK_NIXIE_COLOR 0x001f        // Override Nixie color`
+`# define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM`
+`//#define CLOCK_FONT DSEG7              // Define clock font (defaults to DSEG7, you can also try DSEG14 or FINAL_FRONTIER)`
 
 2. **Weather** (Enabled By Default) - This will show the weather as defined by your weather location. Short pressing the middle button will toggle between the forecast displaying high/low temps, you can also adjust things like your unit preference and whether you want the "theme" to be dark or light (check out both, they're quite different)
-`#define WEATHER_LOCATION "Victoria, BC" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data
-# define WEATHER_SCREEN_MODE Dark        // Can be either Light or Dark
-# define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather`
+`#define WEATHER_LOCATION "Victoria, BC" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data`
+`# define WEATHER_SCREEN_MODE Dark        // Can be either Light or Dark`
+`# define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather`
 
 3. **Stocks** (Enabled By Default) - This will show 5 pre-defined stocks, their prices, names, daily change, and 52 weeks highs/lows. Pressing the middle button will refresh the prices, they will otherwise update automatically every 15 minutes
 There are multiple markets/exchanges supported including crypto and forex, the data for this widget is supplied by twelve-data, info on what data you can pull can be found here: <https://twelvedata.com/exchanges?level=grow>.
