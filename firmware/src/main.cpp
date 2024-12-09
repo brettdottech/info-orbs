@@ -74,11 +74,13 @@ void setup() {
     widgetSet->add(new StockWidget(*sm, *config));
 #endif
     widgetSet->add(new WeatherWidget(*sm, *config));
-#if defined(INCLUDE_WEBDATA) && defined(WEB_DATA_WIDGET_URL)
+#ifdef INCLUDE_WEBDATA
+    #ifdef WEB_DATA_WIDGET_URL
     widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_WIDGET_URL));
-#endif
-#if defined(INCLUDE_WEBDATA) && defined(WEB_DATA_STOCK_WIDGET_URL)
+    #endif
+    #ifdef WEB_DATA_STOCK_WIDGET_URL
     widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_STOCK_WIDGET_URL));
+    #endif
 #endif
 #ifdef INCLUDE_MQTT
     widgetSet->add(new MQTTWidget(*sm, *config));
