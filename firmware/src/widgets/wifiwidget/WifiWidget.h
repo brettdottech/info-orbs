@@ -17,7 +17,6 @@ public:
     String getName() override;
 
     bool isConnected() { return m_isConnected; }
-    WiFiManager &getWiFiManager();
 
 private:
     void connectionTimedOut();

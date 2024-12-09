@@ -175,7 +175,3 @@ void WifiWidget::processWebPortalRequests() {
 String WifiWidget::getName() {
     return "WiFi";
 }
-
-WiFiManager &WifiWidget::getWiFiManager() {
-    return m_wifiManager;
-}
