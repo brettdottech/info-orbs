@@ -2,9 +2,9 @@ name: PlatformIO CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
@@ -28,9 +28,8 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Create config.h
-        working-directory: ./Info-Orbs
-        run: cp lib/config/config.h.template lib/config/config.h
+        working-directory: ./firmware
+        run: cp config/config.h.template config/config.h
 
       - name: Build PlatformIO Project
-        working-directory: ./Info-Orbs
         run: pio run

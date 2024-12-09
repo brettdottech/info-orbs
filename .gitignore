@@ -14,4 +14,18 @@
 
 # Arduino libraries (if installed in the project directory)
 libraries/
-Info-Orbs/lib/config/config.h
+firmware/config/config.h
+.pio
+
+# VS Code
+.vscode/
+
+# Jetbrains IDE
+.idea/
+
+megalinter-reports/
+
+# May be present if running mega-linter-runner locally
+node_modules
+package.json
+package-lock.json
