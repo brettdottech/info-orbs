@@ -16,6 +16,8 @@
 #include "config_helper.h"
 
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
+    m_enabled = true; // Enabled by default
+    m_config.addConfigBool("WeatherWidget", "enabled", &m_enabled, "Enable Widget");
     config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
     String optUnits[] = {"Celsius", "Fahrenheit"};
     config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit");

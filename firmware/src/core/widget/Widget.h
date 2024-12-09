@@ -16,9 +16,11 @@ public:
     virtual void buttonPressed(uint8_t buttonId, ButtonState state) = 0;
     virtual String getName() = 0;
     void setBusy(bool busy);
+    bool isEnabled();
 
 protected:
     ScreenManager &m_manager;
     ConfigManager &m_config;
+    bool m_enabled = false;
 };
 #endif // WIDGET_H

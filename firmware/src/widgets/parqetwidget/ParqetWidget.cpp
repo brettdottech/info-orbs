@@ -9,6 +9,7 @@
 
 ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
+    m_config.addConfigBool("ParqetWidget", "enabled", &m_enabled, "Enable Widget");
     m_config.addConfigString("ParqetWidget", "portfolioId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
     m_config.addConfigBool("ParqetWidget", "showClock", &m_showClock, "Show clock on first screen");
     m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen");

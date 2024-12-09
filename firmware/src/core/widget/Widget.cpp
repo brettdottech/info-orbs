@@ -9,3 +9,7 @@ void Widget::setBusy(bool busy) {
         digitalWrite(BUSY_PIN, LOW);
     }
 }
+
+bool Widget::isEnabled() {
+    return m_enabled;
+}
