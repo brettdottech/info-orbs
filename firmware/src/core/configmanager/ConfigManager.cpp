@@ -45,25 +45,18 @@ ConfigManager *ConfigManager::getInstance() {
 void ConfigManager::setupWiFiManager() {
     WiFiManagerParameter *startLabel = new WiFiManagerParameter(Utils::copyString("<H1>InfoOrbs Configuration</H1>"));
     m_wm.addParameter(startLabel);
-    char lastClassName[30];
+    char lastSection[30];
     for (auto &param : parameters) {
 #ifdef CM_DEBUG
-        Serial.printf("Adding WebPortal parameter: %s, %s\n", param.className, param.variableName);
+        Serial.printf("Adding WebPortal parameter: %s, %s\n", param.section, param.variableName);
 #endif
-        if (!Utils::compareCharArrays(lastClassName, param.className)) {
+        if (!Utils::compareCharArrays(lastSection, param.section)) {
             // New class variables -> add a separator
-            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<HR><H2 style='margin-block-end: 0;'>", param.className, "</H2>"));
-            Serial.printf("New config area: %s\n", param.className);
+            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<HR><H2 style='margin-block-end: 0;'>", param.section, "</H2>"));
+            Serial.printf("New config area: %s\n", param.section);
             m_wm.addParameter(classLabel);
-            strcpy(lastClassName, param.className);
+            strcpy(lastSection, param.section);
         }
-        // if (param.type != CM_PARAM_TYPE_BOOL) {
-        //     // Add extra <BR> for Parameters
-        //     WiFiManagerParameter *brLabel = new WiFiManagerParameter("<BR>");
-        //     m_wm.addParameter(brLabel);
-        // }
-        // Add extra <BR> for Parameters
-        // m_wm.addParameter(brLabel);
         WiFiManagerParameter *divStart = new WiFiManagerParameter("<DIV>");
         WiFiManagerParameter *divEnd = new WiFiManagerParameter("</DIV>");
         m_wm.addParameter(divStart);
@@ -91,37 +84,37 @@ void ConfigManager::setupWiFiManager() {
 void ConfigManager::saveAllConfigs() {
     for (auto &param : parameters) {
         param.saveCallback(); // Save variables to preferences
-        triggerChangeCallbacks(param.className, param.variableName); // Notify listeners
+        triggerChangeCallbacks(param.section, param.variableName); // Notify listeners
     }
 }
 
-std::string ConfigManager::makeKey(const std::string &className, const std::string &varName) {
-    return className + "_" + varName;
+std::string ConfigManager::makeKey(const std::string &section, const std::string &varName) {
+    return section + "_" + varName;
 }
 
-void ConfigManager::triggerChangeCallbacks(const std::string &className, const std::string &varName) {
+void ConfigManager::triggerChangeCallbacks(const std::string &section, const std::string &varName) {
 #ifdef CM_DEBUG
-    Serial.printf("triggerChangeCallbacks, c=%s, v=%s\n", className.c_str(), varName.c_str());
+    Serial.printf("triggerChangeCallbacks, c=%s, v=%s\n", section.c_str(), varName.c_str());
 #endif
-    if (!varName.empty() && changeCallbacks.count(className + "_" + varName)) {
-        for (const auto &callback : changeCallbacks[className + "_" + varName]) {
-            callback(className, varName);
+    if (!varName.empty() && changeCallbacks.count(section + "_" + varName)) {
+        for (const auto &callback : changeCallbacks[section + "_" + varName]) {
+            callback(section, varName);
         }
     }
-    if (changeCallbacks.count(className)) {
-        for (const auto &callback : changeCallbacks[className]) {
-            callback(className, varName);
+    if (changeCallbacks.count(section)) {
+        for (const auto &callback : changeCallbacks[section]) {
+            callback(section, varName);
         }
     }
 }
 
 template <typename T, typename ParameterType, typename... Args>
-void ConfigManager::addConfig(int paramType, const std::string &className, const std::string &varName, T *var, const std::string &description, uint8_t length,
+void ConfigManager::addConfig(int paramType, const std::string &section, const std::string &varName, T *var, const std::string &description, uint8_t length,
                               std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences,
                               Args... args) {
 
     // Convert std::string to char* once
-    char *classNameBuffer = Utils::copyString(className);
+    char *sectionBuffer = Utils::copyString(section);
     char *varNameBuffer = Utils::copyString(varName);
     char *descBuffer = Utils::copyString(description);
 
@@ -135,7 +128,7 @@ void ConfigManager::addConfig(int paramType, const std::string &className, const
     // Create parameter with additional arguments if needed
     ParameterType *param = new ParameterType(varNameBuffer, descBuffer, args..., *var, length);
 
-    auto saveLambda = [this, classNameBuffer, varNameBuffer, var, param, setParameterValue, saveToPreferences]() {
+    auto saveLambda = [this, sectionBuffer, varNameBuffer, var, param, setParameterValue, saveToPreferences]() {
         // Set parameter value
         setParameterValue(param, *var);
         // Save to preferences
@@ -146,52 +139,52 @@ void ConfigManager::addConfig(int paramType, const std::string &className, const
 #endif
     };
 
-    parameters.push_back({param, paramType, classNameBuffer, varNameBuffer, saveLambda});
+    parameters.push_back({param, paramType, sectionBuffer, varNameBuffer, saveLambda});
 }
 
-void ConfigManager::addConfigString(const std::string &className, const std::string &varName, std::string *var, size_t length, const std::string &description) {
+void ConfigManager::addConfigString(const std::string &section, const std::string &varName, std::string *var, size_t length, const std::string &description) {
     addConfig<std::string, StringParameter>(
-        CM_PARAM_TYPE_STRING, className, varName, var, description, length,
+        CM_PARAM_TYPE_STRING, section, varName, var, description, length,
         [this, varName](std::string &var) { var = preferences.getString(varName.c_str(), var.c_str()).c_str(); },
         [](StringParameter *param, std::string &var) { var = param->getValue(); },
         [this, varName](std::string &var) { preferences.putString(varName.c_str(), var.c_str()); });
 }
 
-void ConfigManager::addConfigInt(const std::string &className, const std::string &varName, int *var, const std::string &description) {
+void ConfigManager::addConfigInt(const std::string &section, const std::string &varName, int *var, const std::string &description) {
     addConfig<int, IntParameter>(
-        CM_PARAM_TYPE_INT, className, varName, var, description, 10,
+        CM_PARAM_TYPE_INT, section, varName, var, description, 10,
         [this, varName](int &var) { var = preferences.getInt(varName.c_str(), var); },
         [](IntParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName.c_str(), var); });
 }
 
-void ConfigManager::addConfigBool(const std::string &className, const std::string &varName, bool *var, const std::string &description) {
+void ConfigManager::addConfigBool(const std::string &section, const std::string &varName, bool *var, const std::string &description) {
     addConfig<bool, BoolParameter>(
-        CM_PARAM_TYPE_BOOL, className, varName, var, description, 2,
+        CM_PARAM_TYPE_BOOL, section, varName, var, description, 2,
         [this, varName](bool &var) { var = preferences.getBool(varName.c_str(), var); },
         [this](BoolParameter *param, bool &var) { var = param->getValue(this->m_wm); },
         [this, varName](bool &var) { preferences.putBool(varName.c_str(), var); });
 }
 
-void ConfigManager::addConfigFloat(const std::string &className, const std::string &varName, float *var, const std::string &description) {
+void ConfigManager::addConfigFloat(const std::string &section, const std::string &varName, float *var, const std::string &description) {
     addConfig<float, FloatParameter>(
-        CM_PARAM_TYPE_FLOAT, className, varName, var, description, 10,
+        CM_PARAM_TYPE_FLOAT, section, varName, var, description, 10,
         [this, varName](float &var) { var = preferences.getFloat(varName.c_str(), var); },
         [](FloatParameter *param, float &var) { var = param->getValue(); },
         [this, varName](float &var) { preferences.putFloat(varName.c_str(), var); });
 }
 
-void ConfigManager::addConfigColor(const std::string &className, const std::string &varName, int *var, const std::string &description) {
+void ConfigManager::addConfigColor(const std::string &section, const std::string &varName, int *var, const std::string &description) {
     addConfig<int, ColorParameter>(
-        CM_PARAM_TYPE_COLOR, className, varName, var, description, 10,
+        CM_PARAM_TYPE_COLOR, section, varName, var, description, 10,
         [this, varName](int &var) { var = preferences.getInt(varName.c_str(), var); },
         [](ColorParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName.c_str(), var); });
 }
 
-void ConfigManager::addConfigComboBox(const std::string &className, const std::string &varName, int *var, String options[], int numOptions, const std::string &description) {
+void ConfigManager::addConfigComboBox(const std::string &section, const std::string &varName, int *var, String options[], int numOptions, const std::string &description) {
     addConfig<int, ComboBoxParameter>(
-        CM_PARAM_TYPE_COMBOBOX, className, varName, var, description, 2,
+        CM_PARAM_TYPE_COMBOBOX, section, varName, var, description, 2,
         [this, varName](int &var) { var = preferences.getInt(varName.c_str(), var); },
         [this](ComboBoxParameter *param, int &var) { var = param->getValue(this->m_wm); },
         [this, varName](int &var) { preferences.putInt(varName.c_str(), var); },
@@ -221,11 +214,11 @@ float ConfigManager::getConfigFloat(const std::string &varName, float defaultVal
 }
 
 void ConfigManager::addOnChangeCallback(
-    const std::string &className, const std::string &varName, const std::function<void(const std::string &className, const std::string &varName)> &callback) {
-    changeCallbacks[className + "_" + varName].push_back(callback);
+    const std::string &section, const std::string &varName, const std::function<void(const std::string &section, const std::string &varName)> &callback) {
+    changeCallbacks[section + "_" + varName].push_back(callback);
 }
 
 void ConfigManager::addOnChangeCallback(
-    const std::string &className, const std::function<void(const std::string &className, const std::string &varName)> &callback) {
-    changeCallbacks[className].push_back(callback);
+    const std::string &section, const std::function<void(const std::string &section, const std::string &varName)> &callback) {
+    changeCallbacks[section].push_back(callback);
 }
