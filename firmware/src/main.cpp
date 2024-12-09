@@ -32,13 +32,15 @@ WidgetSet *widgetSet{nullptr};
 void addWidgets() {
     // Always add clock
     widgetSet->add(new ClockWidget(*sm, *config));
-#ifdef INCLUDE_PARQET
-    widgetSet->add(new ParqetWidget(*sm, *config));
+#ifdef INCLUDE_WEATHER
+    widgetSet->add(new WeatherWidget(*sm, *config));
 #endif
 #ifdef INCLUDE_STOCK
     widgetSet->add(new StockWidget(*sm, *config));
 #endif
-    widgetSet->add(new WeatherWidget(*sm, *config));
+#ifdef INCLUDE_PARQET
+    widgetSet->add(new ParqetWidget(*sm, *config));
+#endif
 #ifdef INCLUDE_WEBDATA
     #ifdef WEB_DATA_WIDGET_URL
     widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_WIDGET_URL));
