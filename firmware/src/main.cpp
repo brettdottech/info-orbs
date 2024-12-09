@@ -8,24 +8,13 @@
 #include "clockwidget/ClockWidget.h"
 #include "config_helper.h"
 #include "icons.h"
+#include "mqttwidget/MQTTWidget.h"
+#include "parqetwidget/ParqetWidget.h"
+#include "stockwidget/StockWidget.h"
+#include "weatherwidget/WeatherWidget.h"
+#include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
 #include <Arduino.h>
-
-#ifdef INCLUDE_WEATHER
-    #include "weatherwidget/WeatherWidget.h"
-#endif
-#ifdef INCLUDE_STOCK
-    #include "stockwidget/StockWidget.h"
-#endif
-#ifdef INCLUDE_PARQET
-    #include "parqetwidget/ParqetWidget.h"
-#endif
-#ifdef INCLUDE_WEBDATA
-    #include "webdatawidget/WebDataWidget.h"
-#endif
-#ifdef INCLUDE_MQTT
-    #include "mqttwidget/MQTTWidget.h"
-#endif
 
 TFT_eSPI tft = TFT_eSPI();
 
