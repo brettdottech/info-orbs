@@ -1,6 +1,4 @@
-#ifdef MQTT_WIDGET_HOST
-
-    #include "MQTTWidget.h"
+#include "MQTTWidget.h"
 
 // Initialize the static instance pointer
 MQTTWidget *MQTTWidget::instance = nullptr;
@@ -19,22 +17,22 @@ MQTTWidget::MQTTWidget(ScreenManager &manager, ConfigManager &config)
     // Assign the current instance to the static pointer
     instance = this;
 
-    // Set defaults from config.h
-    #ifdef MQTT_WIDGET_HOST
+// Set defaults from config.h
+#ifdef MQTT_WIDGET_HOST
     mqttHost = MQTT_WIDGET_HOST;
-    #endif
-    #ifdef MQTT_WIDGET_PORT
+#endif
+#ifdef MQTT_WIDGET_PORT
     mqttPort = MQTT_WIDGET_PORT;
-    #endif
-    #ifdef MQTT_SETUP_TOPIC
+#endif
+#ifdef MQTT_SETUP_TOPIC
     mqttSetupTopic = MQTT_SETUP_TOPIC;
-    #endif
-    #ifdef MQTT_WIDGET_USER
+#endif
+#ifdef MQTT_WIDGET_USER
     mqttUser = MQTT_WIDGET_USER;
-    #endif
-    #ifdef MQTT_WIDGET_PASS
+#endif
+#ifdef MQTT_WIDGET_PASS
     mqttPass = MQTT_WIDGET_PASS;
-    #endif
+#endif
 
     m_config.addConfigBool("MqttWidget", "mqttEnabled", &m_enabled, "Enable Widget");
     m_config.addConfigString("MqttWidget", "mqttHost", &mqttHost, 30, "MQTT Host");
@@ -164,7 +162,7 @@ void MQTTWidget::callback(char *topic, byte *payload, unsigned int length) {
     Serial.print("]: ");
     Serial.println(message);
 
-    if (receivedTopic.equals(MQTT_SETUP_TOPIC)) {
+    if (receivedTopic.equals(mqttSetupTopic.c_str())) {
         handleSetupMessage(message);
     } else {
         // Handle data messages for orbs
@@ -357,9 +355,9 @@ void MQTTWidget::reconnect() {
         bool connected;
 
         // Check if username and password are provided
-        if (strlen(MQTT_WIDGET_USER) > 0 && strlen(MQTT_WIDGET_PASS) > 0) {
+        if (!mqttUser.empty() && !mqttPass.empty()) {
             // Attempt to connect with username and password
-            connected = mqttClient.connect(clientId.c_str(), MQTT_WIDGET_USER, MQTT_WIDGET_PASS);
+            connected = mqttClient.connect(clientId.c_str(), mqttUser.c_str(), mqttPass.c_str());
             Serial.println("Attempting MQTT connection with authentication...");
         } else {
             // Attempt to connect without authentication
@@ -371,10 +369,10 @@ void MQTTWidget::reconnect() {
         if (connected) {
             Serial.println("MQTT connected");
             // Once connected, subscribe to the setup topic
-            if (mqttClient.subscribe(MQTT_SETUP_TOPIC)) {
-                Serial.println("Subscribed to setup topic2: " + String(MQTT_SETUP_TOPIC));
+            if (mqttClient.subscribe(mqttSetupTopic.c_str())) {
+                Serial.println("Subscribed to setup topic2: " + String(mqttSetupTopic.c_str()));
             } else {
-                Serial.println("Failed to subscribe to setup topic: " + String(MQTT_SETUP_TOPIC));
+                Serial.println("Failed to subscribe to setup topic: " + String(mqttSetupTopic.c_str()));
             }
         } else {
             Serial.print("failed, rc=");
@@ -444,5 +442,3 @@ void MQTTWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
 }
-
-#endif
