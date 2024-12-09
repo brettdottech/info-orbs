@@ -13,11 +13,35 @@ void MQTTWidget::staticCallback(char *topic, byte *payload, unsigned int length)
 }
 
 // Constructor
-MQTTWidget::MQTTWidget(ScreenManager &manager, ConfigManager &config, const String &host, uint16_t port)
-    : Widget(manager, config), mqttHost(host), mqttPort(port), mqttClient(wifiClient) {
+MQTTWidget::MQTTWidget(ScreenManager &manager, ConfigManager &config)
+    : Widget(manager, config), mqttClient(wifiClient) {
 
     // Assign the current instance to the static pointer
     instance = this;
+
+    // Set defaults from config.h
+    #ifdef MQTT_WIDGET_HOST
+    mqttHost = MQTT_WIDGET_HOST;
+    #endif
+    #ifdef MQTT_WIDGET_PORT
+    mqttPort = MQTT_WIDGET_PORT;
+    #endif
+    #ifdef MQTT_SETUP_TOPIC
+    mqttSetupTopic = MQTT_SETUP_TOPIC;
+    #endif
+    #ifdef MQTT_WIDGET_USER
+    mqttUser = MQTT_WIDGET_USER;
+    #endif
+    #ifdef MQTT_WIDGET_PASS
+    mqttPass = MQTT_WIDGET_PASS;
+    #endif
+
+    m_config.addConfigBool("MqttWidget", "mqttEnabled", &m_enabled, "Enable Widget");
+    m_config.addConfigString("MqttWidget", "mqttHost", &mqttHost, 30, "MQTT Host");
+    m_config.addConfigInt("MqttWidget", "mqttPort", &mqttPort, "MQTT Port");
+    m_config.addConfigString("MqttWidget", "mqttSetupTopic", &mqttSetupTopic, 100, "MQTT Setup Topic");
+    m_config.addConfigString("MqttWidget", "mqttUser", &mqttUser, 20, "MQTT user (empty if authentication is not required)");
+    m_config.addConfigString("MqttWidget", "mqttPass", &mqttPass, 50, "MQTT pass (empty if authentication is not required)");
 
     // Set MQTT broker server and port
     mqttClient.setServer(mqttHost.c_str(), mqttPort);

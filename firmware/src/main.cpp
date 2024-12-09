@@ -8,18 +8,22 @@
 #include "clockwidget/ClockWidget.h"
 #include "config_helper.h"
 #include "icons.h"
-#include "weatherwidget/WeatherWidget.h"
-#include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
 #include <Arduino.h>
 
-#ifdef STOCK_TICKER_LIST
+#ifdef INCLUDE_WEATHER
+    #include "weatherwidget/WeatherWidget.h"
+#endif
+#ifdef INCLUDE_STOCK
     #include "stockwidget/StockWidget.h"
 #endif
-#ifdef PARQET_PORTFOLIO_ID
+#ifdef INCLUDE_PARQET
     #include "parqetwidget/ParqetWidget.h"
 #endif
-#ifdef MQTT_WIDGET_HOST
+#ifdef INCLUDE_WEBDATA
+    #include "webdatawidget/WebDataWidget.h"
+#endif
+#ifdef INCLUDE_MQTT
     #include "mqttwidget/MQTTWidget.h"
 #endif
 
@@ -63,21 +67,21 @@ void setup() {
     globalTime = GlobalTime::getInstance();
 
     widgetSet->add(new ClockWidget(*sm, *config));
-#ifdef PARQET_PORTFOLIO_ID
+#ifdef INCLUDE_PARQET
     widgetSet->add(new ParqetWidget(*sm, *config));
 #endif
-#ifdef STOCK_TICKER_LIST
+#ifdef INCLUDE_STOCK
     widgetSet->add(new StockWidget(*sm, *config));
 #endif
     widgetSet->add(new WeatherWidget(*sm, *config));
-#ifdef WEB_DATA_WIDGET_URL
+#if defined(INCLUDE_WEBDATA) && defined(WEB_DATA_WIDGET_URL)
     widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_WIDGET_URL));
 #endif
-#ifdef WEB_DATA_STOCK_WIDGET_URL
+#if defined(INCLUDE_WEBDATA) && defined(WEB_DATA_STOCK_WIDGET_URL)
     widgetSet->add(new WebDataWidget(*sm, *config, WEB_DATA_STOCK_WIDGET_URL));
 #endif
-#ifdef MQTT_WIDGET_HOST
-    widgetSet->add(new MQTTWidget(*sm, *config, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
+#ifdef INCLUDE_MQTT
+    widgetSet->add(new MQTTWidget(*sm, *config));
 #endif
 
     config->setupWiFiManager();
