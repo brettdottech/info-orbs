@@ -35,10 +35,13 @@ void WifiWidget::setup() {
 #endif
 
     // Remove unwanted buttons from the config portal
-    std::vector<const char *> wm_menu = {"wifi", "param", "info", "update", "restart"}; // buttons: wifi, info, exit, update
+    std::vector<const char *> wm_menu = {"wifi", "param", "custom", "info", "restart"}; // buttons: wifi, info, exit, update
     // Remove unwanted buttons from the Info page
     m_wifiManager.setShowInfoUpdate(false);
     m_wifiManager.setShowInfoErase(false);
+    // Add buttons link
+    const char *buttonsHtml = "<form action='/buttons' method='get'><button>Buttons</button></form><br/>\n";
+    m_wifiManager.setCustomMenuHTML(buttonsHtml);
     m_wifiManager.setMenu(wm_menu);
     m_wifiManager.setClass("invert"); // Dark mode
     m_wifiManager.setShowStaticFields(true);

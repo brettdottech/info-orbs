@@ -77,6 +77,7 @@ void setupConfig() {
 // Forward declaration
 void buttonPressed(uint8_t buttonId, ButtonState state);
 
+// Handle simulated button state
 void handleEndpointButton() {
     if (wifiManager->server->hasArg("name") && wifiManager->server->hasArg("state")) {
         String inButton = wifiManager->server->arg("name");
@@ -93,9 +94,28 @@ void handleEndpointButton() {
     wifiManager->server->send(500, "text/plain", "ERR");
 }
 
+// Show button web page
+void handleEndpointButtons() {
+    String msg = "<html><body><table>";
+    String buttons[] = {"left", "middle", "right"};
+    String states[] = {"short", "medium", "long"};
+    int numButtons = 3; // number of buttons
+    int numStates = 3; // number of states
+    for (int s = 0; s < numStates; s++) {
+        msg += "<tr>";
+        for (int b = 0; b < numButtons; b++) {
+            msg += "<td style='padding: 10px;'><button style='height: 50px; width: 150px;' onclick=\"sendReq('" + buttons[b] + "', '" + states[s] + "')\">" + buttons[b] + " " + states[s] + "</button></td>";
+        }
+        msg += "</tr>";
+    }
+    msg += "</table><script>function sendReq(name, state) {fetch(`/button?name=${name}&state=${state}`);}</script></body></html>";
+    wifiManager->server->send(200, "text/html", msg);
+}
+
 void setupWebPortalEndpoints() {
     // To simulate button presses call e.g. http://<ip>/button?name=right&state=short
     wifiManager->server->on("/button", handleEndpointButton);
+    wifiManager->server->on("/buttons", handleEndpointButtons);
 }
 
 void setup() {
