@@ -64,13 +64,13 @@ public:
 
 private:
     // MQTT-related members
-    std::string mqttHost; // MQTT broker host
-    int mqttPort; // MQTT broker port
+    std::string mqttHost{""}; // MQTT broker host
+    int mqttPort{1883}; // MQTT broker port
     WiFiClient wifiClient; // Wi-Fi client for MQTT
     PubSubClient mqttClient; // MQTT client
-    std::string mqttSetupTopic; // MQTT setup topic
-    std::string mqttUser; // MQTT user (empty if authentication is not required)
-    std::string mqttPass; // MQTT pass (empty if authentication is not required)
+    std::string mqttSetupTopic{""}; // MQTT setup topic
+    std::string mqttUser{""}; // MQTT user (empty if authentication is not required)
+    std::string mqttPass{""}; // MQTT pass (empty if authentication is not required)
 
     // Configuration from setup topic
     std::vector<OrbConfig> orbConfigs; // Vector of orb configurations
