@@ -3,12 +3,12 @@
 
 #include "Button.h"
 #include "ConfigManager.h"
+#include "OrbsWiFiManager.h"
 #include "ScreenManager.h"
 #include "TFT_eSPI.h"
 #include "WidgetSet.h"
 #include "icons.h"
 #include <Arduino.h>
-#include <WiFiManager.h>
 
 class MainHelper {
 public:
