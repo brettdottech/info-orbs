@@ -230,14 +230,14 @@ void WeatherWidget::weatherText(int displayIndex) {
     String message = model.getCurrentText() + " ";
     String messageArr[4];
     int variableRangeS = 0;
-    int variableRangeE = 18;
+    int variableRangeE = 24;
     for (int i = 0; i < 4; i++) {
         while (message.substring(variableRangeE - 1, variableRangeE) != " ") {
             variableRangeE--;
         }
         messageArr[i] = message.substring(variableRangeS, variableRangeE);
         variableRangeS = variableRangeE;
-        variableRangeE = variableRangeS + 18;
+        variableRangeE = variableRangeS + 24;
     }
     //=== OVERFLOW END ==============================
 
@@ -248,7 +248,7 @@ void WeatherWidget::weatherText(int displayIndex) {
     m_manager.setFontColor(m_foregroundColor);
     m_manager.drawFittedString(cityName, centre, 80, 210, 50, Align::MiddleCenter);
 
-    auto y = 125;
+    auto y = 115;
     for (auto i = 0; i < 4; i++) {
         m_manager.drawCentreString(messageArr[i], centre, y, 15);
         y += 25;
