@@ -82,8 +82,17 @@ bool WeatherWidget::getWeatherData() {
     int httpCode = http.GET();
     if (httpCode > 0) {
         // Check for the return code   TODO: factor out
+        JsonDocument filter;
+        filter["resolvedAddress"] = true;
+        filter["currentConditions"]["temp"] = true;
+        filter["days"][0]["description"] = true;
+        filter["currentConditions"]["icon"] = true;
+        filter["days"][0]["icon"] = true;
+        filter["days"][0]["tempmax"] = true;
+        filter["days"][0]["tempmin"] = true;
+        
         JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, http.getString());
+        DeserializationError error = deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
         http.end();
 
         if (!error) {
