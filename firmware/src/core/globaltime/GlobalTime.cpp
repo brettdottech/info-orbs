@@ -13,9 +13,7 @@ GlobalTime::GlobalTime() {
     cm->addConfigString("Timezone", "timezoneLoc", &m_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
     int clockFormat = cm->getConfigInt("clockFormat", 0); // config added in ClockWidget
     Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d\n", m_timezoneLocation.c_str(), clockFormat);
-    if (clockFormat == CLOCK_FORMAT_24_HOUR) {
-        m_format24hour = true;
-    }
+    m_format24hour = (clockFormat == CLOCK_FORMAT_24_HOUR);
 }
 
 GlobalTime::~GlobalTime() {
@@ -29,8 +27,8 @@ GlobalTime *GlobalTime::getInstance() {
     return m_instance;
 }
 
-void GlobalTime::updateTime() {
-    if (millis() - m_updateTimer > m_oneSecond) {
+void GlobalTime::updateTime(bool force) {
+    if (force || millis() - m_updateTimer > m_oneSecond) {
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
             getTimeZoneOffsetFromAPI();
         }

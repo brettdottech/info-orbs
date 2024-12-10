@@ -56,13 +56,15 @@ void ClockWidget::draw(bool force) {
             displaySeconds(2, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
-        if (m_format == CLOCK_FORMAT_12_HOUR_AMPM && m_type != ClockType::NIXIE) {
-            if (m_amPm != m_lastAmPm) {
-                // Clear old AM/PM
-                displayAmPm(m_lastAmPm, TFT_BLACK);
-                m_lastAmPm = m_amPm;
+        if (m_type == ClockType::NORMAL) {
+            if (m_format == CLOCK_FORMAT_12_HOUR_AMPM) {
+                if (m_amPm != m_lastAmPm) {
+                    // Clear old AM/PM
+                    displayAmPm(m_lastAmPm, TFT_BLACK);
+                    m_lastAmPm = m_amPm;
+                }
+                displayAmPm(m_amPm, m_fgColor);
             }
-            displayAmPm(m_amPm, m_fgColor);
         }
     }
 }
@@ -91,6 +93,9 @@ void ClockWidget::update(bool force) {
     }
 
     GlobalTime *time = GlobalTime::getInstance();
+    if (force) {
+        time->updateTime(true);
+    }
 
     m_hourSingle = time->getHour();
     m_minuteSingle = time->getMinute();
@@ -128,11 +133,9 @@ void ClockWidget::changeFormat() {
     if (m_format > 2) {
         m_format = 0;
     }
-    if (m_format == CLOCK_FORMAT_24_HOUR) {
-        time->setFormat24Hour(true);
-    } else {
-        time->setFormat24Hour(false);
-    }
+    time->setFormat24Hour(m_format == CLOCK_FORMAT_24_HOUR);
+    m_manager.clearAllScreens();
+    update(true);
     draw(true);
 }
 
