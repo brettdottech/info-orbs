@@ -33,3 +33,15 @@ jobs:
 
       - name: Build PlatformIO Project
         run: pio run
+
+      - name: Upload artifact on ubuntu-latest
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: .pio/build/esp32doit-devkit-v1/firmware.bin
+
+      - name: Output artifact URL
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run:  echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'
