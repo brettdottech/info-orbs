@@ -2,6 +2,8 @@
 #include "Utils.h"
 #include <Arduino.h>
 
+ScreenManager *ScreenManager::instance = nullptr;
+
 ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
 
     for (int i = 0; i < NUM_SCREENS; i++) {
@@ -14,6 +16,11 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
+
+    // Init TJpg_Decode
+    TJpgDec.setSwapBytes(true); // JPEG rendering setup
+    TJpgDec.setJpgScale(1);
+    TJpgDec.setCallback(tftOutput);
 
     // I'm not sure which cache size is actually good.
     // Needs testing.
@@ -33,6 +40,8 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     Serial.println("SCREEN_3_CS:" + String(SCREEN_3_CS));
     Serial.println("SCREEN_4_CS:" + String(SCREEN_4_CS));
     Serial.println("SCREEN_5_CS:" + String(SCREEN_5_CS));
+
+    instance = this;
 }
 
 void ScreenManager::setFont(TTF_Font font) {
@@ -303,4 +312,38 @@ void ScreenManager::drawLegacyString(const String &string, int32_t x, int32_t y,
 
 int16_t ScreenManager::drawLegacyChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font) {
     return m_tft.drawChar(uniCode, x, y, font);
+}
+
+// Static function to be used in TJpgDec callback
+bool ScreenManager::tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
+    if (instance == nullptr) {
+        Serial.println("TFT_Output not possible, ScreenManager instance not initialized");
+        return false;
+    }
+    uint8_t brightness = instance->getBrightness();
+    uint32_t imageColor = instance->m_imageColor;
+    TFT_eSPI &tft = instance->getDisplay();
+    if (y >= tft.height() || x >= tft.width())
+        return 0;
+    if (imageColor != 0) {
+        // We have an image color set, let's use it
+        Utils::colorizeImageData(bitmap, w * h, imageColor, 1.25, true);
+    }
+    if (brightness != 255) {
+        // Dim bitmap
+        Utils::rgb565dimBitmap(bitmap, w * h, brightness, true);
+    }
+    tft.pushImage(x, y, w, h, bitmap);
+    return true;
+}
+
+JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale, uint32_t imageColor) {
+    // Set scale
+    TJpgDec.setJpgScale(scale);
+    // Set image color
+    m_imageColor = imageColor;
+    JRESULT result = TJpgDec.drawJpg(x, y, jpeg_data, data_size);
+    // Reset image color
+    m_imageColor = 0;
+    return result;
 }

@@ -47,18 +47,6 @@ bool isConnected{true};
 ScreenManager *sm;
 WidgetSet *widgetSet;
 
-// This function should probably be moved somewhere else
-bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
-    if (y >= tft.height())
-        return 0;
-    // Dim bitmap
-    for (int i = 0; i < w * h; i++) {
-        bitmap[i] = Utils::rgb565dim(bitmap[i], sm->getBrightness(), true);
-    }
-    tft.pushImage(x, y, w, h, bitmap);
-    return 1;
-}
-
 /**
  * The ISR handlers must be static
  */
@@ -81,8 +69,6 @@ void setup() {
     Serial.println();
     Serial.println("Starting up...");
 
-    TJpgDec.setSwapBytes(true); // JPEG rendering setup
-    TJpgDec.setCallback(tft_output);
     setupButtons();
 
     sm = new ScreenManager(tft);
@@ -99,11 +85,9 @@ void setup() {
     sm->setFontColor(TFT_RED);
     sm->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 14);
 
-
     sm->selectScreen(2);
 
-    TJpgDec.setJpgScale(1);
-    TJpgDec.drawJpg(0, 0, logo_start, logo_end - logo_start);
+    sm->drawJpg(0, 0, logo_start, logo_end - logo_start);
 
     widgetSet = new WidgetSet(sm);
 
