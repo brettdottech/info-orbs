@@ -1,10 +1,9 @@
 #include "MainHelper.h"
 
-Button buttonLeft(BUTTON_LEFT);
-Button buttonOK(BUTTON_OK);
-Button buttonRight(BUTTON_RIGHT);
-
 // initialize static members
+Button MainHelper::buttonLeft(BUTTON_LEFT);
+Button MainHelper::buttonOK(BUTTON_OK);
+Button MainHelper::buttonRight(BUTTON_RIGHT);
 WiFiManager *MainHelper::s_wifiManager = nullptr;
 ConfigManager *MainHelper::s_configManager = nullptr;
 WidgetSet *MainHelper::s_widgetSet = nullptr;
@@ -15,7 +14,6 @@ int MainHelper::s_widgetCycleDelay = 0;
 #endif
 unsigned long MainHelper::s_widgetCycleDelayPrev = 0;
 bool MainHelper::s_invertedOrbs = INVERTED_ORBS;
-unsigned long MainHelper::s_lastMemoryInfo = 0;
 
 void MainHelper::init(WiFiManager *wm, ConfigManager *cm, WidgetSet *ws) {
     s_wifiManager = wm;
@@ -162,14 +160,4 @@ void MainHelper::showWelcome(ScreenManager *screenManager) {
 
 void MainHelper::resetCycleTimer() {
     s_widgetCycleDelayPrev = millis();
-}
-
-void MainHelper::showMemoryUsage(bool force) {
-    multi_heap_info_t info;
-    if (force || millis() - s_lastMemoryInfo >= 1000) {
-        heap_caps_get_info(&info, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT); // internal RAM, memory capable to store data or to create new task
-        size_t total = heap_caps_get_total_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-        Serial.printf("total: %d, allocated: %d, totalFree: %d, minFree: %d, largestFree: %d\n", total, info.total_allocated_bytes, info.total_free_bytes, info.minimum_free_bytes, info.largest_free_block);
-        s_lastMemoryInfo = millis();
-    }
 }
