@@ -10,6 +10,28 @@
 #include "Utils.h"
 #include "Widget.h"
 
+#ifdef PARQET_DEBUG
+    #define PARQET_DEBUG_PRINT(...) PARQET_DEBUG_PRINT_IMPL(__VA_ARGS__, false)
+    #define PARQET_DEBUG_PRINT_IMPL(msg, ...)                     \
+        do {                                                      \
+            char buffer[128];                                     \
+            snprintf(buffer, sizeof(buffer), msg, ##__VA_ARGS__); \
+            if (buffer[0] != '\0') {                              \
+                Serial.println(buffer);                           \
+            }                                                     \
+        } while (0)
+    #define PARQET_DEBUG_PRINT_MEM(...) PARQET_DEBUG_PRINT_MEM_IMPL(__VA_ARGS__, false)
+    #define PARQET_DEBUG_PRINT_MEM_IMPL(msg, ...)                 \
+        do {                                                      \
+            char buffer[128];                                     \
+            snprintf(buffer, sizeof(buffer), msg, ##__VA_ARGS__); \
+            SHOW_MEMORY_USAGE(buffer);                            \
+        } while (0)
+#else
+    #define PARQET_DEBUG_PRINT(msg, ...) // No-op
+    #define PARQET_DEBUG_PRINT_MEM(msg, ...) // No-op
+#endif
+
 #define PARQET_MODE_COUNT 10
 #define PARQET_MAX_STOCKNAME_LINES 3
 
