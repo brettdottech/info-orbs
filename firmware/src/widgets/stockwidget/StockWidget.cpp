@@ -71,7 +71,7 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
+    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=" + stockApiKey + "&symbol=" + stock.getSymbol();
 
     HTTPClient http;
     http.begin(httpRequestAddress);
@@ -109,20 +109,20 @@ void StockWidget::getStockData(StockDataModel &stock) {
 }
 
 void StockWidget::taskGetStockData(void *pvParameters) {
-    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
+    StockWidget *widget = static_cast<StockWidget *>(pvParameters);
     for (int8_t i = 0; i < widget->m_stockCount; i++) {
         widget->getStockData(widget->m_stocks[i]);
     }
-    
-    // The following code is useful for tuning the space allocated for this task. 
-    // The highWater variable represents the free space remaing for this task (in words) 
+
+    // The following code is useful for tuning the space allocated for this task.
+    // The highWater variable represents the free space remaing for this task (in words)
     // UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
     // Serial.print("Stock Widget: Remaining task stack space: ");
     // Serial.println(highWater);
-    
+
     widget->setBusy(false);
-    widget->m_taskHandle = NULL;     
-    vTaskDelete(NULL); 
+    widget->m_taskHandle = NULL;
+    vTaskDelete(NULL);
 }
 
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
