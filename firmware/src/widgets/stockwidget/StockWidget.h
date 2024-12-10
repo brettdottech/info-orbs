@@ -41,7 +41,6 @@ private:
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
-
 };
 
 #endif // STOCK_WIDGET_H
