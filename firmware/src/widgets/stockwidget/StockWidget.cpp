@@ -71,7 +71,7 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
+    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=" + stockApiKey + "&symbol=" + stock.getSymbol();
 
     HTTPClient http;
     http.begin(httpRequestAddress);

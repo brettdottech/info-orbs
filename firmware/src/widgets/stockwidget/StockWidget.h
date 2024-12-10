@@ -13,6 +13,8 @@
 
 #define MAX_STOCKS 5
 
+const String stockApiKey = STOCK_API_KEY;
+
 class StockWidget : public Widget {
 public:
     StockWidget(ScreenManager &manager);
@@ -35,7 +37,6 @@ private:
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
-
 };
 
 #endif // STOCK_WIDGET_H
