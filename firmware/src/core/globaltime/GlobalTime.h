@@ -38,7 +38,7 @@ class GlobalTime {
 public:
     static GlobalTime *getInstance();
 
-    void updateTime();
+    void updateTime(bool force = false);
     void getHourAndMinute(int &hour, int &minute);
     int getHour();
     int getHour24();
