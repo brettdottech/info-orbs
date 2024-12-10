@@ -5,6 +5,13 @@
 #include <TFT_eSPI.h>
 #include <cstring>
 
+#define SHOW_MEMORY_USAGE(msg)        \
+    do {                              \
+        if (msg[0] != '\0') {         \
+            Serial.println(msg);      \
+        }                             \
+        Utils::showMemoryUsage(true); \
+    } while (0)
 #define MAX_WRAPPED_LINES 10
 
 enum ScreenMode {
