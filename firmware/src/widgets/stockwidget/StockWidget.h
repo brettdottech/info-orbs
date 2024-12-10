@@ -5,6 +5,9 @@
 #include <HTTPClient.h>
 #include <TFT_eSPI.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
 #include "StockDataModel.h"
 #include "Widget.h"
 
@@ -23,6 +26,8 @@ public:
 
 private:
     void getStockData(StockDataModel &stock);
+    static void taskGetStockData(void *pvParameters);
+    TaskHandle_t m_taskHandle;
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
     unsigned long m_stockDelay = 900000; // default to 15m between updates
@@ -30,5 +35,7 @@ private:
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
+
 };
+
 #endif // STOCK_WIDGET_H
