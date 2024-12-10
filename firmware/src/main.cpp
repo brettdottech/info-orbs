@@ -104,7 +104,7 @@ void loop() {
         wifiWidget->processWebPortalRequests();
     }
 #ifdef MEMORY_DEBUG
-    MainHelper::showMemoryUsage();
+    Utils::showMemoryUsage();
 #endif
     if (config->isRequiresRestart()) {
         Serial.println("Restarting ESP now");

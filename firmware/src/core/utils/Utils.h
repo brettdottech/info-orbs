@@ -33,6 +33,10 @@ public:
     static char *copyString(const std::string &originalString);
     static bool compareCharArrays(const char *str1, const char *str2);
     static char *createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix);
+    static void showMemoryUsage(bool force = false);
+
+private:
+    static unsigned long s_lastMemoryInfo;
 };
 
 #endif
