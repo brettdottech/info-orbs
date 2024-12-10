@@ -209,8 +209,13 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
     if (m_type == ClockType::NIXIE && color == CLOCK_COLOR) {
+#ifdef CLOCK_NIXIE_COLOR
+        // Selected color for nixie
+        color = CLOCK_NIXIE_COLOR;
+#else
         // Special color (orange) for nixie
         color = 0xfd40;
+#endif
     }
     m_manager.selectScreen(displayIndex);
     if (seconds < 30) {
@@ -234,47 +239,51 @@ void ClockWidget::displayImage(int displayIndex, const String &digit) {
 
 void ClockWidget::displayNixie(int displayIndex, const String &digit) {
 #if USE_CLOCK_NIXIE
+    #ifdef CLOCK_NIXIE_COLOR
+    uint32_t color = CLOCK_NIXIE_COLOR;
+    #else
+    uint32_t color = 0;
+    #endif
     if (digit.length() != 1) {
         return;
     }
     m_manager.selectScreen(displayIndex);
-    TJpgDec.setJpgScale(1);
     switch (digit.charAt(0)) {
     case '0':
-        TJpgDec.drawJpg(0, 0, nixie_0_start, nixie_0_end - nixie_0_start);
+        m_manager.drawJpg(0, 0, nixie_0_start, nixie_0_end - nixie_0_start, 1, color);
         break;
     case '1':
-        TJpgDec.drawJpg(0, 0, nixie_1_start, nixie_1_end - nixie_1_start);
+        m_manager.drawJpg(0, 0, nixie_1_start, nixie_1_end - nixie_1_start, 1, color);
         break;
     case '2':
-        TJpgDec.drawJpg(0, 0, nixie_2_start, nixie_2_end - nixie_2_start);
+        m_manager.drawJpg(0, 0, nixie_2_start, nixie_2_end - nixie_2_start, 1, color);
         break;
     case '3':
-        TJpgDec.drawJpg(0, 0, nixie_3_start, nixie_3_end - nixie_3_start);
+        m_manager.drawJpg(0, 0, nixie_3_start, nixie_3_end - nixie_3_start, 1, color);
         break;
     case '4':
-        TJpgDec.drawJpg(0, 0, nixie_4_start, nixie_4_end - nixie_4_start);
+        m_manager.drawJpg(0, 0, nixie_4_start, nixie_4_end - nixie_4_start, 1, color);
         break;
     case '5':
-        TJpgDec.drawJpg(0, 0, nixie_5_start, nixie_5_end - nixie_5_start);
+        m_manager.drawJpg(0, 0, nixie_5_start, nixie_5_end - nixie_5_start, 1, color);
         break;
     case '6':
-        TJpgDec.drawJpg(0, 0, nixie_6_start, nixie_6_end - nixie_6_start);
+        m_manager.drawJpg(0, 0, nixie_6_start, nixie_6_end - nixie_6_start, 1, color);
         break;
     case '7':
-        TJpgDec.drawJpg(0, 0, nixie_7_start, nixie_7_end - nixie_7_start);
+        m_manager.drawJpg(0, 0, nixie_7_start, nixie_7_end - nixie_7_start, 1, color);
         break;
     case '8':
-        TJpgDec.drawJpg(0, 0, nixie_8_start, nixie_8_end - nixie_8_start);
+        m_manager.drawJpg(0, 0, nixie_8_start, nixie_8_end - nixie_8_start, 1, color);
         break;
     case '9':
-        TJpgDec.drawJpg(0, 0, nixie_9_start, nixie_9_end - nixie_9_start);
+        m_manager.drawJpg(0, 0, nixie_9_start, nixie_9_end - nixie_9_start, 1, color);
         break;
     case ' ':
-        TJpgDec.drawJpg(0, 0, nixie_colon_off_start, nixie_colon_off_end - nixie_colon_off_start);
+        m_manager.drawJpg(0, 0, nixie_colon_off_start, nixie_colon_off_end - nixie_colon_off_start, 1, color);
         break;
     case ':':
-        TJpgDec.drawJpg(0, 0, nixie_colon_on_start, nixie_colon_on_end - nixie_colon_on_start);
+        m_manager.drawJpg(0, 0, nixie_colon_on_start, nixie_colon_on_end - nixie_colon_on_start, 1, color);
         break;
     }
 #endif
@@ -286,43 +295,42 @@ void ClockWidget::displayCustom(int displayIndex, const String &digit) {
         return;
     }
     m_manager.selectScreen(displayIndex);
-    TJpgDec.setJpgScale(1);
     switch (digit.charAt(0)) {
     case '0':
-        TJpgDec.drawJpg(0, 0, clock_custom_0_start, clock_custom_0_end - clock_custom_0_start);
+        m_manager.drawJpg(0, 0, clock_custom_0_start, clock_custom_0_end - clock_custom_0_start);
         break;
     case '1':
-        TJpgDec.drawJpg(0, 0, clock_custom_1_start, clock_custom_1_end - clock_custom_1_start);
+        m_manager.drawJpg(0, 0, clock_custom_1_start, clock_custom_1_end - clock_custom_1_start);
         break;
     case '2':
-        TJpgDec.drawJpg(0, 0, clock_custom_2_start, clock_custom_2_end - clock_custom_2_start);
+        m_manager.drawJpg(0, 0, clock_custom_2_start, clock_custom_2_end - clock_custom_2_start);
         break;
     case '3':
-        TJpgDec.drawJpg(0, 0, clock_custom_3_start, clock_custom_3_end - clock_custom_3_start);
+        m_manager.drawJpg(0, 0, clock_custom_3_start, clock_custom_3_end - clock_custom_3_start);
         break;
     case '4':
-        TJpgDec.drawJpg(0, 0, clock_custom_4_start, clock_custom_4_end - clock_custom_4_start);
+        m_manager.drawJpg(0, 0, clock_custom_4_start, clock_custom_4_end - clock_custom_4_start);
         break;
     case '5':
-        TJpgDec.drawJpg(0, 0, clock_custom_5_start, clock_custom_5_end - clock_custom_5_start);
+        m_manager.drawJpg(0, 0, clock_custom_5_start, clock_custom_5_end - clock_custom_5_start);
         break;
     case '6':
-        TJpgDec.drawJpg(0, 0, clock_custom_6_start, clock_custom_6_end - clock_custom_6_start);
+        m_manager.drawJpg(0, 0, clock_custom_6_start, clock_custom_6_end - clock_custom_6_start);
         break;
     case '7':
-        TJpgDec.drawJpg(0, 0, clock_custom_7_start, clock_custom_7_end - clock_custom_7_start);
+        m_manager.drawJpg(0, 0, clock_custom_7_start, clock_custom_7_end - clock_custom_7_start);
         break;
     case '8':
-        TJpgDec.drawJpg(0, 0, clock_custom_8_start, clock_custom_8_end - clock_custom_8_start);
+        m_manager.drawJpg(0, 0, clock_custom_8_start, clock_custom_8_end - clock_custom_8_start);
         break;
     case '9':
-        TJpgDec.drawJpg(0, 0, clock_custom_9_start, clock_custom_9_end - clock_custom_9_start);
+        m_manager.drawJpg(0, 0, clock_custom_9_start, clock_custom_9_end - clock_custom_9_start);
         break;
     case ' ':
-        TJpgDec.drawJpg(0, 0, clock_custom_colon_off_start, clock_custom_colon_off_end - clock_custom_colon_off_start);
+        m_manager.drawJpg(0, 0, clock_custom_colon_off_start, clock_custom_colon_off_end - clock_custom_colon_off_start);
         break;
     case ':':
-        TJpgDec.drawJpg(0, 0, clock_custom_colon_on_start, clock_custom_colon_on_end - clock_custom_colon_on_start);
+        m_manager.drawJpg(0, 0, clock_custom_colon_on_start, clock_custom_colon_on_end - clock_custom_colon_on_start);
         break;
     }
 #endif

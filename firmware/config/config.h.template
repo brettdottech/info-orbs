@@ -23,6 +23,7 @@
 #define CLOCK_SHADOWING true            // Use clock shadow (set to false to disable)
 #define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock
 #define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README.md)
+//#define CLOCK_NIXIE_COLOR 0x001f        // Override Nixie color
 #define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM
 //#define CLOCK_FONT DSEG7              // Define clock font (defaults to DSEG7, you can also try DSEG14 or FINAL_FRONTIER)
 
