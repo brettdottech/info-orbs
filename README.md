@@ -83,7 +83,7 @@ Once you're done this, you can flash the firmware to your orbs by holding the "b
   //#define WIFI_PASS "WiFiPassword" // Wifi router password  
   ```
 - Timezone configuration, you will need to change the below field to your local timezone, or timezone you want displayed on the devices clock(s). Please copy/paste the exact timezone as outline in this list <https://timezonedb.com/time-zones>  
-  ```c 
+  ```c
   #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this   list: https://timezonedb.com/time-zones
   ```
 
