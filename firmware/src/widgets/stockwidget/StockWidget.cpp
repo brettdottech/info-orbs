@@ -6,7 +6,7 @@
 
 #include <iomanip>
 
-StockWidget::StockWidget(ScreenManager &manager) : Widget(manager) {
+StockWidget::StockWidget(ScreenManager &manager) : Widget(manager), m_taskHandle(NULL) {
 #ifdef STOCK_TICKER_LIST
     char stockList[strlen(STOCK_TICKER_LIST) + 1];
     strcpy(stockList, STOCK_TICKER_LIST);
@@ -45,12 +45,19 @@ void StockWidget::draw(bool force) {
 
 void StockWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
-        setBusy(true);
-        for (int8_t i = 0; i < m_stockCount; i++) {
-            getStockData(m_stocks[i]);
+        if (m_taskHandle == NULL) { // Check if task is not already running
+            setBusy(true);
+            // Create a task to handle all stock updates
+            if (xTaskCreate(taskGetStockData, "StockDataTask", 8192, this, 1, &m_taskHandle) == pdPASS) {
+                Serial.println("StockDataTask created");
+                m_stockDelayPrev = millis();
+            } else {
+                Serial.println("Failed to create StockDataTask");
+                setBusy(false);
+            }
+        } else {
+            // Serial.println("StockDataTask is already running");
         }
-        setBusy(false);
-        m_stockDelayPrev = millis();
     }
 }
 
@@ -64,7 +71,7 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
+    String httpRequestAddress = "http://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
 
     HTTPClient http;
     http.begin(httpRequestAddress);
@@ -99,6 +106,21 @@ void StockWidget::getStockData(StockDataModel &stock) {
     }
 
     http.end();
+}
+
+void StockWidget::taskGetStockData(void *pvParameters) {
+    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
+    for (int8_t i = 0; i < widget->m_stockCount; i++) {
+        widget->getStockData(widget->m_stocks[i]);
+    }
+    
+    UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
+    Serial.print("Stock Widget: Remaining task stack space: ");
+    Serial.println(highWater);
+    
+    widget->setBusy(false);
+    widget->m_taskHandle = NULL;     
+    vTaskDelete(NULL); 
 }
 
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
