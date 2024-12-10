@@ -123,7 +123,7 @@
 #define TIMEZONE_API_KEY "97R9WKDPBLIO"
 #define TIMEZONE_API_URL "http://api.timezonedb.com/v2.1/get-time-zone"
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
-#define STOCK_API_KEY "6a86e87ce52c4874a0a65215e5bdff6c"
+#define STOCK_API_KEY "e03fc53524454ab8b65d91b23c669cc5"
 
 #define MAX_RETRIES 3
 
