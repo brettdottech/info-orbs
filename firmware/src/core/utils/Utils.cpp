@@ -257,6 +257,24 @@ uint16_t Utils::rgb888ToRgb565(uint32_t rgb888, bool swapBytes) {
     return pixel;
 }
 
+String Utils::rgb565ToRgb888html(int color565) {
+    String hexColor = String(Utils::rgb565ToRgb888(color565), HEX); // Convert to hex and mask for 6 bytes
+    while (hexColor.length() < 6) {
+        hexColor = "0" + hexColor; // Add leading zeroes if needed
+    }
+    hexColor = "#" + hexColor; // Add the HTML color prefix
+    return hexColor;
+}
+
+int Utils::rgb888htmlToRgb565(const String &hexColor) {
+    if (hexColor.startsWith("#")) {
+        String hexColor = hexColor.substring(1); // Remove leading '#'
+    }
+    int rgb888 = strtol(hexColor.c_str(), nullptr, HEX); // Convert to RGB888 int
+    int rgb565 = Utils::rgb888ToRgb565(rgb888); // Convert to RGB565
+    return rgb565;
+}
+
 // Function to apply grayscale and map to target color
 uint16_t Utils::grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes) {
     // Apply brightness enhancement
