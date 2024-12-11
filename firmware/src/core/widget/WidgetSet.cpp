@@ -1,13 +1,6 @@
 #include "WidgetSet.h"
 
-WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager(sm), m_configManager(config) {
-    config.addConfigInt("TFT Settings", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
-    config.addConfigBool("TFT Settings", "nightmode", &m_nightMode, "Enable Nighttime mode");
-    String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
-                         "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
-    config.addConfigComboBox("TFT Settings", "dimStartHour", &m_dimStartHour, optHours, 24, "Nighttime Start [24h format]");
-    config.addConfigComboBox("TFT Settings", "dimEndHour", &m_dimEndHour, optHours, 24, "Nighttime End [24h format]");
-    config.addConfigInt("TFT Settings", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-255]");
+WidgetSet::WidgetSet(ScreenManager *sm) : m_screenManager(sm) {
 }
 
 void WidgetSet::add(Widget *widget) {
@@ -110,27 +103,4 @@ void WidgetSet::initializeAllWidgetsData() {
     showLoading();
     updateAll();
     m_initialized = true;
-}
-
-void WidgetSet::updateBrightnessByTime(uint8_t hour24) {
-    uint8_t newBrightness;
-    if (m_nightMode) {
-        bool isInDimRange;
-        if (m_dimStartHour < m_dimEndHour) {
-            // Normal case: the range does not cross midnight
-            isInDimRange = (hour24 >= m_dimStartHour && hour24 < m_dimEndHour);
-        } else {
-            // Case where the range crosses midnight
-            isInDimRange = (hour24 >= m_dimStartHour || hour24 < m_dimEndHour);
-        }
-        newBrightness = isInDimRange ? m_dimBrightness : m_tftBrightness;
-    } else {
-        newBrightness = m_tftBrightness;
-    }
-
-    if (m_screenManager->setBrightness(newBrightness)) {
-        // brightness was changed -> update widget
-        m_screenManager->clearAllScreens();
-        drawCurrent(true);
-    }
 }

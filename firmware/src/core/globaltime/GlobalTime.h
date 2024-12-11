@@ -75,11 +75,7 @@ private:
     int m_year = 0;
     String m_time;
     String m_weekday;
-#ifdef TIMEZONE_API_LOCATION
     std::string m_timezoneLocation = TIMEZONE_API_LOCATION;
-#else
-    std::string m_timezoneLocation = "";
-#endif
     int m_timeZoneOffset = -1; // A value that will be overwritten by the API
     unsigned long m_nextTimeZoneUpdate = 0;
 

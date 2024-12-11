@@ -10,7 +10,7 @@ GlobalTime::GlobalTime() {
     m_timeClient->begin();
     m_timeClient->setPoolServerName(NTP_SERVER);
     ConfigManager *cm = ConfigManager::getInstance();
-    cm->addConfigString("Timezone", "timezoneLoc", &m_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
+    m_timezoneLocation = cm->getConfigString("timezoneLoc", m_timezoneLocation.c_str()).c_str(); // config added in MainHelper
     int clockFormat = cm->getConfigInt("clockFormat", 0); // config added in ClockWidget
     Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d\n", m_timezoneLocation.c_str(), clockFormat);
     m_format24hour = (clockFormat == CLOCK_FORMAT_24_HOUR);

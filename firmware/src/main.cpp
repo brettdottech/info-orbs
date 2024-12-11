@@ -1,20 +1,11 @@
-#include "Button.h"
-#include "ConfigManager.h"
-#include "GlobalTime.h"
 #include "MainHelper.h"
-#include "ScreenManager.h"
-#include "Utils.h"
-#include "WidgetSet.h"
 #include "clockwidget/ClockWidget.h"
-#include "config_helper.h"
-#include "icons.h"
 #include "mqttwidget/MQTTWidget.h"
 #include "parqetwidget/ParqetWidget.h"
 #include "stockwidget/StockWidget.h"
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
-#include <Arduino.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -62,13 +53,13 @@ void setup() {
     wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
     sm = new ScreenManager(tft);
-    widgetSet = new WidgetSet(sm, *config);
+    widgetSet = new WidgetSet(sm);
 
     // Pass references to MainHelper
-    MainHelper::init(wifiManager, config, widgetSet);
+    MainHelper::init(wifiManager, config, sm, widgetSet);
     MainHelper::setupConfig();
     MainHelper::setupButtons();
-    MainHelper::showWelcome(sm);
+    MainHelper::showWelcome();
 
     pinMode(BUSY_PIN, OUTPUT);
     Serial.println("Connecting to WiFi");
@@ -97,7 +88,7 @@ void loop() {
         MainHelper::checkButtons();
 
         widgetSet->updateCurrent();
-        widgetSet->updateBrightnessByTime(globalTime->getHour24());
+        MainHelper::updateBrightnessByTime(globalTime->getHour24());
         widgetSet->drawCurrent();
 
         MainHelper::checkCycleWidgets();

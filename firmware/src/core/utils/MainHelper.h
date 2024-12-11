@@ -7,12 +7,13 @@
 #include "ScreenManager.h"
 #include "TFT_eSPI.h"
 #include "WidgetSet.h"
+#include "config_helper.h"
 #include "icons.h"
 #include <Arduino.h>
 
 class MainHelper {
 public:
-    static void init(WiFiManager *wm, ConfigManager *cm, WidgetSet *ws);
+    static void init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws);
     static void isrButtonChangeLeft();
     static void isrButtonChangeMiddle();
     static void isrButtonChangeRight();
@@ -28,12 +29,14 @@ public:
     static void handleEndpointButton();
     static void handleEndpointButtons();
 
-    static void showWelcome(ScreenManager *screenManager);
+    static void showWelcome();
     static void resetCycleTimer();
+    static void updateBrightnessByTime(uint8_t hour24);
 
 private:
     static WiFiManager *s_wifiManager;
     static ConfigManager *s_configManager;
+    static ScreenManager *s_screenManager;
     static WidgetSet *s_widgetSet;
 
     static Button buttonLeft;
@@ -43,6 +46,12 @@ private:
     static int s_widgetCycleDelay;
     static unsigned long s_widgetCycleDelayPrev;
     static bool s_invertedOrbs;
+    static std::string s_timezoneLocation;
+    static int s_tftBrightness;
+    static bool s_nightMode;
+    static int s_dimStartHour;
+    static int s_dimEndHour;
+    static int s_dimBrightness;
 };
 
 #endif

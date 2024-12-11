@@ -6,6 +6,7 @@ Button MainHelper::buttonOK(BUTTON_OK);
 Button MainHelper::buttonRight(BUTTON_RIGHT);
 WiFiManager *MainHelper::s_wifiManager = nullptr;
 ConfigManager *MainHelper::s_configManager = nullptr;
+ScreenManager *MainHelper::s_screenManager = nullptr;
 WidgetSet *MainHelper::s_widgetSet = nullptr;
 #ifdef WIDGET_CYCLE_DELAY
 int MainHelper::s_widgetCycleDelay = WIDGET_CYCLE_DELAY; // Automatically cycle widgets every X seconds, set to 0 to disable
@@ -14,10 +15,17 @@ int MainHelper::s_widgetCycleDelay = 0;
 #endif
 unsigned long MainHelper::s_widgetCycleDelayPrev = 0;
 bool MainHelper::s_invertedOrbs = INVERTED_ORBS;
+std::string MainHelper::s_timezoneLocation = TIMEZONE_API_LOCATION;
+int MainHelper::s_tftBrightness = 255;
+bool MainHelper::s_nightMode = false;
+int MainHelper::s_dimStartHour = 22;
+int MainHelper::s_dimEndHour = 7;
+int MainHelper::s_dimBrightness = 128;
 
-void MainHelper::init(WiFiManager *wm, ConfigManager *cm, WidgetSet *ws) {
+void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws) {
     s_wifiManager = wm;
     s_configManager = cm;
+    s_screenManager = sm;
     s_widgetSet = ws;
 }
 
@@ -39,8 +47,16 @@ void MainHelper::setupButtons() {
 }
 
 void MainHelper::setupConfig() {
+    s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
     s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
-    s_configManager->addConfigBool("General", "invertedOrbs", &s_invertedOrbs, "Inverted Orbs (enable if using InfoOrbs upside down)");
+    s_configManager->addConfigBool("TFT Settings", "invertedOrbs", &s_invertedOrbs, "Inverted Orbs (enable if using InfoOrbs upside down)");
+    s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, "TFT Brightness [0-255]");
+    s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, "Enable Nighttime mode");
+    String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
+                         "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
+    s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, "Nighttime Start [24h format]");
+    s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, "Nighttime End [24h format]");
+    s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, "Nighttime Brightness [0-255]");
 }
 
 void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {
@@ -140,24 +156,47 @@ void MainHelper::setupWebPortalEndpoints() {
     s_wifiManager->server->on("/buttons", handleEndpointButtons);
 }
 
-void MainHelper::showWelcome(ScreenManager *screenManager) {
-    screenManager->fillAllScreens(TFT_BLACK);
-    screenManager->setFontColor(TFT_WHITE);
+void MainHelper::showWelcome() {
+    s_screenManager->fillAllScreens(TFT_BLACK);
+    s_screenManager->setFontColor(TFT_WHITE);
 
-    screenManager->selectScreen(0);
-    screenManager->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
+    s_screenManager->selectScreen(0);
+    s_screenManager->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
 
-    screenManager->selectScreen(1);
-    screenManager->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 50, 22);
-    screenManager->drawCentreString("by", ScreenCenterX, ScreenCenterY - 5, 22);
-    screenManager->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 22);
-    screenManager->setFontColor(TFT_RED);
-    screenManager->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 14);
+    s_screenManager->selectScreen(1);
+    s_screenManager->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 50, 22);
+    s_screenManager->drawCentreString("by", ScreenCenterX, ScreenCenterY - 5, 22);
+    s_screenManager->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 22);
+    s_screenManager->setFontColor(TFT_RED);
+    s_screenManager->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 14);
 
-    screenManager->selectScreen(2);
-    screenManager->drawJpg(0, 0, logo_start, logo_end - logo_start);
+    s_screenManager->selectScreen(2);
+    s_screenManager->drawJpg(0, 0, logo_start, logo_end - logo_start);
 }
 
 void MainHelper::resetCycleTimer() {
     s_widgetCycleDelayPrev = millis();
+}
+
+void MainHelper::updateBrightnessByTime(uint8_t hour24) {
+    uint8_t newBrightness;
+    if (s_nightMode) {
+        bool isInDimRange;
+        if (s_dimStartHour < s_dimEndHour) {
+            // Normal case: the range does not cross midnight
+            isInDimRange = (hour24 >= s_dimStartHour && hour24 < s_dimEndHour);
+        } else {
+            // Case where the range crosses midnight
+            isInDimRange = (hour24 >= s_dimStartHour || hour24 < s_dimEndHour);
+        }
+        newBrightness = isInDimRange ? s_dimBrightness : s_tftBrightness;
+    } else {
+        newBrightness = s_tftBrightness;
+    }
+
+    if (s_screenManager->setBrightness(newBrightness)) {
+        // brightness was changed -> update widget
+        s_screenManager->clearAllScreens();
+        s_widgetSet->drawCurrent(true);
+    }
 }
