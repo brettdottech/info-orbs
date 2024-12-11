@@ -20,17 +20,18 @@ public:
 
     static void setupButtons();
     static void setupConfig();
+    static void showWelcome();
 
     static void buttonPressed(uint8_t buttonId, ButtonState state);
     static void checkButtons();
+
     static void checkCycleWidgets();
+    static void resetCycleTimer();
 
     static void setupWebPortalEndpoints();
     static void handleEndpointButton();
     static void handleEndpointButtons();
 
-    static void showWelcome();
-    static void resetCycleTimer();
     static void updateBrightnessByTime(uint8_t hour24);
 
 private:
