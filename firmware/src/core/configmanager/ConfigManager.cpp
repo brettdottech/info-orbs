@@ -67,9 +67,9 @@ void ConfigManager::setupWebPortal() {
     m_wm.addParameter(endLabel);
 
     m_wm.setSaveParamsCallback([this]() {
+        int count = m_wm.server->args();
 #ifdef CM_DEBUG
         Serial.println("Variables saved in WebPortal");
-        int count = m_wm.server->args();
         for (int i = 0; i < count; i++) {
             Serial.printf("Arg %d: %s = %s\n", i, m_wm.server->argName(i).c_str(), m_wm.server->arg(i).c_str());
         }
