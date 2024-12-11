@@ -1,3 +1,6 @@
+#ifndef ORBS_WIFI_MANAGER_H
+#define ORBS_WIFI_MANAGER_H
+
 #include <WiFiManager.h>
 
 /**
@@ -11,3 +14,5 @@ public:
         _showBack = true; // Set _showBack to true
     }
 };
+
+#endif // ORBS_WIFI_MANAGER_H
