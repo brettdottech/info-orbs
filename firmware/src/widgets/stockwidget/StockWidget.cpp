@@ -81,8 +81,20 @@ void StockWidget::getStockData(void *pvParameters, String stockSymbols) {
 
     if (httpCode > 0) { // Check for the returning code
         String payload = http.getString();
+        
+        JsonDocument filter;
+        JsonObject wildcard = filter["*"].to<JsonObject>();
+        wildcard["close"] = true;
+        wildcard["percent_change"] = true;
+        wildcard["change"] = true;
+        wildcard["fifty_two_week"]["high"] = true;
+        wildcard["fifty_two_week"]["low"] = true;
+        wildcard["name"] = true;
+        wildcard["currency"] = true;
+        wildcard["symbol"] = true;
+                
         JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, payload);
+        DeserializationError error = deserializeJson(doc, payload, DeserializationOption::Filter(filter));
 
         if (!error) {
             JsonObject obj = doc.as<JsonObject>();
