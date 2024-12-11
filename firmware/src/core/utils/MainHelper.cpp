@@ -118,7 +118,7 @@ void MainHelper::handleEndpointButton() {
 
 // Show button web page
 void MainHelper::handleEndpointButtons() {
-    String msg = "<html><body style='background: black';><table>";
+    String msg = "<html><body style='background: black; text-align: center;'><div style='display: inline-block; min-width: 260px; max-width: 500px;padding: 5px;'><table>";
     String buttons[] = {"left", "middle", "right"};
     String states[] = {"short", "medium", "long"};
     int numButtons = 3; // number of buttons
@@ -126,11 +126,11 @@ void MainHelper::handleEndpointButtons() {
     for (int s = 0; s < numStates; s++) {
         msg += "<tr>";
         for (int b = 0; b < numButtons; b++) {
-            msg += "<td style='padding: 10px;'><button style='height: 50px; width: 150px;' onclick=\"sendReq('" + buttons[b] + "', '" + states[s] + "')\">" + buttons[b] + " " + states[s] + "</button></td>";
+            msg += "<td style='padding: 5px;'><button style='height: 50px; width: 140px; border-radius: .3rem;' onclick=\"sendReq('" + buttons[b] + "', '" + states[s] + "')\">" + buttons[b] + "<br>" + states[s] + "</button></td>";
         }
         msg += "</tr>";
     }
-    msg += "</table><script>function sendReq(name, state) {fetch(`/button?name=${name}&state=${state}`);}</script></body></html>";
+    msg += "</table><form action='/' method='get'><br><button style='border-radius: .3rem; width: 100%; border: 0; background-color: #1fa3ec; color: #fff; line-height: 2.4rem; font-size: 1.2rem;'>Back</button></form></div><script>function sendReq(name, state) {fetch(`/button?name=${name}&state=${state}`);}</script></body></html>";
     s_wifiManager->server->send(200, "text/html", msg);
 }
 
