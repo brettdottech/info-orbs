@@ -25,7 +25,7 @@ public:
     void changeMode();
 
 private:
-    void getStockData(StockDataModel &stock);
+    void getStockData(void *pvParameters, String stockSymbols);
     static void taskGetStockData(void *pvParameters);
     TaskHandle_t m_taskHandle;
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);

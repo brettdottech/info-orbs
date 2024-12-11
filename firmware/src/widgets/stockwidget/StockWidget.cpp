@@ -70,12 +70,14 @@ void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         changeMode();
 }
 
-void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
+void StockWidget::getStockData(void *pvParameters, String stockSymbols) {
+    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stockSymbols;
 
     HTTPClient http;
     http.begin(httpRequestAddress);
     int httpCode = http.GET();
+
+    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
 
     if (httpCode > 0) { // Check for the returning code
         String payload = http.getString();
@@ -83,18 +85,26 @@ void StockWidget::getStockData(StockDataModel &stock) {
         DeserializationError error = deserializeJson(doc, payload);
 
         if (!error) {
-            float currentPrice = doc["close"].as<float>();
-            if (currentPrice > 0.0) {
-                stock.setCurrentPrice(doc["close"].as<float>());
-                stock.setPercentChange(doc["percent_change"].as<float>() / 100);
-                stock.setPriceChange(doc["change"].as<float>());
-                stock.setHighPrice(doc["fifty_two_week"]["high"].as<float>());
-                stock.setLowPrice(doc["fifty_two_week"]["low"].as<float>());
-                stock.setCompany(doc["name"].as<String>());
-                stock.setTicker(doc["symbol"].as<String>());
-                stock.setCurrencySymbol(doc["currency"].as<String>());
-            } else {
-                Serial.println("skipping invalid data for: " + stock.getSymbol());
+            JsonObject obj = doc.as<JsonObject>();
+            int index = 0; 
+            for (JsonPair keyValue : doc.as<JsonObject>()) {
+                const char *key = keyValue.key().c_str();
+                JsonObject value = keyValue.value().as<JsonObject>();
+                StockDataModel stock;
+                float currentPrice = value["close"].as<float>();
+                if (currentPrice > 0.0) {
+                   widget->m_stocks[index].setCurrentPrice(value["close"].as<float>()); 
+                   widget->m_stocks[index].setPercentChange(value["percent_change"].as<float>() / 100);
+                   widget->m_stocks[index].setPriceChange(value["change"].as<float>());
+                   widget->m_stocks[index].setHighPrice(value["fifty_two_week"]["high"].as<float>());
+                   widget->m_stocks[index].setLowPrice(value["fifty_two_week"]["low"].as<float>());
+                   widget->m_stocks[index].setCompany(value["name"].as<String>());
+                   widget->m_stocks[index].setTicker(value["symbol"].as<String>());
+                   widget->m_stocks[index].setCurrencySymbol(value["currency"].as<String>());                    
+                } else {
+                   Serial.println("skipping invalid data for: " + value["symbol"].as<String>()); 
+                }
+                index++;
             }
         } else {
             // Handle JSON deserialization error
@@ -110,9 +120,15 @@ void StockWidget::getStockData(StockDataModel &stock) {
 
 void StockWidget::taskGetStockData(void *pvParameters) {
     StockWidget *widget = static_cast<StockWidget*>(pvParameters);
+
+    String stockSymbols;
     for (int8_t i = 0; i < widget->m_stockCount; i++) {
-        widget->getStockData(widget->m_stocks[i]);
+        if (!stockSymbols.isEmpty()) {
+            stockSymbols += ",";
+        }
+        stockSymbols += widget->m_stocks[i].getSymbol();
     }
+    widget->getStockData(pvParameters, stockSymbols);
     
     // The following code is useful for tuning the space allocated for this task. 
     // The highWater variable represents the free space remaing for this task (in words) 
