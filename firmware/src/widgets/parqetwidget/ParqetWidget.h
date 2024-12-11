@@ -10,12 +10,34 @@
 #include "Utils.h"
 #include "Widget.h"
 
+#ifdef PARQET_DEBUG
+    #define PARQET_DEBUG_PRINT(...) PARQET_DEBUG_PRINT_IMPL(__VA_ARGS__, false)
+    #define PARQET_DEBUG_PRINT_IMPL(msg, ...)                     \
+        do {                                                      \
+            char buffer[128];                                     \
+            snprintf(buffer, sizeof(buffer), msg, ##__VA_ARGS__); \
+            if (buffer[0] != '\0') {                              \
+                Serial.println(buffer);                           \
+            }                                                     \
+        } while (0)
+    #define PARQET_DEBUG_PRINT_MEM(...) PARQET_DEBUG_PRINT_MEM_IMPL(__VA_ARGS__, false)
+    #define PARQET_DEBUG_PRINT_MEM_IMPL(msg, ...)                 \
+        do {                                                      \
+            char buffer[128];                                     \
+            snprintf(buffer, sizeof(buffer), msg, ##__VA_ARGS__); \
+            SHOW_MEMORY_USAGE(buffer);                            \
+        } while (0)
+#else
+    #define PARQET_DEBUG_PRINT(msg, ...) // No-op
+    #define PARQET_DEBUG_PRINT_MEM(msg, ...) // No-op
+#endif
+
 #define PARQET_MODE_COUNT 10
 #define PARQET_MAX_STOCKNAME_LINES 3
 
 class ParqetWidget : public Widget {
 public:
-    ParqetWidget(ScreenManager &manager);
+    ParqetWidget(ScreenManager &manager, ConfigManager &config);
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
@@ -50,8 +72,13 @@ private:
     boolean m_showTotalValue = false; // Show your total portfolio value
     boolean m_showTotalChart = true; // Show performance chart for total (if we have more than 7 datapoints, ie. not for "today")
     String m_overrideTotalChartToday = "1w"; // Show this chart for "today" to have a chart there as well, set to empty string to disable
-    boolean m_showValues = false; // Show current price (false) or value in portfolio (true)
+    int m_showValues = 0; // Show current price (0) or value in portfolio (1)
 
+#ifdef PARQET_PORTFOLIO_ID
+    std::string m_portfolioId = PARQET_PORTFOLIO_ID;
+#else
+    std::string m_portfolioId = "";
+#endif
     ParqetDataModel m_portfolio;
     int m_holdingsDisplayFrom = 0;
     boolean m_changed = false;

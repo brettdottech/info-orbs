@@ -1,7 +1,7 @@
 
 #include "WebDataWidget.h"
 
-WebDataWidget::WebDataWidget(ScreenManager &manager, String url) : Widget(manager) {
+WebDataWidget::WebDataWidget(ScreenManager &manager, ConfigManager &config, String url) : Widget(manager, config) {
     httpRequestAddress = url;
 
     m_lastUpdate = 0;

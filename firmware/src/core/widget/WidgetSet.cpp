@@ -1,7 +1,15 @@
 #include "WidgetSet.h"
 
-WidgetSet::WidgetSet(ScreenManager *sm) : m_screenManager(sm) {
+WidgetSet::WidgetSet(ScreenManager *sm, ConfigManager &config) : m_screenManager(sm), m_configManager(config) {
+    config.addConfigInt("TFT Settings", "tftBrightness", &m_tftBrightness, "TFT Brightness [0-255]");
+    config.addConfigBool("TFT Settings", "nightmode", &m_nightMode, "Enable Nighttime mode");
+    String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
+                         "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
+    config.addConfigComboBox("TFT Settings", "dimStartHour", &m_dimStartHour, optHours, 24, "Nighttime Start [24h format]");
+    config.addConfigComboBox("TFT Settings", "dimEndHour", &m_dimEndHour, optHours, 24, "Nighttime End [24h format]");
+    config.addConfigInt("TFT Settings", "dimBrightness", &m_dimBrightness, "Nighttime Brightness [0-255]");
 }
+
 void WidgetSet::add(Widget *widget) {
     if (m_widgetCount == MAX_WIDGETS) {
         Serial.println("MAX WIDGETS UNABLE TO ADD");
@@ -43,7 +51,12 @@ void WidgetSet::next() {
     if (m_currentWidget >= m_widgetCount) {
         m_currentWidget = 0;
     }
-    switchWidget();
+    if (!getCurrent()->isEnabled()) {
+        // Recursive call to next()
+        next();
+    } else {
+        switchWidget();
+    }
 }
 
 void WidgetSet::prev() {
@@ -51,7 +64,12 @@ void WidgetSet::prev() {
     if (m_currentWidget < 0) {
         m_currentWidget = m_widgetCount - 1;
     }
-    switchWidget();
+    if (!getCurrent()->isEnabled()) {
+        // Recursive call to next()
+        prev();
+    } else {
+        switchWidget();
+    }
 }
 
 void WidgetSet::switchWidget() {
@@ -76,9 +94,11 @@ void WidgetSet::showLoading() {
 
 void WidgetSet::updateAll() {
     for (int8_t i; i < m_widgetCount; i++) {
-        Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
-        showCenteredLine(4, m_widgets[i]->getName());
-        m_widgets[i]->update();
+        if (m_widgets[i]->isEnabled()) {
+            Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
+            showCenteredLine(4, m_widgets[i]->getName());
+            m_widgets[i]->update();
+        }
     }
 }
 
@@ -93,22 +113,24 @@ void WidgetSet::initializeAllWidgetsData() {
 }
 
 void WidgetSet::updateBrightnessByTime(uint8_t hour24) {
-#if defined(DIM_START_HOUR) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
-    bool isInDimRange;
-
-    if (DIM_START_HOUR < DIM_END_HOUR) {
-        // Normal case: the range does not cross midnight
-        isInDimRange = (hour24 >= DIM_START_HOUR && hour24 < DIM_END_HOUR);
+    uint8_t newBrightness;
+    if (m_nightMode) {
+        bool isInDimRange;
+        if (m_dimStartHour < m_dimEndHour) {
+            // Normal case: the range does not cross midnight
+            isInDimRange = (hour24 >= m_dimStartHour && hour24 < m_dimEndHour);
+        } else {
+            // Case where the range crosses midnight
+            isInDimRange = (hour24 >= m_dimStartHour || hour24 < m_dimEndHour);
+        }
+        newBrightness = isInDimRange ? m_dimBrightness : m_tftBrightness;
     } else {
-        // Case where the range crosses midnight
-        isInDimRange = (hour24 >= DIM_START_HOUR || hour24 < DIM_END_HOUR);
+        newBrightness = m_tftBrightness;
     }
 
-    uint8_t brightness = isInDimRange ? DIM_BRIGHTNESS : TFT_BRIGHTNESS;
-    if (m_screenManager->setBrightness(brightness)) {
+    if (m_screenManager->setBrightness(newBrightness)) {
         // brightness was changed -> update widget
         m_screenManager->clearAllScreens();
         drawCurrent(true);
     }
-#endif
 }

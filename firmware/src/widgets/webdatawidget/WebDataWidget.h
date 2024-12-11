@@ -10,7 +10,7 @@
 
 class WebDataWidget : public Widget {
 public:
-    WebDataWidget(ScreenManager &manager, String url);
+    WebDataWidget(ScreenManager &manager, ConfigManager &config, String url);
     ~WebDataWidget() override;
     void setup() override;
     void update(bool force = false) override;
