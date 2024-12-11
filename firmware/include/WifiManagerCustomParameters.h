@@ -9,6 +9,7 @@ const char colorHtml[] = "type='color'";
 const char numberHtml[] = "type='number'";
 
 class StringParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     StringParameter(const char *id, const char *placeholder, std::string value, const uint8_t length = 30)
         : WiFiManagerParameter(id, placeholder, value.c_str(), length) {
@@ -20,6 +21,7 @@ public:
 };
 
 class IPAddressParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     IPAddressParameter(const char *id, const char *placeholder, IPAddress address)
         : WiFiManagerParameter("") {
@@ -32,6 +34,7 @@ public:
 };
 
 class IntParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     IntParameter(const char *id, const char *placeholder, long value, const uint8_t length = 10)
         : WiFiManagerParameter("") {
@@ -44,6 +47,7 @@ public:
 };
 
 class BoolParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     BoolParameter(const char *id, const char *placeholder, bool value, const uint8_t length = 2)
         : WiFiManagerParameter("") {
@@ -59,6 +63,7 @@ public:
 };
 
 class ColorParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     ColorParameter(const char *id, const char *placeholder, int value, const uint8_t length = 10)
         : WiFiManagerParameter("") {
@@ -74,6 +79,7 @@ public:
 };
 
 class ComboBoxParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     ComboBoxParameter(const char *id, const char *placeholder, String options[], int numOptions, int value, const uint8_t length = 10)
         : WiFiManagerParameter("") {
@@ -100,6 +106,7 @@ public:
 };
 
 class FloatParameter : public WiFiManagerParameter {
+    using WiFiManagerParameter::getValue; // make parent function private
 public:
     FloatParameter(const char *id, const char *placeholder, float value, const uint8_t length = 10)
         : WiFiManagerParameter("") {
