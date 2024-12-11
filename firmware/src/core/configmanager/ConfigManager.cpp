@@ -74,10 +74,14 @@ void ConfigManager::setupWebPortal() {
             Serial.printf("Arg %d: %s = %s\n", i, m_wm.server->argName(i).c_str(), m_wm.server->arg(i).c_str());
         }
 #endif
-        saveAllConfigs();
-        Serial.println("New config values saved.");
-        // Restart to apply new config
-        requiresRestart = true;
+        if (count > 0) {
+            saveAllConfigs();
+            Serial.printf("%d config values saved.\n", count);
+            // Restart to apply new config
+            requiresRestart = true;
+        } else {
+            Serial.println("No confg values to save found. Skipping.");
+        }
     });
 }
 
