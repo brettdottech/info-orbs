@@ -1,6 +1,6 @@
 #include "ConfigManager.h"
 
-ConfigManager *ConfigManager::m_instance = nullptr;
+ConfigManager *ConfigManager::s_instance = nullptr;
 
 ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
     Serial.println("Constructing ConfigManager");
@@ -25,7 +25,7 @@ ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
         }
     }
     Serial.println("ConfigManager initialized");
-    m_instance = this;
+    s_instance = this;
 }
 
 ConfigManager::~ConfigManager() {
@@ -36,10 +36,10 @@ ConfigManager::~ConfigManager() {
 }
 
 ConfigManager *ConfigManager::getInstance() {
-    if (m_instance == nullptr) {
+    if (s_instance == nullptr) {
         Serial.println("ERR in ConfigManager.getInstance(): not initialized");
     }
-    return m_instance;
+    return s_instance;
 }
 
 void ConfigManager::setupWebPortal() {

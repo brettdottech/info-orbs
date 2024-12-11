@@ -69,7 +69,7 @@ private:
         std::function<void()> saveCallback;
     };
 
-    static ConfigManager *m_instance;
+    static ConfigManager *s_instance;
 
     WiFiManager &m_wm;
     Preferences preferences;
