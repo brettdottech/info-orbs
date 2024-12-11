@@ -1,7 +1,7 @@
 #include "WifiWidget.h"
+#include "OrbsWiFiManager.h"
 #include "Utils.h"
 #include <WiFi.h>
-#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 
 const int lineHeight = 40;
 const int statusScreenIndex = 3;

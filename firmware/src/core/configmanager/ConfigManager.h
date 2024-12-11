@@ -2,12 +2,12 @@
 #define CONFIG_MANAGER_H
 
 #include "Button.h"
+#include "OrbsWiFiManager.h"
 #include "Utils.h"
 #include "WifiManagerCustomParameters.h"
 #include "config_helper.h"
 #include "nvs_flash.h"
 #include <Preferences.h>
-#include <WiFiManager.h>
 #include <functional>
 #include <string>
 #include <unordered_map>
