@@ -66,6 +66,9 @@
 // TRUETYPE FONT CONFIGURATION
 //#define DEFAULT_FONT ROBOTO_REGULAR
 
+// ADVANCED COMPILE OPTIONS
+#define INCLUDE_MDNS // Include mDNS funcionality
+
 // ============= END OF USER CONFIGURATION =================================================================
 
 
