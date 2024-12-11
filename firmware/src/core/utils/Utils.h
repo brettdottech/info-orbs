@@ -5,12 +5,15 @@
 #include <TFT_eSPI.h>
 #include <cstring>
 
-#define SHOW_MEMORY_USAGE(msg)        \
-    do {                              \
-        if (msg[0] != '\0') {         \
-            Serial.println(msg);      \
-        }                             \
-        Utils::showMemoryUsage(true); \
+#define SHOW_MEMORY_USAGE(msg)               \
+    do {                                     \
+        Utils::showMemoryUsage(true, false); \
+        if (msg[0] != '\0') {                \
+            Serial.print(" --- ");           \
+            Serial.println(msg);             \
+        } else {                             \
+            Serial.println();                \
+        }                                    \
     } while (0)
 #define MAX_WRAPPED_LINES 10
 
@@ -40,7 +43,7 @@ public:
     static char *copyString(const std::string &originalString);
     static bool compareCharArrays(const char *str1, const char *str2);
     static char *createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix);
-    static void showMemoryUsage(bool force = false);
+    static void showMemoryUsage(bool force = false, bool newLine = true);
 
 private:
     static unsigned long s_lastMemoryInfo;
