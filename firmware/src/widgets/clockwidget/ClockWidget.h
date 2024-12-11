@@ -5,10 +5,6 @@
 #include "Widget.h"
 #include <TJpg_Decoder.h>
 
-#ifndef CLOCK_FORMAT
-    #define CLOCK_FORMAT CLOCK_FORMAT_24_HOUR
-#endif
-
 #ifndef USE_CLOCK_NIXIE
     #define USE_CLOCK_NIXIE true
 #endif

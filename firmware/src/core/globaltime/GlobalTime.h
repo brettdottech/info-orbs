@@ -34,6 +34,16 @@ const String LOC_LANG = "en";
 #define CLOCK_FORMAT_12_HOUR 1
 #define CLOCK_FORMAT_12_HOUR_AMPM 2
 
+#if FORMAT_24_HOUR == true
+    #define CLOCK_FORMAT CLOCK_FORMAT_24_HOUR
+#else
+    #if SHOW_AM_PM_INDICATOR == false
+        #define CLOCK_FORMAT CLOCK_FORMAT_12_HOUR
+    #else
+        #define CLOCK_FORMAT CLOCK_FORMAT_12_HOUR_AMPM
+    #endif
+#endif
+
 class GlobalTime {
 public:
     static GlobalTime *getInstance();
@@ -85,7 +95,7 @@ private:
     unsigned long m_oneSecond = 1000;
     unsigned long m_updateTimer = 0;
 
-    bool m_format24hour;
+    bool m_format24hour{FORMAT_24_HOUR};
 
     void getTimeZoneOffsetFromAPI();
 };
