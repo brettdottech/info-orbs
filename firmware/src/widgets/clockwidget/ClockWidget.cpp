@@ -4,6 +4,16 @@
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Always enabled, do not add a config setting for it
+    String optClockType[] = {"Normal Clock", "Nixie Clock", "Custom Clock"};
+    if (!USE_CLOCK_NIXIE)
+        optClockType[(int) ClockType::NIXIE] += " (not available)";
+    if (!USE_CLOCK_CUSTOM)
+        optClockType[(int) ClockType::CUSTOM] += " (not available)";
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 3, "Default Clock Type (you can also switch types with the middle button)");
+    if (m_type == (int) ClockType::NIXIE && !USE_CLOCK_NIXIE || m_type == (int) ClockType::CUSTOM && !USE_CLOCK_CUSTOM) {
+        // Invalid Clock Type
+        m_type = (int) ClockType::NORMAL;
+    }
     String optFormats[] = {"24h mode", "12h mode", "12h mode (with am/pm)"};
     m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, optFormats, 3, "Clock Format");
     m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show Second Ticks");
@@ -56,7 +66,7 @@ void ClockWidget::draw(bool force) {
             displaySeconds(2, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
-        if (m_type == ClockType::NORMAL) {
+        if (m_type == (int) ClockType::NORMAL) {
             if (m_format == CLOCK_FORMAT_12_HOUR_AMPM) {
                 if (m_amPm != m_lastAmPm) {
                     // Clear old AM/PM
@@ -141,22 +151,22 @@ void ClockWidget::changeFormat() {
 
 void ClockWidget::changeClockType() {
     switch (m_type) {
-    case ClockType::NORMAL:
+    case (int) ClockType::NORMAL:
         if (USE_CLOCK_NIXIE) {
             // If nixie is enabled, use it, otherwise fall through
-            m_type = ClockType::NIXIE;
+            m_type = (int) ClockType::NIXIE;
             break;
         }
 
-    case ClockType::NIXIE:
+    case (int) ClockType::NIXIE:
         if (USE_CLOCK_CUSTOM) {
             // If custom is enabled, use it, otherwise fall through
-            m_type = ClockType::CUSTOM;
+            m_type = (int) ClockType::CUSTOM;
             break;
         }
 
     default:
-        m_type = ClockType::NORMAL;
+        m_type = (int) ClockType::NORMAL;
         break;
     }
     m_manager.clearAllScreens();
@@ -184,7 +194,7 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
-    if (m_type == ClockType::NIXIE || m_type == ClockType::CUSTOM) {
+    if (m_type == (int) ClockType::NIXIE || m_type == (int) ClockType::CUSTOM) {
         if (digit == ":" && color == m_shadowColor) {
             // Show colon off
             displayImage(displayIndex, " ");
@@ -228,7 +238,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (m_type == ClockType::NIXIE && color == m_fgColor) {
+    if (m_type == (int) ClockType::NIXIE && color == m_fgColor) {
         if (m_overrideNixieColorEnabled) {
             // Selected color for nixie
             color = m_overrideNixieColor;
@@ -247,11 +257,11 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
 
 void ClockWidget::displayImage(int displayIndex, const String &digit) {
     switch (m_type) {
-    case ClockType::NIXIE:
+    case (int) ClockType::NIXIE:
         displayNixie(displayIndex, digit);
         break;
 
-    case ClockType::CUSTOM:
+    case (int) ClockType::CUSTOM:
         displayCustom(displayIndex, digit);
         break;
     }

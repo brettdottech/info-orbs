@@ -81,9 +81,9 @@ struct DigitOffset {
 };
 
 enum class ClockType {
-    NORMAL,
-    NIXIE,
-    CUSTOM
+    NORMAL = 0,
+    NIXIE = 1,
+    CUSTOM = 2
 };
 
 class ClockWidget : public Widget {
@@ -108,7 +108,7 @@ private:
     void displayCustom(int displayIndex, const String &digit);
     void changeClockType();
 
-    ClockType m_type = DEFAULT_CLOCK;
+    int m_type = (int) DEFAULT_CLOCK;
 
     int m_format = CLOCK_FORMAT;
     bool m_showSecondTicks = SHOW_SECOND_TICKS;
