@@ -24,7 +24,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
 
     // I'm not sure which cache size is actually good.
     // Needs testing.
-    m_render.setCacheSize(128, 128, 8192);
+    m_render.setCacheSize(8, 8, 4096);
     setFont(DEFAULT_FONT);
     m_render.setDrawer(m_tft);
 
