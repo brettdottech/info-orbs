@@ -98,6 +98,8 @@ void loop() {
     Utils::showMemoryUsage();
 #endif
     if (config->isRequiresRestart()) {
+        // Answer the current request to /paramsave before restarting
+        wifiWidget->processWebPortalRequests();
         Serial.println("Restarting ESP now");
         ESP.restart();
     }
