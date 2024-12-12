@@ -1,7 +1,5 @@
 #include "ClockWidget.h"
 
-#include "config_helper.h"
-
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Always enabled, do not add a config setting for it
     String optClockType[] = {"Normal Clock", "Nixie Clock", "Custom Clock"};

@@ -1,7 +1,8 @@
 #include "GlobalTime.h"
 
+#include "ConfigManager.h"
 #include "config_helper.h"
-#include <TimeLib.h>
+#include <ArduinoJson.h>
 
 GlobalTime *GlobalTime::m_instance = nullptr;
 

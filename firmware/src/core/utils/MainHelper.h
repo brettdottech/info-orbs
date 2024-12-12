@@ -7,8 +7,6 @@
 #include "ScreenManager.h"
 #include "TFT_eSPI.h"
 #include "WidgetSet.h"
-#include "config_helper.h"
-#include "icons.h"
 #include <Arduino.h>
 
 class MainHelper {

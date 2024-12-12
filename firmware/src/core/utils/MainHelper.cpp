@@ -1,4 +1,6 @@
 #include "MainHelper.h"
+#include "config_helper.h"
+#include "icons.h"
 
 // initialize static members
 Button MainHelper::buttonLeft(BUTTON_LEFT);

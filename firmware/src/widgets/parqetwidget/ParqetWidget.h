@@ -2,13 +2,10 @@
 #define PARQET_WIDGET_H
 
 #include "GlobalTime.h"
-#include <ArduinoJson.h>
-#include <HTTPClient.h>
-#include <TFT_eSPI.h>
-
 #include "ParqetDataModel.h"
 #include "Utils.h"
 #include "Widget.h"
+#include "config_helper.h"
 
 #ifdef PARQET_DEBUG
     #define PARQET_DEBUG_PRINT(...) PARQET_DEBUG_PRINT_IMPL(__VA_ARGS__, false)

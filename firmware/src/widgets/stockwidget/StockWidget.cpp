@@ -1,6 +1,5 @@
 #include "StockWidget.h"
 
-#include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 

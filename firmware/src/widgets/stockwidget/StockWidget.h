@@ -10,6 +10,7 @@
 
 #include "StockDataModel.h"
 #include "Widget.h"
+#include "config_helper.h"
 
 #define MAX_STOCKS 5
 

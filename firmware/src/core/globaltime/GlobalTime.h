@@ -1,9 +1,7 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef GLOBALTIME_H
+#define GLOBALTIME_H
 
-#include "ConfigManager.h"
 #include "config_helper.h"
-#include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
 #include <TimeLib.h>
@@ -100,4 +98,4 @@ private:
     void getTimeZoneOffsetFromAPI();
 };
 
-#endif
+#endif // GLOBALTIME_H

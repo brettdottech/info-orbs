@@ -1,4 +1,5 @@
 #include "ScreenManager.h"
+#include "ConfigManager.h"
 #include "Utils.h"
 #include <Arduino.h>
 

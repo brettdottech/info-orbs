@@ -1,6 +1,7 @@
 #include "WifiWidget.h"
 #include "OrbsWiFiManager.h"
 #include "Utils.h"
+#include <ESPmDNS.h>
 #include <WiFi.h>
 
 const int lineHeight = 40;

@@ -2,6 +2,7 @@
 #define WIFIMGR_CUSTOM_PARAMETERS_H
 
 #include "OrbsWiFiManager.h"
+#include "Utils.h"
 
 const char checkboxHtml[] = "type='checkbox'";
 const char checkboxHtmlChecked[] = "type='checkbox' checked";

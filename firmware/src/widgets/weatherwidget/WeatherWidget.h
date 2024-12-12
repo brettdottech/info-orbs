@@ -2,14 +2,9 @@
 #define WEATHERWIDGET_H
 
 #include "GlobalTime.h"
-#include "Utils.h"
 #include "WeatherDataModel.h"
 #include "Widget.h"
 #include "config_helper.h"
-#include <ArduinoJson.h>
-#include <HTTPClient.h>
-#include <TJpg_Decoder.h>
-#include <math.h>
 
 class WeatherWidget : public Widget {
 public:

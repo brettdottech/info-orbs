@@ -3,7 +3,6 @@
     #define WIFIWIDGET_H
 
     #include "Widget.h"
-    #include <ESPmDNS.h>
 
 class WifiWidget : public Widget {
 public:

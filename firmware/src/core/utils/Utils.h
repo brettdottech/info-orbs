@@ -2,8 +2,6 @@
 #define UTILS_H
 
 #include <Arduino.h>
-#include <TFT_eSPI.h>
-#include <cstring>
 
 #define SHOW_MEMORY_USAGE(msg)               \
     do {                                     \

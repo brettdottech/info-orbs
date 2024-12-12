@@ -3,7 +3,7 @@
 
 #include "GlobalTime.h"
 #include "Widget.h"
-#include <TJpg_Decoder.h>
+#include "config_helper.h"
 
 #ifndef USE_CLOCK_NIXIE
     #define USE_CLOCK_NIXIE true

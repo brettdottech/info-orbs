@@ -11,9 +11,10 @@
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "WeatherWidget.h"
-#include "icons.h"
 
-#include "config_helper.h"
+#include "icons.h"
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default

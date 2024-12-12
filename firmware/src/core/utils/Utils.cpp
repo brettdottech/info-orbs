@@ -1,4 +1,6 @@
 #include "Utils.h"
+#include <TFT_eSPI.h>
+#include <cstring>
 
 // initialize static members
 unsigned long Utils::s_lastMemoryInfo = 0;
