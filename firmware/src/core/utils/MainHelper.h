@@ -5,6 +5,7 @@
 #include "ConfigManager.h"
 #include "OrbsWiFiManager.h"
 #include "ScreenManager.h"
+#include "ShowMemoryUsage.h"
 #include "TFT_eSPI.h"
 #include "WidgetSet.h"
 #include <Arduino.h>

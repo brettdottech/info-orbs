@@ -82,7 +82,7 @@ public:
         }
         html += "</select>";
         // Set id as label here, otherwise WifiMgr will show an input
-        init(NULL, id, nullptr, 0, Utils::copyString(html.c_str()), WFM_LABEL_AFTER);
+        init(NULL, id, nullptr, 0, Utils::createConstCharBuffer(html.c_str()), WFM_LABEL_AFTER);
     }
 
     int getValue(WiFiManager &wm) {

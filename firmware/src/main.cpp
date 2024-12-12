@@ -95,7 +95,7 @@ void loop() {
         wifiWidget->processWebPortalRequests();
     }
 #ifdef MEMORY_DEBUG
-    Utils::showMemoryUsage();
+    ShowMemoryUsage::printSerial();
 #endif
     if (config->isRequiresRestart()) {
         // Answer the current request to /paramsave before restarting

@@ -4,16 +4,6 @@
 #include "Button.h"
 #include <Arduino.h>
 
-#define SHOW_MEMORY_USAGE(msg)               \
-    do {                                     \
-        Utils::showMemoryUsage(true, false); \
-        if (msg[0] != '\0') {                \
-            Serial.print(" --- ");           \
-            Serial.println(msg);             \
-        } else {                             \
-            Serial.println();                \
-        }                                    \
-    } while (0)
 #define MAX_WRAPPED_LINES 10
 
 enum ScreenMode {
@@ -33,6 +23,7 @@ public:
     static int32_t stringToColor(String color);
     static String formatFloat(float value, int8_t digits);
     static int32_t stringToAlignment(String alignment);
+
     static uint16_t rgb565dim(uint16_t rgb565, uint8_t brightness, bool swapBytes = false);
     static void rgb565dimBitmap(uint16_t *pixel565, size_t length, uint8_t brightness, bool swapBytes = true);
     static uint32_t rgb565ToRgb888(uint16_t rgb565, bool swapBytes = false);
@@ -41,15 +32,24 @@ public:
     static int rgb888htmlToRgb565(const String &hexColor);
     static uint16_t grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes = false);
     static void colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor888, float brightness, bool swapBytes = true);
-    static char *copyString(const std::string &originalString);
-    static bool compareCharArrays(const char *str1, const char *str2);
-    static char *createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix);
+
     static uint8_t stringToButtonId(const String &buttonName);
     static ButtonState stringToButtonState(const String &buttonState);
-    static void showMemoryUsage(bool force = false, bool newLine = true);
 
-private:
-    static unsigned long s_lastMemoryInfo;
+    /**
+     * Returns true if both stored strings are the same
+     */
+    static bool compareCharArrays(const char *str1, const char *str2);
+    /**
+     * Create a new char buffer and copy the contents of the string into it.
+     * Warning: This will allocate memory! Remeber to delete[] it after use.
+     */
+    static const char *createConstCharBuffer(const std::string &originalString);
+    /**
+     * Create a new char buffer and copy the contents of the strings into it.
+     * Warning: This will allocate memory! Remeber to delete[] it after use.
+     */
+    static const char *createConstCharBufferAndConcat(const char *prefix, const char *original, const char *postfix);
 };
 
 #endif

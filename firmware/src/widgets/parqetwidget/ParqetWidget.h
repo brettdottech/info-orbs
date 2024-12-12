@@ -3,6 +3,7 @@
 
 #include "GlobalTime.h"
 #include "ParqetDataModel.h"
+#include "ShowMemoryUsage.h"
 #include "Utils.h"
 #include "Widget.h"
 #include "config_helper.h"

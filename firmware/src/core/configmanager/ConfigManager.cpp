@@ -48,7 +48,7 @@ ConfigManager *ConfigManager::getInstance() {
 }
 
 void ConfigManager::setupWebPortal() {
-    WiFiManagerParameter *startLabel = new WiFiManagerParameter(Utils::copyString("<H1>InfoOrbs Configuration</H1>"));
+    WiFiManagerParameter *startLabel = new WiFiManagerParameter("<H1>InfoOrbs Configuration</H1>");
     m_wm.addParameter(startLabel);
     char lastSection[30];
     for (auto &param : parameters) {
@@ -57,7 +57,7 @@ void ConfigManager::setupWebPortal() {
 #endif
         if (!Utils::compareCharArrays(lastSection, param.section)) {
             // New class variables -> add a separator
-            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createWithPrefixAndPostfix("<HR><H2 style='margin-block-end: 0;'>", param.section, "</H2>"));
+            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createConstCharBufferAndConcat("<HR><H2 style='margin-block-end: 0;'>", param.section, "</H2>"));
             Serial.printf("New config area: %s\n", param.section);
             m_wm.addParameter(classLabel);
             strcpy(lastSection, param.section);
@@ -68,7 +68,7 @@ void ConfigManager::setupWebPortal() {
         m_wm.addParameter(param.parameter);
         m_wm.addParameter(divEnd);
     }
-    WiFiManagerParameter *endLabel = new WiFiManagerParameter(Utils::copyString("<HR><BR><H3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></H3>"));
+    WiFiManagerParameter *endLabel = new WiFiManagerParameter("<HR><BR><H3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></H3>");
     m_wm.addParameter(endLabel);
 
     m_wm.setSaveParamsCallback([this]() {
@@ -124,9 +124,9 @@ void ConfigManager::addConfig(int paramType, const std::string &section, const s
                               Args... args) {
 
     // Convert std::string to char* once
-    char *sectionBuffer = Utils::copyString(section);
-    char *varNameBuffer = Utils::copyString(varName);
-    char *descBuffer = Utils::copyString(description);
+    const char *sectionBuffer = Utils::createConstCharBuffer(section);
+    const char *varNameBuffer = Utils::createConstCharBuffer(varName);
+    const char *descBuffer = Utils::createConstCharBuffer(description);
 
     // Load value from preferences
     loadFromPreferences(*var);

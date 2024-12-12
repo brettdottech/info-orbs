@@ -3,9 +3,6 @@
 #include <TFT_eSPI.h>
 #include <cstring>
 
-// initialize static members
-unsigned long Utils::s_lastMemoryInfo = 0;
-
 int Utils::getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit) {
     char buf[str.length() + 1];
     char lineBuf[limit + 1];
@@ -317,13 +314,6 @@ void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targe
     }
 }
 
-char *Utils::copyString(const std::string &originalString) {
-    // Allocate enough memory for the string and the null-terminator
-    char *buffer = new char[originalString.size() + 1];
-    std::strcpy(buffer, originalString.c_str()); // Copy the string contents
-    return buffer; // Return the pointer to this new string
-}
-
 bool Utils::compareCharArrays(const char *str1, const char *str2) {
     while (*str1 && (*str1 == *str2)) {
         str1++;
@@ -332,7 +322,14 @@ bool Utils::compareCharArrays(const char *str1, const char *str2) {
     return *str1 == *str2;
 }
 
-char *Utils::createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix) {
+const char *Utils::createConstCharBuffer(const std::string &originalString) {
+    // Allocate enough memory for the string and the null-terminator
+    char *buffer = new char[originalString.size() + 1];
+    strcpy(buffer, originalString.c_str()); // Copy the string contents
+    return buffer; // Return the pointer to this new string
+}
+
+const char *Utils::createConstCharBufferAndConcat(const char *prefix, const char *original, const char *postfix) {
     // Calculate lengths
     size_t prefixLen = strlen(prefix);
     size_t originalLen = strlen(original);
@@ -348,16 +345,6 @@ char *Utils::createWithPrefixAndPostfix(const char *prefix, const char *original
     strcat(result, postfix); // Append postfix
 
     return result;
-}
-
-void Utils::showMemoryUsage(bool force, bool newLine) {
-    multi_heap_info_t info;
-    if (force || millis() - s_lastMemoryInfo >= 1000) {
-        heap_caps_get_info(&info, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT); // internal RAM, memory capable to store data or to create new task
-        size_t total = heap_caps_get_total_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-        Serial.printf("total: %d, allocated: %d, totalFree: %d, minFree: %d, largestFree: %d%s", total, info.total_allocated_bytes, info.total_free_bytes, info.minimum_free_bytes, info.largest_free_block, newLine ? "\n" : "");
-        s_lastMemoryInfo = millis();
-    }
 }
 
 uint8_t Utils::stringToButtonId(const String &buttonName) {
