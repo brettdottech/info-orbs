@@ -29,7 +29,7 @@ public:
     static uint32_t rgb565ToRgb888(uint16_t rgb565, bool swapBytes = false);
     static uint16_t rgb888ToRgb565(uint32_t rgb888, bool swapBytes = false);
     static String rgb565ToRgb888html(int color565);
-    static int rgb888htmlToRgb565(const String &hexColor);
+    static int rgb888htmlToRgb565(String hexColor);
     static uint16_t grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes = false);
     static void colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor888, float brightness, bool swapBytes = true);
 

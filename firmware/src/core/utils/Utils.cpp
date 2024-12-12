@@ -266,11 +266,11 @@ String Utils::rgb565ToRgb888html(int color565) {
     return hexColor;
 }
 
-int Utils::rgb888htmlToRgb565(const String &hexColor) {
+int Utils::rgb888htmlToRgb565(String hexColor) {
     if (hexColor.startsWith("#")) {
-        String hexColor = hexColor.substring(1); // Remove leading '#'
+        hexColor = hexColor.substring(1); // Remove leading '#'
     }
-    int rgb888 = strtol(hexColor.c_str(), nullptr, HEX); // Convert to RGB888 int
+    int rgb888 = strtol(hexColor.c_str(), 0, HEX); // Convert to RGB888 int
     int rgb565 = Utils::rgb888ToRgb565(rgb888); // Convert to RGB565
     return rgb565;
 }
