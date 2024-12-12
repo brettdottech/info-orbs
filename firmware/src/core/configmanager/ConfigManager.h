@@ -30,28 +30,28 @@ public:
     void saveAllConfigs();
 
     // Register different types of variables with descriptions
-    void addConfigString(const std::string &section, const std::string &varName, std::string *var, size_t length, const std::string &description);
-    void addConfigInt(const std::string &section, const std::string &varName, int *var, const std::string &description);
-    void addConfigFloat(const std::string &section, const std::string &varName, float *var, const std::string &description);
-    void addConfigIP(const std::string &section, const std::string &varName, IPAddress *var, const std::string &description);
-    void addConfigBool(const std::string &section, const std::string &varName, bool *var, const std::string &description);
-    void addConfigColor(const std::string &section, const std::string &varName, int *var, const std::string &description);
-    void addConfigComboBox(const std::string &section, const std::string &varName, int *var, String options[], int numOptions, const std::string &description);
+    void addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description);
+    void addConfigInt(const char *section, const char *varName, int *var, const char *description);
+    void addConfigFloat(const char *section, const char *varName, float *var, const char *description);
+    void addConfigIP(const char *section, const char *varName, IPAddress *var, const char *description);
+    void addConfigBool(const char *section, const char *varName, bool *var, const char *description);
+    void addConfigColor(const char *section, const char *varName, int *var, const char *description);
+    void addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description);
 
     // Get stored values
-    std::string getConfigString(const std::string &varName, std::string defaultValue);
-    bool getConfigBool(const std::string &varName, bool defaultValue);
-    int getConfigInt(const std::string &varName, int defaultValue);
-    float getConfigFloat(const std::string &varName, float defaultValue);
+    std::string getConfigString(const char *varName, std::string defaultValue);
+    bool getConfigBool(const char *varName, bool defaultValue);
+    int getConfigInt(const char *varName, int defaultValue);
+    float getConfigFloat(const char *varName, float defaultValue);
 
     // Register callbacks for changes
     void addOnChangeCallback(
-        const std::string &section,
-        const std::string &varName,
-        const std::function<void(const std::string &section, const std::string &varName)> &callback);
+        const char *section,
+        const char *varName,
+        const std::function<void(const char *section, const char *varName)> &callback);
     void addOnChangeCallback(
-        const std::string &section,
-        const std::function<void(const std::string &section, const std::string &varName)> &callback);
+        const char *section,
+        const std::function<void(const char *section, const char *varName)> &callback);
 
     // Check if a restart is required
     bool isRequiresRestart() { return requiresRestart; }
@@ -70,15 +70,15 @@ private:
     WiFiManager &m_wm;
     Preferences preferences;
     std::vector<Parameter> parameters;
-    std::unordered_map<std::string, std::vector<std::function<void(const std::string &section, const std::string &varName)>>> changeCallbacks;
+    std::unordered_map<std::string, std::vector<std::function<void(const char *section, const char *varName)>>> changeCallbacks;
     bool requiresRestart = false;
 
     template <typename T, typename ParameterType, typename... Args>
-    void addConfig(int paramType, const std::string &section, const std::string &varName, T *var, const std::string &description, uint8_t length,
+    void addConfig(int paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length,
                    std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
 
-    std::string makeKey(const std::string &section, const std::string &varName);
-    void triggerChangeCallbacks(const std::string &section, const std::string &varName = "");
+    std::string makeKey(const char *section, const char *varName);
+    void triggerChangeCallbacks(const char *section, const char *varName = "");
 };
 
 #endif // CONFIG_MANAGER_H

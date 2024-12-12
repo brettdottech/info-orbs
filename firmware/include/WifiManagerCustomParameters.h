@@ -81,8 +81,14 @@ public:
             html += "<option value='" + String(i) + "'" + (value == i ? " selected>" : ">") + options[i] + "</option>";
         }
         html += "</select>";
+        htmlBuffer = Utils::createConstCharBuffer(html.c_str());
         // Set id as label here, otherwise WifiMgr will show an input
-        init(NULL, id, nullptr, 0, Utils::createConstCharBuffer(html.c_str()), WFM_LABEL_AFTER);
+        init(NULL, id, nullptr, 0, htmlBuffer, WFM_LABEL_AFTER);
+    }
+
+    ~ComboBoxParameter() {
+        // cleanup memory
+        delete[] htmlBuffer;
     }
 
     int getValue(WiFiManager &wm) {
@@ -96,6 +102,9 @@ public:
         // Fallback to 0
         return 0;
     }
+
+private:
+    const char *htmlBuffer;
 };
 
 class FloatParameter : public WiFiManagerParameter {
