@@ -2,6 +2,33 @@
 #include "config_helper.h"
 #include "icons.h"
 
+// Set defaults if not set in config.h
+#ifndef TFT_BRIGHTNESS
+    #define TFT_BRIGHTNESS 255
+#endif
+
+#if defined(DIM_START_HOU) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
+    #define DIM_ENABLED true
+#else
+    #define DIM_ENABLED false
+#endif
+
+#ifndef DIM_START_HOUR
+    #define DIM_START_HOUR 22
+#endif
+
+#ifndef DIM_END_HOUR
+    #define DIM_END_HOUR 7
+#endif
+
+#ifndef DIM_BRIGHTNESS
+    #define DIM_BRIGHTNESS 128
+#endif
+
+#ifndef WIDGET_CYCLE_DELAY
+    #define WIDGET_CYCLE_DELAY 0
+#endif
+
 // initialize static members
 Button MainHelper::buttonLeft(BUTTON_LEFT);
 Button MainHelper::buttonOK(BUTTON_OK);
@@ -10,19 +37,15 @@ WiFiManager *MainHelper::s_wifiManager = nullptr;
 ConfigManager *MainHelper::s_configManager = nullptr;
 ScreenManager *MainHelper::s_screenManager = nullptr;
 WidgetSet *MainHelper::s_widgetSet = nullptr;
-#ifdef WIDGET_CYCLE_DELAY
-int MainHelper::s_widgetCycleDelay = WIDGET_CYCLE_DELAY; // Automatically cycle widgets every X seconds, set to 0 to disable
-#else
-int MainHelper::s_widgetCycleDelay = 0;
-#endif
+int MainHelper::s_widgetCycleDelay = WIDGET_CYCLE_DELAY;
 unsigned long MainHelper::s_widgetCycleDelayPrev = 0;
 bool MainHelper::s_invertedOrbs = INVERTED_ORBS;
 std::string MainHelper::s_timezoneLocation = TIMEZONE_API_LOCATION;
-int MainHelper::s_tftBrightness = 255;
-bool MainHelper::s_nightMode = false;
-int MainHelper::s_dimStartHour = 22;
-int MainHelper::s_dimEndHour = 7;
-int MainHelper::s_dimBrightness = 128;
+int MainHelper::s_tftBrightness = TFT_BRIGHTNESS;
+bool MainHelper::s_nightMode = DIM_ENABLED;
+int MainHelper::s_dimStartHour = DIM_START_HOUR;
+int MainHelper::s_dimEndHour = DIM_END_HOUR;
+int MainHelper::s_dimBrightness = DIM_BRIGHTNESS;
 
 void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws) {
     s_wifiManager = wm;
