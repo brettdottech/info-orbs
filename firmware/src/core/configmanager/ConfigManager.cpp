@@ -202,8 +202,8 @@ void ConfigManager::addConfigComboBox(const std::string &section, const std::str
     );
 }
 
-String ConfigManager::getConfigString(const std::string &varName, String defaultValue) {
-    String val = preferences.getString(varName.c_str(), defaultValue);
+std::string ConfigManager::getConfigString(const std::string &varName, std::string defaultValue) {
+    std::string val = preferences.getString(varName.c_str(), defaultValue.c_str()).c_str();
     return val;
 }
 
