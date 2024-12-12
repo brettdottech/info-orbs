@@ -63,7 +63,7 @@ public:
 class ColorParameter : public WiFiManagerParameter {
     using WiFiManagerParameter::getValue; // make parent function private
 public:
-    ColorParameter(const char *id, const char *placeholder, int value, const uint8_t length = 10) {
+    ColorParameter(const char *id, const char *placeholder, int value, const uint8_t length = 8) {
         init(id, placeholder, Utils::rgb565ToRgb888html(value).c_str(), length, colorHtml, WFM_LABEL_BEFORE);
     }
 
@@ -75,7 +75,7 @@ public:
 class ComboBoxParameter : public WiFiManagerParameter {
     using WiFiManagerParameter::getValue; // make parent function private
 public:
-    ComboBoxParameter(const char *id, const char *placeholder, String options[], int numOptions, int value, const uint8_t length = 10) {
+    ComboBoxParameter(const char *id, const char *placeholder, String options[], int numOptions, int value, const uint8_t length = 0) {
         String html = "<label for='" + String(id) + "'>" + String(placeholder) + "</label><br/><select id='" + String(id) + "' name='" + String(id) + "'>";
         for (int i = 0; i < numOptions; i++) {
             html += "<option value='" + String(i) + "'" + (value == i ? " selected>" : ">") + options[i] + "</option>";

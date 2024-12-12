@@ -181,7 +181,7 @@ void ConfigManager::addConfigFloat(const char *section, const char *varName, flo
 
 void ConfigManager::addConfigColor(const char *section, const char *varName, int *var, const char *description) {
     addConfig<int, ColorParameter>(
-        CM_PARAM_TYPE_COLOR, section, varName, var, description, 10,
+        CM_PARAM_TYPE_COLOR, section, varName, var, description, 8,
         [this, varName](int &var) { var = preferences.getInt(varName, var); },
         [](ColorParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName, var); });
@@ -189,7 +189,7 @@ void ConfigManager::addConfigColor(const char *section, const char *varName, int
 
 void ConfigManager::addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description) {
     addConfig<int, ComboBoxParameter>(
-        CM_PARAM_TYPE_COMBOBOX, section, varName, var, description, 2,
+        CM_PARAM_TYPE_COMBOBOX, section, varName, var, description, 0,
         [this, varName](int &var) { var = preferences.getInt(varName, var); },
         [this](ComboBoxParameter *param, int &var) { var = param->getValue(this->m_wm); },
         [this, varName](int &var) { preferences.putInt(varName, var); },
