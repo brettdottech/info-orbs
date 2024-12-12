@@ -68,27 +68,3 @@ ButtonState Button::getState() {
         return BTN_NOTHING;
     }
 }
-
-uint8_t Button::stringToButtonId(const String &buttonName) {
-    if (buttonName.equalsIgnoreCase("left")) {
-        return BUTTON_LEFT;
-    } else if (buttonName.equalsIgnoreCase("middle")) {
-        return BUTTON_OK;
-    } else if (buttonName.equalsIgnoreCase("right")) {
-        return BUTTON_RIGHT;
-    } else {
-        return 0;
-    }
-}
-
-ButtonState Button::stringToButtonState(const String &buttonState) {
-    if (buttonState.equalsIgnoreCase("short")) {
-        return BTN_SHORT;
-    } else if (buttonState.equalsIgnoreCase("medium")) {
-        return BTN_MEDIUM;
-    } else if (buttonState.equalsIgnoreCase("long")) {
-        return BTN_LONG;
-    } else {
-        return BTN_NOTHING;
-    }
-}

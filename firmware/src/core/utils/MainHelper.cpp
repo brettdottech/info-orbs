@@ -122,8 +122,8 @@ void MainHelper::handleEndpointButton() {
     if (s_wifiManager->server->hasArg("name") && s_wifiManager->server->hasArg("state")) {
         String inButton = s_wifiManager->server->arg("name");
         String inState = s_wifiManager->server->arg("state");
-        uint8_t buttonId = Button::stringToButtonId(inButton);
-        ButtonState state = Button::stringToButtonState(inState);
+        uint8_t buttonId = Utils::stringToButtonId(inButton);
+        ButtonState state = Utils::stringToButtonState(inState);
 
         if (buttonId != 0 && state != BTN_NOTHING) {
             buttonPressed(buttonId, state);

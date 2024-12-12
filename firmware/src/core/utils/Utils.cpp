@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "config_helper.h"
 #include <TFT_eSPI.h>
 #include <cstring>
 
@@ -356,5 +357,29 @@ void Utils::showMemoryUsage(bool force, bool newLine) {
         size_t total = heap_caps_get_total_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
         Serial.printf("total: %d, allocated: %d, totalFree: %d, minFree: %d, largestFree: %d%s", total, info.total_allocated_bytes, info.total_free_bytes, info.minimum_free_bytes, info.largest_free_block, newLine ? "\n" : "");
         s_lastMemoryInfo = millis();
+    }
+}
+
+uint8_t Utils::stringToButtonId(const String &buttonName) {
+    if (buttonName.equalsIgnoreCase("left")) {
+        return BUTTON_LEFT;
+    } else if (buttonName.equalsIgnoreCase("middle")) {
+        return BUTTON_OK;
+    } else if (buttonName.equalsIgnoreCase("right")) {
+        return BUTTON_RIGHT;
+    } else {
+        return 0;
+    }
+}
+
+ButtonState Utils::stringToButtonState(const String &buttonState) {
+    if (buttonState.equalsIgnoreCase("short")) {
+        return BTN_SHORT;
+    } else if (buttonState.equalsIgnoreCase("medium")) {
+        return BTN_MEDIUM;
+    } else if (buttonState.equalsIgnoreCase("long")) {
+        return BTN_LONG;
+    } else {
+        return BTN_NOTHING;
     }
 }

@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "Button.h"
 #include <Arduino.h>
 
 #define SHOW_MEMORY_USAGE(msg)               \
@@ -43,6 +44,8 @@ public:
     static char *copyString(const std::string &originalString);
     static bool compareCharArrays(const char *str1, const char *str2);
     static char *createWithPrefixAndPostfix(const char *prefix, const char *original, const char *postfix);
+    static uint8_t stringToButtonId(const String &buttonName);
+    static ButtonState stringToButtonState(const String &buttonState);
     static void showMemoryUsage(bool force = false, bool newLine = true);
 
 private:
