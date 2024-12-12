@@ -10,11 +10,12 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
     m_config.addConfigBool("ParqetWidget", "parqetEnabled", &m_enabled, "Enable Widget");
     m_config.addConfigString("ParqetWidget", "portfolioId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
+    m_config.addConfigComboBox("ParqetWidget", "showClock", &m_curMode, m_modes, PARQET_MODE_COUNT, "Default timeframe");
     m_config.addConfigBool("ParqetWidget", "showClock", &m_showClock, "Show clock on first screen");
     m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen");
     m_config.addConfigBool("ParqetWidget", "showTotalVal", &m_showTotalValue, "Show total portfolio value");
-    String options[] = {"Show current price", "Show current value"};
-    m_config.addConfigComboBox("ParqetWidget", "showValues", &m_showValues, options, 2, "Show price or value for stocks");
+    String optPriceVal[] = {"Show current price", "Show current value"};
+    m_config.addConfigComboBox("ParqetWidget", "showValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks");
 }
 
 void ParqetWidget::setup() {

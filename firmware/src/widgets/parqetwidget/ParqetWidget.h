@@ -63,7 +63,7 @@ private:
     unsigned long m_clockDelayPrev = 0;
 
     String m_modes[PARQET_MODE_COUNT] = {"today", "1w", "1m", "3m", "6m", "1y", "3y", "mtd", "ytd", "max"}; // Possible timeframes: today, 1w, 1m, 3m, 6m, 1y, 3y, mtd, ytd, max
-    int8_t m_curMode = 0;
+    int m_curMode = 0;
 
     boolean m_showClock = true; // Show clock on first screen
     boolean m_showTotalScreen = true; // Show a total portfolio screen
