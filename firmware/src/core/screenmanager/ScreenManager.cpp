@@ -24,7 +24,8 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     TJpgDec.setCallback(tftOutput);
 
     // I'm not sure which cache size is actually good.
-    // Needs testing.
+    // It's a tradeoff between memory consumption and render speed.
+    // Needs more testing to find the sweet spot.
     m_render.setCacheSize(8, 8, 4096);
     setFont(DEFAULT_FONT);
     m_render.setDrawer(m_tft);
