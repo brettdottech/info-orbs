@@ -10,6 +10,7 @@
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
 #include <Arduino.h>
+#include <ClickEncoder.h>
 
 #ifdef STOCK_TICKER_LIST
     #include "stockwidget/StockWidget.h"
@@ -24,15 +25,25 @@
 TFT_eSPI tft = TFT_eSPI();
 
 #ifdef WIDGET_CYCLE_DELAY
-unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY * 1000; // Automatically cycle widgets every X seconds, set to 0 to disable
+    unsigned long m_widgetCycleDelay = WIDGET_CYCLE_DELAY * 1000; // Automatically cycle widgets every X seconds, set to 0 to disable
 #else
-unsigned long m_widgetCycleDelay = 0;
+    unsigned long m_widgetCycleDelay = 0;
 #endif
 unsigned long m_widgetCycleDelayPrev = 0;
 
-Button buttonLeft(BUTTON_LEFT);
-Button buttonOK(BUTTON_OK);
-Button buttonRight(BUTTON_RIGHT);
+#ifdef USE_ROTARY_ENCODER
+    unsigned long lastTimeEncoderService = 0;
+    unsigned long lastTimeEncoderTurn = 0;
+    unsigned long lastTimeEncoderClick = 0;
+    ClickEncoder *encoder;
+    int16_t encoderValue = 0;
+    int16_t encoderLastValue = 0;
+    bool encoderBtnIsHeld = false;
+#else
+    Button buttonLeft(BUTTON_LEFT);
+    Button buttonOK(BUTTON_OK);
+    Button buttonRight(BUTTON_RIGHT);
+#endif
 
 GlobalTime *globalTime; // Initialize the global time
 
@@ -59,21 +70,28 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
     return 1;
 }
 
-/**
- * The ISR handlers must be static
- */
-void isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
-void isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
-void isrButtonChangeRight() { buttonRight.isrButtonChange(); }
+
+#ifndef USE_ROTARY_ENCODER
+    /**
+     * The ISR handlers must be static
+     */
+    void isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
+    void isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
+    void isrButtonChangeRight() { buttonRight.isrButtonChange(); }
+#endif
 
 void setupButtons() {
-    buttonLeft.begin();
-    buttonOK.begin();
-    buttonRight.begin();
+    #ifdef USE_ROTARY_ENCODER
+        encoder = new ClickEncoder(ROTARY_CLK, ROTARY_DT, ROTARY_SW);
+    #else
+        buttonLeft.begin();
+        buttonOK.begin();
+        buttonRight.begin();
 
-    attachInterrupt(digitalPinToInterrupt(BUTTON_LEFT), isrButtonChangeLeft, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_OK), isrButtonChangeMiddle, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(BUTTON_LEFT), isrButtonChangeLeft, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(BUTTON_OK), isrButtonChangeMiddle, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
+    #endif
 }
 
 void setup() {
@@ -149,6 +167,75 @@ void checkCycleWidgets() {
     }
 }
 
+#ifdef USE_ROTARY_ENCODER
+
+void performEncoderService() {
+    if (micros() - lastTimeEncoderService < 500)
+        return;
+
+    lastTimeEncoderService = micros();
+    encoder->service();
+}
+
+void handleEncoderTurn() {
+    encoderValue += encoder->getValue();
+
+    if (millis() - lastTimeEncoderTurn < 1000)
+       return;
+
+    if (encoderLastValue < encoderValue) {
+        Serial.println("rotary left -> switch to prev Widget");
+        m_widgetCycleDelayPrev = millis();
+        widgetSet->prev();
+    }
+    else if (encoderLastValue > encoderValue) {
+        Serial.println("rotary right -> switch to next Widget");   
+        m_widgetCycleDelayPrev = millis();
+        widgetSet->next();
+    }
+
+    encoderLastValue = encoderValue;
+    lastTimeEncoderTurn = millis();
+}
+
+void handleEncoderClick() {
+    if (millis() - lastTimeEncoderClick < 100)
+      return;
+
+    ClickEncoder::Button encoderButton = encoder->getButton();
+    if (encoderButton == ClickEncoder::Clicked) {
+        Serial.println("rotary click -> send OK short");        
+        m_widgetCycleDelayPrev = millis();
+        widgetSet->buttonPressed(BUTTON_OK, BTN_SHORT);
+    }
+    else if (encoderButton == ClickEncoder::DoubleClicked) {
+        Serial.println("rotary dblclick -> send OK medium");        
+        m_widgetCycleDelayPrev = millis();
+        widgetSet->buttonPressed(BUTTON_OK, BTN_MEDIUM);
+
+    }
+    else if (!encoderBtnIsHeld && encoderButton == ClickEncoder::Held ) {
+        Serial.println("rotary held start - send OK long");
+        encoderBtnIsHeld = true;     
+        m_widgetCycleDelayPrev = millis();   
+        widgetSet->buttonPressed(BUTTON_OK, BTN_LONG);
+    }
+    else if (encoderBtnIsHeld && encoderButton == ClickEncoder::Released ) {
+        Serial.println("rotary held end");
+        encoderBtnIsHeld = false;
+    }
+
+    lastTimeEncoderClick = millis();
+  }
+
+void checkButtons() {
+    performEncoderService();
+    handleEncoderTurn();
+    handleEncoderClick();
+}
+
+#else
+
 void checkButtons() {
     // Reset cycle timer whenever a button is pressed
     if (buttonLeft.pressedShort()) {
@@ -182,6 +269,8 @@ void checkButtons() {
         }
     }
 }
+
+#endif
 
 void loop() {
     if (wifiWidget->isConnected() == false) {

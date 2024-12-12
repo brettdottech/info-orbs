@@ -8,6 +8,7 @@
 #define INVERTED_ORBS false                       // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
 #define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN                                 // Language selection for Month and Weekday - possible values are EN, DE, FR
+#define USE_ROTARY_ENCODER true                   // Set tu use a Rotary Encoder instead of Buttons  
 
 // NIGHTTIME DIMMING
 //#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)
