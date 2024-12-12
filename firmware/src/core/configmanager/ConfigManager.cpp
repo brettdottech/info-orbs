@@ -105,8 +105,9 @@ void ConfigManager::triggerChangeCallbacks(const std::string &section, const std
 #ifdef CM_DEBUG
     Serial.printf("triggerChangeCallbacks, c=%s, v=%s\n", section.c_str(), varName.c_str());
 #endif
-    if (!varName.empty() && changeCallbacks.count(section + "_" + varName)) {
-        for (const auto &callback : changeCallbacks[section + "_" + varName]) {
+    std::string key = makeKey(section, varName);
+    if (!varName.empty() && changeCallbacks.count(key)) {
+        for (const auto &callback : changeCallbacks[key]) {
             callback(section, varName);
         }
     }
