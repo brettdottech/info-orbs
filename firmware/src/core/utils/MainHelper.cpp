@@ -167,7 +167,7 @@ void MainHelper::showWelcome() {
 
     s_screenManager->selectScreen(0);
     s_screenManager->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
-    if (GIT_BRANCH != "main" && GIT_BRANCH != "unknown") {
+    if (GIT_BRANCH != "main" && GIT_BRANCH != "unknown" && GIT_BRANCH != "HEAD") {
         s_screenManager->setFontColor(TFT_RED);
         s_screenManager->drawCentreString(GIT_BRANCH, ScreenCenterX, ScreenCenterY - 40, 15);
         s_screenManager->drawCentreString(GIT_COMMIT_ID, ScreenCenterX, ScreenCenterY + 40, 15);
