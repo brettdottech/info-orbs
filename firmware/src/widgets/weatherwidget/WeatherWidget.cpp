@@ -21,9 +21,9 @@ WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Wi
     m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
     config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
     String optUnits[] = {"Celsius", "Fahrenheit"};
-    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit");
+    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
     String optModes[] = {"Light", "Dark"};
-    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode");
+    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
     Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }

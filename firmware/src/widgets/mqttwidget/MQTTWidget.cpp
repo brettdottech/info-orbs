@@ -35,11 +35,11 @@ MQTTWidget::MQTTWidget(ScreenManager &manager, ConfigManager &config)
 #endif
 
     m_config.addConfigBool("MqttWidget", "mqttEnabled", &m_enabled, "Enable Widget");
-    m_config.addConfigString("MqttWidget", "mqttHost", &mqttHost, 30, "MQTT Host");
-    m_config.addConfigInt("MqttWidget", "mqttPort", &mqttPort, "MQTT Port");
-    m_config.addConfigString("MqttWidget", "mqttSetupTopic", &mqttSetupTopic, 100, "MQTT Setup Topic");
-    m_config.addConfigString("MqttWidget", "mqttUser", &mqttUser, 20, "MQTT user (empty if authentication is not required)");
-    m_config.addConfigString("MqttWidget", "mqttPass", &mqttPass, 50, "MQTT pass (empty if authentication is not required)");
+    m_config.addConfigString("MqttWidget", "mqttHost", &mqttHost, 30, "MQTT Host", true);
+    m_config.addConfigInt("MqttWidget", "mqttPort", &mqttPort, "MQTT Port", true);
+    m_config.addConfigString("MqttWidget", "mqttSetupTopic", &mqttSetupTopic, 100, "MQTT Setup Topic", true);
+    m_config.addConfigString("MqttWidget", "mqttUser", &mqttUser, 20, "MQTT user (empty if authentication is not required)", true);
+    m_config.addConfigString("MqttWidget", "mqttPass", &mqttPass, 50, "MQTT pass (empty if authentication is not required)", true);
 
     // Set MQTT broker server and port
     mqttClient.setServer(mqttHost.c_str(), mqttPort);

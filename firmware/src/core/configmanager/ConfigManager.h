@@ -30,13 +30,13 @@ public:
     void saveAllConfigs();
 
     // Register different types of variables with descriptions
-    void addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description);
-    void addConfigInt(const char *section, const char *varName, int *var, const char *description);
-    void addConfigFloat(const char *section, const char *varName, float *var, const char *description);
-    void addConfigIP(const char *section, const char *varName, IPAddress *var, const char *description);
-    void addConfigBool(const char *section, const char *varName, bool *var, const char *description);
-    void addConfigColor(const char *section, const char *varName, int *var, const char *description);
-    void addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description);
+    void addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description, bool advanced = false);
+    void addConfigInt(const char *section, const char *varName, int *var, const char *description, bool advanced = false);
+    void addConfigFloat(const char *section, const char *varName, float *var, const char *description, bool advanced = false);
+    void addConfigIP(const char *section, const char *varName, IPAddress *var, const char *description, bool advanced = false);
+    void addConfigBool(const char *section, const char *varName, bool *var, const char *description, bool advanced = false);
+    void addConfigColor(const char *section, const char *varName, int *var, const char *description, bool advanced = false);
+    void addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description, bool advanced = false);
 
     // Get stored values
     std::string getConfigString(const char *varName, std::string defaultValue);
@@ -62,12 +62,15 @@ private:
         const int type;
         const char *section;
         const char *variableName;
+        const bool advanced;
         std::function<void()> saveCallback;
     };
 
     static ConfigManager *s_instance;
 
     // Define pseudo parameters for /param
+    static WiFiManagerParameter s_scriptBlock;
+    static WiFiManagerParameter s_styleBlock;
     static WiFiManagerParameter s_pageStart;
     static WiFiManagerParameter s_pageEnd;
     static WiFiManagerParameter s_fieldsetStart;
@@ -77,6 +80,9 @@ private:
     static WiFiManagerParameter s_divStartNonString;
     static WiFiManagerParameter s_divStartString;
     static WiFiManagerParameter s_divEnd;
+    static WiFiManagerParameter s_toggleAdvanced;
+    static WiFiManagerParameter s_spanAdvancedStart;
+    static WiFiManagerParameter s_spanEnd;
 
     WiFiManager &m_wm;
     Preferences preferences;
@@ -85,7 +91,7 @@ private:
     bool requiresRestart = false;
 
     template <typename T, typename ParameterType, typename... Args>
-    void addConfig(int paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length,
+    void addConfig(int paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length, bool advanced,
                    std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
 
     std::string makeKey(const char *section, const char *varName);

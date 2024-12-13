@@ -17,6 +17,9 @@ const char WEBPORTAL_PARAM_LEGEND_END[] = "</legend>";
 const char WEBPORTAL_PARAM_DIV_START[] = "<div class='param'>";
 const char WEBPORTAL_PARAM_DIV_STRING_START[] = "<div class='param-string'>";
 const char WEBPORTAL_PARAM_DIV_END[] = "</div>";
+const char WEBPORTAL_PARAM_TOGGLE_ADVANCED[] = "<div class='toggle-adv'>Show Advanced Parameters</div>";
+const char WEBPORTAL_PARAM_SPAN_ADVANCED_START[] = "<span class='adv-content'>";
+const char WEBPORTAL_PARAM_SPAN_END[] = "</span>";
 
 // Style for /param
 const char WEBPORTAL_PARAM_STYLE[] =
@@ -27,7 +30,24 @@ const char WEBPORTAL_PARAM_STYLE[] =
     ".param-string { margin: 0; } "
     "fieldset { margin: 10px 0; } "
     "legend { font-size: 1.5rem; font-weight: bold; } "
+    ".toggle-adv {cursor: pointer; text-decoration: underline; } "
+    ".toggle-adv:hover { font-weight: bold; } "
+    ".adv-content { display:none; } "
+    ".adv-content.open { display:block; } "
     "</style>";
+
+const char WEBPORTAL_PARAM_SCRIPT[] =
+    "<script>"
+    "document.querySelectorAll('.toggle-adv').forEach(toggle => {"
+    " toggle.addEventListener('click', () => {"
+    "  const advContent = toggle.nextElementSibling;"
+    "  if (advContent.classList.contains('adv-content')) {"
+    "   advContent.classList.toggle('open');"
+    "   toggle.textContent = advContent.classList.contains('open') ? 'Hide Advanced Parameters' : 'Show Advanced Parameters';"
+    "  }"
+    " });"
+    "});"
+    "</script>";
 
 const char WEBPORTAL_BUTTONS_PAGE_START1[] = "<html>"
                                              "<head>";
@@ -66,7 +86,7 @@ const char WEBPORTAL_BUTTONS_STYLE[] =
 const char WEBPORTAL_BUTTONS_SCRIPT[] =
     "<script>"
     "function sendReq(name, state) {"
-    "fetch(`/button?name=${name}&state=${state}`);"
+    " fetch(`/button?name=${name}&state=${state}`);"
     "}"
     "</script>";
 #endif // ORBS_WIFI_MANAGER_CONFIG_H

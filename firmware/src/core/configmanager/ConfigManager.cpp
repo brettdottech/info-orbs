@@ -8,6 +8,8 @@
 ConfigManager *ConfigManager::s_instance = nullptr;
 
 // Assign pseudo parameters for /param
+WiFiManagerParameter ConfigManager::s_scriptBlock(WEBPORTAL_PARAM_SCRIPT);
+WiFiManagerParameter ConfigManager::s_styleBlock(WEBPORTAL_PARAM_STYLE);
 WiFiManagerParameter ConfigManager::s_pageStart(WEBPORTAL_PARAM_PAGE_START);
 WiFiManagerParameter ConfigManager::s_pageEnd(WEBPORTAL_PARAM_PAGE_END);
 WiFiManagerParameter ConfigManager::s_fieldsetStart(WEBPORTAL_PARAM_FIELDSET_START);
@@ -17,6 +19,9 @@ WiFiManagerParameter ConfigManager::s_legendEnd(WEBPORTAL_PARAM_LEGEND_END);
 WiFiManagerParameter ConfigManager::s_divStartNonString(WEBPORTAL_PARAM_DIV_START);
 WiFiManagerParameter ConfigManager::s_divStartString(WEBPORTAL_PARAM_DIV_STRING_START);
 WiFiManagerParameter ConfigManager::s_divEnd(WEBPORTAL_PARAM_DIV_END);
+WiFiManagerParameter ConfigManager::s_toggleAdvanced(WEBPORTAL_PARAM_TOGGLE_ADVANCED);
+WiFiManagerParameter ConfigManager::s_spanAdvancedStart(WEBPORTAL_PARAM_SPAN_ADVANCED_START);
+WiFiManagerParameter ConfigManager::s_spanEnd(WEBPORTAL_PARAM_SPAN_END);
 
 ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
     Serial.println("Constructing ConfigManager");
@@ -60,20 +65,26 @@ ConfigManager *ConfigManager::getInstance() {
 
 void ConfigManager::setupWebPortal() {
     // Setup custom styles for params
-    m_wm.setCustomHeadElement(WEBPORTAL_PARAM_STYLE);
-
+    m_wm.addParameter(&s_styleBlock);
     m_wm.addParameter(&s_pageStart);
     char lastSection[30];
     bool firstSection = true;
+    bool advancedOpen = false;
     for (auto &param : parameters) {
 #ifdef CM_DEBUG
         Serial.printf("Adding WebPortal parameter: %s, %s\n", param.section, param.variableName);
 #endif
         if (!Utils::compareCharArrays(lastSection, param.section)) {
             Serial.printf("New config section: %s\n", param.section);
+            if (advancedOpen) {
+                // close advanced params span
+                m_wm.addParameter(&s_spanEnd);
+                advancedOpen = false;
+            }
             if (firstSection) {
                 firstSection = false;
             } else {
+                // close previous section
                 m_wm.addParameter(&s_fieldsetEnd);
             }
             m_wm.addParameter(&s_fieldsetStart);
@@ -83,14 +94,27 @@ void ConfigManager::setupWebPortal() {
             m_wm.addParameter(&s_legendEnd);
             strcpy(lastSection, param.section);
         }
+        if (param.advanced && !advancedOpen) {
+            // add advanced toggle
+            m_wm.addParameter(&s_toggleAdvanced);
+            m_wm.addParameter(&s_spanAdvancedStart);
+            advancedOpen = true;
+        }
         // different divs for StringParameter and the rest, StringParameter should be in two lines, the rest in one
         m_wm.addParameter(param.type == CM_PARAM_TYPE_STRING ? &s_divStartString : &s_divStartNonString);
         m_wm.addParameter(param.parameter);
         m_wm.addParameter(&s_divEnd);
     }
+    if (advancedOpen) {
+        // close advanced params span
+        m_wm.addParameter(&s_spanEnd);
+    }
     if (!firstSection) {
+        // close section
         m_wm.addParameter(&s_fieldsetEnd);
     }
+    // Add Javascript
+    m_wm.addParameter(&s_scriptBlock);
     m_wm.addParameter(&s_pageEnd);
 
     m_wm.setSaveParamsCallback([this]() {
@@ -141,7 +165,7 @@ void ConfigManager::triggerChangeCallbacks(const char *section, const char *varN
 }
 
 template <typename T, typename ParameterType, typename... Args>
-void ConfigManager::addConfig(int paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length,
+void ConfigManager::addConfig(int paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length, bool advanced,
                               std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences,
                               Args... args) {
 
@@ -166,52 +190,52 @@ void ConfigManager::addConfig(int paramType, const char *section, const char *va
 #endif
     };
 
-    parameters.push_back({param, paramType, section, varName, saveLambda});
+    parameters.push_back({param, paramType, section, varName, advanced, saveLambda});
 }
 
-void ConfigManager::addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description) {
+void ConfigManager::addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description, bool advanced) {
     addConfig<std::string, StringParameter>(
-        CM_PARAM_TYPE_STRING, section, varName, var, description, length,
+        CM_PARAM_TYPE_STRING, section, varName, var, description, length, advanced,
         [this, varName](std::string &var) { var = preferences.getString(varName, var.c_str()).c_str(); },
         [](StringParameter *param, std::string &var) { var = param->getValue(); },
         [this, varName](std::string &var) { preferences.putString(varName, var.c_str()); });
 }
 
-void ConfigManager::addConfigInt(const char *section, const char *varName, int *var, const char *description) {
+void ConfigManager::addConfigInt(const char *section, const char *varName, int *var, const char *description, bool advanced) {
     addConfig<int, IntParameter>(
-        CM_PARAM_TYPE_INT, section, varName, var, description, 10,
+        CM_PARAM_TYPE_INT, section, varName, var, description, 10, advanced,
         [this, varName](int &var) { var = preferences.getInt(varName, var); },
         [](IntParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName, var); });
 }
 
-void ConfigManager::addConfigBool(const char *section, const char *varName, bool *var, const char *description) {
+void ConfigManager::addConfigBool(const char *section, const char *varName, bool *var, const char *description, bool advanced) {
     addConfig<bool, BoolParameter>(
-        CM_PARAM_TYPE_BOOL, section, varName, var, description, 2,
+        CM_PARAM_TYPE_BOOL, section, varName, var, description, 2, advanced,
         [this, varName](bool &var) { var = preferences.getBool(varName, var); },
         [this](BoolParameter *param, bool &var) { var = param->getValue(this->m_wm); },
         [this, varName](bool &var) { preferences.putBool(varName, var); });
 }
 
-void ConfigManager::addConfigFloat(const char *section, const char *varName, float *var, const char *description) {
+void ConfigManager::addConfigFloat(const char *section, const char *varName, float *var, const char *description, bool advanced) {
     addConfig<float, FloatParameter>(
-        CM_PARAM_TYPE_FLOAT, section, varName, var, description, 10,
+        CM_PARAM_TYPE_FLOAT, section, varName, var, description, 10, advanced,
         [this, varName](float &var) { var = preferences.getFloat(varName, var); },
         [](FloatParameter *param, float &var) { var = param->getValue(); },
         [this, varName](float &var) { preferences.putFloat(varName, var); });
 }
 
-void ConfigManager::addConfigColor(const char *section, const char *varName, int *var, const char *description) {
+void ConfigManager::addConfigColor(const char *section, const char *varName, int *var, const char *description, bool advanced) {
     addConfig<int, ColorParameter>(
-        CM_PARAM_TYPE_COLOR, section, varName, var, description, 8,
+        CM_PARAM_TYPE_COLOR, section, varName, var, description, 8, advanced,
         [this, varName](int &var) { var = preferences.getInt(varName, var); },
         [](ColorParameter *param, int &var) { var = param->getValue(); },
         [this, varName](int &var) { preferences.putInt(varName, var); });
 }
 
-void ConfigManager::addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description) {
+void ConfigManager::addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description, bool advanced) {
     addConfig<int, ComboBoxParameter>(
-        CM_PARAM_TYPE_COMBOBOX, section, varName, var, description, 0,
+        CM_PARAM_TYPE_COMBOBOX, section, varName, var, description, 0, advanced,
         [this, varName](int &var) { var = preferences.getInt(varName, var); },
         [this](ComboBoxParameter *param, int &var) { var = param->getValue(this->m_wm); },
         [this, varName](int &var) { preferences.putInt(varName, var); },
