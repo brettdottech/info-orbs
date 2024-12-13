@@ -15,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+       with:
+          fetch-depth: 1 # Fetch only the latest commit
+          ref: ${{ github.ref }} # Ensure the correct branch is checked out
       - uses: actions/cache@v4
         with:
           path: |

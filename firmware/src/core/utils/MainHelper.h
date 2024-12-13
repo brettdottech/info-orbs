@@ -8,6 +8,7 @@
 #include "ShowMemoryUsage.h"
 #include "TFT_eSPI.h"
 #include "WidgetSet.h"
+#include "git_info.h"
 #include <Arduino.h>
 
 // Set defaults if not set in config.h

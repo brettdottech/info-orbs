@@ -167,13 +167,19 @@ void MainHelper::showWelcome() {
 
     s_screenManager->selectScreen(0);
     s_screenManager->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
+    if (GIT_BRANCH != "main" && GIT_BRANCH != "unknown") {
+        s_screenManager->setFontColor(TFT_RED);
+        s_screenManager->drawCentreString(GIT_BRANCH, ScreenCenterX, ScreenCenterY - 40, 15);
+        s_screenManager->drawCentreString(GIT_COMMIT_ID, ScreenCenterX, ScreenCenterY + 40, 15);
+        s_screenManager->setFontColor(TFT_WHITE);
+    }
 
     s_screenManager->selectScreen(1);
     s_screenManager->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 50, 22);
     s_screenManager->drawCentreString("by", ScreenCenterX, ScreenCenterY - 5, 22);
     s_screenManager->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 22);
     s_screenManager->setFontColor(TFT_RED);
-    s_screenManager->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 14);
+    s_screenManager->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 15);
 
     s_screenManager->selectScreen(2);
     s_screenManager->drawJpg(0, 0, logo_start, logo_end - logo_start);
