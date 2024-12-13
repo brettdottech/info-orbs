@@ -2,9 +2,9 @@ name: PlatformIO CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-       with:
+        with:
           fetch-depth: 1 # Fetch only the latest commit
           ref: ${{ github.ref }} # Ensure the correct branch is checked out
       - uses: actions/cache@v4
@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
