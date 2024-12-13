@@ -1,6 +1,7 @@
 #ifndef ORBS_WIFI_MANAGER_H
 #define ORBS_WIFI_MANAGER_H
 
+#include "OrbsWiFiManagerConfig.h"
 #include <WiFiManager.h>
 
 /**

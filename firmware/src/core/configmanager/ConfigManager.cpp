@@ -48,7 +48,9 @@ ConfigManager *ConfigManager::getInstance() {
 }
 
 void ConfigManager::setupWebPortal() {
-    WiFiManagerParameter *startLabel = new WiFiManagerParameter("<H1>InfoOrbs Configuration</H1>");
+    // Setup DIV styles for params
+    m_wm.setCustomHeadElement(HTTP_FORM_PARAM_STYLE_FOR_DIV);
+    WiFiManagerParameter *startLabel = new WiFiManagerParameter("<h1>InfoOrbs Configuration</h1>");
     m_wm.addParameter(startLabel);
     char lastSection[30];
     for (auto &param : parameters) {
@@ -56,19 +58,21 @@ void ConfigManager::setupWebPortal() {
         Serial.printf("Adding WebPortal parameter: %s, %s\n", param.section, param.variableName);
 #endif
         if (!Utils::compareCharArrays(lastSection, param.section)) {
-            // New class variables -> add a separator
-            WiFiManagerParameter *classLabel = new WiFiManagerParameter(Utils::createConstCharBufferAndConcat("<HR><H2 style='margin-block-end: 0;'>", param.section, "</H2>"));
-            Serial.printf("New config area: %s\n", param.section);
-            m_wm.addParameter(classLabel);
+            // New section -> add a separator
+            WiFiManagerParameter *sectionLabel = new WiFiManagerParameter(Utils::createConstCharBufferAndConcat("<hr><h2 style='margin-block-end: 0;'>", param.section, "</h2>"));
+            Serial.printf("New config section: %s\n", param.section);
+            m_wm.addParameter(sectionLabel);
             strcpy(lastSection, param.section);
         }
-        WiFiManagerParameter *divStart = new WiFiManagerParameter("<DIV>");
-        WiFiManagerParameter *divEnd = new WiFiManagerParameter("</DIV>");
-        m_wm.addParameter(divStart);
+        WiFiManagerParameter *divStartString = new WiFiManagerParameter("<div class='param-string'>");
+        WiFiManagerParameter *divStartNonString = new WiFiManagerParameter("<div class='param'>");
+        WiFiManagerParameter *divEnd = new WiFiManagerParameter("</div>");
+        // different divs for StringParameter and the rest, StringParameter should be in two lines, the rest in one
+        m_wm.addParameter(param.type == CM_PARAM_TYPE_STRING ? divStartString : divStartNonString);
         m_wm.addParameter(param.parameter);
         m_wm.addParameter(divEnd);
     }
-    WiFiManagerParameter *endLabel = new WiFiManagerParameter("<HR><BR><H3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></H3>");
+    WiFiManagerParameter *endLabel = new WiFiManagerParameter("<hr><br><h3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></h3>");
     m_wm.addParameter(endLabel);
 
     m_wm.setSaveParamsCallback([this]() {
