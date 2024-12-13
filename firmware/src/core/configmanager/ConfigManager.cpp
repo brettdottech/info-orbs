@@ -48,32 +48,50 @@ ConfigManager *ConfigManager::getInstance() {
 }
 
 void ConfigManager::setupWebPortal() {
-    // Setup DIV styles for params
-    m_wm.setCustomHeadElement(HTTP_FORM_PARAM_STYLE_FOR_DIV);
-    WiFiManagerParameter *startLabel = new WiFiManagerParameter("<h1>InfoOrbs Configuration</h1>");
-    m_wm.addParameter(startLabel);
+    // define pseudo parameters
+    WiFiManagerParameter *pageStart = new WiFiManagerParameter(WEBPORTAL_PARAM_PAGE_START);
+    WiFiManagerParameter *pageEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_PAGE_END);
+    WiFiManagerParameter *fieldsetStart = new WiFiManagerParameter(WEBPORTAL_PARAM_FIELDSET_START);
+    WiFiManagerParameter *fieldsetEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_FIELDSET_END);
+    WiFiManagerParameter *legendStart = new WiFiManagerParameter(WEBPORTAL_PARAM_LEGEND_START);
+    WiFiManagerParameter *legendEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_LEGEND_END);
+    WiFiManagerParameter *divStartNonString = new WiFiManagerParameter(WEBPORTAL_PARAM_DIV_START);
+    WiFiManagerParameter *divStartString = new WiFiManagerParameter(WEBPORTAL_PARAM_DIV_STRING_START);
+    WiFiManagerParameter *divEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_DIV_END);
+
+    // Setup custom styles for params
+    m_wm.setCustomHeadElement(WEBPORTAL_PARAM_STYLE);
+
+    m_wm.addParameter(pageStart);
     char lastSection[30];
+    bool firstSection = true;
     for (auto &param : parameters) {
 #ifdef CM_DEBUG
         Serial.printf("Adding WebPortal parameter: %s, %s\n", param.section, param.variableName);
 #endif
         if (!Utils::compareCharArrays(lastSection, param.section)) {
-            // New section -> add a separator
-            WiFiManagerParameter *sectionLabel = new WiFiManagerParameter(Utils::createConstCharBufferAndConcat("<hr><h2 style='margin-block-end: 0;'>", param.section, "</h2>"));
             Serial.printf("New config section: %s\n", param.section);
-            m_wm.addParameter(sectionLabel);
+            if (firstSection) {
+                firstSection = false;
+            } else {
+                m_wm.addParameter(fieldsetEnd);
+            }
+            m_wm.addParameter(fieldsetStart);
+            WiFiManagerParameter *legend = new WiFiManagerParameter(param.section);
+            m_wm.addParameter(legendStart);
+            m_wm.addParameter(legend);
+            m_wm.addParameter(legendEnd);
             strcpy(lastSection, param.section);
         }
-        WiFiManagerParameter *divStartString = new WiFiManagerParameter("<div class='param-string'>");
-        WiFiManagerParameter *divStartNonString = new WiFiManagerParameter("<div class='param'>");
-        WiFiManagerParameter *divEnd = new WiFiManagerParameter("</div>");
         // different divs for StringParameter and the rest, StringParameter should be in two lines, the rest in one
         m_wm.addParameter(param.type == CM_PARAM_TYPE_STRING ? divStartString : divStartNonString);
         m_wm.addParameter(param.parameter);
         m_wm.addParameter(divEnd);
     }
-    WiFiManagerParameter *endLabel = new WiFiManagerParameter("<hr><br><h3><font color='red'>Saving will restart the InfoOrbs to apply the new config.</font></h3>");
-    m_wm.addParameter(endLabel);
+    if (!firstSection) {
+        m_wm.addParameter(fieldsetEnd);
+    }
+    m_wm.addParameter(pageEnd);
 
     m_wm.setSaveParamsCallback([this]() {
         int count = m_wm.server->args();
