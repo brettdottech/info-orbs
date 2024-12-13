@@ -67,7 +67,7 @@
 //#define DEFAULT_FONT ROBOTO_REGULAR
 
 // ADVANCED COMPILE OPTIONS
-#define INCLUDE_MDNS // Include mDNS responder, for local name resolution without DNS (disable to save flash/memory)
+//#define INCLUDE_MDNS // Include mDNS responder, for local name resolution without DNS (disable to save flash/memory)
 
 // ============= END OF USER CONFIGURATION =================================================================
 
