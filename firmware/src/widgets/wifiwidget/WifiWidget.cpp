@@ -169,12 +169,6 @@ void WifiWidget::connectionTimedOut() {
     }
 }
 
-void WifiWidget::processWebPortalRequests() {
-    if (m_wifiManager.getWebPortalActive()) {
-        m_wifiManager.process();
-    }
-}
-
 String WifiWidget::getName() {
     return "WiFi";
 }

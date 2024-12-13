@@ -92,15 +92,10 @@ void loop() {
         widgetSet->drawCurrent();
 
         MainHelper::checkCycleWidgets();
-        wifiWidget->processWebPortalRequests();
+        wifiManager->process();
     }
 #ifdef MEMORY_DEBUG
     ShowMemoryUsage::printSerial();
 #endif
-    if (config->isRequiresRestart()) {
-        // Answer the current request to /paramsave before restarting
-        wifiWidget->processWebPortalRequests();
-        Serial.println("Restarting ESP now");
-        ESP.restart();
-    }
+    MainHelper::restartIfNecessary();
 }

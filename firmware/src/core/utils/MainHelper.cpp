@@ -225,3 +225,16 @@ void MainHelper::updateBrightnessByTime(uint8_t hour24) {
         s_widgetSet->drawCurrent(true);
     }
 }
+
+void MainHelper::restartIfNecessary() {
+    if (s_configManager->isRequiresRestart()) {
+        uint32_t start = millis();
+        while (millis() - start < 1000) {
+            // Answer webportal requests for a short time before restarting
+            // to avoid a browser timeout
+            s_wifiManager->process();
+        }
+        Serial.println("Restarting ESP now");
+        ESP.restart();
+    }
+}

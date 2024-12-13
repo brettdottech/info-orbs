@@ -30,6 +30,7 @@ public:
     static void setupWebPortalEndpoints();
     static void handleEndpointButton();
     static void handleEndpointButtons();
+    static void restartIfNecessary();
 
     static void updateBrightnessByTime(uint8_t hour24);
 
