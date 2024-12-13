@@ -7,6 +7,17 @@
 
 ConfigManager *ConfigManager::s_instance = nullptr;
 
+// Assign pseudo parameters for /param
+WiFiManagerParameter ConfigManager::s_pageStart(WEBPORTAL_PARAM_PAGE_START);
+WiFiManagerParameter ConfigManager::s_pageEnd(WEBPORTAL_PARAM_PAGE_END);
+WiFiManagerParameter ConfigManager::s_fieldsetStart(WEBPORTAL_PARAM_FIELDSET_START);
+WiFiManagerParameter ConfigManager::s_fieldsetEnd(WEBPORTAL_PARAM_FIELDSET_END);
+WiFiManagerParameter ConfigManager::s_legendStart(WEBPORTAL_PARAM_LEGEND_START);
+WiFiManagerParameter ConfigManager::s_legendEnd(WEBPORTAL_PARAM_LEGEND_END);
+WiFiManagerParameter ConfigManager::s_divStartNonString(WEBPORTAL_PARAM_DIV_START);
+WiFiManagerParameter ConfigManager::s_divStartString(WEBPORTAL_PARAM_DIV_STRING_START);
+WiFiManagerParameter ConfigManager::s_divEnd(WEBPORTAL_PARAM_DIV_END);
+
 ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
     Serial.println("Constructing ConfigManager");
     if (!preferences.begin("config", false)) {
@@ -48,21 +59,10 @@ ConfigManager *ConfigManager::getInstance() {
 }
 
 void ConfigManager::setupWebPortal() {
-    // define pseudo parameters
-    WiFiManagerParameter *pageStart = new WiFiManagerParameter(WEBPORTAL_PARAM_PAGE_START);
-    WiFiManagerParameter *pageEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_PAGE_END);
-    WiFiManagerParameter *fieldsetStart = new WiFiManagerParameter(WEBPORTAL_PARAM_FIELDSET_START);
-    WiFiManagerParameter *fieldsetEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_FIELDSET_END);
-    WiFiManagerParameter *legendStart = new WiFiManagerParameter(WEBPORTAL_PARAM_LEGEND_START);
-    WiFiManagerParameter *legendEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_LEGEND_END);
-    WiFiManagerParameter *divStartNonString = new WiFiManagerParameter(WEBPORTAL_PARAM_DIV_START);
-    WiFiManagerParameter *divStartString = new WiFiManagerParameter(WEBPORTAL_PARAM_DIV_STRING_START);
-    WiFiManagerParameter *divEnd = new WiFiManagerParameter(WEBPORTAL_PARAM_DIV_END);
-
     // Setup custom styles for params
     m_wm.setCustomHeadElement(WEBPORTAL_PARAM_STYLE);
 
-    m_wm.addParameter(pageStart);
+    m_wm.addParameter(&s_pageStart);
     char lastSection[30];
     bool firstSection = true;
     for (auto &param : parameters) {
@@ -74,24 +74,24 @@ void ConfigManager::setupWebPortal() {
             if (firstSection) {
                 firstSection = false;
             } else {
-                m_wm.addParameter(fieldsetEnd);
+                m_wm.addParameter(&s_fieldsetEnd);
             }
-            m_wm.addParameter(fieldsetStart);
+            m_wm.addParameter(&s_fieldsetStart);
             WiFiManagerParameter *legend = new WiFiManagerParameter(param.section);
-            m_wm.addParameter(legendStart);
+            m_wm.addParameter(&s_legendStart);
             m_wm.addParameter(legend);
-            m_wm.addParameter(legendEnd);
+            m_wm.addParameter(&s_legendEnd);
             strcpy(lastSection, param.section);
         }
         // different divs for StringParameter and the rest, StringParameter should be in two lines, the rest in one
-        m_wm.addParameter(param.type == CM_PARAM_TYPE_STRING ? divStartString : divStartNonString);
+        m_wm.addParameter(param.type == CM_PARAM_TYPE_STRING ? &s_divStartString : &s_divStartNonString);
         m_wm.addParameter(param.parameter);
-        m_wm.addParameter(divEnd);
+        m_wm.addParameter(&s_divEnd);
     }
     if (!firstSection) {
-        m_wm.addParameter(fieldsetEnd);
+        m_wm.addParameter(&s_fieldsetEnd);
     }
-    m_wm.addParameter(pageEnd);
+    m_wm.addParameter(&s_pageEnd);
 
     m_wm.setSaveParamsCallback([this]() {
         int count = m_wm.server->args();

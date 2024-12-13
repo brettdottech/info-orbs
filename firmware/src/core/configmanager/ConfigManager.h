@@ -67,6 +67,17 @@ private:
 
     static ConfigManager *s_instance;
 
+    // Define pseudo parameters for /param
+    static WiFiManagerParameter s_pageStart;
+    static WiFiManagerParameter s_pageEnd;
+    static WiFiManagerParameter s_fieldsetStart;
+    static WiFiManagerParameter s_fieldsetEnd;
+    static WiFiManagerParameter s_legendStart;
+    static WiFiManagerParameter s_legendEnd;
+    static WiFiManagerParameter s_divStartNonString;
+    static WiFiManagerParameter s_divStartString;
+    static WiFiManagerParameter s_divEnd;
+
     WiFiManager &m_wm;
     Preferences preferences;
     std::vector<Parameter> parameters;
