@@ -7,14 +7,14 @@
 GlobalTime *GlobalTime::m_instance = nullptr;
 
 GlobalTime::GlobalTime() {
-    m_timeClient = new NTPClient(m_udp);
-    m_timeClient->begin();
-    m_timeClient->setPoolServerName(NTP_SERVER);
     ConfigManager *cm = ConfigManager::getInstance();
     m_timezoneLocation = cm->getConfigString("timezoneLoc", m_timezoneLocation); // config added in MainHelper
     int clockFormat = cm->getConfigInt("clockFormat", CLOCK_FORMAT); // config added in ClockWidget
-    Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d\n", m_timezoneLocation.c_str(), clockFormat);
+    m_ntpServer = cm->getConfigString("ntpServer", m_ntpServer); // config added in MainHelper
+    Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d, ntpServer=%s\n", m_timezoneLocation.c_str(), clockFormat, m_ntpServer.c_str());
     m_format24hour = (clockFormat == CLOCK_FORMAT_24_HOUR);
+    m_timeClient = new NTPClient(m_udp, m_ntpServer.c_str());
+    m_timeClient->begin();
 }
 
 GlobalTime::~GlobalTime() {

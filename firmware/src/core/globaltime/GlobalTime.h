@@ -94,6 +94,7 @@ private:
     unsigned long m_updateTimer = 0;
 
     bool m_format24hour{FORMAT_24_HOUR};
+    std::string m_ntpServer{NTP_SERVER};
 
     void getTimeZoneOffsetFromAPI();
 };

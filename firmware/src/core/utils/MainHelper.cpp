@@ -2,33 +2,6 @@
 #include "config_helper.h"
 #include "icons.h"
 
-// Set defaults if not set in config.h
-#ifndef TFT_BRIGHTNESS
-    #define TFT_BRIGHTNESS 255
-#endif
-
-#if defined(DIM_START_HOU) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
-    #define DIM_ENABLED true
-#else
-    #define DIM_ENABLED false
-#endif
-
-#ifndef DIM_START_HOUR
-    #define DIM_START_HOUR 22
-#endif
-
-#ifndef DIM_END_HOUR
-    #define DIM_END_HOUR 7
-#endif
-
-#ifndef DIM_BRIGHTNESS
-    #define DIM_BRIGHTNESS 128
-#endif
-
-#ifndef WIDGET_CYCLE_DELAY
-    #define WIDGET_CYCLE_DELAY 0
-#endif
-
 // initialize static members
 Button MainHelper::buttonLeft(BUTTON_LEFT);
 Button MainHelper::buttonOK(BUTTON_OK);
@@ -41,6 +14,7 @@ int MainHelper::s_widgetCycleDelay = WIDGET_CYCLE_DELAY;
 unsigned long MainHelper::s_widgetCycleDelayPrev = 0;
 bool MainHelper::s_invertedOrbs = INVERTED_ORBS;
 std::string MainHelper::s_timezoneLocation = TIMEZONE_API_LOCATION;
+std::string MainHelper::s_ntpServer = NTP_SERVER;
 int MainHelper::s_tftBrightness = TFT_BRIGHTNESS;
 bool MainHelper::s_nightMode = DIM_ENABLED;
 int MainHelper::s_dimStartHour = DIM_START_HOUR;
@@ -74,6 +48,8 @@ void MainHelper::setupButtons() {
 void MainHelper::setupConfig() {
     s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
     s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
+    s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, "NTP server", true);
+    
     s_configManager->addConfigBool("TFT Settings", "invertedOrbs", &s_invertedOrbs, "Inverted Orbs (enable if using InfoOrbs upside down)");
     s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, "Enable Nighttime mode");
     s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, "TFT Brightness [0-255]", true);
