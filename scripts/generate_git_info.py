@@ -9,15 +9,18 @@ def get_git_info():
         # Get the current Git branch name
         branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.STDOUT)
         branch_name = branch_name.strip().decode("utf-8")
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
         branch_name = "unknown"
+        print(e)
+
 
     try:
         # Get the short commit ID
         commit_id = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.STDOUT)
         commit_id = commit_id.strip().decode("utf-8")
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
         commit_id = "unknown"
+        print(e)
 
     return branch_name, commit_id
 
