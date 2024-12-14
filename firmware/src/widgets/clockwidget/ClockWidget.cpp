@@ -10,26 +10,16 @@ ClockWidget::~ClockWidget() {
 }
 
 void ClockWidget::addConfigToManager() {
-    String optClockType[] = {
+    String optClockType[2 + USE_CLOCK_CUSTOM] = {
         "Normal Clock",
-        "Nixie Clock",
-        "Custom Clock 0",
-        "Custom Clock 1",
-        "Custom Clock 2",
-        "Custom Clock 3",
-        "Custom Clock 4",
-        "Custom Clock 5",
-        "Custom Clock 6",
-        "Custom Clock 7",
-        "Custom Clock 8",
-        "Custom Clock 9"};
+        "Nixie Clock"};
     if (!USE_CLOCK_NIXIE)
         optClockType[(int) ClockType::NIXIE] += " (n/a)";
-    for (int i = USE_CLOCK_CUSTOM; i < 10; i++) {
-        optClockType[(int) ClockType::CUSTOM0 + i] += " (n/a)";
+    for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
+        optClockType[(int) ClockType::CUSTOM0 + i] = "Custom Clock " + String(i);
     }
 
-    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, CLOCK_TYPE_NUM, "Default Clock Type (you can also switch types with the middle button)");
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
     if (!isValidClockType(m_type)) {
         // Invalid Clock Type
         m_type = (int) ClockType::NORMAL;
