@@ -1,14 +1,36 @@
 #include "ClockWidget.h"
+#include "clock-custom.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Always enabled, do not add a config setting for it
-    String optClockType[] = {"Normal Clock", "Nixie Clock", "Custom Clock"};
+    addConfigToManager();
+}
+
+ClockWidget::~ClockWidget() {
+}
+
+void ClockWidget::addConfigToManager() {
+    String optClockType[] = {
+        "Normal Clock",
+        "Nixie Clock",
+        "Custom Clock 0",
+        "Custom Clock 1",
+        "Custom Clock 2",
+        "Custom Clock 3",
+        "Custom Clock 4",
+        "Custom Clock 5",
+        "Custom Clock 6",
+        "Custom Clock 7",
+        "Custom Clock 8",
+        "Custom Clock 9"};
     if (!USE_CLOCK_NIXIE)
-        optClockType[(int) ClockType::NIXIE] += " (not available)";
-    if (!USE_CLOCK_CUSTOM)
-        optClockType[(int) ClockType::CUSTOM] += " (not available)";
-    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 3, "Default Clock Type (you can also switch types with the middle button)");
-    if (m_type == (int) ClockType::NIXIE && !USE_CLOCK_NIXIE || m_type == (int) ClockType::CUSTOM && !USE_CLOCK_CUSTOM) {
+        optClockType[(int) ClockType::NIXIE] += " (n/a)";
+    for (int i = USE_CLOCK_CUSTOM; i < 10; i++) {
+        optClockType[(int) ClockType::CUSTOM0 + i] += " (n/a)";
+    }
+
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, CLOCK_TYPE_NUM, "Default Clock Type (you can also switch types with the middle button)");
+    if (!isValidClockType(m_type)) {
         // Invalid Clock Type
         m_type = (int) ClockType::NORMAL;
     }
@@ -18,11 +40,18 @@ ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget
     m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock Color", true);
     m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing", true);
     m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock Shadow Color", true);
-    m_config.addConfigBool("ClockWidget", "clkOvrNixCol", &m_overrideNixieColorEnabled, "Override Nixie Color", true);
-    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "New Nixie color", true);
-}
+    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "Override Nixie color (black=disable)", true);
 
-ClockWidget::~ClockWidget() {
+#if USE_CLOCK_CUSTOM > 0
+    for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
+        const char *tickKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "tckCol");
+        const char *tickDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Second Tick Color");
+        m_config.addConfigColor("ClockWidget", tickKey, &m_customTickColor[i], tickDesc, true);
+        const char *overrideKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "ovrCol");
+        const char *overrideDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Override color (black=disable)");
+        m_config.addConfigColor("ClockWidget", overrideKey, &m_customOverrideColor[i], overrideDesc, true);
+    }
+#endif
 }
 
 void ClockWidget::setup() {
@@ -60,7 +89,10 @@ void ClockWidget::draw(bool force) {
             displayDigit(2, "", ":", m_shadowColor, false);
         }
         if (m_showSecondTicks) {
-            displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
+            if (!isCustomClock(m_type)) {
+                // not a custom clock -> clear background
+                displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
+            }
             displaySeconds(2, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
@@ -147,28 +179,33 @@ void ClockWidget::changeFormat() {
     draw(true);
 }
 
+bool ClockWidget::isCustomClock(int clockType) {
+    return (clockType >= (int) ClockType::CUSTOM0 && clockType <= (int) ClockType::CUSTOM9);
+}
+
+bool ClockWidget::isValidClockType(int clockType) {
+    if (clockType == (int) ClockType::NORMAL)
+        return true; // Always enabled
+    else if (clockType == (int) ClockType::NIXIE)
+        return USE_CLOCK_NIXIE > 0;
+    else if (isCustomClock(clockType))
+        return USE_CLOCK_CUSTOM > clockType - (int) ClockType::CUSTOM0;
+    else
+        return false;
+}
+
 void ClockWidget::changeClockType() {
-    switch (m_type) {
-    case (int) ClockType::NORMAL:
-        if (USE_CLOCK_NIXIE) {
-            // If nixie is enabled, use it, otherwise fall through
-            m_type = (int) ClockType::NIXIE;
-            break;
-        }
-
-    case (int) ClockType::NIXIE:
-        if (USE_CLOCK_CUSTOM) {
-            // If custom is enabled, use it, otherwise fall through
-            m_type = (int) ClockType::CUSTOM;
-            break;
-        }
-
-    default:
-        m_type = (int) ClockType::NORMAL;
-        break;
+    m_type++;
+    if (m_type >= CLOCK_TYPE_NUM) {
+        m_type = 0;
     }
-    m_manager.clearAllScreens();
-    draw(true);
+    if (!isValidClockType(m_type)) {
+        // Call recursively until a valid clock type is found
+        changeClockType();
+    } else {
+        m_manager.clearAllScreens();
+        draw(true);
+    }
 }
 
 void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
@@ -192,12 +229,12 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
-    if (m_type == (int) ClockType::NIXIE || m_type == (int) ClockType::CUSTOM) {
+    if (m_type == (int) ClockType::NIXIE || isCustomClock(m_type)) {
         if (digit == ":" && color == m_shadowColor) {
             // Show colon off
-            displayImage(displayIndex, " ");
+            displayDigitImage(displayIndex, " ");
         } else {
-            displayImage(displayIndex, digit);
+            displayDigitImage(displayIndex, digit);
         }
     } else {
         // Normal clock
@@ -236,14 +273,21 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (m_type == (int) ClockType::NIXIE && color == m_fgColor) {
-        if (m_overrideNixieColorEnabled) {
-            // Selected color for nixie
+    if (color != m_fgColor && m_type != (int) ClockType::NORMAL) {
+        // ignore clear tick (we draw the whole image anyway)
+        return;
+    }
+    if (m_type == (int) ClockType::NIXIE) {
+        if (m_overrideNixieColor != TFT_BLACK) {
+            // Selected override color for nixie
             color = m_overrideNixieColor;
         } else {
             // Special color (orange) for nixie
             color = 0xfd40;
         }
+    } else if (isCustomClock(m_type)) {
+        String tickColorKey = "clkCust" + String(m_type - (int) ClockType::CUSTOM0) + "tckCol";
+        color = m_config.getConfigInt(tickColorKey.c_str(), TFT_WHITE);
     }
     m_manager.selectScreen(displayIndex);
     if (seconds < 30) {
@@ -253,114 +297,47 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
     }
 }
 
-void ClockWidget::displayImage(int displayIndex, const String &digit) {
-    switch (m_type) {
-    case (int) ClockType::NIXIE:
-        displayNixie(displayIndex, digit);
-        break;
-
-    case (int) ClockType::CUSTOM:
-        displayCustom(displayIndex, digit);
-        break;
-    }
-}
-
-void ClockWidget::displayNixie(int displayIndex, const String &digit) {
-#if USE_CLOCK_NIXIE
-    int color = 0;
-    if (m_overrideNixieColorEnabled) {
-        color = m_overrideNixieColor;
-    }
+void ClockWidget::displayDigitImage(int displayIndex, const String &digit) {
     if (digit.length() != 1) {
         return;
     }
-    m_manager.selectScreen(displayIndex);
-    switch (digit.charAt(0)) {
-    case '0':
-        m_manager.drawJpg(0, 0, nixie_0_start, nixie_0_end - nixie_0_start, 1, color);
-        break;
-    case '1':
-        m_manager.drawJpg(0, 0, nixie_1_start, nixie_1_end - nixie_1_start, 1, color);
-        break;
-    case '2':
-        m_manager.drawJpg(0, 0, nixie_2_start, nixie_2_end - nixie_2_start, 1, color);
-        break;
-    case '3':
-        m_manager.drawJpg(0, 0, nixie_3_start, nixie_3_end - nixie_3_start, 1, color);
-        break;
-    case '4':
-        m_manager.drawJpg(0, 0, nixie_4_start, nixie_4_end - nixie_4_start, 1, color);
-        break;
-    case '5':
-        m_manager.drawJpg(0, 0, nixie_5_start, nixie_5_end - nixie_5_start, 1, color);
-        break;
-    case '6':
-        m_manager.drawJpg(0, 0, nixie_6_start, nixie_6_end - nixie_6_start, 1, color);
-        break;
-    case '7':
-        m_manager.drawJpg(0, 0, nixie_7_start, nixie_7_end - nixie_7_start, 1, color);
-        break;
-    case '8':
-        m_manager.drawJpg(0, 0, nixie_8_start, nixie_8_end - nixie_8_start, 1, color);
-        break;
-    case '9':
-        m_manager.drawJpg(0, 0, nixie_9_start, nixie_9_end - nixie_9_start, 1, color);
-        break;
-    case ' ':
-        m_manager.drawJpg(0, 0, nixie_colon_off_start, nixie_colon_off_end - nixie_colon_off_start, 1, color);
-        break;
-    case ':':
-        m_manager.drawJpg(0, 0, nixie_colon_on_start, nixie_colon_on_end - nixie_colon_on_start, 1, color);
-        break;
+    char c = digit.charAt(0);
+    uint8_t index;
+    if (c == ' ')
+        index = 10;
+    else if (c == ':')
+        index = 11;
+    else
+        index = c - '0';
+    if (index >= 12) {
+        return;
     }
+    if (m_type == (int) ClockType::NIXIE) {
+        displayNixie(displayIndex, index);
+    } else if (isCustomClock(m_type)) {
+        displayCustom(displayIndex, m_type - (int) ClockType::CUSTOM0, index);
+    }
+}
+
+void ClockWidget::displayNixie(int displayIndex, uint8_t index) {
+#if USE_CLOCK_NIXIE > 0
+    displayClockGraphics(displayIndex, clock_nixie, index, m_overrideNixieColor);
 #endif
 }
 
-void ClockWidget::displayCustom(int displayIndex, const String &digit) {
-#if USE_CLOCK_CUSTOM
-    if (digit.length() != 1) {
-        return;
-    }
-    m_manager.selectScreen(displayIndex);
-    switch (digit.charAt(0)) {
-    case '0':
-        m_manager.drawJpg(0, 0, clock_custom_0_start, clock_custom_0_end - clock_custom_0_start);
-        break;
-    case '1':
-        m_manager.drawJpg(0, 0, clock_custom_1_start, clock_custom_1_end - clock_custom_1_start);
-        break;
-    case '2':
-        m_manager.drawJpg(0, 0, clock_custom_2_start, clock_custom_2_end - clock_custom_2_start);
-        break;
-    case '3':
-        m_manager.drawJpg(0, 0, clock_custom_3_start, clock_custom_3_end - clock_custom_3_start);
-        break;
-    case '4':
-        m_manager.drawJpg(0, 0, clock_custom_4_start, clock_custom_4_end - clock_custom_4_start);
-        break;
-    case '5':
-        m_manager.drawJpg(0, 0, clock_custom_5_start, clock_custom_5_end - clock_custom_5_start);
-        break;
-    case '6':
-        m_manager.drawJpg(0, 0, clock_custom_6_start, clock_custom_6_end - clock_custom_6_start);
-        break;
-    case '7':
-        m_manager.drawJpg(0, 0, clock_custom_7_start, clock_custom_7_end - clock_custom_7_start);
-        break;
-    case '8':
-        m_manager.drawJpg(0, 0, clock_custom_8_start, clock_custom_8_end - clock_custom_8_start);
-        break;
-    case '9':
-        m_manager.drawJpg(0, 0, clock_custom_9_start, clock_custom_9_end - clock_custom_9_start);
-        break;
-    case ' ':
-        m_manager.drawJpg(0, 0, clock_custom_colon_off_start, clock_custom_colon_off_end - clock_custom_colon_off_start);
-        break;
-    case ':':
-        m_manager.drawJpg(0, 0, clock_custom_colon_on_start, clock_custom_colon_on_end - clock_custom_colon_on_start);
-        break;
-    }
+void ClockWidget::displayCustom(int displayIndex, uint8_t clockNumber, uint8_t index) {
+#if USE_CLOCK_CUSTOM > 0
+    String ovrColorKey = "clkCust" + String(clockNumber) + "ovrCol";
+    int ovrColor = m_config.getConfigInt(ovrColorKey.c_str(), TFT_BLACK);
+    displayClockGraphics(displayIndex, clock_custom[clockNumber], index, ovrColor);
 #endif
+}
+
+void ClockWidget::displayClockGraphics(int displayIndex, const byte *clockArray[12][2], uint8_t index, int colorOverride) {
+    m_manager.selectScreen(displayIndex);
+    const byte *start = clockArray[index][0];
+    const byte *end = clockArray[index][1];
+    m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
 }
 
 String ClockWidget::getName() {
