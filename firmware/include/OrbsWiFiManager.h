@@ -12,7 +12,7 @@
 class OrbsWiFiManager : public WiFiManager {
 public:
     OrbsWiFiManager() {
-        _showBack = true; // Set _showBack to true
+        _showBack = true;
     }
 };
 

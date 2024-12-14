@@ -28,9 +28,11 @@ const String LOC_FORMAT_DAYMONTH = "%d %B"; // in strftime format, this will be 
 const String LOC_LANG = "en";
 #endif
 
-#define CLOCK_FORMAT_24_HOUR 0
-#define CLOCK_FORMAT_12_HOUR 1
-#define CLOCK_FORMAT_12_HOUR_AMPM 2
+enum ClockFormat {
+    CLOCK_FORMAT_24_HOUR = 0,
+    CLOCK_FORMAT_12_HOUR = 1,
+    CLOCK_FORMAT_12_HOUR_AMPM = 2
+};
 
 #if FORMAT_24_HOUR == true
     #define CLOCK_FORMAT CLOCK_FORMAT_24_HOUR

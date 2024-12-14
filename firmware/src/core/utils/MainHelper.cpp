@@ -213,7 +213,7 @@ void MainHelper::updateBrightnessByTime(uint8_t hour24) {
 }
 
 void MainHelper::restartIfNecessary() {
-    if (s_configManager->isRequiresRestart()) {
+    if (s_configManager->requiresRestart()) {
         uint32_t start = millis();
         while (millis() - start < 1000) {
             // Answer webportal requests for a short time before restarting

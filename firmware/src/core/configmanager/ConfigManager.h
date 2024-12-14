@@ -9,12 +9,14 @@
 #include <unordered_map>
 #include <vector>
 
-#define CM_PARAM_TYPE_STRING 0
-#define CM_PARAM_TYPE_INT 1
-#define CM_PARAM_TYPE_BOOL 2
-#define CM_PARAM_TYPE_FLOAT 3
-#define CM_PARAM_TYPE_COLOR 4
-#define CM_PARAM_TYPE_COMBOBOX 5
+enum class ParamType {
+    String = 0,
+    Int = 1,
+    Bool = 2,
+    Float = 3,
+    Color = 4,
+    ComboBox = 5
+};
 
 // Uncomment to show debug output
 // #define CM_DEBUG
@@ -54,12 +56,12 @@ public:
         const std::function<void(const char *section, const char *varName)> &callback);
 
     // Check if a restart is required
-    bool isRequiresRestart() { return requiresRestart; }
+    bool requiresRestart() { return m_requiresRestart; }
 
 private:
     struct Parameter {
         WiFiManagerParameter *parameter;
-        const int type;
+        const ParamType type;
         const char *section;
         const char *variableName;
         const bool advanced;
@@ -85,13 +87,13 @@ private:
     static WiFiManagerParameter s_spanEnd;
 
     WiFiManager &m_wm;
-    Preferences preferences;
-    std::vector<Parameter> parameters;
-    std::unordered_map<std::string, std::vector<std::function<void(const char *section, const char *varName)>>> changeCallbacks;
-    bool requiresRestart = false;
+    Preferences m_preferences;
+    std::vector<Parameter> m_parameters;
+    std::unordered_map<std::string, std::vector<std::function<void(const char *section, const char *varName)>>> m_changeCallbacks;
+    bool m_requiresRestart = false;
 
     template <typename T, typename ParameterType, typename... Args>
-    void addConfig(int paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length, bool advanced,
+    void addConfig(ParamType paramType, const char *section, const char *varName, T *var, const char *description, uint8_t length, bool advanced,
                    std::function<void(T &)> loadFromPreferences, std::function<void(ParameterType *, T &)> setParameterValue, std::function<void(T &)> saveToPreferences, Args... args);
 
     std::string makeKey(const char *section, const char *varName);
