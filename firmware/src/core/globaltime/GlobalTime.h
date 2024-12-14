@@ -18,7 +18,7 @@ const char LOC_WEEKDAY[7][11] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "D
 const String LOC_FORMAT_DAYMONTH = "%d. %B"; // in strftime format
 const String LOC_LANG = "de";
 #elif LOCALE == FR // French
-const char LOC_MONTH[12][10] = {"Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"}; // Define french for month
+const char LOC_MONTH[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}; // Define french for month
 const char LOC_WEEKDAY[7][11] = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"}; // Define french for weekday
 const String LOC_FORMAT_DAYMONTH = "%d %B"; // in strftime format
 const String LOC_LANG = "fr";
