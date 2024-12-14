@@ -1,3 +1,11 @@
+###########################################################################################################
+# This script will automatically be called by PlatformIO during the build process (as pre-action script)
+# It is responsible for embedding the correct images/files into the firmware depending
+# on the buildflags and config.h defines.
+#
+# You do NOT need to run it manually
+###########################################################################################################
+
 import re
 from os.path import basename, join
 from SCons.Script import Builder, Import
@@ -6,7 +14,7 @@ from SCons.Script import Builder, Import
 config_header_path = "firmware/config/config.h"
 
 # Map macros to directories and their respective files
-# The final filename is constructed as "dir + file" so the dir should end with a "/" unless you now what you are doing
+# The final filename is constructed as "dir + file" so the dir should end with a "/" unless you know what you are doing
 embed_map = {
     "USE_CLOCK_NIXIE == NIXIE_NOHOLES": [
         ["images/ClockWidget/nixie.no-holes/", 
