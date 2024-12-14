@@ -3,23 +3,9 @@
 
 #include "GlobalTime.h"
 #include "Widget.h"
+#include "clock-custom.h"
 #include "config_helper.h"
-
-#ifndef USE_CLOCK_NIXIE
-    #define USE_CLOCK_NIXIE true
-#endif
-
-#ifndef USE_CLOCK_CUSTOM
-    #define USE_CLOCK_CUSTOM false
-#endif
-
-#if USE_CLOCK_NIXIE
-    #include "nixie.h"
-#endif
-
-#if USE_CLOCK_CUSTOM
-    #include "clock-custom.h"
-#endif
+#include "nixie.h"
 
 #ifndef CLOCK_NIXIE_COLOR
     #define CLOCK_NIXIE_COLOR 0
@@ -79,8 +65,19 @@ struct DigitOffset {
 enum class ClockType {
     NORMAL = 0,
     NIXIE = 1,
-    CUSTOM = 2
+    CUSTOM0 = 2,
+    CUSTOM1 = 3,
+    CUSTOM2 = 4,
+    CUSTOM3 = 5,
+    CUSTOM4 = 6,
+    CUSTOM5 = 7,
+    CUSTOM6 = 8,
+    CUSTOM7 = 9,
+    CUSTOM8 = 10,
+    CUSTOM9 = 11
 };
+
+#define CLOCK_TYPE_NUM 12
 
 class ClockWidget : public Widget {
 public:
@@ -93,16 +90,20 @@ public:
     String getName() override;
 
 private:
+    void addConfigToManager();
     void changeFormat();
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
     void displayAmPm(String &amPm, uint32_t color);
     DigitOffset getOffsetForDigit(const String &digit);
-    void displayImage(int displayIndex, const String &digit);
-    void displayNixie(int displayIndex, const String &digit);
-    void displayCustom(int displayIndex, const String &digit);
+    void displayDigitImage(int displayIndex, const String &digit);
+    void displayNixie(int displayIndex, uint8_t index);
+    void displayCustom(int displayIndex, uint8_t clockNumber, uint8_t index);
+    void displayClockGraphics(int displayIndex, const byte *clockArray[12][2], uint8_t index, int colorOverride);
     void changeClockType();
+    bool isValidClockType(int clockType);
+    bool isCustomClock(int clockType);
 
     int m_type = (int) DEFAULT_CLOCK;
 
@@ -111,8 +112,11 @@ private:
     int m_fgColor = CLOCK_COLOR;
     int m_shadowColor = CLOCK_SHADOW_COLOR;
     bool m_shadowing = CLOCK_SHADOWING;
-    bool m_overrideNixieColorEnabled = CLOCK_NIXIE_OVERRIDE_COLOR;
     int m_overrideNixieColor = CLOCK_NIXIE_COLOR;
+
+    // Colors for CustomClocks
+    int m_customTickColor[10];
+    int m_customOverrideColor[10];
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
