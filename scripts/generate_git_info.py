@@ -1,3 +1,10 @@
+###########################################################################################################
+# This script will automatically be called by PlatformIO during the build process (as pre-action script)
+# It is responsible for fetching the name of the current branch and the commit id from git
+# This will be shown on the welcome screen
+#
+# You do NOT need to run it manually
+###########################################################################################################
 import os
 import subprocess
 
