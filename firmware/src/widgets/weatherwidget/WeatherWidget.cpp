@@ -6,8 +6,6 @@
 // make high/low an enum, if we even keep it (I strongly suggest just switching back
 // and forth between high and low every 10 seconds or something)
 // 3
-// factor out the JSON error handling (come on now)
-// 4
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "WeatherWidget.h"
@@ -15,7 +13,7 @@
 
 #include "config_helper.h"
 
-WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager), weatherDataTaskHandle(NULL) {
     m_mode = MODE_HIGHS;
 }
 
@@ -33,6 +31,8 @@ void WeatherWidget::changeMode() {
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
+    if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
+        update(true);           
 }
 
 void WeatherWidget::setup() {
@@ -62,17 +62,21 @@ void WeatherWidget::draw(bool force) {
 }
 
 void WeatherWidget::update(bool force) {
+
     if (force || m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
-        setBusy(true);
-        if (force) {
-            int retry = 0;
-            while (!getWeatherData() && retry++ < MAX_RETRIES)
-                ;
+        if (weatherDataTaskHandle == NULL) { // Check if task is not already running
+            setBusy(true);
+            // Create a task to handle all weather updates
+            if (xTaskCreate(taskGetWeatherData, "FetchWeatherData", 5000, this, 1, &weatherDataTaskHandle) == pdPASS) {
+                Serial.println("WeatherDataTask created");
+                m_weatherDelayPrev = millis();
+            } else {
+                Serial.println("Failed to create WeatherDataTask");
+                setBusy(false);
+            }
         } else {
-            getWeatherData();
+             Serial.println("WeatherDataTask is already running");
         }
-        setBusy(false);
-        m_weatherDelayPrev = millis();
     }
 }
 
@@ -110,21 +114,7 @@ bool WeatherWidget::getWeatherData() {
             }
         } else {
             // Handle JSON deserialization error
-            switch (error.code()) {
-            case DeserializationError::Ok:
-                Serial.print(F("Deserialization succeeded"));
-                break;
-            case DeserializationError::InvalidInput:
-                Serial.print(F("Invalid input!"));
-                break;
-            case DeserializationError::NoMemory:
-                Serial.print(F("Not enough memory"));
-                break;
-            default:
-                Serial.print(F("Deserialization failed"));
-                break;
-            }
-
+            Serial.println("Deserialization failed: " + String(error.c_str()));
             return false;
         }
     } else {
@@ -134,6 +124,22 @@ bool WeatherWidget::getWeatherData() {
         return false;
     }
     return true;
+}
+
+void WeatherWidget::taskGetWeatherData(void *pvParameters) {
+    WeatherWidget *widget = static_cast<WeatherWidget *>(pvParameters);
+
+    widget->getWeatherData();
+
+    // The following code is useful for tuning the space allocated for this task. 
+    // The highWater variable represents the free space remaing for this task (in words) 
+    // UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
+    // Serial.print("Weather Widget: Remaining task stack space: ");
+    // Serial.println(highWater);
+
+    widget->setBusy(false);
+    widget->weatherDataTaskHandle = NULL;
+    vTaskDelete(NULL);
 }
 
 void WeatherWidget::displayClock(int displayIndex) {
