@@ -92,11 +92,9 @@ public:
     }
 
     int getValue(WiFiManager &wm) {
-        Serial.println(_label);
         // The combobox will return its value via "/paramsave" argument
         if (wm.server->hasArg(_label)) {
             String arg = wm.server->arg(_label);
-            Serial.println(arg);
             return arg.toInt();
         }
         // Fallback to 0
