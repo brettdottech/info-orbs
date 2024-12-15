@@ -100,7 +100,7 @@ bool WeatherWidget::getWeatherData() {
         filter["days"][0]["icon"] = true;
         filter["days"][0]["tempmax"] = true;
         filter["days"][0]["tempmin"] = true;
-        
+
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
         http.end();
