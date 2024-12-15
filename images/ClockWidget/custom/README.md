@@ -1,7 +1,7 @@
 # ClockWidget
 
 To use the custom clock face, replace the JPGs in this folder with your own creations.
-Make sure to save them as 240px * 240px and DO NOT enable progressive encoding.
+Make sure to save them as 240px \* 240px and DO NOT enable progressive encoding.
 
 Then add
 `#define USE_CLOCK_CUSTOM X`
@@ -12,21 +12,21 @@ If you want to disable the nixie clock, set
 
 The first custom clock (number 0) uses these images:
 
-0_0.jpg
-0_1.jpg
-...
-0_9.jpg
-0_colon_off.jpg
-0_colon_on.jpg
+- 0_0.jpg
+- 0_1.jpg
+- ...
+- 0_9.jpg
+- 0_colon_off.jpg
+- 0_colon_on.jpg
 
 The second custom clock (number 1) uses these images:
 
-1_0.jpg
-1_1.jpg
-...
-1_9.jpg
-1_colon_off.jpg
-1_colon_on.jpg
+- 1_0.jpg
+- 1_1.jpg
+- ...
+- 1_9.jpg
+- 1_colon_off.jpg
+- 1_colon_on.jpg
 
 and so on.
 
