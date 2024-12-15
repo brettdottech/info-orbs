@@ -1,6 +1,6 @@
 #include "Widget.h"
 
-Widget::Widget(ScreenManager &manager) : m_manager(manager) {}
+Widget::Widget(ScreenManager &manager, ConfigManager &config) : m_manager(manager), m_config(config) {}
 
 void Widget::setBusy(bool busy) {
     if (busy) {
@@ -8,4 +8,8 @@ void Widget::setBusy(bool busy) {
     } else {
         digitalWrite(BUSY_PIN, LOW);
     }
+}
+
+bool Widget::isEnabled() {
+    return m_enabled;
 }

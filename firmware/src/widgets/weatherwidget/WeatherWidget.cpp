@@ -11,11 +11,20 @@
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "WeatherWidget.h"
+
 #include "icons.h"
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
 
-#include "config_helper.h"
-
-WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
+    m_enabled = true; // Enabled by default
+    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
+    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
+    String optUnits[] = {"Celsius", "Fahrenheit"};
+    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
+    String optModes[] = {"Light", "Dark"};
+    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
+    Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }
 
@@ -37,9 +46,6 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 
 void WeatherWidget::setup() {
     m_time = GlobalTime::getInstance();
-#ifdef WEATHER_SCREEN_MODE
-    m_screenMode = WEATHER_SCREEN_MODE;
-#endif
     configureColors();
 }
 
@@ -78,6 +84,10 @@ void WeatherWidget::update(bool force) {
 
 bool WeatherWidget::getWeatherData() {
     HTTPClient http;
+    String weatherUnits = m_weatherUnits == 0 ? "metric" : "us";
+    String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
+                                String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
+                                "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
     http.begin(httpRequestAddress);
     int httpCode = http.GET();
     if (httpCode > 0) {
@@ -90,7 +100,7 @@ bool WeatherWidget::getWeatherData() {
         filter["days"][0]["icon"] = true;
         filter["days"][0]["tempmax"] = true;
         filter["days"][0]["tempmin"] = true;
-        
+
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
         http.end();

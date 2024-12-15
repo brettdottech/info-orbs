@@ -1,15 +1,17 @@
 #include "StockWidget.h"
 
-#include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 
 #include <iomanip>
 
-StockWidget::StockWidget(ScreenManager &manager) : Widget(manager), m_taskHandle(NULL) {
-#ifdef STOCK_TICKER_LIST
-    char stockList[strlen(STOCK_TICKER_LIST) + 1];
-    strcpy(stockList, STOCK_TICKER_LIST);
+StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config), m_taskHandle(NULL) {
+    m_enabled = true; // Enabled by default
+    m_config.addConfigBool("StockWidget", "stocksEnabled", &m_enabled, "Enable Widget");
+    config.addConfigString("StockWidget", "stockList", &m_stockList, 200,
+                           "Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on '&country = Canada' to narrow down to your ticker)");
+    char stockList[m_stockList.size()];
+    strcpy(stockList, m_stockList.c_str());
 
     char *symbol = strtok(stockList, ",");
     m_stockCount = 0;
@@ -23,7 +25,6 @@ StockWidget::StockWidget(ScreenManager &manager) : Widget(manager), m_taskHandle
             break;
         }
     } while (symbol = strtok(nullptr, ","));
-#endif
 }
 
 void StockWidget::setup() {
@@ -109,20 +110,20 @@ void StockWidget::getStockData(StockDataModel &stock) {
 }
 
 void StockWidget::taskGetStockData(void *pvParameters) {
-    StockWidget *widget = static_cast<StockWidget*>(pvParameters);
+    StockWidget *widget = static_cast<StockWidget *>(pvParameters);
     for (int8_t i = 0; i < widget->m_stockCount; i++) {
         widget->getStockData(widget->m_stocks[i]);
     }
-    
-    // The following code is useful for tuning the space allocated for this task. 
-    // The highWater variable represents the free space remaing for this task (in words) 
+
+    // The following code is useful for tuning the space allocated for this task.
+    // The highWater variable represents the free space remaing for this task (in words)
     // UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
     // Serial.print("Stock Widget: Remaining task stack space: ");
     // Serial.println(highWater);
-    
+
     widget->setBusy(false);
-    widget->m_taskHandle = NULL;     
-    vTaskDelete(NULL); 
+    widget->m_taskHandle = NULL;
+    vTaskDelete(NULL);
 }
 
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
