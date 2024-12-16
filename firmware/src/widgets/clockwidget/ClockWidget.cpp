@@ -219,6 +219,7 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
+    uint32_t start = millis();
     if (m_type == (int) ClockType::NIXIE || isCustomClock(m_type)) {
         if (digit == ":" && color == m_shadowColor) {
             // Show colon off
@@ -256,6 +257,8 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
         m_manager.setFontColor(color, TFT_BLACK);
         m_manager.drawString(digit, defaultX + digitOffset.x, defaultY + digitOffset.y, fontSize, Align::MiddleCenter);
     }
+    uint32_t end = millis();
+    Serial.printf("displayDigit(%s) took %dms\n", digit, end - start);
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color) {
@@ -319,7 +322,10 @@ void ClockWidget::displayCustom(int displayIndex, uint8_t clockNumber, uint8_t i
 #if USE_CLOCK_CUSTOM > 0
     String ovrColorKey = "clkCust" + String(clockNumber) + "ovrCol";
     int ovrColor = m_config.getConfigInt(ovrColorKey.c_str(), TFT_BLACK);
-    displayClockGraphics(displayIndex, clock_custom[clockNumber], index, ovrColor);
+    // displayClockGraphics(displayIndex, clock_custom[clockNumber], index, ovrColor);
+    m_manager.selectScreen(displayIndex);
+    String name = "/clock/custom" + String(clockNumber) + "/" + String(index) + ".jpg";
+    m_manager.drawFsJpg(0, 0, name.c_str(), 1, ovrColor);
 #endif
 }
 
