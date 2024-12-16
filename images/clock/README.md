@@ -12,21 +12,21 @@ If you want to disable the nixie clock, set
 
 The first custom clock (number 0) uses these images:
 
-- 0_0.jpg
-- 0_1.jpg
+- custom0/0.jpg
+- custom0/1.jpg
 - ...
-- 0_9.jpg
-- 0_colon_off.jpg
-- 0_colon_on.jpg
+- custom0/9.jpg
+- custom0/10.jpg No colon image
+- custom0/11.jpg Colon image
 
 The second custom clock (number 1) uses these images:
 
-- 1_0.jpg
-- 1_1.jpg
+- custom1/0.jpg
+- custom1/1.jpg
 - ...
-- 1_9.jpg
-- 1_colon_off.jpg
-- 1_colon_on.jpg
+- custom1/9.jpg
+- custom1/10.jpg No colon image
+- custom1/11.jpg Colon image
 
 and so on.
 

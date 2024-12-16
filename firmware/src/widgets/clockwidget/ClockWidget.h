@@ -115,8 +115,8 @@ private:
     int m_overrideNixieColor = CLOCK_NIXIE_COLOR;
 
     // Colors for CustomClocks
-    int m_customTickColor[10];
-    int m_customOverrideColor[10];
+    int m_customTickColor[10]{TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE};
+    int m_customOverrideColor[10]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
