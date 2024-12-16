@@ -269,7 +269,8 @@ void MainHelper::setupWebPortalEndpoints() {
     // To simulate button presses call e.g. http://<ip>/button?name=right&state=short
     s_wifiManager->server->on("/button", handleEndpointButton);
     s_wifiManager->server->on("/buttons", handleEndpointButtons);
-    s_wifiManager->server->on("/upload", HTTP_POST, [] { s_wifiManager->server->send(200, "text/html", "<h2>File uploaded successfully!</h2><a href='/browse?dir=" + s_wifiManager->server->arg("dir") + "'>Back to file list</a>"); }, handleEndpointUploadFile);
+    s_wifiManager->server->on(
+        "/upload", HTTP_POST, [] { s_wifiManager->server->send(200, "text/html", "<h2>File uploaded successfully!</h2><a href='/browse?dir=" + s_wifiManager->server->arg("dir") + "'>Back to file list</a>"); }, handleEndpointUploadFile);
     s_wifiManager->server->on("/delete", HTTP_GET, handleEndpointDeleteFile);
     s_wifiManager->server->on("/browse", HTTP_GET, handleEndpointListFiles);
 }
