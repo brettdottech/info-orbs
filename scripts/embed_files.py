@@ -16,54 +16,14 @@ config_header_path = "firmware/config/config.h"
 # Map macros to directories and their respective files
 # The final filename is constructed as "dir + file" so the dir should end with a "/" unless you know what you are doing
 embed_map = {
-    "USE_CLOCK_NIXIE == NIXIE_NOHOLES": [
-        ["images/clock/nixie.no-holes/", 
-            ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
+    "USE_CLOCK_NIXIE == NIXIE_NOHOLES": [ # Condition
+        ["images/clock/nixie.no-holes/", # Source directory
+            ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]], # Files
     ],
     "USE_CLOCK_NIXIE == NIXIE_HOLES": [
         ["images/clock/nixie.holes/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
     ],
-    # "USE_CLOCK_CUSTOM > 0": [
-    #     ["images/clock/custom/0_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 1": [
-    #     ["images/clock/custom/1_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 2": [
-    #     ["images/clock/custom/2_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 3": [
-    #     ["images/clock/custom/3_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 4": [
-    #     ["images/clock/custom/4_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 5": [
-    #     ["images/clock/custom/5_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 6": [
-    #     ["images/clock/custom/6_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 7": [
-    #     ["images/clock/custom/7_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 8": [
-    #     ["images/clock/custom/8_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
-    # "USE_CLOCK_CUSTOM > 9": [
-    #     ["images/clock/custom/9_", 
-    #         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
-    # ],
 }
 
 Import("env")
