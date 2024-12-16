@@ -51,6 +51,7 @@ public:
 
     static void setupButtons();
     static void setupConfig();
+    static void setupLittleFS();
     static void showWelcome();
 
     static void buttonPressed(uint8_t buttonId, ButtonState state);
@@ -62,7 +63,12 @@ public:
     static void setupWebPortalEndpoints();
     static void handleEndpointButton();
     static void handleEndpointButtons();
+    static void handleEndpointListFiles();
+    static void handleEndpointUploadFile();
+    static void handleEndpointDeleteFile();
+
     static void restartIfNecessary();
+
 
     static void updateBrightnessByTime(uint8_t hour24);
 };

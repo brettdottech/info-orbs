@@ -53,6 +53,7 @@ void setup() {
 
     // Pass references to MainHelper
     MainHelper::init(wifiManager, config, sm, widgetSet);
+    MainHelper::setupLittleFS();
     MainHelper::setupConfig();
     MainHelper::setupButtons();
     MainHelper::showWelcome();
