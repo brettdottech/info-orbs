@@ -3,7 +3,6 @@
 
 #include "GlobalTime.h"
 #include "Widget.h"
-#include "clock-custom.h"
 #include "config_helper.h"
 #include "nixie.h"
 
