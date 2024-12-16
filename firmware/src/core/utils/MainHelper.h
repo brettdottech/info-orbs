@@ -69,7 +69,6 @@ public:
 
     static void restartIfNecessary();
 
-
     static void updateBrightnessByTime(uint8_t hour24);
 };
 
