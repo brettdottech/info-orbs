@@ -1,5 +1,4 @@
 #include "ClockWidget.h"
-#include "clock-custom.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Always enabled, do not add a config setting for it
