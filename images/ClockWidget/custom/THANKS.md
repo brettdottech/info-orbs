@@ -4,7 +4,7 @@ We currently ship the following custom clocks:
 
 ## Custom Clock 0
 
-- Style: Rainbow Dot Clock
+- Style: Rainbow Square Clock
 - Author: @Andrea in Discord
 
 ## Custom Clock 1
