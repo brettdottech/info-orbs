@@ -2,24 +2,24 @@
 #include "config_helper.h"
 #include "icons.h"
 
-// initialize static members
-Button MainHelper::buttonLeft(BUTTON_LEFT);
-Button MainHelper::buttonOK(BUTTON_OK);
-Button MainHelper::buttonRight(BUTTON_RIGHT);
-WiFiManager *MainHelper::s_wifiManager = nullptr;
-ConfigManager *MainHelper::s_configManager = nullptr;
-ScreenManager *MainHelper::s_screenManager = nullptr;
-WidgetSet *MainHelper::s_widgetSet = nullptr;
-int MainHelper::s_widgetCycleDelay = WIDGET_CYCLE_DELAY;
-unsigned long MainHelper::s_widgetCycleDelayPrev = 0;
-bool MainHelper::s_invertedOrbs = INVERTED_ORBS;
-std::string MainHelper::s_timezoneLocation = TIMEZONE_API_LOCATION;
-std::string MainHelper::s_ntpServer = NTP_SERVER;
-int MainHelper::s_tftBrightness = TFT_BRIGHTNESS;
-bool MainHelper::s_nightMode = DIM_ENABLED;
-int MainHelper::s_dimStartHour = DIM_START_HOUR;
-int MainHelper::s_dimEndHour = DIM_END_HOUR;
-int MainHelper::s_dimBrightness = DIM_BRIGHTNESS;
+// initialize static variables
+static Button buttonLeft(BUTTON_LEFT);
+static Button buttonOK(BUTTON_OK);
+static Button buttonRight(BUTTON_RIGHT);
+static WiFiManager *s_wifiManager = nullptr;
+static ConfigManager *s_configManager = nullptr;
+static ScreenManager *s_screenManager = nullptr;
+static WidgetSet *s_widgetSet = nullptr;
+static int s_widgetCycleDelay = WIDGET_CYCLE_DELAY;
+static unsigned long s_widgetCycleDelayPrev = 0;
+static bool s_invertedOrbs = INVERTED_ORBS;
+static std::string s_timezoneLocation = TIMEZONE_API_LOCATION;
+static std::string s_ntpServer = NTP_SERVER;
+static int s_tftBrightness = TFT_BRIGHTNESS;
+static bool s_nightMode = DIM_ENABLED;
+static int s_dimStartHour = DIM_START_HOUR;
+static int s_dimEndHour = DIM_END_HOUR;
+static int s_dimBrightness = DIM_BRIGHTNESS;
 
 void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws) {
     s_wifiManager = wm;

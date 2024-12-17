@@ -37,10 +37,6 @@ public:
     static ButtonState stringToButtonState(const String &buttonState);
 
     /**
-     * Returns true if both stored strings are the same
-     */
-    static bool compareCharArrays(const char *str1, const char *str2);
-    /**
      * Create a new char buffer and copy the contents of the string into it.
      * Warning: This will allocate memory! Remeber to delete[] it after use.
      */

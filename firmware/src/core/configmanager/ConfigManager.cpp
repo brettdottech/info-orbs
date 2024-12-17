@@ -8,20 +8,20 @@
 ConfigManager *ConfigManager::s_instance = nullptr;
 
 // Assign pseudo parameters for /param
-WiFiManagerParameter ConfigManager::s_scriptBlock(WEBPORTAL_PARAM_SCRIPT);
-WiFiManagerParameter ConfigManager::s_styleBlock(WEBPORTAL_PARAM_STYLE);
-WiFiManagerParameter ConfigManager::s_pageStart(WEBPORTAL_PARAM_PAGE_START);
-WiFiManagerParameter ConfigManager::s_pageEnd(WEBPORTAL_PARAM_PAGE_END);
-WiFiManagerParameter ConfigManager::s_fieldsetStart(WEBPORTAL_PARAM_FIELDSET_START);
-WiFiManagerParameter ConfigManager::s_fieldsetEnd(WEBPORTAL_PARAM_FIELDSET_END);
-WiFiManagerParameter ConfigManager::s_legendStart(WEBPORTAL_PARAM_LEGEND_START);
-WiFiManagerParameter ConfigManager::s_legendEnd(WEBPORTAL_PARAM_LEGEND_END);
-WiFiManagerParameter ConfigManager::s_divStartNonString(WEBPORTAL_PARAM_DIV_START);
-WiFiManagerParameter ConfigManager::s_divStartString(WEBPORTAL_PARAM_DIV_STRING_START);
-WiFiManagerParameter ConfigManager::s_divEnd(WEBPORTAL_PARAM_DIV_END);
-WiFiManagerParameter ConfigManager::s_toggleAdvanced(WEBPORTAL_PARAM_TOGGLE_ADVANCED);
-WiFiManagerParameter ConfigManager::s_spanAdvancedStart(WEBPORTAL_PARAM_SPAN_ADVANCED_START);
-WiFiManagerParameter ConfigManager::s_spanEnd(WEBPORTAL_PARAM_SPAN_END);
+static WiFiManagerParameter s_scriptBlock(WEBPORTAL_PARAM_SCRIPT);
+static WiFiManagerParameter s_styleBlock(WEBPORTAL_PARAM_STYLE);
+static WiFiManagerParameter s_pageStart(WEBPORTAL_PARAM_PAGE_START);
+static WiFiManagerParameter s_pageEnd(WEBPORTAL_PARAM_PAGE_END);
+static WiFiManagerParameter s_fieldsetStart(WEBPORTAL_PARAM_FIELDSET_START);
+static WiFiManagerParameter s_fieldsetEnd(WEBPORTAL_PARAM_FIELDSET_END);
+static WiFiManagerParameter s_legendStart(WEBPORTAL_PARAM_LEGEND_START);
+static WiFiManagerParameter s_legendEnd(WEBPORTAL_PARAM_LEGEND_END);
+static WiFiManagerParameter s_divStartNonString(WEBPORTAL_PARAM_DIV_START);
+static WiFiManagerParameter s_divStartString(WEBPORTAL_PARAM_DIV_STRING_START);
+static WiFiManagerParameter s_divEnd(WEBPORTAL_PARAM_DIV_END);
+static WiFiManagerParameter s_toggleAdvanced(WEBPORTAL_PARAM_TOGGLE_ADVANCED);
+static WiFiManagerParameter s_spanAdvancedStart(WEBPORTAL_PARAM_SPAN_ADVANCED_START);
+static WiFiManagerParameter s_spanEnd(WEBPORTAL_PARAM_SPAN_END);
 
 ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
     Serial.println("Constructing ConfigManager");
@@ -73,7 +73,7 @@ void ConfigManager::setupWebPortal() {
 #ifdef CM_DEBUG
         Serial.printf("Adding WebPortal parameter: %s, %s\n", param.section, param.variableName);
 #endif
-        if (!Utils::compareCharArrays(lastSection, param.section)) {
+        if (strcmp(lastSection, param.section) != 0) {
             Serial.printf("New config section: %s\n", param.section);
             if (advancedOpen) {
                 // close advanced params span

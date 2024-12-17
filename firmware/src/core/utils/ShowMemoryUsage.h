@@ -15,9 +15,6 @@
 class ShowMemoryUsage {
 public:
     static void printSerial(bool force = false, bool newLine = true);
-
-private:
-    static unsigned long s_lastMemoryUsageShownAt;
 };
 
 #endif // SHOW_MEMORY_USAGE_H

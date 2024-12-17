@@ -314,14 +314,6 @@ void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targe
     }
 }
 
-bool Utils::compareCharArrays(const char *str1, const char *str2) {
-    while (*str1 && (*str1 == *str2)) {
-        str1++;
-        str2++;
-    }
-    return *str1 == *str2;
-}
-
 const char *Utils::createConstCharBuffer(const std::string &originalString) {
     // Allocate enough memory for the string and the null-terminator
     char *buffer = new char[originalString.size() + 1];

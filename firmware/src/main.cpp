@@ -9,12 +9,8 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-GlobalTime *globalTime; // Initialize the global time
-
-String connectingString{""};
-
+GlobalTime *globalTime{nullptr};
 WifiWidget *wifiWidget{nullptr};
-
 ScreenManager *sm{nullptr};
 ConfigManager *config{nullptr};
 OrbsWiFiManager *wifiManager{nullptr};
