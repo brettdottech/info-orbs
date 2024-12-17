@@ -8,9 +8,10 @@
 
 #ifndef CLOCK_NIXIE_COLOR
     #define CLOCK_NIXIE_COLOR 0
-    #define CLOCK_NIXIE_OVERRIDE_COLOR false
-#else
-    #define CLOCK_NIXIE_OVERRIDE_COLOR true
+#endif
+
+#ifndef USE_CLOCK_CUSTOM
+    #define USE_CLOCK_CUSTOM 0 // no custom clocks by default
 #endif
 
 #ifndef CLOCK_FONT
