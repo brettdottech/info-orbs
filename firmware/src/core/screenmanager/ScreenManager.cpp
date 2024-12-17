@@ -1,4 +1,5 @@
 #include "ScreenManager.h"
+#include "ConfigManager.h"
 #include "Utils.h"
 #include <Arduino.h>
 
@@ -12,7 +13,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     }
 
     m_tft.init();
-    m_tft.setRotation(INVERTED_ORBS ? 2 : 0);
+    m_tft.setRotation(ConfigManager::getInstance()->getConfigBool("invertedOrbs", INVERTED_ORBS) ? 2 : 0);
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
@@ -23,8 +24,9 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     TJpgDec.setCallback(tftOutput);
 
     // I'm not sure which cache size is actually good.
-    // Needs testing.
-    m_render.setCacheSize(128, 128, 8192);
+    // It's a tradeoff between memory consumption and render speed.
+    // Needs more testing to find the sweet spot.
+    m_render.setCacheSize(8, 8, 4096);
     setFont(DEFAULT_FONT);
     m_render.setDrawer(m_tft);
 

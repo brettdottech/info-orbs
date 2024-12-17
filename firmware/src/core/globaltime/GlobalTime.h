@@ -1,8 +1,7 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef GLOBALTIME_H
+#define GLOBALTIME_H
 
 #include "config_helper.h"
-#include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
 #include <TimeLib.h>
@@ -29,11 +28,27 @@ const String LOC_FORMAT_DAYMONTH = "%d %B"; // in strftime format, this will be 
 const String LOC_LANG = "en";
 #endif
 
+enum ClockFormat {
+    CLOCK_FORMAT_24_HOUR = 0,
+    CLOCK_FORMAT_12_HOUR = 1,
+    CLOCK_FORMAT_12_HOUR_AMPM = 2
+};
+
+#if FORMAT_24_HOUR == true
+    #define CLOCK_FORMAT CLOCK_FORMAT_24_HOUR
+#else
+    #if SHOW_AM_PM_INDICATOR == false
+        #define CLOCK_FORMAT CLOCK_FORMAT_12_HOUR
+    #else
+        #define CLOCK_FORMAT CLOCK_FORMAT_12_HOUR_AMPM
+    #endif
+#endif
+
 class GlobalTime {
 public:
     static GlobalTime *getInstance();
 
-    void updateTime();
+    void updateTime(bool force = false);
     void getHourAndMinute(int &hour, int &minute);
     int getHour();
     int getHour24();
@@ -70,6 +85,7 @@ private:
     int m_year = 0;
     String m_time;
     String m_weekday;
+    std::string m_timezoneLocation = TIMEZONE_API_LOCATION;
     int m_timeZoneOffset = -1; // A value that will be overwritten by the API
     unsigned long m_nextTimeZoneUpdate = 0;
 
@@ -80,8 +96,9 @@ private:
     unsigned long m_updateTimer = 0;
 
     bool m_format24hour{FORMAT_24_HOUR};
+    std::string m_ntpServer{NTP_SERVER};
 
     void getTimeZoneOffsetFromAPI();
 };
 
-#endif
+#endif // GLOBALTIME_H

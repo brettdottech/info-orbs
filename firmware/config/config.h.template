@@ -9,6 +9,13 @@
 #define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN                                 // Language selection for Month and Weekday - possible values are EN, DE, FR
 
+// WIDGETS
+#define INCLUDE_WEATHER       // include WeatherWidget
+#define INCLUDE_STOCK         // include StockWidget
+#define INCLUDE_PARQET        // include ParqetWidget
+//#define INCLUDE_WEBDATA       // include WebDataWidget
+//#define INCLUDE_MQTT          // include MQTTWidget
+
 // NIGHTTIME DIMMING
 //#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)
 //#define DIM_END_HOUR 7     // Undim the screens at this time (24h format)
@@ -58,6 +65,9 @@
 
 // TRUETYPE FONT CONFIGURATION
 //#define DEFAULT_FONT ROBOTO_REGULAR
+
+// ADVANCED COMPILE OPTIONS
+//#define INCLUDE_MDNS // Include mDNS responder, for local name resolution without DNS (disable to save flash/memory)
 
 // ============= END OF USER CONFIGURATION =================================================================
 

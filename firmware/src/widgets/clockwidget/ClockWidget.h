@@ -3,7 +3,7 @@
 
 #include "GlobalTime.h"
 #include "Widget.h"
-#include <TJpg_Decoder.h>
+#include "config_helper.h"
 
 #ifndef USE_CLOCK_NIXIE
     #define USE_CLOCK_NIXIE true
@@ -19,6 +19,13 @@
 
 #if USE_CLOCK_CUSTOM
     #include "clock-custom.h"
+#endif
+
+#ifndef CLOCK_NIXIE_COLOR
+    #define CLOCK_NIXIE_COLOR 0
+    #define CLOCK_NIXIE_OVERRIDE_COLOR false
+#else
+    #define CLOCK_NIXIE_OVERRIDE_COLOR true
 #endif
 
 #ifndef CLOCK_FONT
@@ -70,14 +77,14 @@ struct DigitOffset {
 };
 
 enum class ClockType {
-    NORMAL,
-    NIXIE,
-    CUSTOM
+    NORMAL = 0,
+    NIXIE = 1,
+    CUSTOM = 2
 };
 
 class ClockWidget : public Widget {
 public:
-    ClockWidget(ScreenManager &manager);
+    ClockWidget(ScreenManager &manager, ConfigManager &config);
     ~ClockWidget() override;
     void setup() override;
     void update(bool force = false) override;
@@ -86,7 +93,7 @@ public:
     String getName() override;
 
 private:
-    void change24hMode();
+    void changeFormat();
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
@@ -97,7 +104,15 @@ private:
     void displayCustom(int displayIndex, const String &digit);
     void changeClockType();
 
-    ClockType m_type = DEFAULT_CLOCK;
+    int m_type = (int) DEFAULT_CLOCK;
+
+    int m_format = CLOCK_FORMAT;
+    bool m_showSecondTicks = SHOW_SECOND_TICKS;
+    int m_fgColor = CLOCK_COLOR;
+    int m_shadowColor = CLOCK_SHADOW_COLOR;
+    bool m_shadowing = CLOCK_SHADOWING;
+    bool m_overrideNixieColorEnabled = CLOCK_NIXIE_OVERRIDE_COLOR;
+    int m_overrideNixieColor = CLOCK_NIXIE_COLOR;
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;

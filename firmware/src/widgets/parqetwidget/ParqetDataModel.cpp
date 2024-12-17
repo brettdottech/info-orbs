@@ -5,15 +5,6 @@
 ParqetDataModel::ParqetDataModel() {
 }
 
-ParqetDataModel &ParqetDataModel::setPortfolioId(String portfolioId) {
-    m_portfolioId = portfolioId;
-    return *this;
-}
-
-String ParqetDataModel::getPortfolioId() {
-    return m_portfolioId;
-}
-
 void sortHoldings(ParqetHoldingDataModel *holdings, int size) {
     for (int i = 0; i < size - 1; i++) {
         for (int j = 0; j < size - i - 1; j++) {

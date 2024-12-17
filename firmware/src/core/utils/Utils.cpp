@@ -1,4 +1,7 @@
 #include "Utils.h"
+#include "config_helper.h"
+#include <TFT_eSPI.h>
+#include <cstring>
 
 int Utils::getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit) {
     char buf[str.length() + 1];
@@ -254,6 +257,24 @@ uint16_t Utils::rgb888ToRgb565(uint32_t rgb888, bool swapBytes) {
     return pixel;
 }
 
+String Utils::rgb565ToRgb888html(int color565) {
+    String hexColor = String(Utils::rgb565ToRgb888(color565), HEX); // Convert to hex and mask for 6 bytes
+    while (hexColor.length() < 6) {
+        hexColor = "0" + hexColor; // Add leading zeroes if needed
+    }
+    hexColor = "#" + hexColor; // Add the HTML color prefix
+    return hexColor;
+}
+
+int Utils::rgb888htmlToRgb565(String hexColor) {
+    if (hexColor.startsWith("#")) {
+        hexColor = hexColor.substring(1); // Remove leading '#'
+    }
+    int rgb888 = strtol(hexColor.c_str(), 0, HEX); // Convert to RGB888 int
+    int rgb565 = Utils::rgb888ToRgb565(rgb888); // Convert to RGB565
+    return rgb565;
+}
+
 // Function to apply grayscale and map to target color
 uint16_t Utils::grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes) {
     // Apply brightness enhancement
@@ -290,5 +311,62 @@ void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targe
 
         // Map grayscale to the target color
         pixels565[i] = grayscaleToTargetColor(grayscale, targetR8, targetG8, targetB8, brightness, swapBytes);
+    }
+}
+
+bool Utils::compareCharArrays(const char *str1, const char *str2) {
+    while (*str1 && (*str1 == *str2)) {
+        str1++;
+        str2++;
+    }
+    return *str1 == *str2;
+}
+
+const char *Utils::createConstCharBuffer(const std::string &originalString) {
+    // Allocate enough memory for the string and the null-terminator
+    char *buffer = new char[originalString.size() + 1];
+    strcpy(buffer, originalString.c_str()); // Copy the string contents
+    return buffer; // Return the pointer to this new string
+}
+
+const char *Utils::createConstCharBufferAndConcat(const char *prefix, const char *original, const char *postfix) {
+    // Calculate lengths
+    size_t prefixLen = strlen(prefix);
+    size_t originalLen = strlen(original);
+    size_t postfixLen = strlen(postfix);
+
+    // Allocate memory for new string (including null terminator)
+    size_t totalLen = prefixLen + originalLen + postfixLen + 1; // +1 for '\0'
+    char *result = new char[totalLen];
+
+    // Construct the new string
+    strcpy(result, prefix); // Copy prefix
+    strcat(result, original); // Append original string
+    strcat(result, postfix); // Append postfix
+
+    return result;
+}
+
+uint8_t Utils::stringToButtonId(const String &buttonName) {
+    if (buttonName.equalsIgnoreCase("left")) {
+        return BUTTON_LEFT;
+    } else if (buttonName.equalsIgnoreCase("middle")) {
+        return BUTTON_OK;
+    } else if (buttonName.equalsIgnoreCase("right")) {
+        return BUTTON_RIGHT;
+    } else {
+        return 0;
+    }
+}
+
+ButtonState Utils::stringToButtonState(const String &buttonState) {
+    if (buttonState.equalsIgnoreCase("short")) {
+        return BTN_SHORT;
+    } else if (buttonState.equalsIgnoreCase("medium")) {
+        return BTN_MEDIUM;
+    } else if (buttonState.equalsIgnoreCase("long")) {
+        return BTN_LONG;
+    } else {
+        return BTN_NOTHING;
     }
 }
