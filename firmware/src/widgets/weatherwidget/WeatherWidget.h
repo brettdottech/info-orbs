@@ -2,6 +2,9 @@
 #define WEATHERWIDGET_H
 
 #include "GlobalTime.h"
+#include "Utils.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include "WeatherDataModel.h"
 #include "Widget.h"
 #include "config_helper.h"
@@ -26,6 +29,7 @@ private:
     void weatherText(int displayIndex);
     void threeDayWeather(int displayIndex);
     bool getWeatherData();
+    static void taskGetWeatherData(void *pvParameters);    
     int getClockStamp();
     void configureColors();
 
@@ -68,5 +72,6 @@ private:
 
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
+    TaskHandle_t weatherDataTaskHandle = NULL; // Task handle for weather data task    
 };
 #endif // WEATHERWIDGET_H
