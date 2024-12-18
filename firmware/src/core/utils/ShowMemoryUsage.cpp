@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 // initialize static members
-unsigned long ShowMemoryUsage::s_lastMemoryUsageShownAt = 0;
+static unsigned long s_lastMemoryUsageShownAt = 0;
 
 void ShowMemoryUsage::printSerial(bool force, bool newLine) {
     multi_heap_info_t info;

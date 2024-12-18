@@ -16,7 +16,7 @@
     #define TFT_BRIGHTNESS 255
 #endif
 
-#if defined(DIM_START_HOU) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
+#if defined(DIM_START_HOUR) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
     #define DIM_ENABLED true
 #else
     #define DIM_ENABLED false
@@ -65,27 +65,6 @@ public:
     static void restartIfNecessary();
 
     static void updateBrightnessByTime(uint8_t hour24);
-
-private:
-    static WiFiManager *s_wifiManager;
-    static ConfigManager *s_configManager;
-    static ScreenManager *s_screenManager;
-    static WidgetSet *s_widgetSet;
-
-    static Button buttonLeft;
-    static Button buttonOK;
-    static Button buttonRight;
-
-    static int s_widgetCycleDelay;
-    static unsigned long s_widgetCycleDelayPrev;
-    static bool s_invertedOrbs;
-    static std::string s_timezoneLocation;
-    static std::string s_ntpServer;
-    static int s_tftBrightness;
-    static bool s_nightMode;
-    static int s_dimStartHour;
-    static int s_dimEndHour;
-    static int s_dimBrightness;
 };
 
 #endif
