@@ -14,6 +14,8 @@
 
 #define MAX_STOCKS 5
 
+const String stockApiKey = STOCK_API_KEY;
+
 class StockWidget : public Widget {
 public:
     StockWidget(ScreenManager &manager, ConfigManager &config);
