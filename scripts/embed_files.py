@@ -8,7 +8,7 @@
 
 import re
 from os.path import basename, join
-from SCons.Script import Builder, Import
+from SCons.Script import Import
 
 # Extract macros from the config header file
 config_header_path = "firmware/config/config.h"
@@ -103,42 +103,48 @@ def extract_macros_with_values(file_path):
         print(f"Warning: Header file '{file_path}' not found.")
     return macros
 
-# Extract -D flags from BUILD_FLAGS
-build_flags = env.get("BUILD_FLAGS", [])
-cpp_defines = {flag[2:].split("=")[0].strip(): flag[2:].split("=")[1].strip() if "=" in flag else None for flag in build_flags if flag.startswith("-D")}
+def action():
+    # Extract -D flags from BUILD_FLAGS
+    build_flags = env.get("BUILD_FLAGS", [])
+    cpp_defines = {flag[2:].split("=")[0].strip(): flag[2:].split("=")[1].strip() if "=" in flag else None for flag in build_flags if flag.startswith("-D")}
 
-# Extract macros from the config header file
-header_macros = extract_macros_with_values(config_header_path)
+    # Extract macros from the config header file
+    header_macros = extract_macros_with_values(config_header_path)
 
-# Combine all macros
-all_macros = {**header_macros, **cpp_defines}
-print("Extracted macros with values:", all_macros)
+    # Combine all macros
+    all_macros = {**header_macros, **cpp_defines}
+    # Uncomment for debugging
+    # print("Extracted macros with values:", all_macros)
 
-# Function to evaluate conditions in embed_map
-def evaluate_condition(condition, macros):
-    try:
-        # Replace undefined identifiers with quoted strings
-        condition = re.sub(
-            r"\b([A-Za-z_][A-Za-z0-9_]*)\b",
-            lambda match: f"'{match.group(1)}'" if match.group(1) not in macros else match.group(1),
-            condition,
-        )
-        return eval(condition, {}, macros)
-    except Exception as e:
-        print(f"Error evaluating condition '{condition}': {e}")
-        return False
+    # Function to evaluate conditions in embed_map
+    def evaluate_condition(condition, macros):
+        try:
+            # Replace undefined identifiers with quoted strings
+            condition = re.sub(
+                r"\b([A-Za-z_][A-Za-z0-9_]*)\b",
+                lambda match: f"'{match.group(1)}'" if match.group(1) not in macros else match.group(1),
+                condition,
+            )
+            return eval(condition, {}, macros)
+        except Exception as e:
+            print(f"Error evaluating condition '{condition}': {e}")
+            return False
 
-# Determine which files to embed based on conditions in embed_map
-to_embed = []
-for condition, directories in embed_map.items():
-    if evaluate_condition(condition, all_macros):
-        for directory, files in directories:
-            to_embed.extend(["../" + directory + file for file in files])
+    # Determine which files to embed based on conditions in embed_map
+    to_embed = []
+    for condition, directories in embed_map.items():
+        if evaluate_condition(condition, all_macros):
+            for directory, files in directories:
+                to_embed.extend(["../" + directory + file for file in files])
 
-# Update the build environment with embedded files
-if len(to_embed) > 0:
-    print(f"Embedding files: {to_embed}")
-    embed_files(to_embed, "embed_files")
-else:
-    print("No files selected for embedding.")
+    # Update the build environment with embedded files
+    if len(to_embed) > 0:
+        print(f"Embedding files: {to_embed}")
+        embed_files(to_embed, "embed_files")
+    else:
+        print("No files selected for embedding.")
 
+# I would prefer to use
+# env.AddPreAction("buildprog", action)
+# but that does not work :-(
+action()
