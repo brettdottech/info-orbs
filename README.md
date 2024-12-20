@@ -26,15 +26,15 @@ Version 1.1 is here, in the future releases will be more frequent, but this one 
 
 **1.1 Changes:**
 
-1.  WifiManager added allowing users to configure/change their Wifi credentials using a friendly in-browser portal.
-2.  TTF fonts, giving us much more flexibility in the fonts we use and how they're scaled.
-3.  Updated Stock widget with a new look and now supporting international markets, different currencies, crypto and forex.
-4.  Nixie Tube clock
-5.  Support for users to create their own clocks by simply uploading images for digit
-6.  Weather widget "dark mode"
-7.  Widget auto-scrolling (switch between widgets automatically ever x seconds)
-8.  Screen "Dimming" during certain hours of the day. This is artificial dimming through way of adjusting the colours to be less saturated, but it works very well.
-9.  Medium & long press button support to allow for further on device configurations
+1. WifiManager added allowing users to configure/change their Wifi credentials using a friendly in-browser portal.
+2. TTF fonts, giving us much more flexibility in the fonts we use and how they're scaled.
+3. Updated Stock widget with a new look and now supporting international markets, different currencies, crypto and forex.
+4. Nixie Tube clock
+5. Support for users to create their own clocks by simply uploading images for digit
+6. Weather widget "dark mode"
+7. Widget auto-scrolling (switch between widgets automatically ever x seconds)
+8. Screen "Dimming" during certain hours of the day. This is artificial dimming through way of adjusting the colours to be less saturated, but it works very well.
+9. Medium & long press button support to allow for further on device configurations
 10. MQTT widget introduced to display data from and MQTT broker, with a [home assistant blueprint available](https://github.com/dreed47/info-orbs-mqtt-ha).
 11. Multi Language support for the weather widget
 
@@ -118,7 +118,7 @@ Once you're done this, you can flash the firmware to your orbs by holding the "b
    #define CLOCK_SHADOW_COLOR 0x20a1       // Clock shadow color (Light brown)
    #define CLOCK_SHADOWING true            // Use clock shadow (set to false   to   disable)
    #define USE_CLOCK_NIXIE NIXIE_NOHOLES   // Set to NIXIE_HOLES or NIXIE_NOHOLES to define the Nixie style (set to 0 to disable)
-   #define USE_CLOCK_CUSTOM 1              // Number of Custom Clocks [0-10] (set to 0 to disable, see images/ClockWidget/custom/README.md)
+   #define USE_CLOCK_CUSTOM 1              // Number of Custom Clocks [0-10] (set to 0 to disable, see images/clock/README.md)
    //#define CLOCK_NIXIE_COLOR 0x001f        // Override Nixie color
    #define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face:       ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM0..9
    //#define CLOCK_FONT DSEG7              // Define clock font (defaults to   DSEG7,    you can also try DSEG14 or FINAL_FRONTIER)
