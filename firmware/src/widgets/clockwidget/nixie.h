@@ -4,11 +4,9 @@
 #include "config_helper.h"
 #include <Arduino.h>
 
-enum NixieVariants {
-    NIXIE_DISABLED = 0,
-    NIXIE_HOLES = 1,
-    NIXIE_NOHOLES = 2,
-};
+#define NIXIE_DISABLED 0
+#define NIXIE_HOLES 1
+#define NIXIE_NOHOLES 2
 
 #ifndef USE_CLOCK_NIXIE
     #define USE_CLOCK_NIXIE NIXIE_NOHOLES // enable nixie without holes by default
