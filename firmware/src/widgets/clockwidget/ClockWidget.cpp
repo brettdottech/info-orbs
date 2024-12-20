@@ -257,7 +257,9 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
         m_manager.drawString(digit, defaultX + digitOffset.x, defaultY + digitOffset.y, fontSize, Align::MiddleCenter);
     }
     uint32_t end = millis();
+#ifdef CLOCK_DEBUG
     Serial.printf("displayDigit(%s) took %dms\n", digit, end - start);
+#endif
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color) {
