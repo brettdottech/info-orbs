@@ -13,7 +13,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     }
 
     m_tft.init();
-    m_tft.setRotation(ConfigManager::getInstance()->getConfigBool("invertedOrbs", INVERTED_ORBS) ? 2 : 0);
+    m_tft.setRotation(ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION));
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
@@ -95,7 +95,9 @@ OpenFontRender &ScreenManager::getRender() {
 // Selects a single screen
 void ScreenManager::selectScreen(int screen) {
     for (int i = 0; i < NUM_SCREENS; i++) {
-        int currentDisplay = INVERTED_ORBS ? NUM_SCREENS - i - 1 : i;
+        int orbRotation = ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION);
+        bool rotateDisplays = orbRotation == 1 || orbRotation == 2;
+        int currentDisplay = rotateDisplays ? NUM_SCREENS - i - 1 : i;
         digitalWrite(m_screen_cs[currentDisplay], i == screen ? LOW : HIGH);
     }
 }

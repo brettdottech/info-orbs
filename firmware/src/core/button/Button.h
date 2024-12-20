@@ -9,10 +9,17 @@ enum ButtonState {
     BTN_LONG
 };
 
+enum Buttons {
+    BUTTON_LEFT = 0,
+    BUTTON_MIDDLE = 1,
+    BUTTON_OK = 1, // backwards compatibility
+    BUTTON_RIGHT = 2,
+};
+
 class Button {
 public:
-    Button(uint8_t pin);
-    void begin();
+    Button();
+    void begin(uint8_t pin);
     bool pressedShort();
     bool pressedMedium();
     bool pressedLong();

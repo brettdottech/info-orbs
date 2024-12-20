@@ -2,17 +2,16 @@
 #include "config_helper.h"
 #include "icons.h"
 
-// initialize static variables
-static Button buttonLeft(BUTTON_LEFT);
-static Button buttonOK(BUTTON_OK);
-static Button buttonRight(BUTTON_RIGHT);
+static Button buttonLeft;
+static Button buttonMiddle;
+static Button buttonRight;
 static WiFiManager *s_wifiManager = nullptr;
 static ConfigManager *s_configManager = nullptr;
 static ScreenManager *s_screenManager = nullptr;
 static WidgetSet *s_widgetSet = nullptr;
 static int s_widgetCycleDelay = WIDGET_CYCLE_DELAY;
 static unsigned long s_widgetCycleDelayPrev = 0;
-static bool s_invertedOrbs = INVERTED_ORBS;
+static int s_orbRotation = ORB_ROTATION;
 static std::string s_timezoneLocation = TIMEZONE_API_LOCATION;
 static std::string s_ntpServer = NTP_SERVER;
 static int s_tftBrightness = TFT_BRIGHTNESS;
@@ -32,17 +31,27 @@ void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, Wid
  * The ISR handlers must be static
  */
 void MainHelper::isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
-void MainHelper::isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
+void MainHelper::isrButtonChangeMiddle() { buttonMiddle.isrButtonChange(); }
 void MainHelper::isrButtonChangeRight() { buttonRight.isrButtonChange(); }
 
 void MainHelper::setupButtons() {
-    buttonLeft.begin();
-    buttonOK.begin();
-    buttonRight.begin();
+    bool invertButtons = s_orbRotation == 1 || s_orbRotation == 2;
+    int leftPin = BUTTON_LEFT_PIN;
+    int middlePin = BUTTON_MIDDLE_PIN;
+    int rightPin = BUTTON_RIGHT_PIN;
 
-    attachInterrupt(digitalPinToInterrupt(BUTTON_LEFT), isrButtonChangeLeft, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_OK), isrButtonChangeMiddle, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_RIGHT), isrButtonChangeRight, CHANGE);
+    if (invertButtons) {
+        leftPin = BUTTON_RIGHT_PIN;
+        rightPin = BUTTON_LEFT_PIN;
+    }
+
+    buttonLeft.begin(leftPin);
+    buttonMiddle.begin(middlePin);
+    buttonRight.begin(rightPin);
+
+    attachInterrupt(digitalPinToInterrupt(leftPin), isrButtonChangeLeft, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(middlePin), isrButtonChangeMiddle, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(rightPin), isrButtonChangeRight, CHANGE);
 }
 
 void MainHelper::setupConfig() {
@@ -50,7 +59,8 @@ void MainHelper::setupConfig() {
     s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
     s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, "NTP server", true);
 
-    s_configManager->addConfigBool("TFT Settings", "invertedOrbs", &s_invertedOrbs, "Inverted Orbs (enable if using InfoOrbs upside down)");
+    String optRotation[] = {"No rotation", "Rotate 90° clockwise", "Rotate 180°", "Rotate 270° clockwise"};
+    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, 4, "Orb rotation");
     s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, "Enable Nighttime mode");
     s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, "TFT Brightness [0-255]", true);
     String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
@@ -82,10 +92,10 @@ void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {
             Serial.printf("Left button pressed, state=%d\n", state);
             s_widgetCycleDelayPrev = millis();
             s_widgetSet->buttonPressed(BUTTON_LEFT, state);
-        } else if (buttonId == BUTTON_OK) {
+        } else if (buttonId == BUTTON_MIDDLE) {
             Serial.printf("Middle button pressed, state=%d\n", state);
             s_widgetCycleDelayPrev = millis();
-            s_widgetSet->buttonPressed(BUTTON_OK, state);
+            s_widgetSet->buttonPressed(BUTTON_MIDDLE, state);
         } else if (buttonId == BUTTON_RIGHT) {
             Serial.printf("Right button pressed, state=%d\n", state);
             s_widgetCycleDelayPrev = millis();
@@ -99,9 +109,9 @@ void MainHelper::checkButtons() {
     if (leftState != BTN_NOTHING) {
         buttonPressed(BUTTON_LEFT, leftState);
     }
-    ButtonState middleState = buttonOK.getState();
+    ButtonState middleState = buttonMiddle.getState();
     if (middleState != BTN_NOTHING) {
-        buttonPressed(BUTTON_OK, middleState);
+        buttonPressed(BUTTON_MIDDLE, middleState);
     }
     ButtonState rightState = buttonRight.getState();
     if (rightState != BTN_NOTHING) {
