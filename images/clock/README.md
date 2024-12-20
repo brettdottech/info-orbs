@@ -7,8 +7,8 @@ Then add
 `#define USE_CLOCK_CUSTOM X`
 to your config.h and set X to the number of custom clocks you want to include
 
-If you want to disable the nixie clock, set
-`#define USE_CLOCK_NIXIE 0`
+If you want to disable the custom clocks, set
+`#define USE_CLOCK_CUSTOM 0`
 
 The first custom clock (number 0) uses these images:
 
