@@ -158,7 +158,7 @@ const char WEBPORTAL_BROWSE_START[] = R"(
 </head>
 <body>
     <div class="container">
-        <h2>LittleFS File Browser</h2>
+        <h2>InfoOrbs File Browser</h2>
 )";
 
 const char WEBPORTAL_BROWSE_UPLOAD_FORM1[] = R"(

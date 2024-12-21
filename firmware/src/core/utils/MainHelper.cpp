@@ -256,6 +256,11 @@ void MainHelper::handleEndpointDownloadFilesFromURL() {
     String currentDir = s_wifiManager->server->arg("dir");
     currentDir.replace("\n", ""); // Remove \n from form
     currentDir.replace("\r", ""); // Remove \r from form
+    if (url.startsWith("https://github.com")) {
+        // Replace GitHub URLs
+        url.replace("github.com", "raw.githubusercontent.com");
+        url.replace("tree", "refs/heads");
+    }
     if (url == "" || currentDir == "") {
         s_wifiManager->server->send(400, "text/html", "<h2>Invalid URL or directory</h2>");
         return;
