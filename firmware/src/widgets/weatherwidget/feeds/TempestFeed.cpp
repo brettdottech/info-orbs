@@ -70,15 +70,23 @@ String TempestFeed::translateIcon(const std::string& icon) {
         {"partly-cloudy-night", "partly-cloudy-night"},
         {"cloudy", "partly-cloudy-day"},  // Map cloudy to partly-cloudy-day
         {"rain", "rain"},
+        {"rainy", "rain"},
+        {"sleet", "rain"},
         {"possibly-rain-day", "rain"},
         {"possibly-rain-night", "rain"},
+        {"possibly-sleet-day", "rain"},
+        {"possibly-sleet-night", "rain"},
         {"snow", "snow"},
         {"possibly-snow-day", "snow"},
         {"possibly-snow-night", "snow"},
         {"fog", "fog"},
+        {"foggy", "fog"},
         {"hail", "rain"},  // Example: treat hail as rain
         {"thunderstorm", "rain"},  // Example: treat thunderstorm as rain
+        {"possibly-thunderstorm-day", "rain"},  // Example: treat thunderstorm as rain
+        {"possibly-thunderstorm-night", "rain"},  // Example: treat thunderstorm as rain
         {"wind", "clear-day"},  // Example: map windy to clear-day
+        {"windy", "clear-day"},  // Example: map windy to clear-day
         {"tornado", "rain"}  // Example: treat tornado as rain
     };
 
