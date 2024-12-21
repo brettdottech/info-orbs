@@ -8,13 +8,14 @@
 
 class TempestFeed : public WeatherFeed {
 public:
-    TempestFeed(const String &apiKey, const std::string &stationId, int units);
+    TempestFeed(const String &apiKey, const String &stationId, int units, const String &stationName);
     bool getWeatherData(WeatherDataModel &model) override;
     String translateIcon(const std::string& icon);
     
 private:
     String apiKey;
-    std::string stationId;
+    String stationId;
+    String stationName;
     int units;
 };
 

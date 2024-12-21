@@ -1,18 +1,16 @@
 #include "TempestFeed.h"
-#include "GlobalTime.h"
-#include "config_helper.h"
 #include <unordered_map>
 
 
-TempestFeed::TempestFeed(const String &apiKey, const std::string &stationId, int units)
-    : apiKey(apiKey), stationId(stationId), units(units) {}
+TempestFeed::TempestFeed(const String &apiKey, const String &stationId, int units, const String &stationName)
+    : apiKey(apiKey), stationId(stationId), units(units), stationName(stationName) {}
 
 bool TempestFeed::getWeatherData(WeatherDataModel &model) {
 
     HTTPClient http;
     String tempUnits = units == 0 ? "c" : "f";
 
-    String httpRequestAddress = "https://swd.weatherflow.com/swd/rest/better_forecast?station_id=" + String(stationId.c_str()) +
+    String httpRequestAddress = "https://swd.weatherflow.com/swd/rest/better_forecast?station_id=" + stationId +
                                 "&units_temp=" + tempUnits + "&units_wind=mph&units_pressure=mb&units_precip=in&units_distance=mi&api_key=" + apiKey;
 
     http.begin(httpRequestAddress);
@@ -36,7 +34,7 @@ bool TempestFeed::getWeatherData(WeatherDataModel &model) {
         http.end();
 
         if (!error | DeserializationError::IncompleteInput) {
-            model.setCityName(String(WEATHER_TEMPEST_STATION_NAME));
+            model.setCityName(stationName);
             model.setCurrentTemperature(doc["current_conditions"]["air_temperature"].as<float>());
             model.setCurrentText(doc["forecast"]["daily"][0]["conditions"].as<String>());
 

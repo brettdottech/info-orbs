@@ -33,7 +33,7 @@ WeatherWidget::~WeatherWidget() {
 
 WeatherFeed* WeatherWidget::createWeatherFeed() {
 #ifdef WEATHER_TEMPEST_FEED
-    return new TempestFeed(WEATHER_TEMPEST_API_KEY, WEATHER_TEMPEST_STATION_ID, m_weatherUnits);
+    return new TempestFeed(WEATHER_TEMPEST_API_KEY, WEATHER_TEMPEST_STATION_ID, m_weatherUnits, WEATHER_TEMPEST_STATION_NAME);
 #else
     return new VisualCrossingFeed(WEATHER_VISUALCROSSING_API_KEY, m_weatherLocation, m_weatherUnits);
 #endif
