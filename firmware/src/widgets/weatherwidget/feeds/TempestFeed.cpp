@@ -4,15 +4,15 @@
 #include <unordered_map>
 
 
-TempestFeed::TempestFeed(const String &apiKey, const std::string &location, int units)
-    : apiKey(apiKey), location(location), units(units) {}
+TempestFeed::TempestFeed(const String &apiKey, const std::string &stationId, int units)
+    : apiKey(apiKey), stationId(stationId), units(units) {}
 
 bool TempestFeed::getWeatherData(WeatherDataModel &model) {
 
     HTTPClient http;
     String tempUnits = units == 0 ? "c" : "f";
 
-    String httpRequestAddress = "https://swd.weatherflow.com/swd/rest/better_forecast?station_id=" + String(WEATHER_TEMPEST_STATION_ID) +
+    String httpRequestAddress = "https://swd.weatherflow.com/swd/rest/better_forecast?station_id=" + String(stationId.c_str()) +
                                 "&units_temp=" + tempUnits + "&units_wind=mph&units_pressure=mb&units_precip=in&units_distance=mi&api_key=" + apiKey;
 
     http.begin(httpRequestAddress);
