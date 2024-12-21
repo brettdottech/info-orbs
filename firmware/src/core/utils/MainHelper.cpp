@@ -434,5 +434,7 @@ void MainHelper::restartIfNecessary() {
 
 void MainHelper::setupLittleFS() {
     LittleFSHelper::begin();
+#ifdef LITTLEFS_DEBUG
     LittleFSHelper::listFilesRecursively("/");
+#endif
 }
