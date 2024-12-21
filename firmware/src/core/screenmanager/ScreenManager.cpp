@@ -2,6 +2,7 @@
 #include "ConfigManager.h"
 #include "Utils.h"
 #include <Arduino.h>
+#include <LittleFS.h>
 
 ScreenManager *ScreenManager::instance = nullptr;
 
@@ -13,7 +14,7 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     }
 
     m_tft.init();
-    m_tft.setRotation(ConfigManager::getInstance()->getConfigBool("invertedOrbs", INVERTED_ORBS) ? 2 : 0);
+    m_tft.setRotation(ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION));
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
@@ -95,7 +96,9 @@ OpenFontRender &ScreenManager::getRender() {
 // Selects a single screen
 void ScreenManager::selectScreen(int screen) {
     for (int i = 0; i < NUM_SCREENS; i++) {
-        int currentDisplay = INVERTED_ORBS ? NUM_SCREENS - i - 1 : i;
+        int orbRotation = ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION);
+        bool rotateDisplays = orbRotation == 1 || orbRotation == 2;
+        int currentDisplay = rotateDisplays ? NUM_SCREENS - i - 1 : i;
         digitalWrite(m_screen_cs[currentDisplay], i == screen ? LOW : HIGH);
     }
 }
@@ -345,6 +348,17 @@ JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], 
     // Set image color
     m_imageColor = imageColor;
     JRESULT result = TJpgDec.drawJpg(x, y, jpeg_data, data_size);
+    // Reset image color
+    m_imageColor = 0;
+    return result;
+}
+
+JRESULT ScreenManager::drawFsJpg(int32_t x, int32_t y, const char *filename, uint8_t scale, uint32_t imageColor) {
+    // Set scale
+    TJpgDec.setJpgScale(scale);
+    // Set image color
+    m_imageColor = imageColor;
+    JRESULT result = TJpgDec.drawFsJpg(x, y, filename, LittleFS);
     // Reset image color
     m_imageColor = 0;
     return result;

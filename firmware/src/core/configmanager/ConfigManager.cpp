@@ -39,7 +39,7 @@ ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
         }
     } else {
         Serial.println("NVS initialized successfully in ConfigManager");
-        if (digitalRead(BUTTON_OK) == Button::PRESSED_LEVEL) {
+        if (digitalRead(BUTTON_MIDDLE_PIN) == Button::PRESSED_LEVEL) {
             Serial.println("Middle button pressed -> Clearing preferences...");
             m_preferences.clear();
             Serial.println("...done");
