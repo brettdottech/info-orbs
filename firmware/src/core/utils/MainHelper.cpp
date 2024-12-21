@@ -292,7 +292,7 @@ void MainHelper::handleEndpointDownloadFilesFromURL() {
                     }
 
                     file.close();
-                    Serial.println("Downloaded: " + fileName);
+                    Serial.println("Downloaded: " + fileName + " (" + String(file.size()) + ")");
                 } else {
                     Serial.println("Failed to open file for writing: " + filePath);
                 }
