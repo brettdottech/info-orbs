@@ -10,10 +10,11 @@ enum ButtonState {
 };
 
 enum Buttons {
-    BUTTON_LEFT = 0,
-    BUTTON_MIDDLE = 1,
-    BUTTON_OK = 1, // backwards compatibility
-    BUTTON_RIGHT = 2,
+    BUTTON_INVALID = 0,
+    BUTTON_LEFT = 1,
+    BUTTON_MIDDLE = 2,
+    BUTTON_OK = 2, // backwards compatibility
+    BUTTON_RIGHT = 3,
 };
 
 class Button {
