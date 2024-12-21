@@ -134,7 +134,7 @@ void MainHelper::handleEndpointButton() {
         uint8_t buttonId = Utils::stringToButtonId(inButton);
         ButtonState state = Utils::stringToButtonState(inState);
 
-        if (buttonId != 0 && state != BTN_NOTHING) {
+        if (buttonId != BUTTON_INVALID && state != BTN_NOTHING) {
             buttonPressed(buttonId, state);
             s_wifiManager->server->send(200, "text/plain", "OK " + inButton + "/" + inState + " -> " + String(buttonId) + "/" + String(state));
             return;

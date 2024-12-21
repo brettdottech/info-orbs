@@ -339,15 +339,15 @@ const char *Utils::createConstCharBufferAndConcat(const char *prefix, const char
     return result;
 }
 
-uint8_t Utils::stringToButtonId(const String &buttonName) {
+Buttons Utils::stringToButtonId(const String &buttonName) {
     if (buttonName.equalsIgnoreCase("left")) {
         return BUTTON_LEFT;
     } else if (buttonName.equalsIgnoreCase("middle")) {
-        return BUTTON_OK;
+        return BUTTON_MIDDLE;
     } else if (buttonName.equalsIgnoreCase("right")) {
         return BUTTON_RIGHT;
     } else {
-        return 0;
+        return BUTTON_INVALID;
     }
 }
 
