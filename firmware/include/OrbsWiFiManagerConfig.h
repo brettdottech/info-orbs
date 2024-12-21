@@ -104,4 +104,92 @@ const char WEBPORTAL_BUTTONS_SCRIPT[] = R"(
 </script>
 )";
 
+const char WEBPORTAL_BROWSE_START[] = R"(
+<html>
+<head>
+    <title>InfoOrbs File Browser</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        h2, h3 { color: #333; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 10px 0; display: flex; align-items: center; }
+        a { text-decoration: none; color: #007BFF; }
+        a:hover { text-decoration: underline; }
+        .button { display: inline-block; padding: 10px 20px; margin: 5px 0; background-color: #007BFF; color: white; border: none; border-radius: 5px; text-align: center; cursor: pointer; text-decoration: none; }
+        .delete { margin: 5px 20px; }
+        .button:hover { background-color: #0056b3; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .icon { cursor: pointer; margin-left: 10px; color: red; }
+        .preview { width: 100px; height: 100px; object-fit: cover; margin-right: 10px; }
+        .input-group { display: flex; margin: 10px 0; }
+        .input-group input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-right: 10px; }
+        .spinner {
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid #3498db; 
+            border-radius: 50%; 
+            width: 100px; 
+            height: 100px; 
+            animation: spin 2s linear infinite; 
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed position relative to the viewport */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Offset by half its own size to perfectly center */
+            z-index: 9999; /* Ensure the spinner is above other content */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        function confirmDelete(file, dir) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                window.location.href = '/delete?file=' + file + '&dir=' + dir;
+            }
+        }
+        function showSpinner() {
+                document.getElementById("spinner").style.display = "block";
+        }
+        function hideSpinner() {
+            document.getElementById("spinner").style.display = "none";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>LittleFS File Browser</h2>
+)";
+
+const char WEBPORTAL_BROWSE_UPLOAD_FORM1[] = R"(
+        <h3>Upload a new file</h3>
+        <form method='POST' enctype='multipart/form-data' action='/upload'>
+            <input type='file' name='file'>
+            <input type='hidden' name='dir' value='
+)";
+
+const char WEBPORTAL_BROWSE_UPLOAD_FORM2[] = R"(
+'>
+            <input class='button' type='submit' value='Upload'>
+        </form>
+)";
+
+const char WEBPORTAL_BROWSE_DOWNLOADURL_FORM1[] = R"(
+        <h3>Download CustomClock images (1.jpg, ..., 11.jpg) from URL</h3>
+        <form method='POST' action='/downloadFromUrl' onsubmit='showSpinner()'>
+            <div class='input-group'>
+                <input type='text' name='url' placeholder='Enter URL (e.g., http://example.com)' required>
+                <input type='hidden' name='dir' value='
+)";
+
+const char WEBPORTAL_BROWSE_DOWNLOADURL_FORM2[] = R"(
+'>
+            <button class='button' type='submit'>Download</button>
+            </div>
+        </form>
+        <div id="spinner" class='spinner'/>
+    </div>
+</body>
+</html>
+)";
 #endif // ORBS_WIFI_MANAGER_CONFIG_H
