@@ -1,3 +1,4 @@
+// include guard to ensure header is not included more than once
 #ifndef WEATHERWIDGET_H
 #define WEATHERWIDGET_H
 
@@ -5,6 +6,12 @@
 #include "WeatherDataModel.h"
 #include "Widget.h"
 #include "config_helper.h"
+
+#ifdef WEATHER_TEMPEST_FEED
+#include "feeds/TempestFeed.h"
+#else
+#include "feeds/VisualCrossingFeed.h"
+#endif
 
 class WeatherWidget : public Widget {
 public:
@@ -25,9 +32,9 @@ private:
     void singleWeatherDeg(int displayIndex);
     void weatherText(int displayIndex);
     void threeDayWeather(int displayIndex);
-    bool getWeatherData();
     int getClockStamp();
     void configureColors();
+    WeatherFeed* createWeatherFeed();
 
     GlobalTime *m_time;
     int8_t m_mode;
@@ -50,6 +57,7 @@ private:
     int m_clockStamp = 0;
 
     WeatherDataModel model;
+    WeatherFeed *weatherFeed;
 
 // This is a hack to support old config.h files that have WEATHER_LOCAION instead of LOCATION.
 #ifndef WEATHER_LOCATION
@@ -64,9 +72,8 @@ private:
     int m_weatherUnits = 1;
 #endif
 
-    const String weatherApiKey = WEATHER_API_KEY;
-
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 };
+
 #endif // WEATHERWIDGET_H

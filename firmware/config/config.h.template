@@ -38,6 +38,11 @@
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data
 #define WEATHER_SCREEN_MODE Dark        // Can be either Light or Dark
 #define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather
+#define WEATHER_VISUALCROSSING_API_KEY "XW2RDGD6XK432AF25BNK2A3C7" // Visual Crossing API key
+//#define WEATHER_TEMPEST_FEED true
+//#define WEATHER_TEMPEST_STATION_ID "#####" // Set the station ID of your Tempest weather station
+//#define WEATHER_TEMPEST_STATION_NAME "Home" // Set the name of your Tempest weather station
+//#define WEATHER_TEMPEST_API_KEY "YOUR_API_KEY" // Your Tempest Weather API key
 
 // STOCK TICKER CONFIGURATION
 #define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,SPY,APC&country=Germany" // Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on "&country=Canada" to narrow down to your ticker)
