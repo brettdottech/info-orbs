@@ -33,7 +33,7 @@ public:
     static uint16_t grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes = false);
     static void colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targetColor888, float brightness, bool swapBytes = true);
 
-    static uint8_t stringToButtonId(const String &buttonName);
+    static Buttons stringToButtonId(const String &buttonName);
     static ButtonState stringToButtonState(const String &buttonState);
 
     /**

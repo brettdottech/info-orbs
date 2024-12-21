@@ -5,7 +5,7 @@
 
 // MAIN CONFIGURATION
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
-#define INVERTED_ORBS false                       // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
+#define ORB_ROTATION 0                            // 0 = Normal, 1 = 90 degrees CW, 2 = 180 degrees, 3 = 270 degrees CW
 #define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN                                 // Language selection for Month and Weekday - possible values are EN, DE, FR
 
@@ -97,15 +97,9 @@
 #define SCREEN_4_CS 25
 #define SCREEN_5_CS 21
 
-#if INVERTED_ORBS
-    #define BUTTON_OK 27
-    #define BUTTON_LEFT 14
-    #define BUTTON_RIGHT 26
-#else
-    #define BUTTON_OK 27
-    #define BUTTON_LEFT 26
-    #define BUTTON_RIGHT 14
-#endif
+#define BUTTON_LEFT_PIN 26
+#define BUTTON_MIDDLE_PIN 27
+#define BUTTON_RIGHT_PIN 14
 
 #define BUTTON_DEBOUNCE_TIME 35        // Debounce buttons for X ms
 #define BUTTON_MEDIUM_PRESS_TIME 500    // Medium press is registered after X ms
