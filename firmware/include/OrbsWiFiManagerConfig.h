@@ -138,32 +138,47 @@ const char WEBPORTAL_BROWSE_START[] = R"(
         input[type="file"] {
             display: none;
         }
+        /* Overlay covering the whole page */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            display: none; /* Hidden by default */
+            z-index: 9998; /* Below spinner */
+            justify-content: center;
+            align-items: center;
+        }
+        /* Spinner styling */
         .spinner {
+            text-align: center; /* Center the text below the spinner */
+            z-index: 9999; /* Ensure it's above the overlay */
+        }
+        .spinner-circle {
             border: 4px solid #f3f3f3; 
             border-top: 4px solid #3498db; 
             border-radius: 50%; 
             width: 100px; 
             height: 100px; 
             animation: spin 2s linear infinite; 
-            display: none; /* Hidden by default */
-            position: fixed; /* Fixed position relative to the viewport */
-            top: 50%; /* Center vertically */
-            left: 50%; /* Center horizontally */
-            transform: translate(-50%, -50%); /* Offset by half its own size to perfectly center */
-            z-index: 9999; /* Ensure the spinner is above other content */
+            margin: 0 auto; /* Center the circle */
         }
         .spinner-text {
-            position: absolute; /* Position relative to the spinner */
-            top: 120%; /* Place the text below the spinner */
-            left: 50%; /* Center the text horizontally */
-            transform: translateX(-50%); /* Adjust for text width */
-            font-size: 16px; /* Adjust font size as needed */
-            color: #333; /* Text color */
-            text-align: center;
+            margin-top: 10px; /* Space between the spinner and the text */
+            font-size: 16px;
+            color: #CCC;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        /* Add blur to the page content when overlay is active */
+        .blur {
+            filter: blur(5px);
+            pointer-events: none; /* Disable all interactions */
+            user-select: none; /* Prevent text selection */
         }
         #drop-area {
             border: 2px dashed #007BFF;
@@ -226,15 +241,23 @@ const char WEBPORTAL_BROWSE_START[] = R"(
                     });
             }
         }
+        function showSpinner(text = 'Processing, please wait...') {
+            const overlay = document.getElementById('overlay');
+            const spinnerText = document.getElementById('spinner-text');
+            const container = document.getElementById('container');
 
-        function showSpinner() {
-                document.getElementById("spinner").style.display = "block";
+            if (spinnerText) spinnerText.textContent = text;
+
+            overlay.style.display = 'flex'; // Show the overlay
+            container.classList.add('blur'); // Blur the page content
         }
-
         function hideSpinner() {
-            document.getElementById("spinner").style.display = "none";
-        }
+            const overlay = document.getElementById('overlay');
+            const container = document.getElementById('container');
 
+            overlay.style.display = 'none'; // Hide the overlay
+            container.classList.remove('blur'); // Remove blur from the page content
+        }
         function setSpinnerText(text) {
             const spinnerText = document.getElementById('spinner-text');
             if (spinnerText) {
@@ -301,15 +324,21 @@ const char WEBPORTAL_BROWSE_START[] = R"(
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class='overlay' id='overlay'>
+        <div class='spinner' id='spinner'>
+            <div class='spinner-circle'></div>
+            <p class='spinner-text' id='spinner-text'>Processing, please wait...</p>
+        </div>
+    </div>
+    <div class='container' id='container'>
         <h2>InfoOrbs File Browser</h2>
 )";
 
 const char WEBPORTAL_BROWSE_UPLOAD_FORM1[] = "<h3>Upload new files to ";
 
 const char WEBPORTAL_BROWSE_UPLOAD_FORM2[] = R"(:</h3>
-        <div id="drop-area">
-            <form id="upload-form" method='POST' enctype='multipart/form-data' action='/upload'>
+        <div id='drop-area'>
+            <form id='upload-form' method='POST' enctype='multipart/form-data' action='/upload'>
                 <p>Drag and drop files here or <label class='button' for='fileElem'>Select files</label><input type='file' id='fileElem' name=')";
 
 const char WEBPORTAL_BROWSE_UPLOAD_FORM3[] = R"(' multiple></p>
@@ -331,7 +360,6 @@ const char WEBPORTAL_BROWSE_FETCHURL_FORM2[] = R"('>
             <button class='button' type='submit'>Fetch</button>
             </div>
         </form>
-        <div id='spinner' class='spinner'><p class='spinner-text' id='spinner-text'>Processing, please wait...</p></div>
     </div>
 </body>
 </html>
