@@ -288,7 +288,7 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
     int endA = (seconds * 6) + 180 + 3;
     if (startA > 360) {startA = startA - 360;}
     if (endA > 360 ) {endA = endA - 360;}
-    m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 100, startA, endA, color, TFT_BLACK);
+    m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, startA, endA, color, TFT_BLACK);
 }
 
 void ClockWidget::displayDigitImage(int displayIndex, const String &digit) {
