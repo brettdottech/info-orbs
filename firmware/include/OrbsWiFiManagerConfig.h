@@ -159,7 +159,19 @@ const char WEBPORTAL_BROWSE_START[] = R"(
     <script>
         function confirmDelete(file, dir) {
             if (confirm('Are you sure you want to delete this file?')) {
-                window.location.href = '/delete?file=' + file + '&dir=' + dir;
+                const url = `/delete?file=${encodeURIComponent(file)}&dir=${encodeURIComponent(dir)}`;
+                showSpinner();
+                fetch(url, { method: 'GET' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload(); // Refresh the current page
+                        } else {
+                            alert('Failed to delete the file.');
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error: ' + error.message);
+                    });
             }
         }
 
