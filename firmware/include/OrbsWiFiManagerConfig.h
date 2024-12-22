@@ -109,10 +109,10 @@ const char WEBPORTAL_BROWSE_START[] = R"(
 <head>
     <title>InfoOrbs File Browser</title>
     <style>
-        body { background: #060606; text-align: center; color: #fff; font-family: verdana; padding: 20px; }
+        body { background: #060606; color: #fff; font-family: verdana; padding: 20px; }
         ul { list-style-type: none; padding: 0; }
         li { margin: 10px 0; display: flex; align-items: center; }
-        a { text-decoration: none; }
+        a { text-decoration: none; color: #fff; }
         a:hover { text-decoration: underline; }
         .button { display: inline-block; padding: 10px 20px; margin: 5px 0; background-color: #007BFF; color: white; border: none; border-radius: 5px; text-align: center; cursor: pointer; text-decoration: none; }
         .delete { margin: 5px 20px; }
