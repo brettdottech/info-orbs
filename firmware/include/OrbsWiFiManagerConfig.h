@@ -152,6 +152,15 @@ const char WEBPORTAL_BROWSE_START[] = R"(
             transform: translate(-50%, -50%); /* Offset by half its own size to perfectly center */
             z-index: 9999; /* Ensure the spinner is above other content */
         }
+        .spinner-text {
+            position: absolute; /* Position relative to the spinner */
+            top: 120%; /* Place the text below the spinner */
+            left: 50%; /* Center the text horizontally */
+            transform: translateX(-50%); /* Adjust for text width */
+            font-size: 16px; /* Adjust font size as needed */
+            color: #333; /* Text color */
+            text-align: center;
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -224,6 +233,13 @@ const char WEBPORTAL_BROWSE_START[] = R"(
 
         function hideSpinner() {
             document.getElementById("spinner").style.display = "none";
+        }
+
+        function setSpinnerText(text) {
+            const spinnerText = document.getElementById('spinner-text');
+            if (spinnerText) {
+                spinnerText.textContent = text;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -315,7 +331,7 @@ const char WEBPORTAL_BROWSE_FETCHURL_FORM2[] = R"('>
             <button class='button' type='submit'>Fetch</button>
             </div>
         </form>
-        <div id="spinner" class='spinner'/>
+        <div id='spinner' class='spinner'><p class='spinner-text' id='spinner-text'>Processing, please wait...</p></div>
     </div>
 </body>
 </html>
