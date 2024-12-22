@@ -122,6 +122,19 @@ const char WEBPORTAL_BROWSE_START[] = R"(
         .preview { width: 100px; height: 100px; object-fit: cover; margin-right: 10px; }
         .input-group { display: flex; margin: 10px 0; }
         .input-group input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-right: 10px; }
+        .file-item {
+            display: flex;
+            align-items: center; /* Vertically centers the content */
+            margin-bottom: 15px; /* Optional spacing between file items */
+        }
+
+        .file-item img.preview {
+            margin-right: 15px; /* Adds spacing between the image and the text */
+        }
+
+        .file-item button {
+            margin-left: auto; /* Pushes the delete button to the right */
+        }
         input[type="file"] {
             display: none;
         }
@@ -157,6 +170,36 @@ const char WEBPORTAL_BROWSE_START[] = R"(
         }
     </style>
     <script>
+        async function handleFetchFromUrl(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            const form = document.getElementById('download-url-form');
+            const urlInput = document.getElementById('urlInput').value;
+            const dirInput = document.getElementById('dirInput').value;
+
+            const formData = new FormData();
+            formData.append('url', urlInput);
+            formData.append('dir', dirInput);
+
+            try {
+                showSpinner();
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                hideSpinner();
+                if (response.ok) {
+                    location.reload(); // Refresh the page to show the new files
+                } else {
+                    const error = await response.text();
+                    alert('Error: ' + error);
+                }
+            } catch (error) {
+                hideSpinner();
+                alert('Download failed: ' + error.message);
+            }
+        }
+
         function confirmDelete(file, dir) {
             if (confirm('Are you sure you want to delete this file?')) {
                 const url = `/delete?file=${encodeURIComponent(file)}&dir=${encodeURIComponent(dir)}`;
@@ -263,10 +306,10 @@ const char WEBPORTAL_BROWSE_UPLOAD_FORM4[] = R"('>
 
 const char WEBPORTAL_BROWSE_FETCHURL_FORM1[] = R"(
         <h3>Fetch CustomClock images (0.jpg, ..., 11.jpg) from URL:</h3>
-        <form method='POST' action='/fetchFromUrl' onsubmit='showSpinner()'>
+        <form id='download-url-form' action='/fetchFromUrl' onsubmit='handleFetchFromUrl(event)'>
             <div class='input-group'>
-                <input type='text' name='url' placeholder='Enter URL (e.g., http://example.com)' required>
-                <input type='hidden' name='dir' value=')";
+                <input type='text' id='urlInput' name='url' placeholder='Enter URL (e.g., http://example.com)' required>
+                <input type='hidden' id='dirInput' name='dir' value=')";
 
 const char WEBPORTAL_BROWSE_FETCHURL_FORM2[] = R"('>
             <button class='button' type='submit'>Fetch</button>

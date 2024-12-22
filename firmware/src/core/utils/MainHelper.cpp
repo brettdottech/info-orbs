@@ -224,7 +224,7 @@ void MainHelper::handleEndpointListFiles() {
                     previewHtml = "<img class='preview' src='/download?path=" + filePath + "'>";
                 }
 
-                html += "<div><a href='/download?path=" + filePath + "' download>" + previewHtml + "</a>" +
+                html += "<div class='file-item'><a href='/download?path=" + filePath + "' download>" + previewHtml + "</a>" +
                         fileName + " (" + String(file.size()) +
                         " Bytes) <button class='button delete' onclick=\"confirmDelete('" +
                         String(file.name()) + "', '" + currentDir + "')\">Delete</button></div>";
