@@ -109,20 +109,22 @@ const char WEBPORTAL_BROWSE_START[] = R"(
 <head>
     <title>InfoOrbs File Browser</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
-        h2, h3 { color: #333; }
+        body { background: #060606; text-align: center; color: #fff; font-family: verdana; padding: 20px; }
         ul { list-style-type: none; padding: 0; }
         li { margin: 10px 0; display: flex; align-items: center; }
-        a { text-decoration: none; color: #007BFF; }
+        a { text-decoration: none; }
         a:hover { text-decoration: underline; }
         .button { display: inline-block; padding: 10px 20px; margin: 5px 0; background-color: #007BFF; color: white; border: none; border-radius: 5px; text-align: center; cursor: pointer; text-decoration: none; }
         .delete { margin: 5px 20px; }
         .button:hover { background-color: #0056b3; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .container { max-width: 800px; margin: auto; background: #111; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
         .icon { cursor: pointer; margin-left: 10px; color: red; }
         .preview { width: 100px; height: 100px; object-fit: cover; margin-right: 10px; }
         .input-group { display: flex; margin: 10px 0; }
         .input-group input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-right: 10px; }
+        input[type="file"] {
+            display: none;
+        }
         .spinner {
             border: 4px solid #f3f3f3; 
             border-top: 4px solid #3498db; 
@@ -141,6 +143,18 @@ const char WEBPORTAL_BROWSE_START[] = R"(
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #drop-area {
+            border: 2px dashed #007BFF;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #333;
+        }
+        #drop-area.hover {
+            border-color: #0056b3;
+            background-color: #666;
+        }
     </style>
     <script>
         function confirmDelete(file, dir) {
@@ -148,12 +162,71 @@ const char WEBPORTAL_BROWSE_START[] = R"(
                 window.location.href = '/delete?file=' + file + '&dir=' + dir;
             }
         }
+
         function showSpinner() {
                 document.getElementById("spinner").style.display = "block";
         }
+
         function hideSpinner() {
             document.getElementById("spinner").style.display = "none";
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('fileElem');
+            const form = document.getElementById('upload-form');
+
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('hover');
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('hover');
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('hover');
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(fileInput.files);
+            });
+
+            function handleFiles(files) {
+                // Send files via FormData
+                const formData = new FormData();
+                for (const file of files) {
+                    // Use the path as name
+                    formData.append(form.elements['dir'].value, file);
+                }
+                uploadFiles(formData);
+            }
+
+            async function uploadFiles(formData) {
+                showSpinner();
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    hideSpinner();
+                    if (response.ok) {
+                        alert('Files uploaded successfully!');
+                        location.reload(); // Refresh the page
+                    } else {
+                        alert('Error uploading files.');
+                    }
+                } catch (error) {
+                    hideSpinner();
+                    alert('Upload failed: ' + error.message);
+
+                }
+            }
+        });
     </script>
 </head>
 <body>
@@ -162,29 +235,28 @@ const char WEBPORTAL_BROWSE_START[] = R"(
 )";
 
 const char WEBPORTAL_BROWSE_UPLOAD_FORM1[] = R"(
-        <h3>Upload a new file</h3>
-        <form method='POST' enctype='multipart/form-data' action='/upload'>
-            <input type='file' name='file'>
-            <input type='hidden' name='dir' value='
+<h3>Upload new files</h3>
+        <div id="drop-area">
+            <form id="upload-form" method='POST' enctype='multipart/form-data' action='/upload'>
+                <p>Drag and drop files here or <label class='button' for='fileElem'>Select files</label><input type='file' id='fileElem' name=')";
+
+const char WEBPORTAL_BROWSE_UPLOAD_FORM2[] = R"(' multiple></p>
+                <input type='hidden' name='dir' value=')";
+
+const char WEBPORTAL_BROWSE_UPLOAD_FORM3[] = R"('>
+            </form>
+        </div>
 )";
 
-const char WEBPORTAL_BROWSE_UPLOAD_FORM2[] = R"(
-'>
-            <input class='button' type='submit' value='Upload'>
-        </form>
-)";
-
-const char WEBPORTAL_BROWSE_DOWNLOADURL_FORM1[] = R"(
-        <h3>Download CustomClock images (1.jpg, ..., 11.jpg) from URL</h3>
-        <form method='POST' action='/downloadFromUrl' onsubmit='showSpinner()'>
+const char WEBPORTAL_BROWSE_FETCHURL_FORM1[] = R"(
+        <h3>Fetch CustomClock images (0.jpg, ..., 11.jpg) from URL</h3>
+        <form method='POST' action='/fetchFromUrl' onsubmit='showSpinner()'>
             <div class='input-group'>
                 <input type='text' name='url' placeholder='Enter URL (e.g., http://example.com)' required>
-                <input type='hidden' name='dir' value='
-)";
+                <input type='hidden' name='dir' value=')";
 
-const char WEBPORTAL_BROWSE_DOWNLOADURL_FORM2[] = R"(
-'>
-            <button class='button' type='submit'>Download</button>
+const char WEBPORTAL_BROWSE_FETCHURL_FORM2[] = R"('>
+            <button class='button' type='submit'>Fetch</button>
             </div>
         </form>
         <div id="spinner" class='spinner'/>

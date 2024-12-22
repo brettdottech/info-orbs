@@ -67,7 +67,7 @@ public:
     static void handleEndpointUploadFile();
     static void handleEndpointDeleteFile();
     static void handleEndpointDownloadFile();
-    static void handleEndpointDownloadFilesFromURL();
+    static void handleEndpointFetchFilesFromURL();
 
     static void restartIfNecessary();
 
