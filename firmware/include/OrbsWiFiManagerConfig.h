@@ -309,7 +309,6 @@ const char WEBPORTAL_BROWSE_START[] = R"(
                     });
                     hideSpinner();
                     if (response.ok) {
-                        alert('Files uploaded successfully!');
                         location.reload(); // Refresh the page
                     } else {
                         alert('Error uploading files.');
