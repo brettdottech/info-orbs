@@ -31,7 +31,8 @@ private:
     TaskHandle_t m_taskHandle;
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
-    unsigned long m_stockDelay = 900000; // default to 15m between updates
+    //unsigned long m_stockDelay = 900000; // default to 15m between updates
+    unsigned long m_stockDelay = 600000; // 10min
     unsigned long m_stockDelayPrev = 0;
 
 #ifdef STOCK_TICKER_LIST
