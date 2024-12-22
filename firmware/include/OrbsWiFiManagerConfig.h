@@ -110,8 +110,8 @@ const char WEBPORTAL_BROWSE_START[] = R"(
     <title>InfoOrbs File Browser</title>
     <style>
         body { background: #060606; color: #fff; font-family: verdana; padding: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; display: flex; align-items: center; }
+        ul { list-style-type: disc; list-style-position: inside; padding: 0; }
+        li { margin: 10px 0; align-items: center; }
         a { text-decoration: none; color: #fff; }
         a:hover { text-decoration: underline; }
         .button { display: inline-block; padding: 10px 20px; margin: 5px 0; background-color: #007BFF; color: white; border: none; border-radius: 5px; text-align: center; cursor: pointer; text-decoration: none; }
@@ -234,22 +234,23 @@ const char WEBPORTAL_BROWSE_START[] = R"(
         <h2>InfoOrbs File Browser</h2>
 )";
 
-const char WEBPORTAL_BROWSE_UPLOAD_FORM1[] = R"(
-<h3>Upload new files</h3>
+const char WEBPORTAL_BROWSE_UPLOAD_FORM1[] = "<h3>Upload new files to ";
+
+const char WEBPORTAL_BROWSE_UPLOAD_FORM2[] = R"(:</h3>
         <div id="drop-area">
             <form id="upload-form" method='POST' enctype='multipart/form-data' action='/upload'>
                 <p>Drag and drop files here or <label class='button' for='fileElem'>Select files</label><input type='file' id='fileElem' name=')";
 
-const char WEBPORTAL_BROWSE_UPLOAD_FORM2[] = R"(' multiple></p>
+const char WEBPORTAL_BROWSE_UPLOAD_FORM3[] = R"(' multiple></p>
                 <input type='hidden' name='dir' value=')";
 
-const char WEBPORTAL_BROWSE_UPLOAD_FORM3[] = R"('>
+const char WEBPORTAL_BROWSE_UPLOAD_FORM4[] = R"('>
             </form>
         </div>
 )";
 
 const char WEBPORTAL_BROWSE_FETCHURL_FORM1[] = R"(
-        <h3>Fetch CustomClock images (0.jpg, ..., 11.jpg) from URL</h3>
+        <h3>Fetch CustomClock images (0.jpg, ..., 11.jpg) from URL:</h3>
         <form method='POST' action='/fetchFromUrl' onsubmit='showSpinner()'>
             <div class='input-group'>
                 <input type='text' name='url' placeholder='Enter URL (e.g., http://example.com)' required>

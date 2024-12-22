@@ -195,7 +195,7 @@ void MainHelper::handleEndpointListFiles() {
             if (file.isDirectory()) {
                 if (first) {
                     first = false;
-                    html += "<h3>Directories</h3><ul>";
+                    html += "<h3>Directories:</h3><ul>";
                 }
                 html += "<li><a href='/browse?dir=" + currentDir + String(file.name()) + "/'>" + String(file.name()) + "</a></li>";
             }
@@ -213,7 +213,7 @@ void MainHelper::handleEndpointListFiles() {
             if (!file.isDirectory()) {
                 if (first) {
                     first = false;
-                    html += "<h3>Files</h3><ul>";
+                    html += "<h3>Files:</h3>";
                 }
                 String fileName = String(file.name());
                 String filePath = currentDir + fileName;
@@ -224,15 +224,12 @@ void MainHelper::handleEndpointListFiles() {
                     previewHtml = "<img class='preview' src='/download?path=" + filePath + "'>";
                 }
 
-                html += "<li><a href='/download?path=" + filePath + "' download>" + previewHtml + "</a>" +
+                html += "<div><a href='/download?path=" + filePath + "' download>" + previewHtml + "</a>" +
                         fileName + " (" + String(file.size()) +
                         " Bytes) <button class='button delete' onclick=\"confirmDelete('" +
-                        String(file.name()) + "', '" + currentDir + "')\">Delete</button></li>";
+                        String(file.name()) + "', '" + currentDir + "')\">Delete</button></div>";
             }
             file = dir.openNextFile();
-        }
-        if (!first) {
-            html += "</ul>";
         }
     }
 
@@ -241,6 +238,8 @@ void MainHelper::handleEndpointListFiles() {
     html += WEBPORTAL_BROWSE_UPLOAD_FORM2;
     html += currentDir;
     html += WEBPORTAL_BROWSE_UPLOAD_FORM3;
+    html += currentDir;
+    html += WEBPORTAL_BROWSE_UPLOAD_FORM4;
 
     html += WEBPORTAL_BROWSE_FETCHURL_FORM1;
     html += currentDir;
