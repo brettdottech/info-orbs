@@ -246,11 +246,11 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
         }
     }
     m_manager.selectScreen(displayIndex);
-    if (seconds < 30) {
-        m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds + 180, 6 * seconds + 180 + 6, color, TFT_BLACK);
-    } else {
-        m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds - 180, 6 * seconds - 180 + 6, color, TFT_BLACK);
-    }
+    int startA = (seconds * 6) + 180 - 3;
+    int endA = (seconds * 6) + 180 + 3;
+    if (startA > 360) {startA = startA - 360;}
+    if (endA > 360 ) {endA = endA - 360;}
+    m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 100, startA, endA, color, TFT_BLACK);
 }
 
 void ClockWidget::displayImage(int displayIndex, const String &digit) {
