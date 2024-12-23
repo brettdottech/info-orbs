@@ -41,8 +41,9 @@ void WifiWidget::setup() {
     m_wifiManager.setShowInfoUpdate(false);
     m_wifiManager.setShowInfoErase(false);
     // Add buttons link
-    const char *buttonsHtml = "<form action='/buttons' method='get'><button>Buttons</button></form><br/>\n";
-    m_wifiManager.setCustomMenuHTML(buttonsHtml);
+    const char *customMenuHtml = "<form action='/browse' method='get'><button>Browse Filesystem</button></form><br/>\n"
+                                 "<form action='/buttons' method='get'><button>Buttons</button></form><br/>\n";
+    m_wifiManager.setCustomMenuHTML(customMenuHtml);
     m_wifiManager.setMenu(wm_menu);
     m_wifiManager.setClass("invert"); // Dark mode
     m_wifiManager.setShowStaticFields(true);
