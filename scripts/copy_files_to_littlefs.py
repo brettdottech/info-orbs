@@ -19,54 +19,54 @@ clear_out_dir = True
 # The final filename is constructed as "dir + file" so the dir should end with a "/" unless you know what you are doing
 embed_map = {
     "USE_CLOCK_CUSTOM > 0": [ # Condition
-        ["images/clock/custom0/", # Source directory
+        ["images/clock/CustomClock0/", # Source directory
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"], # Files
-            1], # Skip first level while copying ("images/")
+            2], # Skip first two levels while copying ("images/")
     ],
     "USE_CLOCK_CUSTOM > 1": [
-        ["images/clock/custom1/", 
+        ["images/clock/CustomClock1/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 2": [
-        ["images/clock/custom2/", 
+        ["images/clock/CustomClock2/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 3": [
-        ["images/clock/custom3/", 
+        ["images/clock/CustomClock3/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 4": [
-        ["images/clock/custom4/", 
+        ["images/clock/CustomClock4/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 5": [
-        ["images/clock/custom5/", 
+        ["images/clock/CustomClock5/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 6": [
-        ["images/clock/custom6/", 
+        ["images/clock/CustomClock6/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 7": [
-        ["images/clock/custom7/", 
+        ["images/clock/CustomClock7/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 8": [
-        ["images/clock/custom8/", 
+        ["images/clock/CustomClock8/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
     "USE_CLOCK_CUSTOM > 9": [
-        ["images/clock/custom9/", 
+        ["images/clock/CustomClock9/", 
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
-            1],
+            2],
     ],
 }
 
