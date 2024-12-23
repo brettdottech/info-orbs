@@ -1,6 +1,8 @@
 #include "MainHelper.h"
+#include "LittleFSHelper.h"
 #include "config_helper.h"
 #include "icons.h"
+#include <HTTPClient.h>
 
 static Button buttonLeft;
 static Button buttonMiddle;
@@ -165,10 +167,236 @@ void MainHelper::handleEndpointButtons() {
     s_wifiManager->server->send(200, "text/html", msg);
 }
 
+void MainHelper::handleEndpointListFiles() {
+    String html = WEBPORTAL_BROWSE_HTML_START;
+    html += WEBPORTAL_BROWSE_STYLE;
+    html += WEBPORTAL_BROWSE_SCRIPT;
+    html += WEBPORTAL_BROWSE_BODY_START;
+
+    // Get the current directory from the query parameter or default to "/"
+    String currentDir = s_wifiManager->server->arg("dir");
+    if (currentDir == "") {
+        currentDir = "/"; // Default to the root directory
+    }
+
+    html += "<h3>Current Directory: " + currentDir + "</h3>";
+
+    // Add "Parent Directory" button
+    if (currentDir != "/") {
+        String parentDir = currentDir.substring(0, currentDir.lastIndexOf('/', currentDir.length() - 2) + 1);
+        html += "<a class='button' href='/browse?dir=" + parentDir + "'>Back to Parent Directory</a>";
+    }
+
+    // List files and directories
+    File dir = LittleFS.open(currentDir);
+    if (!dir.isDirectory()) {
+        html += "<p>Not a valid directory</p>";
+    } else {
+        File file = dir.openNextFile();
+        bool first = true;
+        while (file) {
+            if (file.isDirectory()) {
+                if (first) {
+                    first = false;
+                    html += "<h3>Directories:</h3><ul>";
+                }
+                html += "<li><a href='/browse?dir=" + currentDir + String(file.name()) + "/'>" + String(file.name()) + "</a></li>";
+            }
+            file = dir.openNextFile();
+        }
+        if (!first) {
+            html += "</ul>";
+        }
+
+        // List files in the current directory
+        dir = LittleFS.open(currentDir); // Reset to the beginning to list files
+        file = dir.openNextFile();
+        first = true;
+        while (file) {
+            if (!file.isDirectory()) {
+                if (first) {
+                    first = false;
+                    html += "<h3>Files:</h3>";
+                }
+                String fileName = String(file.name());
+                String filePath = currentDir + fileName;
+
+                // Check if the file is a JPG for preview
+                String previewHtml = "";
+                if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                    previewHtml = "<img class='preview' src='/download?path=" + filePath + "'>";
+                }
+
+                html += "<div class='file-item'><a href='/download?path=" + filePath + "' download>" + previewHtml + "</a>" +
+                        fileName + " (" + String(file.size()) +
+                        " Bytes) <button class='button delete' onclick=\"confirmDelete('" +
+                        String(file.name()) + "', '" + currentDir + "')\">Delete</button></div>";
+            }
+            file = dir.openNextFile();
+        }
+    }
+
+    html += WEBPORTAL_BROWSE_UPLOAD_FORM1;
+    html += currentDir;
+    html += WEBPORTAL_BROWSE_UPLOAD_FORM2;
+    html += currentDir;
+    html += WEBPORTAL_BROWSE_UPLOAD_FORM3;
+    html += currentDir;
+    html += WEBPORTAL_BROWSE_UPLOAD_FORM4;
+
+    html += WEBPORTAL_BROWSE_FETCHURL_FORM1;
+    html += currentDir;
+    html += WEBPORTAL_BROWSE_FETCHURL_FORM2;
+
+    html += WEBPORTAL_BROWSE_HTML_END;
+
+    s_wifiManager->server->send(200, "text/html", html);
+}
+
+void MainHelper::handleEndpointDownloadFile() {
+    String filePath = s_wifiManager->server->arg("path");
+
+    if (LittleFS.exists(filePath)) {
+        File file = LittleFS.open(filePath, "r");
+        if (file) {
+            s_wifiManager->server->streamFile(file, "application/octet-stream");
+            file.close();
+        } else {
+            s_wifiManager->server->send(500, "text/plain", "Failed to open file.");
+        }
+    } else {
+        s_wifiManager->server->send(404, "text/plain", "File not found.");
+    }
+}
+
+void MainHelper::handleEndpointFetchFilesFromURL() {
+    String url = s_wifiManager->server->arg("url");
+    String currentDir = s_wifiManager->server->arg("dir");
+    if (url.startsWith("https://github.com")) {
+        // Replace GitHub URLs
+        url.replace("github.com", "raw.githubusercontent.com");
+        url.replace("tree", "refs/heads");
+    }
+    if (url == "" || currentDir == "") {
+        s_wifiManager->server->send(400, "text/html", "<h2>Invalid URL or directory</h2>");
+        return;
+    }
+
+    // Download files 0.jpg to 11.jpg
+    for (int i = 0; i <= 11; i++) {
+        String fileName = String(i) + ".jpg";
+        String filePath = currentDir + fileName;
+        String fileUrl = url + "/" + fileName;
+
+        Serial.printf("Downloading %s to %s\n", fileUrl.c_str(), filePath.c_str());
+
+        HTTPClient http;
+        // Initialize HTTP connection
+        if (http.begin(fileUrl)) {
+            int httpCode = http.GET();
+
+            if (httpCode == HTTP_CODE_OK) {
+                File file = LittleFS.open(filePath, "w");
+                if (file) {
+                    // Read data from the HTTP stream and write it to the file
+                    Stream &stream = http.getStream();
+                    uint8_t buffer[128]; // Buffer for reading data
+                    size_t sizeRead;
+
+                    while ((sizeRead = stream.readBytes(buffer, sizeof(buffer))) > 0) {
+                        file.write(buffer, sizeRead);
+                    }
+
+                    Serial.println("Downloaded: " + fileName + " (" + String(file.size()) + ")");
+                    file.close();
+                } else {
+                    Serial.println("Failed to open file for writing: " + filePath);
+                }
+            } else {
+                Serial.println("Failed to download: " + fileUrl + " (HTTP Code: " + String(httpCode) + ")");
+            }
+
+            http.end();
+        } else {
+            Serial.println("Failed to initialize HTTP connection for: " + fileUrl);
+        }
+    }
+
+    s_wifiManager->server->send(200, "text/html", "<h2>Files downloaded successfully!</h2><a href='/browse?dir=" + currentDir + "'>Back to file list</a>");
+}
+
+void MainHelper::handleEndpointUploadFile() {
+    static File fsUploadFile; // Persistent file object for the upload session
+    HTTPUpload &upload = s_wifiManager->server->upload();
+
+    String uploadDir = upload.name; // Use the name field as directory (because we can't read arg['dir'] here)
+    if (uploadDir == "") {
+        uploadDir = "/"; // Default to root directory
+    }
+
+    String filePath = uploadDir + upload.filename;
+
+    if (upload.status == UPLOAD_FILE_START) {
+        Serial.println("Upload Start: " + filePath);
+
+        // Ensure the directory exists
+        if (!LittleFS.exists(uploadDir)) {
+            LittleFS.mkdir(uploadDir);
+        }
+
+        // Open the file for writing
+        fsUploadFile = LittleFS.open(filePath, "w");
+        if (!fsUploadFile) {
+            Serial.println("Failed to open file for writing: " + filePath);
+            return;
+        }
+    } else if (upload.status == UPLOAD_FILE_WRITE) {
+        if (fsUploadFile) {
+            // Write the file data
+            fsUploadFile.write(upload.buf, upload.currentSize);
+        } else {
+            Serial.println("File not open for writing during upload: " + filePath);
+        }
+    } else if (upload.status == UPLOAD_FILE_END) {
+        if (fsUploadFile) {
+            fsUploadFile.close();
+            Serial.println("Upload End: " + filePath);
+        } else {
+            Serial.println("Failed to close file: " + filePath);
+        }
+    } else if (upload.status == UPLOAD_FILE_ABORTED) {
+        if (fsUploadFile) {
+            fsUploadFile.close();
+            LittleFS.remove(filePath); // Clean up incomplete file
+            Serial.println("Upload Aborted: " + filePath);
+        }
+    }
+}
+
+void MainHelper::handleEndpointDeleteFile() {
+    String fileName = s_wifiManager->server->arg("file");
+    String dir = s_wifiManager->server->arg("dir");
+    String filePath = dir + fileName;
+
+    if (LittleFS.exists(filePath)) {
+        LittleFS.remove(filePath);
+        Serial.println("File deleted: " + filePath);
+        s_wifiManager->server->send(200, "text/html", "<h2>File deleted successfully!</h2><a href='/browse?dir=" + dir + "'>Back to file list</a>");
+    } else {
+        s_wifiManager->server->send(404, "text/html", "<h2>File not found</h2><a href='/browse?dir=" + dir + "'>Back to file list</a>");
+    }
+}
+
 void MainHelper::setupWebPortalEndpoints() {
     // To simulate button presses call e.g. http://<ip>/button?name=right&state=short
     s_wifiManager->server->on("/button", handleEndpointButton);
     s_wifiManager->server->on("/buttons", handleEndpointButtons);
+    s_wifiManager->server->on("/browse", HTTP_GET, handleEndpointListFiles);
+    s_wifiManager->server->on("/download", HTTP_GET, handleEndpointDownloadFile);
+    s_wifiManager->server->on("/fetchFromUrl", HTTP_POST, handleEndpointFetchFilesFromURL);
+    s_wifiManager->server->on(
+        "/upload", HTTP_POST, [] { s_wifiManager->server->send(200, "text/html", "<h2>File uploaded successfully!</h2><a href='/browse?dir=" + s_wifiManager->server->arg("dir") + "'>Back to file list</a>"); }, handleEndpointUploadFile);
+    s_wifiManager->server->on("/delete", HTTP_GET, handleEndpointDeleteFile);
 }
 
 void MainHelper::showWelcome() {
@@ -233,4 +461,11 @@ void MainHelper::restartIfNecessary() {
         Serial.println("Restarting ESP now");
         ESP.restart();
     }
+}
+
+void MainHelper::setupLittleFS() {
+    LittleFSHelper::begin();
+#ifdef LITTLEFS_DEBUG
+    LittleFSHelper::listFilesRecursively("/");
+#endif
 }

@@ -3,6 +3,17 @@
 #include <TFT_eSPI.h>
 #include <cstring>
 
+// Cache structure to hold precomputed values
+struct GrayscaleToTargetColorCache {
+    uint8_t targetR8, targetG8, targetB8;
+    float brightness;
+    bool swapBytes;
+    uint16_t lut[256];
+    bool valid = false; // Indicates if the cache is valid
+};
+
+GrayscaleToTargetColorCache grayscaleToTargetColorCache; // Global cache for grayscaleToTargetColor
+
 int Utils::getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit) {
     char buf[str.length() + 1];
     char lineBuf[limit + 1];
@@ -275,19 +286,43 @@ int Utils::rgb888htmlToRgb565(String hexColor) {
     return rgb565;
 }
 
-// Function to apply grayscale and map to target color
+// Function to apply grayscale and map to target color with caching
 uint16_t Utils::grayscaleToTargetColor(uint8_t grayscale, uint8_t targetR8, uint8_t targetG8, uint8_t targetB8, float brightness, bool swapBytes) {
-    // Apply brightness enhancement
-    int scaledGrayscale = grayscale * brightness;
-    if (scaledGrayscale > 255)
-        scaledGrayscale = 255; // Clamp to 255
+    // Check if the cache matches the current parameters
+    if (!grayscaleToTargetColorCache.valid ||
+        grayscaleToTargetColorCache.targetR8 != targetR8 ||
+        grayscaleToTargetColorCache.targetG8 != targetG8 ||
+        grayscaleToTargetColorCache.targetB8 != targetB8 ||
+        grayscaleToTargetColorCache.brightness != brightness ||
+        grayscaleToTargetColorCache.swapBytes != swapBytes) {
 
-    // Map grayscale to target color
-    uint8_t r = (targetR8 * scaledGrayscale) / 255;
-    uint8_t g = (targetG8 * scaledGrayscale) / 255;
-    uint8_t b = (targetB8 * scaledGrayscale) / 255;
+        // Cache miss: Recompute the LUT
+        grayscaleToTargetColorCache.targetR8 = targetR8;
+        grayscaleToTargetColorCache.targetG8 = targetG8;
+        grayscaleToTargetColorCache.targetB8 = targetB8;
+        grayscaleToTargetColorCache.brightness = brightness;
+        grayscaleToTargetColorCache.swapBytes = swapBytes;
 
-    return rgb888ToRgb565((r << 16) | (g << 8) | b, swapBytes);
+        for (uint16_t i = 0; i < 256; i++) {
+            // Apply brightness enhancement
+            int scaledGrayscale = i * brightness;
+            if (scaledGrayscale > 255)
+                scaledGrayscale = 255; // Clamp to 255
+
+            // Map grayscale to target color
+            uint8_t r = (targetR8 * scaledGrayscale) / 255;
+            uint8_t g = (targetG8 * scaledGrayscale) / 255;
+            uint8_t b = (targetB8 * scaledGrayscale) / 255;
+
+            // Store in LUT
+            grayscaleToTargetColorCache.lut[i] = rgb888ToRgb565((r << 16) | (g << 8) | b, swapBytes);
+        }
+
+        grayscaleToTargetColorCache.valid = true; // Mark cache as valid
+    }
+
+    // Use the cached value
+    return grayscaleToTargetColorCache.lut[grayscale];
 }
 
 // Function to colorize image data
@@ -300,6 +335,19 @@ void Utils::colorizeImageData(uint16_t *pixels565, size_t length, uint32_t targe
     uint8_t targetB8 = targetColor888 & 0xFF;
 
     for (size_t i = 0; i < length; i++) {
+        if (pixels565[i] == TFT_BLACK) {
+            // Skip black pixels
+            continue;
+        } else if (pixels565[i] == TFT_WHITE) {
+            // Set target color directly
+            if (swapBytes) {
+                // Swap bytes
+                pixels565[i] = (targetColor565 >> 8) | (targetColor565 << 8);
+            } else {
+                pixels565[i] = targetColor565;
+            }
+            continue;
+        }
         // Convert RGB565 to RGB888
         uint32_t color888 = rgb565ToRgb888(pixels565[i], true);
 

@@ -31,15 +31,21 @@ def get_git_info():
 
     return branch_name, commit_id
 
-# Get Git branch and commit ID
-branch_name, commit_id = get_git_info()
+def action():
+    # Get Git branch and commit ID
+    branch_name, commit_id = get_git_info()
 
-# Ensure the include directory exists
-os.makedirs(os.path.dirname(header_file), exist_ok=True)
+    # Ensure the include directory exists
+    os.makedirs(os.path.dirname(header_file), exist_ok=True)
 
-# Write the branch name and commit ID to the header file
-with open(header_file, "w") as f:
-    f.write(f'#define GIT_BRANCH "{branch_name}"\n')
-    f.write(f'#define GIT_COMMIT_ID "{commit_id}"\n')
+    # Write the branch name and commit ID to the header file
+    with open(header_file, "w") as f:
+        f.write(f'#define GIT_BRANCH "{branch_name}"\n')
+        f.write(f'#define GIT_COMMIT_ID "{commit_id}"\n')
 
-print(f"Generated {header_file} with branch name: {branch_name} and commit ID: {commit_id}")
+    print(f"Generated {header_file} with branch name: {branch_name} and commit ID: {commit_id}")
+
+# I would prefer to use
+# env.AddPreAction("buildprog", action)
+# but that does not work :-(
+action()

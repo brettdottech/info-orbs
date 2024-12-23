@@ -2,6 +2,7 @@
 #include "ConfigManager.h"
 #include "Utils.h"
 #include <Arduino.h>
+#include <LittleFS.h>
 
 ScreenManager *ScreenManager::instance = nullptr;
 
@@ -347,6 +348,17 @@ JRESULT ScreenManager::drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], 
     // Set image color
     m_imageColor = imageColor;
     JRESULT result = TJpgDec.drawJpg(x, y, jpeg_data, data_size);
+    // Reset image color
+    m_imageColor = 0;
+    return result;
+}
+
+JRESULT ScreenManager::drawFsJpg(int32_t x, int32_t y, const char *filename, uint8_t scale, uint32_t imageColor) {
+    // Set scale
+    TJpgDec.setJpgScale(scale);
+    // Set image color
+    m_imageColor = imageColor;
+    JRESULT result = TJpgDec.drawFsJpg(x, y, filename, LittleFS);
     // Reset image color
     m_imageColor = 0;
     return result;
