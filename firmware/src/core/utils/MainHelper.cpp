@@ -168,7 +168,10 @@ void MainHelper::handleEndpointButtons() {
 }
 
 void MainHelper::handleEndpointListFiles() {
-    String html = WEBPORTAL_BROWSE_START;
+    String html = WEBPORTAL_BROWSE_HTML_START;
+    html += WEBPORTAL_BROWSE_STYLE;
+    html += WEBPORTAL_BROWSE_SCRIPT;
+    html += WEBPORTAL_BROWSE_BODY_START;
 
     // Get the current directory from the query parameter or default to "/"
     String currentDir = s_wifiManager->server->arg("dir");
@@ -244,6 +247,8 @@ void MainHelper::handleEndpointListFiles() {
     html += WEBPORTAL_BROWSE_FETCHURL_FORM1;
     html += currentDir;
     html += WEBPORTAL_BROWSE_FETCHURL_FORM2;
+
+    html += WEBPORTAL_BROWSE_HTML_END;
 
     s_wifiManager->server->send(200, "text/html", html);
 }
