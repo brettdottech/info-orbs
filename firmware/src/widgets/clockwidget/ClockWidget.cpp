@@ -321,9 +321,8 @@ void ClockWidget::displayCustom(int displayIndex, uint8_t clockNumber, uint8_t i
 #if USE_CLOCK_CUSTOM > 0
     String ovrColorKey = "clkCust" + String(clockNumber) + "ovrCol";
     int ovrColor = m_config.getConfigInt(ovrColorKey.c_str(), TFT_BLACK);
-    // displayClockGraphics(displayIndex, clock_custom[clockNumber], index, ovrColor);
     m_manager.selectScreen(displayIndex);
-    String name = "/clock/custom" + String(clockNumber) + "/" + String(index) + ".jpg";
+    String name = "/CustomClock" + String(clockNumber) + "/" + String(index) + ".jpg";
     m_manager.drawFsJpg(0, 0, name.c_str(), 1, ovrColor);
 #endif
 }

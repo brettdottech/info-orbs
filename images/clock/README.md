@@ -12,21 +12,21 @@ If you want to disable the custom clocks, set
 
 The first custom clock (number 0) uses these images:
 
-- custom0/0.jpg
-- custom0/1.jpg
+- CustomClock0/0.jpg
+- CustomClock0/1.jpg
 - ...
-- custom0/9.jpg
-- custom0/10.jpg No colon image
-- custom0/11.jpg Colon image
+- CustomClock0/9.jpg
+- CustomClock0/10.jpg No colon image
+- CustomClock0/11.jpg Colon image
 
 The second custom clock (number 1) uses these images:
 
-- custom1/0.jpg
-- custom1/1.jpg
+- CustomClock1/0.jpg
+- CustomClock1/1.jpg
 - ...
-- custom1/9.jpg
-- custom1/10.jpg No colon image
-- custom1/11.jpg Colon image
+- CustomClock1/9.jpg
+- CustomClock1/10.jpg No colon image
+- CustomClock1/11.jpg Colon image
 
 and so on.
 
