@@ -284,11 +284,9 @@ void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
         color = m_config.getConfigInt(tickColorKey.c_str(), TFT_WHITE);
     }
     m_manager.selectScreen(displayIndex);
-    if (seconds < 30) {
-        m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds + 180, 6 * seconds + 180 + 6, color, TFT_BLACK);
-    } else {
-        m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, 6 * seconds - 180, 6 * seconds - 180 + 6, color, TFT_BLACK);
-    }
+    int startA = ((seconds * 6) + 180 - 3) % 360;
+    int endA = ((seconds * 6) + 180 + 3) % 360;
+    m_manager.drawSmoothArc(SCREEN_SIZE / 2, SCREEN_SIZE / 2, 120, 110, startA, endA, color, TFT_BLACK);
 }
 
 void ClockWidget::displayDigitImage(int displayIndex, const String &digit) {
