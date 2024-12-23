@@ -110,7 +110,7 @@ const char WEBPORTAL_BROWSE_HTML_START[] = R"(
     <title>InfoOrbs File Browser</title>
 )";
 
-const char WEBPORTAL_BROWSE_STYLE[] = R"()
+const char WEBPORTAL_BROWSE_STYLE[] = R"(
 <style>
     body { background: #060606; color: #fff; font-family: verdana; padding: 20px; }
     ul { list-style-type: disc; list-style-position: inside; padding: 0; }
@@ -326,7 +326,8 @@ const char WEBPORTAL_BROWSE_SCRIPT[] = R"(
             }
         }
     });
-</script>)";
+</script>
+)";
 
 const char WEBPORTAL_BROWSE_BODY_START[] = R"(
 </head>
