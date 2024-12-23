@@ -323,6 +323,11 @@ void MainHelper::handleEndpointFetchFilesFromURL() {
     }
 
     s_wifiManager->server->send(200, "text/html", "<h2>Files downloaded successfully!</h2><a href='/browse?dir=" + currentDir + "'>Back to file list</a>");
+
+    // Update ClockWidget (we might be showing the changed custom clock)
+    if (s_widgetSet->getCurrent()->getName() == "Clock") {
+        s_widgetSet->setClearScreensOnDrawCurrent();
+    }
 }
 
 void MainHelper::handleEndpointUploadFile() {
@@ -370,6 +375,10 @@ void MainHelper::handleEndpointUploadFile() {
             LittleFS.remove(filePath); // Clean up incomplete file
             Serial.println("Upload Aborted: " + filePath);
         }
+    }
+    // Update ClockWidget (we might be showing the changed custom clock)
+    if (s_widgetSet->getCurrent()->getName() == "Clock") {
+        s_widgetSet->setClearScreensOnDrawCurrent();
     }
 }
 
