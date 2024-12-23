@@ -21,7 +21,7 @@ embed_map = {
     "USE_CLOCK_CUSTOM > 0": [ # Condition
         ["images/clock/CustomClock0/", # Source directory
             ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"], # Files
-            2], # Skip first two levels while copying ("images/")
+            2], # Skip first two levels while copying ("images/clock/")
     ],
     "USE_CLOCK_CUSTOM > 1": [
         ["images/clock/CustomClock1/", 
