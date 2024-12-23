@@ -47,6 +47,7 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 void WeatherWidget::setup() {
     m_time = GlobalTime::getInstance();
     configureColors();
+    prevMillisSwitch = millis();
 }
 
 void WeatherWidget::draw(bool force) {
@@ -64,6 +65,16 @@ void WeatherWidget::draw(bool force) {
         singleWeatherDeg(3);
         threeDayWeather(4);
         model.setChangedStatus(false);
+    }
+
+    currentSwitchMillis = millis();
+    if (currentSwitchMillis - prevMillisSwitch >= switchinterval) {
+        prevMillisSwitch = currentSwitchMillis;
+        m_mode++;
+        if (m_mode > MODE_LOWS) {
+            m_mode = MODE_HIGHS;
+        }
+        threeDayWeather(4);
     }
 }
 
