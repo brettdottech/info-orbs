@@ -4,12 +4,12 @@
 /**
  * After calling begin() make sure to attach an interrupt handler in main.cpp that will call isrButtonChange()
  */
-Button::Button(uint8_t pin)
-    : m_pin(pin), m_lastPinLevelChange(0),
-      m_pinLevel(RELEASED_LEVEL), m_state(BTN_NOTHING),
-      m_hasChanged(false) {}
+Button::Button() : m_lastPinLevelChange(0),
+                   m_pinLevel(RELEASED_LEVEL), m_state(BTN_NOTHING),
+                   m_hasChanged(false) {}
 
-void Button::begin() {
+void Button::begin(uint8_t pin) {
+    m_pin = pin;
     pinMode(m_pin, BUTTON_MODE);
 }
 
