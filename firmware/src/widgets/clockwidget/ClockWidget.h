@@ -33,10 +33,9 @@
 
 // Not all digits in DSEG7/14 are aligned identically, therefore we need to offset them
 #ifndef CLOCK_DIGITS_OFFSET
-    #define CLOCK_DIGITS_OFFSET                                                                 \
-        {                                                                                       \
-            {0, 0}, {1, -5}, {0, 0}, {1, 0}, {0, -5}, {0, 0}, {0, 0}, {0, -5}, {0, 0}, { 0, 0 } \
-        }
+    #define CLOCK_DIGITS_OFFSET \
+        {                       \
+            {0, 0}, {1, -5}, {0, 0}, {1, 0}, {0, -5}, {0, 0}, {0, 0}, {0, -5}, {0, 0}, {0, 0}}
 // Use zero offset for other fonts (or adjust)
 // #define CLOCK_DIGITS_OFFSET { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 #endif
@@ -117,6 +116,7 @@ private:
     // Colors for CustomClocks
     int m_customTickColor[10]{TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE};
     int m_customOverrideColor[10]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bool m_customEnabled[10]{false, false, false, false, false, false, false, false, false, false};
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;

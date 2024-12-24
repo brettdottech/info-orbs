@@ -17,8 +17,15 @@ void ClockWidget::addConfigToManager() {
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
         optClockType[(int) ClockType::CUSTOM0 + i] = "Custom Clock " + String(i);
     }
-
     m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
+#if USE_CLOCK_CUSTOM > 0
+    // Get enabled setting here to know which clocks are valid,
+    // because we did not add the config key for it yet (this happens some lines below)
+    for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
+        String enKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "en");
+        m_customEnabled[i] = m_config.getConfigBool(enKey.c_str(), m_customEnabled[i]);
+    }
+#endif
     if (!isValidClockType(m_type)) {
         // Invalid Clock Type
         m_type = (int) ClockType::NORMAL;
@@ -29,10 +36,14 @@ void ClockWidget::addConfigToManager() {
     m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock Color", true);
     m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing", true);
     m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock Shadow Color", true);
+#if USE_CLOCK_NIXIE > 0
     m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "Override Nixie color (black=disable)", true);
-
+#endif
 #if USE_CLOCK_CUSTOM > 0
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
+        const char *enKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "en");
+        const char *enDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Enable");
+        m_config.addConfigBool("ClockWidget", enKey, &m_customEnabled[i], enDesc, true);
         const char *tickKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "tckCol");
         const char *tickDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Second Tick Color");
         m_config.addConfigColor("ClockWidget", tickKey, &m_customTickColor[i], tickDesc, true);
@@ -177,9 +188,10 @@ bool ClockWidget::isValidClockType(int clockType) {
         return true; // Always enabled
     else if (clockType == (int) ClockType::NIXIE)
         return USE_CLOCK_NIXIE > 0;
-    else if (isCustomClock(clockType))
-        return USE_CLOCK_CUSTOM > clockType - (int) ClockType::CUSTOM0;
-    else
+    else if (isCustomClock(clockType)) {
+        int customClockNumber = clockType - (int) ClockType::CUSTOM0;
+        return USE_CLOCK_CUSTOM > customClockNumber && m_customEnabled[customClockNumber];
+    } else
         return false;
 }
 
