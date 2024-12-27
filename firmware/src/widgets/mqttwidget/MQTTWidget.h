@@ -23,6 +23,7 @@ struct OrbConfig {
     String orbvalunit; // value unit
     int orbsize; // font size
     String jsonField; // JSON field to extract
+    int drawscript; //subscribed value is actually the instructions to draw the orb
     std::map<String, String> lastValuesMap; // Store last values for fields
 };
 
@@ -66,6 +67,7 @@ private:
     // MQTT-related members
     std::string mqttHost{""}; // MQTT broker host
     int mqttPort{1883}; // MQTT broker port
+    unsigned long lastReconnectAttempt{0}; // Last reconnection attempt time
     WiFiClient wifiClient; // Wi-Fi client for MQTT
     PubSubClient mqttClient; // MQTT client
     std::string mqttSetupTopic{""}; // MQTT setup topic

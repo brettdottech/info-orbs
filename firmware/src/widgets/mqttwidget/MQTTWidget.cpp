@@ -1,5 +1,5 @@
 #include "MQTTWidget.h"
-
+#include "DrawScript.h"
 // Initialize the static instance pointer
 MQTTWidget *MQTTWidget::instance = nullptr;
 
@@ -43,7 +43,7 @@ MQTTWidget::MQTTWidget(ScreenManager &manager, ConfigManager &config)
 
     // Set MQTT broker server and port
     mqttClient.setServer(mqttHost.c_str(), mqttPort);
-    mqttClient.setBufferSize(2048);
+    mqttClient.setBufferSize(8192);
 
     // Set the static callback proxy
     mqttClient.setCallback(staticCallback);
@@ -298,6 +298,7 @@ void MQTTWidget::handleSetupMessage(const String &message) {
         config.xposval = orbObj["xposval"].as<int>();
         config.yposval = orbObj["yposval"].as<int>();
         config.orbsize = orbObj["orbsize"].as<int>();
+        config.drawscript = orbObj["drawscript"].as<int>();
         String bgColorStr = orbObj["orb-bg"].as<String>();
         String textColorStr = orbObj["orb-textcol"].as<String>();
 
@@ -340,13 +341,21 @@ void MQTTWidget::subscribeToOrbs() {
     }
 }
 
+#define RECONNECT_INTERVAL 5000
 // Handle MQTT reconnection
 void MQTTWidget::reconnect() {
     //    Serial.println("Inside reconnect method");
 
     // Loop until reconnected
-    while (!mqttClient.connected()) {
+    if (!mqttClient.connected()) {
+        // Check if it's time to attempt a reconnection
+        unsigned long now = millis();
+        if (now - lastReconnectAttempt < RECONNECT_INTERVAL) {
+            return;
+        }
+
         Serial.println("Attempting MQTT connection...");
+        lastReconnectAttempt = now;
 
         // Generate a random client ID
         String clientId = "MQTTWidgetClient-";
@@ -378,8 +387,6 @@ void MQTTWidget::reconnect() {
             Serial.print("failed, rc=");
             Serial.print(mqttClient.state());
             Serial.println(" try again in 5 seconds");
-            // Wait 5 seconds before retrying again
-            delay(5000);
         }
     }
 }
@@ -405,33 +412,28 @@ void MQTTWidget::drawOrb(int orbid) {
         return;
     }
 
-    m_manager.fillScreen(orb->orbBgColor);
 
-    // Define the position and size of the orb (adjust as needed)
-    int x = 0; // Starting X position
-    int y = 0; // Starting Y position
-    int width = 240; // Width of the orb
-    int height = 240; // Height of the orb
-    int centre = 120;
-    int screenWidth = SCREEN_SIZE;
-    // int screenHeight = display.height();
+    if (orb->drawscript) {
+        String script = orbDataMap[orb->topicSrc];
+        DrawScript drawScript = DrawScript(m_manager);
+        drawScript.processScript(script);
+    } else {
+        m_manager.fillScreen(orb->orbBgColor);
 
-    // Clear the display area with the background color
-    // display.fillRect(x, y, screenWidth, screenHeight, orb->orbBgColor);
+        // Set text properties
+        m_manager.setFontColor(orb->orbTextColor, orb->orbBgColor);
+        // m_manager.setTextSize(orb->orbsize);
 
-    // Set text properties
-    m_manager.setFontColor(orb->orbTextColor, orb->orbBgColor);
-    // m_manager.setTextSize(orb->orbsize);
+        // Display orb description/title
+        // display.drawString(orb->orbdesc, centre, orb->xpostxt, orb->ypostxt);
+        m_manager.drawString(orb->orbdesc, orb->xpostxt, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
+        // m_manager.drawString(orb->orbdesc, centre, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
 
-    // Display orb description/title
-    // display.drawString(orb->orbdesc, centre, orb->xpostxt, orb->ypostxt);
-    m_manager.drawString(orb->orbdesc, orb->xpostxt, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
-    // m_manager.drawString(orb->orbdesc, centre, orb->ypostxt, orb->orbsize, Align::MiddleCenter);
-
-    // Display orb data
-    String data = orbDataMap[orb->topicSrc];
-    // display.drawString(data + orb->orbvalunit, centre, orb->xposval, orb->yposval);
-    m_manager.drawString(data + orb->orbvalunit, orb->xposval, orb->yposval, orb->orbsize, Align::MiddleCenter);
+        // Display orb data
+        String data = orbDataMap[orb->topicSrc];
+        // display.drawString(data + orb->orbvalunit, centre, orb->xposval, orb->yposval);
+        m_manager.drawString(data + orb->orbvalunit, orb->xposval, orb->yposval, orb->orbsize, Align::MiddleCenter);
+    }
 }
 
 String MQTTWidget::getName() {
