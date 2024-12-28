@@ -5,6 +5,7 @@
 #include "WeatherDataModel.h"
 #include "Widget.h"
 #include "config_helper.h"
+#include <HTTPClientWrapper.h>
 
 class WeatherWidget : public Widget {
 public:
@@ -28,6 +29,7 @@ private:
     bool getWeatherData();
     int getClockStamp();
     void configureColors();
+    void processResponse(int httpCode, const String& response);
 
     GlobalTime *m_time;
     int8_t m_mode;

@@ -89,6 +89,8 @@ void loop() {
 
         MainHelper::checkCycleWidgets();
         wifiManager->process();
+        HTTPClientWrapper::getInstance()->processRequestQueue();  
+        HTTPClientWrapper::getInstance()->processResponseQueue();
     }
 #ifdef MEMORY_DEBUG
     ShowMemoryUsage::printSerial();
