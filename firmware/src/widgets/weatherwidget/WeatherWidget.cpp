@@ -68,7 +68,7 @@ void WeatherWidget::draw(bool force) {
     }
 
     currentSwitchMillis = millis();
-    if (currentSwitchMillis - prevMillisSwitch >= switchinterval) {
+    if ((currentSwitchMillis - prevMillisSwitch >= switchinterval) && switchinterval > 0) {
         prevMillisSwitch = currentSwitchMillis;
         m_mode++;
         if (m_mode > MODE_LOWS) {
