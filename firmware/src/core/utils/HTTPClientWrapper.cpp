@@ -65,7 +65,7 @@ void HTTPClientWrapper::processRequestQueue() {
 
     // Only try to take semaphore if we have work to do
     if (xSemaphoreTake(requestSemaphore, 0) != pdTRUE) {
-        Serial.println("⚠️ Semaphore blocked - request already in progress");
+        //Serial.println("⚠️ Semaphore blocked - request already in progress");
         return;
     }
 
