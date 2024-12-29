@@ -8,14 +8,14 @@
 
 ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
-    m_config.addConfigBool("ParqetWidget", "parqetEnabled", &m_enabled, "Enable Widget");
-    m_config.addConfigString("ParqetWidget", "portfolioId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
-    m_config.addConfigComboBox("ParqetWidget", "showClock", &m_defaultMode, m_modes, PARQET_MODE_COUNT, "Default timeframe (you can change timeframes by medium pressing the middle button)", true);
-    m_config.addConfigBool("ParqetWidget", "showClock", &m_showClock, "Show clock on first screen", true);
-    m_config.addConfigBool("ParqetWidget", "showTotalScr", &m_showTotalScreen, "Show totals screen", true);
-    m_config.addConfigBool("ParqetWidget", "showTotalVal", &m_showTotalValue, "Show total portfolio value", true);
+    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, "Enable Widget");
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
+    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, "Default timeframe (you can change timeframes by medium pressing the middle button)", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, "Show clock on first screen", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, "Show totals screen", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, "Show total portfolio value", true);
     String optPriceVal[] = {"Show current price", "Show current value"};
-    m_config.addConfigComboBox("ParqetWidget", "showValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks", true);
+    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks", true);
     m_curMode = m_defaultMode;
 }
 
