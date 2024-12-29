@@ -69,7 +69,7 @@ private:
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 
-    const long switchinterval = HIGH_LOW_INTERVAL * 1000;
+    int switchinterval = HIGH_LOW_INTERVAL;
     unsigned long currentSwitchMillis;
     unsigned long prevMillisSwitch = 0;
 };

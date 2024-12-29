@@ -24,6 +24,7 @@ WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Wi
     config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
     String optModes[] = {"Light", "Dark"};
     config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
+    config.addConfigInt("WeatherWidget", "weatherCycleHL", &switchinterval, "Switch between Highs and Lows every X seconds, set to 0 to disable", true);
     Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }
@@ -68,7 +69,7 @@ void WeatherWidget::draw(bool force) {
     }
 
     currentSwitchMillis = millis();
-    if ((currentSwitchMillis - prevMillisSwitch >= switchinterval) && switchinterval > 0) {
+    if ((currentSwitchMillis - prevMillisSwitch >= (switchinterval * 1000)) && switchinterval > 0) {
         prevMillisSwitch = currentSwitchMillis;
         m_mode++;
         if (m_mode > MODE_LOWS) {
