@@ -420,3 +420,11 @@ ButtonState Utils::stringToButtonState(const String &buttonState) {
         return BTN_NOTHING;
     }
 }
+
+void Utils::setBusy(bool busy) {
+    if (busy) {
+        digitalWrite(BUSY_PIN, HIGH);
+    } else {
+        digitalWrite(BUSY_PIN, LOW);
+    }
+}
