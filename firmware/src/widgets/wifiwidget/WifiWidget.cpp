@@ -22,7 +22,7 @@ void WifiWidget::setup() {
 
     // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
-    if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
+    if (digitalRead(BUTTON_RIGHT_PIN) == Button::PRESSED_LEVEL) {
         m_wifiManager.resetSettings();
         m_manager.drawCentreString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         delay(messageDelay);
@@ -41,8 +41,9 @@ void WifiWidget::setup() {
     m_wifiManager.setShowInfoUpdate(false);
     m_wifiManager.setShowInfoErase(false);
     // Add buttons link
-    const char *buttonsHtml = "<form action='/buttons' method='get'><button>Buttons</button></form><br/>\n";
-    m_wifiManager.setCustomMenuHTML(buttonsHtml);
+    const char *customMenuHtml = "<form action='/browse' method='get'><button>Browse Filesystem</button></form><br/>\n"
+                                 "<form action='/buttons' method='get'><button>Buttons</button></form><br/>\n";
+    m_wifiManager.setCustomMenuHTML(customMenuHtml);
     m_wifiManager.setMenu(wm_menu);
     m_wifiManager.setClass("invert"); // Dark mode
     m_wifiManager.setShowStaticFields(true);
