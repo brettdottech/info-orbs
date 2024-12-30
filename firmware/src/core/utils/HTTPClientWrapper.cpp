@@ -1,4 +1,6 @@
 #include "HTTPClientWrapper.h"
+#include "Utils.h"
+#include <HTTPClient.h>
 
 HTTPClientWrapper* HTTPClientWrapper::instance = nullptr;
 SemaphoreHandle_t HTTPClientWrapper::requestSemaphore = nullptr;
@@ -12,6 +14,7 @@ volatile uint32_t HTTPClientWrapper::maxConcurrentRequests = 0;
 HTTPClientWrapper::HTTPClientWrapper() {
     if (!requestSemaphore) {
         requestSemaphore = xSemaphoreCreateBinary();
+        Utils::setBusy(false);
         xSemaphoreGive(requestSemaphore);
     }
     if (!requestQueue) {
@@ -22,21 +25,6 @@ HTTPClientWrapper::HTTPClientWrapper() {
     }
 }
 
-HTTPClientWrapper::~HTTPClientWrapper() {
-    if (requestSemaphore) {
-        vSemaphoreDelete(requestSemaphore);
-        requestSemaphore = nullptr;
-    }
-    if (requestQueue) {
-        vQueueDelete(requestQueue);
-        requestQueue = nullptr;
-    }
-    if (responseQueue) {
-        vQueueDelete(responseQueue);
-        responseQueue = nullptr;
-    }
-}
-
 HTTPClientWrapper* HTTPClientWrapper::getInstance() {
     if (!instance) {
         instance = new HTTPClientWrapper();
@@ -44,8 +32,8 @@ HTTPClientWrapper* HTTPClientWrapper::getInstance() {
     return instance;
 }
 
-bool HTTPClientWrapper::addRequest(const String& url, ResponseCallback callback) {
-    auto* params = new RequestParams{url, callback};
+bool HTTPClientWrapper::addRequest(const String& url, ResponseCallback callback, PreProcessCallback preProcessResponse) {
+    auto* params = new RequestParams{url, callback, preProcessResponse};
     
     if (xQueueSend(requestQueue, &params, 0) != pdPASS) {
         delete params;
@@ -68,7 +56,7 @@ void HTTPClientWrapper::processRequestQueue() {
         //Serial.println("⚠️ Semaphore blocked - request already in progress");
         return;
     }
-
+    Utils::setBusy(true);
     Serial.println("✅ Obtained semaphore");
     activeRequests++;
     if (activeRequests > maxConcurrentRequests) {
@@ -82,6 +70,7 @@ void HTTPClientWrapper::processRequestQueue() {
         // This should never happen since we checked queue size above
         Serial.println("⚠️ Queue empty after size check!");
         activeRequests--;
+        Utils::setBusy(false);
         xSemaphoreGive(requestSemaphore);
         return;
     }
@@ -104,6 +93,7 @@ void HTTPClientWrapper::processRequestQueue() {
     if (result != pdPASS) {
         Serial.println("Failed to create HTTP request task");
         delete requestParams;
+        Utils::setBusy(false);
         xSemaphoreGive(requestSemaphore);
     }
 }
@@ -113,33 +103,47 @@ void HTTPClientWrapper::httpTask(void* params) {
     
     Serial.printf("🔵 Starting HTTP request for: %s\n", requestParams->url.c_str());
     
-    HTTPClient http;
-    WiFiClientSecure client;
-    client.setInsecure(); 
+    {
+        HTTPClient http;
+        WiFiClientSecure client;
+        client.setInsecure(); 
     
-    http.begin(client, requestParams->url);
-    http.setTimeout(10000); // 10 second timeout
-    
-    int httpCode = http.GET();
-    String response;
-    
-    if (httpCode > 0) {
-        response = http.getString();
-    }
-    
-    http.end();
-    client.stop();
-    
-    // Queue the response instead of calling callback directly
-    auto* responseData = new ResponseData{
-        httpCode,
-        response,
-        requestParams->callback
-    };
-    
-    if (xQueueSend(responseQueue, &responseData, 0) != pdPASS) {
-        Serial.println("Failed to queue response");
-        delete responseData;
+        http.begin(client, requestParams->url);
+        http.setTimeout(10000); // 10 second timeout
+        
+        int httpCode = http.GET();
+        String response;
+        
+        if (httpCode > 0) {
+            response = http.getString();
+        }
+        
+        http.end();
+        client.stop();
+
+        // Explicitly reset the objects
+        http.~HTTPClient(); // Call the destructor
+        new (&http) HTTPClient(); // Reinitialize using placement new
+
+        client.~WiFiClientSecure(); // Call the destructor
+        new (&client) WiFiClientSecure(); // Reinitialize using placement new
+        
+        // Call preProcessResponse if provided
+        if (requestParams->preProcessResponse) {
+            requestParams->preProcessResponse(httpCode, response);
+        }
+
+        // Queue the response instead of calling callback directly
+        auto* responseData = new ResponseData{
+            httpCode,
+            response,
+            requestParams->callback
+        };
+        
+        if (xQueueSend(responseQueue, &responseData, 0) != pdPASS) {
+            Serial.println("Failed to queue response");
+            delete responseData;
+        }
     }
     
     //UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
@@ -151,6 +155,7 @@ void HTTPClientWrapper::httpTask(void* params) {
     Serial.printf("Active requests now: %d\n", activeRequests);
     
     delete requestParams;
+    Utils::setBusy(false);
     xSemaphoreGive(requestSemaphore);
     Serial.println("✅ Released semaphore");
     vTaskDelete(nullptr);

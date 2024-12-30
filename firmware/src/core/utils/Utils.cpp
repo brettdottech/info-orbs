@@ -3,6 +3,14 @@
 #include <TFT_eSPI.h>
 #include <cstring>
 
+void Utils::setBusy(bool busy) {
+    if (busy) {
+        digitalWrite(BUSY_PIN, HIGH);
+    } else {
+        digitalWrite(BUSY_PIN, LOW);
+    }
+}
+
 int Utils::getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit) {
     char buf[str.length() + 1];
     char lineBuf[limit + 1];

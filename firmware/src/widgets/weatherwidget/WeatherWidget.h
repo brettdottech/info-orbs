@@ -29,6 +29,7 @@ private:
     bool getWeatherData();
     int getClockStamp();
     void configureColors();
+    void preProcessResponse(int httpCode, String& response);
     void processResponse(int httpCode, const String& response);
 
     GlobalTime *m_time;

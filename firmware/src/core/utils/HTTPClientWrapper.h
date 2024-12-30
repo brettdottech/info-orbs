@@ -2,7 +2,6 @@
 #define HTTP_CLIENT_WRAPPER_H
 
 #include <Arduino.h>
-#include <HTTPClient.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
@@ -12,10 +11,10 @@
 class HTTPClientWrapper {
 public:
     using ResponseCallback = std::function<void(int httpCode, const String& response)>;
+    using PreProcessCallback = std::function<void(int httpCode, String& response)>;
     
     static HTTPClientWrapper* getInstance();
-    bool makeRequest(const String& url, ResponseCallback callback);
-    bool addRequest(const String& url, ResponseCallback callback);
+    bool addRequest(const String& url, ResponseCallback callback, PreProcessCallback preProcessResponse = nullptr);
     void processRequestQueue();  
     void processResponseQueue();
 
@@ -25,13 +24,13 @@ private:
     static volatile uint32_t maxConcurrentRequests;
 
     HTTPClientWrapper();
-    ~HTTPClientWrapper();
     
     static void httpTask(void* params);
     
     struct RequestParams {
         String url;
         ResponseCallback callback;
+        PreProcessCallback preProcessResponse;
     };
 
     struct ResponseData {

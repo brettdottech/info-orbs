@@ -40,6 +40,8 @@ void WeatherWidget::changeMode() {
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
+    if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
+        update(true);        
 }
 
 void WeatherWidget::setup() {
@@ -67,7 +69,6 @@ void WeatherWidget::draw(bool force) {
 
 void WeatherWidget::update(bool force) {
     if (force || m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
-        setBusy(true);
         if (force) {
             int retry = 0;
             while (!getWeatherData() && retry++ < MAX_RETRIES)
@@ -75,7 +76,6 @@ void WeatherWidget::update(bool force) {
         } else {
             getWeatherData();
         }
-        setBusy(false);
         m_weatherDelayPrev = millis();
     }
 }
@@ -89,10 +89,13 @@ bool WeatherWidget::getWeatherData() {
     return HTTPClientWrapper::getInstance()->addRequest(httpRequestAddress,
         [this](int httpCode, const String& response) {
             processResponse(httpCode, response);
+        },
+        [this](int httpCode, String& response) {
+            preProcessResponse(httpCode, response);
         });
 }
 
-void WeatherWidget::processResponse(int httpCode, const String& response) {
+void WeatherWidget::preProcessResponse(int httpCode, String& response) {
     if (httpCode > 0) {
         JsonDocument filter;
         filter["resolvedAddress"] = true;
@@ -105,6 +108,20 @@ void WeatherWidget::processResponse(int httpCode, const String& response) {
 
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+
+        if (!error) {
+            response = doc.as<String>();
+        } else {
+            // Handle JSON deserialization error
+            Serial.println("Deserialization failed: " + String(error.c_str()));
+        }
+    }
+}
+
+void WeatherWidget::processResponse(int httpCode, const String& response) {
+    if (httpCode > 0) {
+        JsonDocument doc;
+        DeserializationError error = deserializeJson(doc, response);
 
         if (!error) {
             model.setCityName(doc["resolvedAddress"].as<String>());

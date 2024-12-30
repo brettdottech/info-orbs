@@ -46,7 +46,6 @@ void StockWidget::draw(bool force) {
 
 void StockWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
-        setBusy(true);
         
         // Queue requests for each stock
         for (int8_t i = 0; i < m_stockCount; i++) {
@@ -60,7 +59,7 @@ void StockWidget::update(bool force) {
         }
         
         m_stockDelayPrev = millis();
-        setBusy(false);
+
     }
 }
 
