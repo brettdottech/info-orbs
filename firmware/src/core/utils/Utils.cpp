@@ -3,15 +3,6 @@
 #include <TFT_eSPI.h>
 #include <cstring>
 
-
-void Utils::setBusy(bool busy) {
-    if (busy) {
-        digitalWrite(BUSY_PIN, HIGH);
-    } else {
-        digitalWrite(BUSY_PIN, LOW);
-    }
-}
-
 // Cache structure to hold precomputed values
 struct GrayscaleToTargetColorCache {
     uint8_t targetR8, targetG8, targetB8;

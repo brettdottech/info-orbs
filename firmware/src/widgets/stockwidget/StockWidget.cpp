@@ -1,8 +1,5 @@
 #include "StockWidget.h"
-
 #include <ArduinoJson.h>
-#include <HTTPClient.h>
-
 #include <iomanip>
 
 StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
