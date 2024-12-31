@@ -51,6 +51,7 @@ private:
     static const UBaseType_t RESPONSE_QUEUE_SIZE = 20;
     static const UBaseType_t RESPONSE_QUEUE_ITEM_SIZE = sizeof(ResponseData*);
     static const TickType_t QUEUE_CHECK_DELAY = pdMS_TO_TICKS(100); // 100ms between queue checks
+    bool isUrlInQueue(const String& url);
 };
 
 #endif // HTTP_CLIENT_WRAPPER_H

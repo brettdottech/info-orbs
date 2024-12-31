@@ -33,6 +33,11 @@ HTTPClientWrapper* HTTPClientWrapper::getInstance() {
 }
 
 bool HTTPClientWrapper::addRequest(const String& url, ResponseCallback callback, PreProcessCallback preProcessResponse) {
+    if (isUrlInQueue(url)) {
+        Serial.printf("Request already in queue: %s\n", url.c_str());
+        return false;
+    }
+
     auto* params = new RequestParams{url, callback, preProcessResponse};
     
     if (xQueueSend(requestQueue, &params, 0) != pdPASS) {
@@ -45,6 +50,7 @@ bool HTTPClientWrapper::addRequest(const String& url, ResponseCallback callback,
     return true;
 }
 
+
 void HTTPClientWrapper::processRequestQueue() {  
     // First check if there are any requests to process
     if (uxQueueMessagesWaiting(requestQueue) == 0) {
@@ -56,6 +62,7 @@ void HTTPClientWrapper::processRequestQueue() {
         //Serial.println("⚠️ Semaphore blocked - request already in progress");
         return;
     }
+
     Utils::setBusy(true);
     Serial.println("✅ Obtained semaphore");
     activeRequests++;
@@ -67,7 +74,6 @@ void HTTPClientWrapper::processRequestQueue() {
     // Get next request
     RequestParams* requestParams;
     if (xQueueReceive(requestQueue, &requestParams, 0) != pdPASS) {
-        // This should never happen since we checked queue size above
         Serial.println("⚠️ Queue empty after size check!");
         activeRequests--;
         Utils::setBusy(false);
@@ -133,7 +139,6 @@ void HTTPClientWrapper::httpTask(void* params) {
             requestParams->preProcessResponse(httpCode, response);
         }
 
-        // Queue the response instead of calling callback directly
         auto* responseData = new ResponseData{
             httpCode,
             response,
@@ -162,11 +167,31 @@ void HTTPClientWrapper::httpTask(void* params) {
 }
 
 void HTTPClientWrapper::processResponseQueue() {
-    ResponseData* responseData;
+    // Early exit if queue is empty
+    if (uxQueueMessagesWaiting(responseQueue) == 0) {
+        return;
+    }
     
-    // Process all available responses
+    ResponseData* responseData;
     while (xQueueReceive(responseQueue, &responseData, 0) == pdPASS) {
         responseData->callback(responseData->httpCode, responseData->response);
         delete responseData;
     }
+}
+
+bool HTTPClientWrapper::isUrlInQueue(const String& url) {
+    // Iterate through the queue to check for duplicate URLs
+    UBaseType_t queueLength = uxQueueMessagesWaiting(requestQueue);
+    for (UBaseType_t i = 0; i < queueLength; i++) {
+        RequestParams* requestParams;
+        if (xQueuePeek(requestQueue, &requestParams, 0) == pdPASS) {
+            if (requestParams->url == url) {
+                return true; // Duplicate URL found
+            }
+            // Move to the next item in the queue
+            xQueueReceive(requestQueue, &requestParams, 0);
+            xQueueSend(requestQueue, &requestParams, 0);
+        }
+    }
+    return false; // No duplicate URL found
 }
