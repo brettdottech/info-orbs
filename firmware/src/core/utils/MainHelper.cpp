@@ -272,6 +272,9 @@ void MainHelper::handleEndpointDownloadFile() {
 void MainHelper::handleEndpointFetchFilesFromURL() {
     String url = s_wifiManager->server->arg("url");
     String currentDir = s_wifiManager->server->arg("dir");
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+    }
     if (url.startsWith("https://github.com")) {
         // Replace GitHub URLs
         url.replace("github.com", "raw.githubusercontent.com");
