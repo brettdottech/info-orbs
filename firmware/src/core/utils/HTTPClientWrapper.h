@@ -39,8 +39,7 @@ private:
         ResponseCallback callback;
     };
 
-    static HTTPClientWrapper* instance;
-    static SemaphoreHandle_t requestSemaphore;
+    static HTTPClientWrapper *instance;
     static QueueHandle_t requestQueue;
     static QueueHandle_t responseQueue;
     

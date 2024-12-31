@@ -1,9 +1,9 @@
 #include "HTTPClientWrapper.h"
+#include "GlobalResources.h"
 #include "Utils.h"
 #include <HTTPClient.h>
 
-HTTPClientWrapper* HTTPClientWrapper::instance = nullptr;
-SemaphoreHandle_t HTTPClientWrapper::requestSemaphore = nullptr;
+HTTPClientWrapper *HTTPClientWrapper::instance = nullptr;
 QueueHandle_t HTTPClientWrapper::requestQueue = nullptr;
 QueueHandle_t HTTPClientWrapper::responseQueue = nullptr;
 
@@ -12,11 +12,6 @@ volatile uint32_t HTTPClientWrapper::activeRequests = 0;
 volatile uint32_t HTTPClientWrapper::maxConcurrentRequests = 0;
 
 HTTPClientWrapper::HTTPClientWrapper() {
-    if (!requestSemaphore) {
-        requestSemaphore = xSemaphoreCreateBinary();
-        Utils::setBusy(false);
-        xSemaphoreGive(requestSemaphore);
-    }
     if (!requestQueue) {
         requestQueue = xQueueCreate(REQUEST_QUEUE_SIZE, REQUEST_QUEUE_ITEM_SIZE);  
     }
@@ -58,7 +53,7 @@ void HTTPClientWrapper::processRequestQueue() {
     }
 
     // Only try to take semaphore if we have work to do
-    if (xSemaphoreTake(requestSemaphore, 0) != pdTRUE) {
+    if (xSemaphoreTake(taskSemaphore, 0) != pdTRUE) {
         //Serial.println("⚠️ Semaphore blocked - request already in progress");
         return;
     }
@@ -77,7 +72,7 @@ void HTTPClientWrapper::processRequestQueue() {
         Serial.println("⚠️ Queue empty after size check!");
         activeRequests--;
         Utils::setBusy(false);
-        xSemaphoreGive(requestSemaphore);
+        xSemaphoreGive(taskSemaphore);
         return;
     }
 
@@ -100,7 +95,7 @@ void HTTPClientWrapper::processRequestQueue() {
         Serial.println("Failed to create HTTP request task");
         delete requestParams;
         Utils::setBusy(false);
-        xSemaphoreGive(requestSemaphore);
+        xSemaphoreGive(taskSemaphore);
     }
 }
 
@@ -161,7 +156,7 @@ void HTTPClientWrapper::httpTask(void* params) {
     
     delete requestParams;
     Utils::setBusy(false);
-    xSemaphoreGive(requestSemaphore);
+    xSemaphoreGive(taskSemaphore);
     Serial.println("✅ Released semaphore");
     vTaskDelete(nullptr);
 }

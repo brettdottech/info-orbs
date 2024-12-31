@@ -1,3 +1,4 @@
+#include "GlobalResources.h"
 #include "MainHelper.h"
 #include "clockwidget/ClockWidget.h"
 #include "mqttwidget/MQTTWidget.h"
@@ -42,6 +43,8 @@ void addWidgets() {
 }
 
 void setup() {
+    // Initialize global resources
+    initializeGlobalResources();
     Serial.begin(115200);
     Serial.println();
     Serial.println("Starting up...");
