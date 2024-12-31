@@ -272,6 +272,10 @@ void MainHelper::handleEndpointDownloadFile() {
 void MainHelper::handleEndpointFetchFilesFromURL() {
     String url = s_wifiManager->server->arg("url");
     String currentDir = s_wifiManager->server->arg("dir");
+    if (url == "" || currentDir == "") {
+        s_wifiManager->server->send(400, "text/html", "<h2>Invalid URL or directory</h2>");
+        return;
+    }
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
         url = "https://" + url;
     }
@@ -279,10 +283,6 @@ void MainHelper::handleEndpointFetchFilesFromURL() {
         // Replace GitHub URLs
         url.replace("github.com", "raw.githubusercontent.com");
         url.replace("tree", "refs/heads");
-    }
-    if (url == "" || currentDir == "") {
-        s_wifiManager->server->send(400, "text/html", "<h2>Invalid URL or directory</h2>");
-        return;
     }
 
     // Download files 0.jpg to 11.jpg
