@@ -18,6 +18,7 @@ enum ScreenMode {
 
 class Utils {
 public:
+    static void setBusy(bool busy);
     static int getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit);
     static String getWrappedLine(String str, int limit, int lineNum, int maxLines);
     static int32_t stringToColor(String color);

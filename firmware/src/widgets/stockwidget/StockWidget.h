@@ -2,8 +2,8 @@
 #define STOCK_WIDGET_H
 
 #include <ArduinoJson.h>
-#include <HTTPClient.h>
 #include <TFT_eSPI.h>
+#include <HTTPClientWrapper.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -28,7 +28,7 @@ public:
 private:
     void getStockData(StockDataModel &stock);
     static void taskGetStockData(void *pvParameters);
-    TaskHandle_t m_taskHandle;
+    void processResponse(StockDataModel& stock, int httpCode, const String& response);
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
     unsigned long m_stockDelay = 900000; // default to 15m between updates

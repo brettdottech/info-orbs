@@ -6,15 +6,13 @@
 // make high/low an enum, if we even keep it (I strongly suggest just switching back
 // and forth between high and low every 10 seconds or something)
 // 3
-// factor out the JSON error handling (come on now)
-// 4
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "WeatherWidget.h"
 
 #include "icons.h"
 #include <ArduinoJson.h>
-#include <HTTPClient.h>
+
 
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
@@ -42,6 +40,8 @@ void WeatherWidget::changeMode() {
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
+    if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
+        update(true);        
 }
 
 void WeatherWidget::setup() {
@@ -69,7 +69,6 @@ void WeatherWidget::draw(bool force) {
 
 void WeatherWidget::update(bool force) {
     if (force || m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
-        setBusy(true);
         if (force) {
             int retry = 0;
             while (!getWeatherData() && retry++ < MAX_RETRIES)
@@ -77,21 +76,27 @@ void WeatherWidget::update(bool force) {
         } else {
             getWeatherData();
         }
-        setBusy(false);
         m_weatherDelayPrev = millis();
     }
 }
 
 bool WeatherWidget::getWeatherData() {
-    HTTPClient http;
     String weatherUnits = m_weatherUnits == 0 ? "metric" : "us";
     String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
-                                String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
-    http.begin(httpRequestAddress);
-    int httpCode = http.GET();
+                               String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
+                               "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
+
+    return HTTPClientWrapper::getInstance()->addRequest(httpRequestAddress,
+        [this](int httpCode, const String& response) {
+            processResponse(httpCode, response);
+        },
+        [this](int httpCode, String& response) {
+            preProcessResponse(httpCode, response);
+        });
+}
+
+void WeatherWidget::preProcessResponse(int httpCode, String& response) {
     if (httpCode > 0) {
-        // Check for the return code   TODO: factor out
         JsonDocument filter;
         filter["resolvedAddress"] = true;
         filter["currentConditions"]["temp"] = true;
@@ -102,8 +107,21 @@ bool WeatherWidget::getWeatherData() {
         filter["days"][0]["tempmin"] = true;
 
         JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
-        http.end();
+        DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+
+        if (!error) {
+            response = doc.as<String>();
+        } else {
+            // Handle JSON deserialization error
+            Serial.println("Deserialization failed: " + String(error.c_str()));
+        }
+    }
+}
+
+void WeatherWidget::processResponse(int httpCode, const String& response) {
+    if (httpCode > 0) {
+        JsonDocument doc;
+        DeserializationError error = deserializeJson(doc, response);
 
         if (!error) {
             model.setCityName(doc["resolvedAddress"].as<String>());
@@ -120,30 +138,11 @@ bool WeatherWidget::getWeatherData() {
             }
         } else {
             // Handle JSON deserialization error
-            switch (error.code()) {
-            case DeserializationError::Ok:
-                Serial.print(F("Deserialization succeeded"));
-                break;
-            case DeserializationError::InvalidInput:
-                Serial.print(F("Invalid input!"));
-                break;
-            case DeserializationError::NoMemory:
-                Serial.print(F("Not enough memory"));
-                break;
-            default:
-                Serial.print(F("Deserialization failed"));
-                break;
-            }
-
-            return false;
+            Serial.println("Deserialization failed: " + String(error.c_str()));
         }
     } else {
-        // Handle HTTP request error
-        Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        http.end();
-        return false;
+        Serial.printf("HTTP request failed, error code: %d\n", httpCode);
     }
-    return true;
 }
 
 void WeatherWidget::displayClock(int displayIndex) {

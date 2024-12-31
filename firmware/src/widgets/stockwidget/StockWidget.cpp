@@ -1,11 +1,8 @@
 #include "StockWidget.h"
-
 #include <ArduinoJson.h>
-#include <HTTPClient.h>
-
 #include <iomanip>
 
-StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config), m_taskHandle(NULL) {
+StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
     m_config.addConfigBool("StockWidget", "stocksEnabled", &m_enabled, "Enable Widget");
     config.addConfigString("StockWidget", "stockList", &m_stockList, 200,
@@ -46,42 +43,27 @@ void StockWidget::draw(bool force) {
 
 void StockWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
-        if (m_taskHandle == NULL) { // Check if task is not already running
-            setBusy(true);
-            // Create a task to handle all stock updates
-            if (xTaskCreate(taskGetStockData, "StockDataTask", 8192, this, 1, &m_taskHandle) == pdPASS) {
-                Serial.println("StockDataTask created");
-                m_stockDelayPrev = millis();
-            } else {
-                Serial.println("Failed to create StockDataTask");
-                setBusy(false);
-            }
-        } else {
-            // Serial.println("StockDataTask is already running");
+        
+        // Queue requests for each stock
+        for (int8_t i = 0; i < m_stockCount; i++) {
+            String url = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + m_stocks[i].getSymbol();
+            
+            StockDataModel& stock = m_stocks[i];
+            HTTPClientWrapper::getInstance()->addRequest(url,
+                [this, &stock](int httpCode, const String& response) {
+                    processResponse(stock, httpCode, response);
+                });
         }
+        
+        m_stockDelayPrev = millis();
+
     }
 }
 
-void StockWidget::changeMode() {
-    update(true);
-}
-
-void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT)
-        changeMode();
-}
-
-void StockWidget::getStockData(StockDataModel &stock) {
-    String httpRequestAddress = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + stock.getSymbol();
-
-    HTTPClient http;
-    http.begin(httpRequestAddress);
-    int httpCode = http.GET();
-
-    if (httpCode > 0) { // Check for the returning code
-        String payload = http.getString();
+void StockWidget::processResponse(StockDataModel& stock, int httpCode, const String& response) {
+    if (httpCode > 0) {
         JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, payload);
+        DeserializationError error = deserializeJson(doc, response);
 
         if (!error) {
             float currentPrice = doc["close"].as<float>();
@@ -98,32 +80,20 @@ void StockWidget::getStockData(StockDataModel &stock) {
                 Serial.println("skipping invalid data for: " + stock.getSymbol());
             }
         } else {
-            // Handle JSON deserialization error
             Serial.println("deserializeJson() failed");
         }
     } else {
-        // Handle HTTP request error
-        Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
+        Serial.printf("HTTP request failed, error: %d\n", httpCode);
     }
-
-    http.end();
 }
 
-void StockWidget::taskGetStockData(void *pvParameters) {
-    StockWidget *widget = static_cast<StockWidget *>(pvParameters);
-    for (int8_t i = 0; i < widget->m_stockCount; i++) {
-        widget->getStockData(widget->m_stocks[i]);
-    }
+void StockWidget::changeMode() {
+    update(true);
+}
 
-    // The following code is useful for tuning the space allocated for this task.
-    // The highWater variable represents the free space remaing for this task (in words)
-    // UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
-    // Serial.print("Stock Widget: Remaining task stack space: ");
-    // Serial.println(highWater);
-
-    widget->setBusy(false);
-    widget->m_taskHandle = NULL;
-    vTaskDelete(NULL);
+void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+    if (buttonId == BUTTON_OK && state == BTN_SHORT)
+        changeMode();
 }
 
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
