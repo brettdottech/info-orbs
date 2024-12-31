@@ -46,6 +46,9 @@ void setup() {
     Serial.println();
     Serial.println("Starting up...");
 
+    // Setup buttons first (needed for ConfigManager to reset to defaults when holding the middle button)
+    MainHelper::setupButtons();
+
     wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
     sm = new ScreenManager(tft);
@@ -55,7 +58,6 @@ void setup() {
     MainHelper::init(wifiManager, config, sm, widgetSet);
     MainHelper::setupLittleFS();
     MainHelper::setupConfig();
-    MainHelper::setupButtons();
     MainHelper::showWelcome();
 
     pinMode(BUSY_PIN, OUTPUT);
@@ -90,7 +92,7 @@ void loop() {
 
         MainHelper::checkCycleWidgets();
         wifiManager->process();
-        HTTPClientWrapper::getInstance()->processRequestQueue();  
+        HTTPClientWrapper::getInstance()->processRequestQueue();
         HTTPClientWrapper::getInstance()->processResponseQueue();
     }
 #ifdef MEMORY_DEBUG
