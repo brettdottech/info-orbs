@@ -14,7 +14,6 @@ struct GrayscaleToTargetColorCache {
 
 GrayscaleToTargetColorCache grayscaleToTargetColorCache; // Global cache for grayscaleToTargetColor
 
-
 int Utils::getWrappedLines(String (&lines)[MAX_WRAPPED_LINES], String str, int limit) {
     char buf[str.length() + 1];
     char lineBuf[limit + 1];
