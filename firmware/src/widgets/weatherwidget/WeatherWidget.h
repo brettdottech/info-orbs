@@ -69,8 +69,7 @@ private:
     const int MODE_HIGHS = 0;
     const int MODE_LOWS = 1;
 
-    int switchinterval = HIGH_LOW_INTERVAL;
-    unsigned long currentSwitchMillis;
-    unsigned long prevMillisSwitch = 0;
+    int m_switchinterval = HIGH_LOW_INTERVAL;
+    unsigned long m_prevMillisSwitch = 0;
 };
 #endif // WEATHERWIDGET_H
