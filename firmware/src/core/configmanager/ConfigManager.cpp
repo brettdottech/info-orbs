@@ -39,6 +39,8 @@ ConfigManager::ConfigManager(WiFiManager &wm) : m_wm(wm) {
         }
     } else {
         Serial.println("NVS initialized successfully in ConfigManager");
+        // Init pinMode for middle button (even if the buttons are not setup yet)
+        pinMode(BUTTON_MIDDLE_PIN, BUTTON_MODE);
         if (digitalRead(BUTTON_MIDDLE_PIN) == Button::PRESSED_LEVEL) {
             Serial.println("Middle button pressed -> Clearing preferences...");
             m_preferences.clear();
