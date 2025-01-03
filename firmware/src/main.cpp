@@ -3,9 +3,10 @@
 #include "ScreenManager.h"
 #include "Utils.h"
 #include "WidgetSet.h"
-#include "clockwidget/ClockWidget.h"
+#include "core/Gadgets.h"
 #include "config_helper.h"
 #include "icons.h"
+#include "clockwidget/ClockWidget.h"
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
@@ -34,7 +35,7 @@ Button buttonLeft(BUTTON_LEFT);
 Button buttonOK(BUTTON_OK);
 Button buttonRight(BUTTON_RIGHT);
 
-GlobalTime *globalTime; // Initialize the global time
+//GlobalTime *globalTime; // Initialize the global time
 
 String connectingString{""};
 
@@ -45,7 +46,9 @@ const int connectionTimeout{10000};
 bool isConnected{true};
 
 ScreenManager *sm;
-WidgetSet *widgetSet;
+//WidgetSet *widgetSet;
+Settings *settings;
+Gadgets *gadgets;
 
 /**
  * The ISR handlers must be static
@@ -89,7 +92,8 @@ void setup() {
 
     sm->drawJpg(0, 0, logo_start, logo_end - logo_start);
 
-    widgetSet = new WidgetSet(sm);
+    settings = new Settings();
+    gadgets = new Gadgets(*settings);
 
 #ifdef GC9A01_DRIVER
     Serial.println("GC9A01 Driver");
@@ -103,27 +107,6 @@ void setup() {
 
     wifiWidget = new WifiWidget(*sm);
     wifiWidget->setup();
-
-    globalTime = GlobalTime::getInstance();
-
-    widgetSet->add(new ClockWidget(*sm));
-#ifdef PARQET_PORTFOLIO_ID
-    widgetSet->add(new ParqetWidget(*sm));
-#endif
-#ifdef STOCK_TICKER_LIST
-    widgetSet->add(new StockWidget(*sm));
-#endif
-    widgetSet->add(new WeatherWidget(*sm));
-#ifdef WEB_DATA_WIDGET_URL
-    widgetSet->add(new WebDataWidget(*sm, WEB_DATA_WIDGET_URL));
-#endif
-#ifdef WEB_DATA_STOCK_WIDGET_URL
-    widgetSet->add(new WebDataWidget(*sm, WEB_DATA_STOCK_WIDGET_URL));
-#endif
-#ifdef MQTT_WIDGET_HOST
-    widgetSet->add(new MQTTWidget(*sm, MQTT_WIDGET_HOST, MQTT_WIDGET_PORT));
-#endif
-
     m_widgetCycleDelayPrev = millis();
 }
 
@@ -140,12 +123,12 @@ void checkButtons() {
         // Left short press cycles widgets backward
         Serial.println("Left button short pressed -> switch to prev Widget");
         m_widgetCycleDelayPrev = millis();
-        widgetSet->prev();
+        gadgets->prev();
     } else if (buttonRight.pressedShort()) {
         // Right short press cycles widgets forward
         Serial.println("Right button short pressed -> switch to next Widget");
         m_widgetCycleDelayPrev = millis();
-        widgetSet->next();
+        gadgets->next();
     } else {
         ButtonState leftState = buttonLeft.getState();
         ButtonState middleState = buttonOK.getState();
@@ -155,15 +138,15 @@ void checkButtons() {
         if (leftState != BTN_NOTHING) {
             Serial.printf("Left button pressed, state=%d\n", leftState);
             m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_LEFT, leftState);
+            gadgets->buttonPressed(Left, leftState);
         } else if (middleState != BTN_NOTHING) {
             Serial.printf("Middle button pressed, state=%d\n", middleState);
             m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_OK, middleState);
+            gadgets->buttonPressed(Middle, middleState);
         } else if (rightState != BTN_NOTHING) {
             Serial.printf("Right button pressed, state=%d\n", rightState);
             m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+            gadgetsSS->buttonPressed(Right, rightState);
         }
     }
 }
@@ -172,19 +155,19 @@ void loop() {
     if (wifiWidget->isConnected() == false) {
         wifiWidget->update();
         wifiWidget->draw();
-        widgetSet->setClearScreensOnDrawCurrent(); // Clear screen after wifiWidget
+        //widgetSet->setClearScreensOnDrawCurrent(); // Clear screen after wifiWidget
         delay(100);
     } else {
-        if (!widgetSet->initialUpdateDone()) {
-            widgetSet->initializeAllWidgetsData();
-        }
-        globalTime->updateTime();
+        //if (!widgetSet->initialUpdateDone()) {
+        //            widgetSet->initializeAllWidgetsData();
+        //}
+        GlobalTime::getInstance()->updateTime();
 
         checkButtons();
 
-        widgetSet->updateCurrent();
-        widgetSet->updateBrightnessByTime(globalTime->getHour24());
-        widgetSet->drawCurrent();
+        //widgetSet->updateCurrent();
+        //widgetSet->updateBrightnessByTime(globalTime->getHour24());
+        //widgetSet->drawCurrent();
 
         checkCycleWidgets();
     }

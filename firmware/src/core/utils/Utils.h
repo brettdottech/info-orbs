@@ -8,7 +8,8 @@
 
 enum ScreenMode {
     Light = 1,
-    Dark = 2
+    Dark = 2,
+    Auto = 3
 };
 
 #define ScreenWidth 240

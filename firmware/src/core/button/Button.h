@@ -2,6 +2,12 @@
 #define BUTTON_H
 #include <Arduino.h>
 
+enum OrbButton {
+    Left,
+    Middle,
+    Right
+};
+
 enum ButtonState {
     BTN_NOTHING,
     BTN_SHORT,
