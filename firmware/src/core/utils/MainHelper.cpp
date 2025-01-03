@@ -3,6 +3,7 @@
 #include "config_helper.h"
 #include "icons.h"
 #include <HTTPClient.h>
+#include <esp_task_wdt.h>
 
 static Button buttonLeft;
 static Button buttonMiddle;
@@ -27,6 +28,7 @@ void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, Wid
     s_configManager = cm;
     s_screenManager = sm;
     s_widgetSet = ws;
+    watchdogInit();
 }
 
 /**
@@ -480,4 +482,24 @@ void MainHelper::setupLittleFS() {
 #ifdef LITTLEFS_DEBUG
     LittleFSHelper::listFilesRecursively("/");
 #endif
+}
+
+void MainHelper::watchdogInit() {
+    Serial.printf("Initializing watchdog timer to %d seconds... ", WDT_TIMEOUT);
+    // Initialize the watchdog timer for the main task
+    if (esp_task_wdt_init(WDT_TIMEOUT, true) == ESP_OK) {
+        Serial.println("done!");
+        // Add the main task to the watchdog
+        if (esp_task_wdt_add(nullptr) == ESP_OK) {
+            Serial.println("Main task added to watchdog.");
+        } else {
+            Serial.println("Failed to add main task to watchdog.");
+        }
+    } else {
+        Serial.println("failed!");
+    }
+}
+
+void MainHelper::watchdogReset() {
+    esp_task_wdt_reset();
 }

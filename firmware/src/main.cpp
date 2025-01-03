@@ -70,6 +70,7 @@ void setup() {
 }
 
 void loop() {
+    MainHelper::watchdogReset();
     if (wifiWidget->isConnected() == false) {
         wifiWidget->update();
         wifiWidget->draw();

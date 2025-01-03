@@ -42,6 +42,10 @@
     #define NTP_SERVER "pool.ntp.org"
 #endif
 
+#ifndef WDT_TIMEOUT
+    #define WDT_TIMEOUT 60 // Timeout in seconds
+#endif
+
 class MainHelper {
 public:
     static void init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws);
@@ -70,6 +74,9 @@ public:
     static void handleEndpointFetchFilesFromURL();
 
     static void restartIfNecessary();
+
+    static void watchdogInit();
+    static void watchdogReset();
 
     static void updateBrightnessByTime(uint8_t hour24);
 };
