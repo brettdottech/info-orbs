@@ -1,19 +1,22 @@
 #include "ParqetWidget.h"
 
-#include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <StreamUtils.h>
 
 #include <iomanip>
 
-ParqetWidget::ParqetWidget(ScreenManager &manager) : Widget(manager) {
-    Serial.println("Constructing ParqetWidget");
-    ParqetDataModel parqet = ParqetDataModel();
-#ifdef PARQET_PORTFOLIO_ID
-    parqet.setPortfolioId(PARQET_PORTFOLIO_ID);
-#endif
-    m_portfolio = parqet;
+ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
+    Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
+    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, "Enable Widget");
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
+    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, "Default timeframe (you can change timeframes by medium pressing the middle button)", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, "Show clock on first screen", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, "Show totals screen", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, "Show total portfolio value", true);
+    String optPriceVal[] = {"Show current price", "Show current value"};
+    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks", true);
+    m_curMode = m_defaultMode;
 }
 
 void ParqetWidget::setup() {
@@ -97,7 +100,7 @@ void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         update(true);
     } else if (buttonId == BUTTON_OK && state == BTN_LONG) {
         // Reset view to default timeframe and reload
-        m_curMode = 0;
+        m_curMode = m_defaultMode;
         update(true);
     }
 }
@@ -111,24 +114,31 @@ ParqetDataModel ParqetWidget::getPortfolio() {
 }
 
 void ParqetWidget::updatePortfolio() {
-    String portfolioId = m_portfolio.getPortfolioId();
+    PARQET_DEBUG_PRINT_MEM("Begin .updatePortfolio()");
+    String portfolioId = String(m_portfolioId.c_str());
+    if (portfolioId.isEmpty()) {
+        return;
+    }
     Serial.printf("Parqet: Update Portfolio %s\n", portfolioId.c_str());
     String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble";
     String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"timeframe\": \"" + getTimeframe() + "\"}";
-    Serial.printf("POST Payload: %s\n", postPayload.c_str());
+    PARQET_DEBUG_PRINT("POST Payload: %s", postPayload.c_str());
     HTTPClient http;
     const char *keys[] = {"Transfer-Encoding"};
     http.collectHeaders(keys, 1);
     http.begin(httpRequestAddress);
+    PARQET_DEBUG_PRINT_MEM("after http.begin()");
     http.addHeader("Content-Type", "application/json");
 
     int httpCode = http.POST(postPayload);
-    Serial.printf("HTTP %d, Size %d\n", httpCode, http.getSize());
+    PARQET_DEBUG_PRINT("HTTP %d, Size %d", httpCode, http.getSize());
 
     // Check for the returning code
     if (httpCode == 200) {
         Stream &rawStream = http.getStream();
-        ChunkDecodingStream decodedStream(http.getStream());
+        PARQET_DEBUG_PRINT_MEM("after getStream()");
+        ChunkDecodingStream decodedStream(rawStream);
+        PARQET_DEBUG_PRINT_MEM("after decodedStream()");
 
         // Choose the right stream depending on the Transfer-Encoding header
         // Parqet might send chunked responses
@@ -139,15 +149,24 @@ void ParqetWidget::updatePortfolio() {
         JsonDocument doc;
         JsonDocument filter;
         // Filter the response to save memory
-        filter["holdings"] = true;
-        filter["performance"] = true;
+        filter["holdings"][0]["assetType"] = true;
+        filter["holdings"][0]["currency"] = true;
+        filter["holdings"][0]["asset"] = true;
+        filter["holdings"][0]["sharedAsset"]["name"] = true;
+        filter["holdings"][0]["performance"] = true;
+        filter["holdings"][0]["position"] = true;
+        filter["performance"]["purchaseValueForInterval"] = true;
+        filter["performance"]["portfolioValue"] = true;
 
+        PARQET_DEBUG_PRINT_MEM("Parsing portfolio JSON now...");
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+        PARQET_DEBUG_PRINT_MEM("after deserializeJson()");
 
         if (!error) {
             JsonArray holdings = doc["holdings"];
             // Initialize a new array (reserver one extra element for totals)
             ParqetHoldingDataModel *holdingArray = new ParqetHoldingDataModel[holdings.size() + 1];
+            PARQET_DEBUG_PRINT_MEM("after new holdingArray");
             int count = 0;
             for (JsonVariant holding : holdings) {
                 String type = holding["assetType"].as<String>();
@@ -178,8 +197,7 @@ void ParqetWidget::updatePortfolio() {
                         holdingArray[count++] = h;
                     }
                 } else {
-                    // String id = holding["_id"].as<String>();
-                    // Serial.printf("Invalid type: %s, id: %s\n", type.c_str(), id.c_str());
+                    PARQET_DEBUG_PRINT("Invalid type: %s, id: %s", type.c_str(), holding["_id"].as<String>().c_str());
                 }
             }
             // Add total
@@ -201,6 +219,7 @@ void ParqetWidget::updatePortfolio() {
                 holdingArray[count++] = h;
             }
             m_portfolio.setHoldings(holdingArray, count);
+            PARQET_DEBUG_PRINT_MEM("after setHoldings()");
         } else {
             // Handle JSON deserialization error
             Serial.println("deserializeJson() failed");
@@ -212,10 +231,15 @@ void ParqetWidget::updatePortfolio() {
     }
 
     http.end();
+    PARQET_DEBUG_PRINT_MEM("Parqet portfolio update complete");
 }
 
 void ParqetWidget::updatePortfolioChart() {
-    String portfolioId = m_portfolio.getPortfolioId();
+    PARQET_DEBUG_PRINT_MEM("Begin .updatePortfolioChart()");
+    String portfolioId = String(m_portfolioId.c_str());
+    if (portfolioId.isEmpty()) {
+        return;
+    }
     String timeframe = getTimeframe();
     Serial.printf("Parqet: Update Portfolio Chart %s\n", portfolioId.c_str());
     if (!m_showTotalChart || (timeframe == "today" && m_overrideTotalChartToday == "")) {
@@ -229,7 +253,7 @@ void ParqetWidget::updatePortfolioChart() {
         timeframe = m_overrideTotalChartToday;
     }
     String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"perfChartConfig\": [\"u\"], \"timeframe\": \"" + timeframe + "\"}";
-    Serial.printf("POST Payload: %s\n", postPayload.c_str());
+    PARQET_DEBUG_PRINT("POST Payload: %s", postPayload.c_str());
     HTTPClient http;
     const char *keys[] = {"Transfer-Encoding"};
     http.collectHeaders(keys, 1);
@@ -237,12 +261,14 @@ void ParqetWidget::updatePortfolioChart() {
     http.addHeader("Content-Type", "application/json");
 
     int httpCode = http.POST(postPayload);
-    Serial.printf("HTTP %d, Size %d\n", httpCode, http.getSize());
+    PARQET_DEBUG_PRINT("HTTP %d, Size %d", httpCode, http.getSize());
 
     // Check for the returning code
     if (httpCode == 200) {
         Stream &rawStream = http.getStream();
-        ChunkDecodingStream decodedStream(http.getStream());
+        PARQET_DEBUG_PRINT_MEM("after .getStream()");
+        ChunkDecodingStream decodedStream(rawStream);
+        PARQET_DEBUG_PRINT_MEM("after .decodedStream()");
 
         // Choose the right stream depending on the Transfer-Encoding header
         // Parqet might send chunked responses
@@ -254,7 +280,9 @@ void ParqetWidget::updatePortfolioChart() {
         JsonDocument filter;
         // Filter the response to save memory
         filter["charts"][0]["values"]["perfHistory"] = true;
+        PARQET_DEBUG_PRINT_MEM("Parsing chart JSON now...");
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+        PARQET_DEBUG_PRINT_MEM("after deserializeJson()");
 
         if (!error) {
             JsonArray charts = doc["charts"];
@@ -284,6 +312,7 @@ void ParqetWidget::updatePortfolioChart() {
     }
 
     http.end();
+    PARQET_DEBUG_PRINT_MEM("Parqet chart update complete");
 }
 
 void ParqetWidget::clearScreen(int8_t displayIndex, int32_t background) {
@@ -314,7 +343,7 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
 }
 
 void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
-    // Serial.printf("displayStock(): display=%d, stock=%s\n", displayIndex, stock.getName().c_str());
+    PARQET_DEBUG_PRINT("displayStock(): display=%d, stock=%s", displayIndex, stock.getName().c_str());
     m_manager.selectScreen(displayIndex);
     m_manager.fillScreen(backgroundColor);
     m_manager.setFontColor(textColor);

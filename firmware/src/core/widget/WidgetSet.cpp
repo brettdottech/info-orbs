@@ -2,6 +2,7 @@
 
 WidgetSet::WidgetSet(ScreenManager *sm) : m_screenManager(sm) {
 }
+
 void WidgetSet::add(Widget *widget) {
     if (m_widgetCount == MAX_WIDGETS) {
         Serial.println("MAX WIDGETS UNABLE TO ADD");
@@ -43,7 +44,12 @@ void WidgetSet::next() {
     if (m_currentWidget >= m_widgetCount) {
         m_currentWidget = 0;
     }
-    switchWidget();
+    if (!getCurrent()->isEnabled()) {
+        // Recursive call to next()
+        next();
+    } else {
+        switchWidget();
+    }
 }
 
 void WidgetSet::prev() {
@@ -51,7 +57,12 @@ void WidgetSet::prev() {
     if (m_currentWidget < 0) {
         m_currentWidget = m_widgetCount - 1;
     }
-    switchWidget();
+    if (!getCurrent()->isEnabled()) {
+        // Recursive call to next()
+        prev();
+    } else {
+        switchWidget();
+    }
 }
 
 void WidgetSet::switchWidget() {
@@ -76,9 +87,11 @@ void WidgetSet::showLoading() {
 
 void WidgetSet::updateAll() {
     for (int8_t i; i < m_widgetCount; i++) {
-        Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
-        showCenteredLine(4, m_widgets[i]->getName());
-        m_widgets[i]->update();
+        if (m_widgets[i]->isEnabled()) {
+            Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
+            showCenteredLine(4, m_widgets[i]->getName());
+            m_widgets[i]->update();
+        }
     }
 }
 
@@ -90,25 +103,4 @@ void WidgetSet::initializeAllWidgetsData() {
     showLoading();
     updateAll();
     m_initialized = true;
-}
-
-void WidgetSet::updateBrightnessByTime(uint8_t hour24) {
-#if defined(DIM_START_HOUR) && defined(DIM_END_HOUR) && defined(DIM_BRIGHTNESS)
-    bool isInDimRange;
-
-    if (DIM_START_HOUR < DIM_END_HOUR) {
-        // Normal case: the range does not cross midnight
-        isInDimRange = (hour24 >= DIM_START_HOUR && hour24 < DIM_END_HOUR);
-    } else {
-        // Case where the range crosses midnight
-        isInDimRange = (hour24 >= DIM_START_HOUR || hour24 < DIM_END_HOUR);
-    }
-
-    uint8_t brightness = isInDimRange ? DIM_BRIGHTNESS : TFT_BRIGHTNESS;
-    if (m_screenManager->setBrightness(brightness)) {
-        // brightness was changed -> update widget
-        m_screenManager->clearAllScreens();
-        drawCurrent(true);
-    }
-#endif
 }

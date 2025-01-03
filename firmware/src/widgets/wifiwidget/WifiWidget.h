@@ -6,7 +6,7 @@
 
 class WifiWidget : public Widget {
 public:
-    WifiWidget(ScreenManager &manager);
+    WifiWidget(ScreenManager &manager, ConfigManager &config, WiFiManager &wifiManager);
     ~WifiWidget() override;
     void setup() override;
     void update(bool force = false) override;
@@ -18,6 +18,8 @@ public:
 
 private:
     void connectionTimedOut();
+
+    WiFiManager &m_wifiManager;
 
     bool m_isConnected{false};
     bool m_connectionFailed{false};

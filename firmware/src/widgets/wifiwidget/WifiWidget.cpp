@@ -1,18 +1,17 @@
 #include "WifiWidget.h"
+#include "OrbsWiFiManager.h"
 #include "Utils.h"
+#include <ESPmDNS.h>
 #include <WiFi.h>
-#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 
 const int lineHeight = 40;
 const int statusScreenIndex = 3;
 const int fontSize = 19;
 const int messageDelay = 5000;
 
-WifiWidget::WifiWidget(ScreenManager &manager) : Widget(manager) {}
+WifiWidget::WifiWidget(ScreenManager &manager, ConfigManager &config, WiFiManager &wifiManager) : Widget(manager, config), m_wifiManager(wifiManager) {}
 
 WifiWidget::~WifiWidget() {}
-
-WiFiManager wifimgr;
 
 void WifiWidget::setup() {
     m_manager.setFont(DEFAULT_FONT);
@@ -21,43 +20,48 @@ void WifiWidget::setup() {
     m_manager.setFontColor(TFT_WHITE);
     m_manager.drawCentreString("Connecting", ScreenCenterX, ScreenCenterY - lineHeight, fontSize);
 
-    WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
-
-#if (defined WIFI_SSID && defined WIFI_PASS)
-    m_hardCodedWiFi = true;
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-#endif
-
-    // Remove unwanted buttons from the config portal
-    std::vector<const char *> wm_menu = {"wifi"}; // buttons: wifi, info, exit, update
-    // Remove unwanted buttons from the Info page
-    wifimgr.setShowInfoUpdate(false);
-    wifimgr.setShowInfoErase(false);
-    wifimgr.setMenu(wm_menu);
-
     // Hold right button when connecting to power to reset wifi settings
     // these are stored by the ESP WiFi library
-    if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
-        wifimgr.resetSettings();
+    if (digitalRead(BUTTON_RIGHT_PIN) == Button::PRESSED_LEVEL) {
+        m_wifiManager.resetSettings();
         m_manager.drawCentreString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         delay(messageDelay);
     }
 
+    WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
+
+#if (defined WIFI_SSID && defined WIFI_PASS)
+    // Preload credentials from config.h
+    m_wifiManager.preloadWiFi(WIFI_SSID, WIFI_PASS);
+#endif
+
+    // Remove unwanted buttons from the config portal
+    std::vector<const char *> wm_menu = {"wifi", "param", "custom", "info", "restart"}; // buttons: wifi, info, exit, update
+    // Remove unwanted buttons from the Info page
+    m_wifiManager.setShowInfoUpdate(false);
+    m_wifiManager.setShowInfoErase(false);
+    // Add buttons link
+    const char *customMenuHtml = "<form action='/browse' method='get'><button>Browse Filesystem</button></form><br/>\n"
+                                 "<form action='/buttons' method='get'><button>Buttons</button></form><br/>\n";
+    m_wifiManager.setCustomMenuHTML(customMenuHtml);
+    m_wifiManager.setMenu(wm_menu);
+    m_wifiManager.setClass("invert"); // Dark mode
+    m_wifiManager.setShowStaticFields(true);
+
     // Set WiFiManager to non-blocking so status and info can be displayed
-    wifimgr.setConfigPortalBlocking(false);
+    m_wifiManager.setConfigPortalBlocking(false);
 
     // If you want the config portal to only be available for so many seconds
     // wm.setConfigPortalTimeout(60);
 
-    // Add the last 2 digits of the MAC address onto the end of the config portal SSID
-    // so each Info-Orbs has a unique SSID
-    m_apssid = "Info-Orbs_" + WiFi.macAddress().substring(15);
+    // Use a static SSID to be able to show a static QR Code
+    m_apssid = "InfoOrbs";
 
-    wifimgr.setCleanConnect(true);
-    wifimgr.setConnectRetries(5);
+    m_wifiManager.setCleanConnect(true);
+    m_wifiManager.setConnectRetries(5);
 
     // WiFiManager automatically connects using saved credentials...
-    if (wifimgr.autoConnect(m_apssid.c_str())) {
+    if (m_wifiManager.autoConnect(m_apssid.c_str())) {
         Serial.print("WifiManager connected.");
     } else { // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1
         m_configPortalRunning = true;
@@ -80,7 +84,7 @@ void WifiWidget::update(bool force) {
     // Force is currently unhandled due to not knowing what behavior it would change
 
     // If WiFiManager is non-blocking, this keeps the configuration portal running
-    wifimgr.process();
+    m_wifiManager.process();
 
     if (WiFi.status() == WL_CONNECTED) {
         m_isConnected = true;
@@ -88,6 +92,18 @@ void WifiWidget::update(bool force) {
         m_ipaddress = WiFi.localIP().toString();
         Serial.print("IP address: ");
         Serial.println(m_ipaddress);
+        // Start the WebPortal
+        m_wifiManager.startWebPortal();
+#ifdef INCLUDE_MDNS
+        // Initialize mDNS
+        String mDNSname = m_apssid + "-" + WiFi.macAddress().substring(15);
+        if (!MDNS.begin(mDNSname)) {
+            Serial.println("Error setting up MDNS responder!");
+        } else {
+            Serial.printf("mDNS responder started. You should find this device at http://%s\n", mDNSname.c_str());
+        }
+        MDNS.addService("http", "tcp", 80);
+#endif
     } else {
         m_connectionTimer += 500;
         m_dotsString += " . ";
@@ -120,7 +136,6 @@ void WifiWidget::draw(bool force) {
         m_manager.drawCentreString(m_ipaddress, ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         Serial.println();
         Serial.println("Connected to WiFi");
-        m_isConnected = true;
         delay(messageDelay);
     } else if (m_connectionFailed && !m_hasDisplayedError) {
         m_hasDisplayedError = true;

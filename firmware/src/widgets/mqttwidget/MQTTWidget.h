@@ -32,10 +32,8 @@ public:
      * @brief Constructor for MQTTWidget.
      *
      * @param manager Reference to the ScreenManager.
-     * @param host MQTT broker host address.
-     * @param port MQTT broker port number.
      */
-    MQTTWidget(ScreenManager &manager, const String &host, uint16_t port);
+    MQTTWidget(ScreenManager &manager, ConfigManager &config);
 
     /**
      * @brief Initializes the MQTT connection and subscribes to the setup topic.
@@ -66,10 +64,14 @@ public:
 
 private:
     // MQTT-related members
-    String mqttHost; // MQTT broker host
-    uint16_t mqttPort; // MQTT broker port
+    std::string mqttHost{""}; // MQTT broker host
+    int mqttPort{1883}; // MQTT broker port
+    unsigned long lastReconnectAttempt{0}; // Last reconnection attempt time
     WiFiClient wifiClient; // Wi-Fi client for MQTT
     PubSubClient mqttClient; // MQTT client
+    std::string mqttSetupTopic{""}; // MQTT setup topic
+    std::string mqttUser{""}; // MQTT user (empty if authentication is not required)
+    std::string mqttPass{""}; // MQTT pass (empty if authentication is not required)
 
     // Configuration from setup topic
     std::vector<OrbConfig> orbConfigs; // Vector of orb configurations

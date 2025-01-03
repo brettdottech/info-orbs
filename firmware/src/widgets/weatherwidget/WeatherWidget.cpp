@@ -6,16 +6,23 @@
 // make high/low an enum, if we even keep it (I strongly suggest just switching back
 // and forth between high and low every 10 seconds or something)
 // 3
-// factor out the JSON error handling (come on now)
-// 4
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "WeatherWidget.h"
+
 #include "icons.h"
+#include <ArduinoJson.h>
 
-#include "config_helper.h"
-
-WeatherWidget::WeatherWidget(ScreenManager &manager) : Widget(manager) {
+WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
+    m_enabled = true; // Enabled by default
+    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
+    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
+    String optUnits[] = {"Celsius", "Fahrenheit"};
+    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
+    String optModes[] = {"Light", "Dark"};
+    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
+    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, "Switch between Highs and Lows every X seconds, set to 0 to disable", true);
+    Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }
 
@@ -33,14 +40,14 @@ void WeatherWidget::changeMode() {
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
+    if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
+        update(true);
 }
 
 void WeatherWidget::setup() {
     m_time = GlobalTime::getInstance();
-#ifdef WEATHER_SCREEN_MODE
-    m_screenMode = WEATHER_SCREEN_MODE;
-#endif
     configureColors();
+    m_prevMillisSwitch = millis();
 }
 
 void WeatherWidget::draw(bool force) {
@@ -59,11 +66,19 @@ void WeatherWidget::draw(bool force) {
         threeDayWeather(4);
         model.setChangedStatus(false);
     }
+
+    if ((millis() - m_prevMillisSwitch >= (m_switchinterval * 1000)) && m_switchinterval > 0) {
+        m_prevMillisSwitch = millis();
+        m_mode++;
+        if (m_mode > MODE_LOWS) {
+            m_mode = MODE_HIGHS;
+        }
+        threeDayWeather(4);
+    }
 }
 
 void WeatherWidget::update(bool force) {
     if (force || m_weatherDelayPrev == 0 || (millis() - m_weatherDelayPrev) >= m_weatherDelay) {
-        setBusy(true);
         if (force) {
             int retry = 0;
             while (!getWeatherData() && retry++ < MAX_RETRIES)
@@ -71,20 +86,53 @@ void WeatherWidget::update(bool force) {
         } else {
             getWeatherData();
         }
-        setBusy(false);
         m_weatherDelayPrev = millis();
     }
 }
 
 bool WeatherWidget::getWeatherData() {
-    HTTPClient http;
-    http.begin(httpRequestAddress);
-    int httpCode = http.GET();
+    String weatherUnits = m_weatherUnits == 0 ? "metric" : "us";
+    String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
+                                String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
+                                "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
+
+    return HTTPClientWrapper::getInstance()->addRequest(
+        httpRequestAddress,
+        [this](int httpCode, const String &response) {
+            processResponse(httpCode, response);
+        },
+        [this](int httpCode, String &response) {
+            preProcessResponse(httpCode, response);
+        });
+}
+
+void WeatherWidget::preProcessResponse(int httpCode, String &response) {
     if (httpCode > 0) {
-        // Check for the return code   TODO: factor out
+        JsonDocument filter;
+        filter["resolvedAddress"] = true;
+        filter["currentConditions"]["temp"] = true;
+        filter["days"][0]["description"] = true;
+        filter["currentConditions"]["icon"] = true;
+        filter["days"][0]["icon"] = true;
+        filter["days"][0]["tempmax"] = true;
+        filter["days"][0]["tempmin"] = true;
+
         JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, http.getString());
-        http.end();
+        DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+
+        if (!error) {
+            response = doc.as<String>();
+        } else {
+            // Handle JSON deserialization error
+            Serial.println("Deserialization failed: " + String(error.c_str()));
+        }
+    }
+}
+
+void WeatherWidget::processResponse(int httpCode, const String &response) {
+    if (httpCode > 0) {
+        JsonDocument doc;
+        DeserializationError error = deserializeJson(doc, response);
 
         if (!error) {
             model.setCityName(doc["resolvedAddress"].as<String>());
@@ -101,30 +149,11 @@ bool WeatherWidget::getWeatherData() {
             }
         } else {
             // Handle JSON deserialization error
-            switch (error.code()) {
-            case DeserializationError::Ok:
-                Serial.print(F("Deserialization succeeded"));
-                break;
-            case DeserializationError::InvalidInput:
-                Serial.print(F("Invalid input!"));
-                break;
-            case DeserializationError::NoMemory:
-                Serial.print(F("Not enough memory"));
-                break;
-            default:
-                Serial.print(F("Deserialization failed"));
-                break;
-            }
-
-            return false;
+            Serial.println("Deserialization failed: " + String(error.c_str()));
         }
     } else {
-        // Handle HTTP request error
-        Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        http.end();
-        return false;
+        Serial.printf("HTTP request failed, error code: %d\n", httpCode);
     }
-    return true;
 }
 
 void WeatherWidget::displayClock(int displayIndex) {
@@ -246,9 +275,9 @@ void WeatherWidget::weatherText(int displayIndex) {
     cityName.remove(cityName.indexOf(",", 0));
 
     m_manager.setFontColor(m_foregroundColor);
-    m_manager.drawFittedString(cityName, centre, 80, 210, 50, Align::MiddleCenter);
+    m_manager.drawFittedString(cityName, centre, 70, 195, 50, Align::MiddleCenter);
 
-    auto y = 115;
+    auto y = 118;
     for (auto i = 0; i < 4; i++) {
         m_manager.drawCentreString(messageArr[i], centre, y, 15);
         y += 25;

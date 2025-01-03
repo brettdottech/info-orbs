@@ -5,9 +5,16 @@
 
 // MAIN CONFIGURATION
 #define TIMEZONE_API_LOCATION "America/Vancouver" // Use timezone from this list: https://timezonedb.com/time-zones
-#define INVERTED_ORBS false                       // Set to true if using InfoOrbs upside down. Inverts screens and re-orders screens and buttons.
+#define ORB_ROTATION 0                            // 0 = Normal, 1 = 90 degrees CW, 2 = 180 degrees, 3 = 270 degrees CW
 #define WIDGET_CYCLE_DELAY 0                      // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LOCALE EN                                 // Language selection for Month and Weekday - possible values are EN, DE, FR
+
+// WIDGETS
+#define INCLUDE_WEATHER       // include WeatherWidget
+#define INCLUDE_STOCK         // include StockWidget
+#define INCLUDE_PARQET        // include ParqetWidget
+//#define INCLUDE_WEBDATA       // include WebDataWidget
+//#define INCLUDE_MQTT          // include MQTTWidget
 
 // NIGHTTIME DIMMING
 //#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)
@@ -21,16 +28,17 @@
 #define CLOCK_COLOR 0xfc80              // Orange for clock
 #define CLOCK_SHADOW_COLOR 0x20a1       // Clock shadow color (Light brown)
 #define CLOCK_SHADOWING true            // Use clock shadow (set to false to disable)
-#define USE_CLOCK_NIXIE true            // Set to true to enable Nixie style clock
-#define USE_CLOCK_CUSTOM false          // Set to true to enable custom clock (see images/ClockWidget/custom/README.md)
+#define USE_CLOCK_NIXIE NIXIE_NOHOLES   // Set to NIXIE_HOLES or NIXIE_NOHOLES to define the Nixie style (set to 0 to disable)
+#define USE_CLOCK_CUSTOM 1              // Number of Custom Clocks [0-10] (set to 0 to disable, see images/clock/README.md)
 //#define CLOCK_NIXIE_COLOR 0x001f        // Override Nixie color
-#define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM
+#define DEFAULT_CLOCK ClockType::NORMAL // Set the default clock face: ClockType::NORMAL, ClockType::NIXIE or ClockType::CUSTOM0..9
 //#define CLOCK_FONT DSEG7              // Define clock font (defaults to DSEG7, you can also try DSEG14 or FINAL_FRONTIER)
 
 // WEATHER CONFIGURATION
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data
 #define WEATHER_SCREEN_MODE Dark        // Can be either Light or Dark
 #define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather
+#define HIGH_LOW_INTERVAL 0             // Switch between Highs and Lows on 3 day forecast in X seconds - set to 0 to disable
 
 // STOCK TICKER CONFIGURATION
 #define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,SPY,APC&country=Germany" // Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on "&country=Canada" to narrow down to your ticker)
@@ -58,6 +66,9 @@
 
 // TRUETYPE FONT CONFIGURATION
 //#define DEFAULT_FONT ROBOTO_REGULAR
+
+// ADVANCED COMPILE OPTIONS
+//#define INCLUDE_MDNS // Include mDNS responder, for local name resolution without DNS (disable to save flash/memory)
 
 // ============= END OF USER CONFIGURATION =================================================================
 
@@ -87,15 +98,9 @@
 #define SCREEN_4_CS 25
 #define SCREEN_5_CS 21
 
-#if INVERTED_ORBS
-    #define BUTTON_OK 27
-    #define BUTTON_LEFT 14
-    #define BUTTON_RIGHT 26
-#else
-    #define BUTTON_OK 27
-    #define BUTTON_LEFT 26
-    #define BUTTON_RIGHT 14
-#endif
+#define BUTTON_LEFT_PIN 26
+#define BUTTON_MIDDLE_PIN 27
+#define BUTTON_RIGHT_PIN 14
 
 #define BUTTON_DEBOUNCE_TIME 35        // Debounce buttons for X ms
 #define BUTTON_MEDIUM_PRESS_TIME 500    // Medium press is registered after X ms
