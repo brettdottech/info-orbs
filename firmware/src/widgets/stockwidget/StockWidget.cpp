@@ -12,7 +12,7 @@ StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget
 
     String stockchangeFormats[] = {"Percent", "Price"};
     m_config.addConfigComboBox("StockWidget", "stockchgFmt", &m_stockchangeformat, stockchangeFormats, 2, "Show percent or price change", true);
-        
+
     char *symbol = strtok(stockList, ",");
     m_stockCount = 0;
     do {
@@ -134,10 +134,9 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
         m_manager.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
         m_manager.drawArc(centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
     }
-    if (!m_stockchangeformat){
+    if (!m_stockchangeformat) {
         m_manager.drawString(stock.getPercentChange(2) + "%", centre, 48, bigFontSize, Align::MiddleCenter);
-    }
-    else{
+    } else {
         m_manager.drawString(stock.getPriceChange(2) + stock.getCurrencySymbol(), centre, 48, bigFontSize, Align::MiddleCenter);
     }
     // Draw stock data

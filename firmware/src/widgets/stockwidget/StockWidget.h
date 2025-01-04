@@ -44,7 +44,7 @@ private:
     int8_t m_stockCount;
 
 #ifndef STOCK_CHANGE_FORMAT
-  #define STOCK_CHANGE_FORMAT 0
+    #define STOCK_CHANGE_FORMAT 0
 #endif
 
     int m_stockchangeformat = STOCK_CHANGE_FORMAT; // Show percent change (0) or price change (1) for stocks
