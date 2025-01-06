@@ -1,4 +1,5 @@
 #include "ShowMemoryUsage.h"
+#include "config_helper.h"
 #include <Arduino.h>
 
 // initialize static members
