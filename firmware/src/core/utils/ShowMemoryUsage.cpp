@@ -1,13 +1,18 @@
 #include "ShowMemoryUsage.h"
-#include "config_helper.h"
+#include "../../../config/config.h"
 #include <Arduino.h>
 
 // initialize static members
 static unsigned long s_lastMemoryUsageShownAt = 0;
 
+#ifdef MEMORY_DEBUG_INTERVAL
+    static const unsigned long interval = MEMORY_DEBUG_INTERVAL;
+#else
+    static const unsigned long interval = 1000;
+#endif
+
 void ShowMemoryUsage::printSerial(bool force, bool newLine) {
     multi_heap_info_t info;
-    const unsigned long interval = MEMORY_DEBUG_INTERVAL ? MEMORY_DEBUG_INTERVAL : 1000;
     if (force || (!s_lastMemoryUsageShownAt || (millis() - s_lastMemoryUsageShownAt >= interval))) {
         heap_caps_get_info(&info, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
         size_t total = heap_caps_get_total_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
