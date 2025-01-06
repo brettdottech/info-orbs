@@ -130,7 +130,6 @@
 
 #define MAX_RETRIES 3
 
-// #define MEMORY_DEBUG true
 // #define MEMORY_DEBUG_INTERVAL 5000
 
 #endif
