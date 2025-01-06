@@ -1,4 +1,5 @@
 #include "StockWidget.h"
+#include "TaskFactory.h"
 #include <ArduinoJson.h>
 #include <iomanip>
 
@@ -49,14 +50,15 @@ void StockWidget::update(bool force) {
             String url = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + m_stocks[i].getSymbol();
             
             StockDataModel& stock = m_stocks[i];
-            HTTPClientWrapper::getInstance()->addRequest(url,
-                [this, &stock](int httpCode, const String& response) {
-                    processResponse(stock, httpCode, response);
-                });
-        }
-        
-        m_stockDelayPrev = millis();
 
+            auto task = TaskFactory::createHttpTask(url, [this, &stock](int httpCode, const String &response) {
+                processResponse(stock, httpCode, response);
+            });
+
+            TaskManager::getInstance()->addTask(std::move(task));
+        }
+
+        m_stockDelayPrev = millis();
     }
 }
 
