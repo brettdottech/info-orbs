@@ -1,3 +1,13 @@
+// TODO:
+// 1
+// factor out a selectDisplay that selects the dispay and returns the workable object,
+// so we don't have this select, getDisplay crap all over the place
+// 2
+// make high/low an enum, if we even keep it (I strongly suggest just switching back
+// and forth between high and low every 10 seconds or something)
+// 3
+// factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
+
 #include "WeatherWidget.h"
 #include "TaskFactory.h"
 #include "icons.h"
@@ -170,6 +180,9 @@ void WeatherWidget::displayClock(int displayIndex) {
     m_manager.drawString(m_time->getMinutePadded(), centre + 10, clockY, 66, Align::MiddleLeft);
 }
 
+// Write an image to the screen from a hex array.
+// scale of the image (1=full size, then multiples of 2 to scale down)
+// getting the byte array size is very annoying as it's computed on compile, so you can't do it dynamically.
 void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[], int jpgDataSize, int scale) {
     m_manager.selectScreen(displayIndex);
 
@@ -179,6 +192,7 @@ void WeatherWidget::showJPG(int displayIndex, int x, int y, const byte jpgData[]
     TJpgDec.drawJpg(x, y, jpgData, jpgDataSize);
 }
 
+// Take the text output from the weather API and map it to a icon/byte array, then display it
 void WeatherWidget::drawWeatherIcon(int displayIndex, const String &condition, int x, int y, int scale) {
     const byte *iconStart = NULL;
     const byte *iconEnd = NULL;
@@ -214,6 +228,8 @@ void WeatherWidget::drawWeatherIcon(int displayIndex, const String &condition, i
     }
 }
 
+// Displays the current temperature on a single screen.
+// doesn't round deg, just removes all text after the decimal
 void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.selectScreen(displayIndex);
     m_manager.fillScreen(m_backgroundColor);
@@ -236,8 +252,15 @@ void WeatherWidget::singleWeatherDeg(int displayIndex) {
     m_manager.setBackgroundColor(m_backgroundColor);
 }
 
+// Display the user's current city and the text description of the weather
 void WeatherWidget::weatherText(int displayIndex) {
     m_manager.selectScreen(displayIndex);
+
+    //=== TEXT OVERFLOW ============================
+    // This takes a given string a and breaks it down in max x character long strings ensuring not to break it only at a space.
+    // Given the small width of the screens this will porbablly be needed to this project again so making sure to outline it
+    // clearly as this should liekly eventually be turned into a fucntion. Before use the array size should be made to be dynamic.
+    // In this case its used for the weather text description
 
     String message = model.getCurrentText() + " ";
     String messageArr[4];
@@ -251,6 +274,7 @@ void WeatherWidget::weatherText(int displayIndex) {
         variableRangeS = variableRangeE;
         variableRangeE = variableRangeS + 24;
     }
+    //=== OVERFLOW END ==============================
 
     m_manager.fillScreen(m_backgroundColor);
     String cityName = model.getCityName();
@@ -315,6 +339,9 @@ void WeatherWidget::configureColors() {
     m_foregroundColor = m_screenMode == Light ? TFT_BLACK : TFT_WHITE;
     m_backgroundColor = m_screenMode == Light ? TFT_WHITE : TFT_BLACK;
 
+    // NOTE: In Light mode, we draw decorative black chunks and display the high and low on them in white.
+    //       It does not make sense to have glaring white chunks in dark mode, so we don't draw them at all,
+    //       and display the high and low in white too.
     m_invertedForegroundColor = m_screenMode == Light ? m_backgroundColor : m_foregroundColor;
     m_invertedBackgroundColor = m_screenMode == Light ? m_foregroundColor : m_backgroundColor;
 
