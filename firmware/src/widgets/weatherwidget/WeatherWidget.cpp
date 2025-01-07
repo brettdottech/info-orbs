@@ -32,7 +32,6 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         changeMode();
     if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
         update(true);
-        update(true);
 }
 
 void WeatherWidget::setup() {
@@ -86,8 +85,6 @@ bool WeatherWidget::getWeatherData() {
     String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
                                 String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
                                 "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
-                                String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
     auto task = TaskFactory::createHttpTask(httpRequestAddress, [this](int httpCode, const String &response) { processResponse(httpCode, response); }, [this](int httpCode, String &response) { preProcessResponse(httpCode, response); });
 
@@ -104,7 +101,6 @@ bool WeatherWidget::getWeatherData() {
     return success;
 }
 
-void WeatherWidget::preProcessResponse(int httpCode, String &response) {
 void WeatherWidget::preProcessResponse(int httpCode, String &response) {
     if (httpCode > 0) {
         JsonDocument filter;
@@ -128,7 +124,6 @@ void WeatherWidget::preProcessResponse(int httpCode, String &response) {
     }
 }
 
-void WeatherWidget::processResponse(int httpCode, const String &response) {
 void WeatherWidget::processResponse(int httpCode, const String &response) {
     if (httpCode > 0) {
         JsonDocument doc;
