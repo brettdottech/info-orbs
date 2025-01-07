@@ -73,7 +73,7 @@ private:
     const int MODE_LOWS = 1;
 
 #ifndef HIGH_LOW_INTERVAL
-  #define HIGH_LOW_INTERVAL 0
+    #define HIGH_LOW_INTERVAL 0
 #endif
 
     int m_switchinterval = HIGH_LOW_INTERVAL;
