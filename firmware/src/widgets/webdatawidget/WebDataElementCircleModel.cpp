@@ -68,7 +68,7 @@ void WebDataElementCircleModel::parseData(const JsonObject &doc, int32_t default
     if (doc["radius"].is<int32_t>()) {
         setRadius(doc["radius"].as<int32_t>());
     }
-    if (doc["filled"].is<int32_t>()) {
+    if (doc["filled"].is<bool>()) {
         setFilled(doc["filled"].as<bool>());
     }
     if (const char *color = doc["color"]) {
