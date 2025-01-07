@@ -13,14 +13,16 @@ std::unique_ptr<T> make_unique(Args &&...args) {
 class TaskFactory {
 public:
     static std::unique_ptr<Task> createHttpTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess = nullptr) {
-        return make_unique<Task>(url, callback, [url, callback, preProcess]() { TaskFactory::httpTask(url, callback, preProcess); }, preProcess);
+        return make_unique<Task>(
+            url, callback, [url, callback, preProcess]() { TaskFactory::httpTask(url, callback, preProcess); }, preProcess);
     }
 
     static std::unique_ptr<Task> createMqttTask(const String &topic, Task::ResponseCallback callback) {
-        return make_unique<Task>(topic, callback, []() {
-            // Placeholder for MQTT task execution logic
-        },
-                                 nullptr);
+        return make_unique<Task>(
+            topic, callback, []() {
+                // Placeholder for MQTT task execution logic
+            },
+            nullptr);
     }
 
     // Declare the httpTask method

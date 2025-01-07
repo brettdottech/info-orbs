@@ -55,4 +55,3 @@ private:
 };
 
 #endif // HTTP_CLIENT_WRAPPER_H
-

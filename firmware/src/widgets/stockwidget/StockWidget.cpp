@@ -51,8 +51,8 @@ void StockWidget::update(bool force) {
         // Queue requests for each stock
         for (int8_t i = 0; i < m_stockCount; i++) {
             String url = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + m_stocks[i].getSymbol();
-            
-            StockDataModel& stock = m_stocks[i];
+
+            StockDataModel &stock = m_stocks[i];
 
             auto task = TaskFactory::createHttpTask(url, [this, &stock](int httpCode, const String &response) {
                 processResponse(stock, httpCode, response);
@@ -60,7 +60,6 @@ void StockWidget::update(bool force) {
 
             TaskManager::getInstance()->addTask(std::move(task));
         }
-
 
         m_stockDelayPrev = millis();
     }
