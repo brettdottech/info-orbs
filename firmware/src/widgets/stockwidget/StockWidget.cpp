@@ -137,7 +137,7 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
     if (!m_stockchangeformat) {
         m_manager.drawString(stock.getPercentChange(2) + "%", centre, 48, bigFontSize, Align::MiddleCenter);
     } else {
-        m_manager.drawString(stock.getPriceChange(2) + stock.getCurrencySymbol(), centre, 48, bigFontSize, Align::MiddleCenter);
+        m_manager.drawString(stock.getCurrencySymbol() + stock.getPriceChange(2), centre, 48, bigFontSize, Align::MiddleCenter);
     }
     // Draw stock data
     m_manager.setFontColor(TFT_BLACK, TFT_WHITE);
