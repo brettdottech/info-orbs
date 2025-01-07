@@ -26,8 +26,6 @@ public:
     void changeMode();
 
 private:
-    // void getStockData(StockDataModel &stock);
-    // static void taskGetStockData(void *pvParameters);
     void processResponse(StockDataModel &stock, int httpCode, const String &response);
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 

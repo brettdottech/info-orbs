@@ -290,6 +290,7 @@ void WeatherWidget::weatherText(int displayIndex) {
     }
 }
 
+// Displays the next 3 days' weather forecast
 void WeatherWidget::threeDayWeather(int displayIndex) {
     const int days = 3;
     const int columnSize = 75;
@@ -310,16 +311,20 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
     m_manager.setBackgroundColor(m_backgroundColor);
 
     int temperatureFontSize = fontSize; // 0-9 only
+    // Look up all the temperatures, and if any of them are more than 2 digits, we need
+    // to scale down the font -- or it won't look right on the screen.
     String temps[days];
     for (auto i = 0; i < days; i++) {
         temps[i] = m_mode == MODE_HIGHS ? model.getDayHigh(i, 0) : model.getDayLow(i, 0);
         if (temps[i].length() > 4) {
+            // We've got a nutty 3-digit temperature (plus degree sign), scale down
             temperatureFontSize = fontSize - 4; // smaller
         }
     }
 
     m_manager.setFontColor(m_foregroundColor);
     for (auto i = 0; i < days; i++) {
+        // TODO: only works for 3 days
         const int x = (centre - columnSize) + i * columnSize;
 
         drawWeatherIcon(displayIndex, model.getDayIcon(i), x - 30, 40, 4);
