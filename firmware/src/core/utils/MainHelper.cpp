@@ -2,6 +2,7 @@
 #include "LittleFSHelper.h"
 #include "config_helper.h"
 #include "icons.h"
+#include <ArduinoLog.h>
 #include <HTTPClient.h>
 #include <esp_task_wdt.h>
 
@@ -82,26 +83,26 @@ void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {
     // Reset cycle timer whenever a button is pressed
     if (buttonId == BUTTON_LEFT && state == BTN_SHORT) {
         // Left short press cycles widgets backward
-        Serial.println("Left button short pressed -> switch to prev Widget");
+        Log.noticeln("Left button short pressed -> switch to prev Widget");
         s_widgetCycleDelayPrev = millis();
         s_widgetSet->prev();
     } else if (buttonId == BUTTON_RIGHT && state == BTN_SHORT) {
         // Right short press cycles widgets forward
-        Serial.println("Right button short pressed -> switch to next Widget");
+        Log.noticeln("Right button short pressed -> switch to next Widget");
         s_widgetCycleDelayPrev = millis();
         s_widgetSet->next();
     } else {
-        // Everying else that is not BTN_NOTHING will be forwarded to the current widget
+        // Everything else that is not BTN_NOTHING will be forwarded to the current widget
         if (buttonId == BUTTON_LEFT) {
-            Serial.printf("Left button pressed, state=%d\n", state);
+            Log.noticeln("Left button pressed, state=%d", state);
             s_widgetCycleDelayPrev = millis();
             s_widgetSet->buttonPressed(BUTTON_LEFT, state);
         } else if (buttonId == BUTTON_MIDDLE) {
-            Serial.printf("Middle button pressed, state=%d\n", state);
+            Log.noticeln("Middle button pressed, state=%d", state);
             s_widgetCycleDelayPrev = millis();
             s_widgetSet->buttonPressed(BUTTON_MIDDLE, state);
         } else if (buttonId == BUTTON_RIGHT) {
-            Serial.printf("Right button pressed, state=%d\n", state);
+            Log.noticeln("Right button pressed, state=%d", state);
             s_widgetCycleDelayPrev = millis();
             s_widgetSet->buttonPressed(BUTTON_RIGHT, state);
         }
@@ -293,7 +294,7 @@ void MainHelper::handleEndpointFetchFilesFromURL() {
         String filePath = currentDir + fileName;
         String fileUrl = url + "/" + fileName;
 
-        Serial.printf("Downloading %s to %s\n", fileUrl.c_str(), filePath.c_str());
+        Log.noticeln("Downloading %s to %s", fileUrl.c_str(), filePath.c_str());
 
         HTTPClient http;
         // Initialize HTTP connection
@@ -312,18 +313,18 @@ void MainHelper::handleEndpointFetchFilesFromURL() {
                         file.write(buffer, sizeRead);
                     }
 
-                    Serial.println("Downloaded: " + fileName + " (" + String(file.size()) + ")");
+                    Log.noticeln("Downloaded: %s (%d)", fileName.c_str(), file.size());
                     file.close();
                 } else {
-                    Serial.println("Failed to open file for writing: " + filePath);
+                    Log.errorln("Failed to open file for writing: %s", filePath.c_str());
                 }
             } else {
-                Serial.println("Failed to download: " + fileUrl + " (HTTP Code: " + String(httpCode) + ")");
+                Log.errorln("Failed to download: %s (HTTP Code: %d)", fileUrl.c_str(), httpCode);
             }
 
             http.end();
         } else {
-            Serial.println("Failed to initialize HTTP connection for: " + fileUrl);
+            Log.errorln("Failed to initialize HTTP connection for: %s", fileUrl.c_str());
         }
     }
 
@@ -347,7 +348,7 @@ void MainHelper::handleEndpointUploadFile() {
     String filePath = uploadDir + upload.filename;
 
     if (upload.status == UPLOAD_FILE_START) {
-        Serial.println("Upload Start: " + filePath);
+        Log.noticeln("Upload Start: %s", filePath.c_str());
 
         // Ensure the directory exists
         if (!LittleFS.exists(uploadDir)) {
@@ -357,7 +358,7 @@ void MainHelper::handleEndpointUploadFile() {
         // Open the file for writing
         fsUploadFile = LittleFS.open(filePath, "w");
         if (!fsUploadFile) {
-            Serial.println("Failed to open file for writing: " + filePath);
+            Log.errorln("Failed to open file for writing: %s", filePath.c_str());
             return;
         }
     } else if (upload.status == UPLOAD_FILE_WRITE) {
@@ -365,20 +366,20 @@ void MainHelper::handleEndpointUploadFile() {
             // Write the file data
             fsUploadFile.write(upload.buf, upload.currentSize);
         } else {
-            Serial.println("File not open for writing during upload: " + filePath);
+            Log.errorln("File not open for writing during upload: %s", filePath.c_str());
         }
     } else if (upload.status == UPLOAD_FILE_END) {
         if (fsUploadFile) {
             fsUploadFile.close();
-            Serial.println("Upload End: " + filePath);
+            Log.errorln("Upload End: %s", filePath.c_str());
         } else {
-            Serial.println("Failed to close file: " + filePath);
+            Log.errorln("Failed to close file: %s", filePath.c_str());
         }
     } else if (upload.status == UPLOAD_FILE_ABORTED) {
         if (fsUploadFile) {
             fsUploadFile.close();
             LittleFS.remove(filePath); // Clean up incomplete file
-            Serial.println("Upload Aborted: " + filePath);
+            Log.errorln("Upload Aborted: %s", filePath.c_str());
         }
     }
     // Update ClockWidget (we might be showing the changed custom clock)
@@ -394,7 +395,7 @@ void MainHelper::handleEndpointDeleteFile() {
 
     if (LittleFS.exists(filePath)) {
         LittleFS.remove(filePath);
-        Serial.println("File deleted: " + filePath);
+        Log.noticeln("File deleted: %s", filePath.c_str());
         s_wifiManager->server->send(200, "text/html", "<h2>File deleted successfully!</h2><a href='/browse?dir=" + dir + "'>Back to file list</a>");
     } else {
         s_wifiManager->server->send(404, "text/html", "<h2>File not found</h2><a href='/browse?dir=" + dir + "'>Back to file list</a>");
@@ -472,7 +473,7 @@ void MainHelper::restartIfNecessary() {
             // to avoid a browser timeout
             s_wifiManager->process();
         }
-        Serial.println("Restarting ESP now");
+        Log.noticeln("Restarting ESP now");
         ESP.restart();
     }
 }
@@ -485,18 +486,18 @@ void MainHelper::setupLittleFS() {
 }
 
 void MainHelper::watchdogInit() {
-    Serial.printf("Initializing watchdog timer to %d seconds... ", WDT_TIMEOUT);
+    Log.noticeln("Initializing watchdog timer to %d seconds... ", WDT_TIMEOUT);
     // Initialize the watchdog timer for the main task
     if (esp_task_wdt_init(WDT_TIMEOUT, true) == ESP_OK) {
-        Serial.println("done!");
+        Log.noticeln("done!");
         // Add the main task to the watchdog
         if (esp_task_wdt_add(nullptr) == ESP_OK) {
-            Serial.println("Main task added to watchdog.");
+            Log.noticeln("Main task added to watchdog.");
         } else {
-            Serial.println("Failed to add main task to watchdog.");
+            Log.errorln("Failed to add main task to watchdog.");
         }
     } else {
-        Serial.println("failed!");
+        Log.errorln("failed!");
     }
 }
 
