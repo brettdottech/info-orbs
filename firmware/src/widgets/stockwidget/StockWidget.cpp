@@ -44,7 +44,7 @@ void StockWidget::draw(bool force) {
 
 void StockWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
-        
+
         // Queue requests for each stock
         for (int8_t i = 0; i < m_stockCount; i++) {
             String url = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + m_stocks[i].getSymbol();
@@ -58,11 +58,12 @@ void StockWidget::update(bool force) {
             TaskManager::getInstance()->addTask(std::move(task));
         }
 
+
         m_stockDelayPrev = millis();
     }
 }
 
-void StockWidget::processResponse(StockDataModel& stock, int httpCode, const String& response) {
+void StockWidget::processResponse(StockDataModel &stock, int httpCode, const String &response) {
     if (httpCode > 0) {
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response);

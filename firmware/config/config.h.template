@@ -38,6 +38,7 @@
 #define WEATHER_LOCATION "Victoria, BC" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data
 #define WEATHER_SCREEN_MODE Dark        // Can be either Light or Dark
 #define WEATHER_UNITS_METRIC            // Comment this line out (or delete it) if you want imperial units for the weather
+#define HIGH_LOW_INTERVAL 0             // Switch between Highs and Lows on 3 day forecast in X seconds - set to 0 to disable
 
 // STOCK TICKER CONFIGURATION
 #define STOCK_TICKER_LIST "BTC/USD,USD/CAD,XEQT,SPY,APC&country=Germany" // Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on "&country=Canada" to narrow down to your ticker)
