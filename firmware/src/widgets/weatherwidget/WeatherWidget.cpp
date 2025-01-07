@@ -13,7 +13,6 @@
 #include "icons.h"
 #include <ArduinoJson.h>
 
-
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
     m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
@@ -22,6 +21,7 @@ WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Wi
     config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
     String optModes[] = {"Light", "Dark"};
     config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
+    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, "Switch between Highs and Lows every X seconds, set to 0 to disable", true);
     Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }
@@ -41,12 +41,13 @@ void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
     if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
-        update(true);        
+        update(true);
 }
 
 void WeatherWidget::setup() {
     m_time = GlobalTime::getInstance();
     configureColors();
+    m_prevMillisSwitch = millis();
 }
 
 void WeatherWidget::draw(bool force) {
@@ -64,6 +65,15 @@ void WeatherWidget::draw(bool force) {
         singleWeatherDeg(3);
         threeDayWeather(4);
         model.setChangedStatus(false);
+    }
+
+    if ((millis() - m_prevMillisSwitch >= (m_switchinterval * 1000)) && m_switchinterval > 0) {
+        m_prevMillisSwitch = millis();
+        m_mode++;
+        if (m_mode > MODE_LOWS) {
+            m_mode = MODE_HIGHS;
+        }
+        threeDayWeather(4);
     }
 }
 
@@ -83,19 +93,20 @@ void WeatherWidget::update(bool force) {
 bool WeatherWidget::getWeatherData() {
     String weatherUnits = m_weatherUnits == 0 ? "metric" : "us";
     String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
-                               String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                               "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
+                                String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
+                                "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
-    return HTTPClientWrapper::getInstance()->addRequest(httpRequestAddress,
-        [this](int httpCode, const String& response) {
+    return HTTPClientWrapper::getInstance()->addRequest(
+        httpRequestAddress,
+        [this](int httpCode, const String &response) {
             processResponse(httpCode, response);
         },
-        [this](int httpCode, String& response) {
+        [this](int httpCode, String &response) {
             preProcessResponse(httpCode, response);
         });
 }
 
-void WeatherWidget::preProcessResponse(int httpCode, String& response) {
+void WeatherWidget::preProcessResponse(int httpCode, String &response) {
     if (httpCode > 0) {
         JsonDocument filter;
         filter["resolvedAddress"] = true;
@@ -118,7 +129,7 @@ void WeatherWidget::preProcessResponse(int httpCode, String& response) {
     }
 }
 
-void WeatherWidget::processResponse(int httpCode, const String& response) {
+void WeatherWidget::processResponse(int httpCode, const String &response) {
     if (httpCode > 0) {
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response);

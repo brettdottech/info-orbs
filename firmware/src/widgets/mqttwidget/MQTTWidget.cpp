@@ -340,13 +340,21 @@ void MQTTWidget::subscribeToOrbs() {
     }
 }
 
+#define RECONNECT_INTERVAL 5000
 // Handle MQTT reconnection
 void MQTTWidget::reconnect() {
     //    Serial.println("Inside reconnect method");
 
     // Loop until reconnected
-    while (!mqttClient.connected()) {
+    if (!mqttClient.connected()) {
+        // Check if it's time to attempt a reconnection
+        unsigned long now = millis();
+        if (now - lastReconnectAttempt < RECONNECT_INTERVAL) {
+            return;
+        }
+
         Serial.println("Attempting MQTT connection...");
+        lastReconnectAttempt = now;
 
         // Generate a random client ID
         String clientId = "MQTTWidgetClient-";
@@ -378,8 +386,6 @@ void MQTTWidget::reconnect() {
             Serial.print("failed, rc=");
             Serial.print(mqttClient.state());
             Serial.println(" try again in 5 seconds");
-            // Wait 5 seconds before retrying again
-            delay(5000);
         }
     }
 }
