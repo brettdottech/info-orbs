@@ -6,6 +6,7 @@
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
+#include <ArduinoLog.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -43,8 +44,8 @@ void addWidgets() {
 
 void setup() {
     Serial.begin(115200);
-    Serial.println();
-    Serial.println("Starting up...");
+    Log.begin(LOG_LEVEL, &Serial);
+    Log.noticeln("Starting up...");
 
     wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
@@ -59,7 +60,7 @@ void setup() {
     MainHelper::showWelcome();
 
     pinMode(BUSY_PIN, OUTPUT);
-    Serial.println("Connecting to WiFi");
+    Log.noticeln("Connecting to WiFi");
     wifiWidget = new WifiWidget(*sm, *config, *wifiManager);
     wifiWidget->setup();
 

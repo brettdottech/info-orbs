@@ -71,6 +71,10 @@
 // ADVANCED COMPILE OPTIONS
 //#define INCLUDE_MDNS // Include mDNS responder, for local name resolution without DNS (disable to save flash/memory)
 
+// Log levels: LOG_LEVEL_SILENT, LOG_LEVEL_FATAL, LOG_LEVEL_ERROR, 
+// LOG_LEVEL_WARNING, LOG_LEVEL_NOTICE, LOG_LEVEL_VERBOSE
+#define LOG_LEVEL LOG_LEVEL_VERBOSE
+
 // ============= END OF USER CONFIGURATION =================================================================
 
 
