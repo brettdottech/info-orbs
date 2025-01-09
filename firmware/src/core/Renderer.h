@@ -2,7 +2,7 @@
 #define RENDERER_H
 
 #include "ttf-fonts.h"
-#include "screenmanager\ScreenManager.h"
+#include "screenmanager/ScreenManager.h"
 #include "Settings.h"
 
 struct Renderer : private ScreenManager {

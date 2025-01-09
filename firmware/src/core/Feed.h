@@ -12,10 +12,10 @@ enum FeedId
 };
 
 struct Feed {
-public:
-   virtual String& getName();
-   virtual FeedId getId();
-   template<class DerivedFeedType> DerivedFeedType getFeed() { return *dynamic_cast<DerivedFeedType*>(this); }
+   const FeedId Id;
+   
+   explicit Feed(FeedId id) : Id(id) {}
+   template<class DerivedFeedType> DerivedFeedType getFeed() { return *static_cast<DerivedFeedType*>(this); }
 };
 
 #endif

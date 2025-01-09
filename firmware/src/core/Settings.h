@@ -1,7 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-
+#include <Arduino.h>
 #include "GlobalTime.h"
 #include "Utils.h"
 #include "GadgetSettings.h"

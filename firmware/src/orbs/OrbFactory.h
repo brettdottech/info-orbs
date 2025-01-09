@@ -1,8 +1,8 @@
 #ifndef ORBFACTORY_H
 #define ORBFACTORY_H
 
-#include "..\..\core\Settings.h"
-#include "..\..\core\Orb.h"
+#include "../../core/Settings.h"
+#include "../../core/Orb.h"
 #include "DateTimeWeekDayOrb.h"
 
 class OrbFactory {

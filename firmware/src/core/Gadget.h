@@ -5,7 +5,7 @@
 #include "Settings.h"
 #include "Feeds.h"
 #include "Orb.h"
-#include "..\..\orbs\OrbFactory.h"
+#include "../../orbs\OrbFactory.h"
 
 
 #define ORB_COUNT 5

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <map>
 #include "Feed.h"
-#include "..\..\feeds\FeedFactory.h"
+#include "../../feeds/FeedFactory.h"
 
 struct Feeds {
 private:

@@ -2,13 +2,13 @@
 #define DATETIMEFEED_H
 
 #include "GlobalTime.h"
-#include "..\..\core\Feed.h"
+#include "../../core/Feed.h"
 
-class DateTimeFeed : private Feed {
+class DateTimeFeed : public Feed {
 private:
     GlobalTime* _DateTime = nullptr;
 public:    
-    DateTimeFeed() { _DateTime = GlobalTime::getInstance(); }
+    DateTimeFeed() : Feed(FeedId::FeedDateTime) { _DateTime = GlobalTime::getInstance(); }
     GlobalTime* getData() { return _DateTime; }
 };
 

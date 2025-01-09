@@ -2,9 +2,9 @@
 #define DATETIMEWEEKDAYORB_H
 
 #include "GlobalTime.h"
-#include "..\..\feeds\DateTimeFeed.h"
-#include "..\..\core\Settings.h"
-#include "..\..\core\Orb.h"
+#include "../../feeds/DateTimeFeed.h"
+#include "../../core/Settings.h"
+#include "../../core/Orb.h"
 
 class DateTimeWeekdayOrb : public Orb {
 public:    

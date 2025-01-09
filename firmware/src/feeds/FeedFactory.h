@@ -1,7 +1,7 @@
 #ifndef FEEDFACTORY_H
 #define FEEDFACTORY_H
 
-#include "..\..\core\Feed.h"
+#include "../../core/Feed.h"
 #include "DateTimeFeed.h"
 
 class FeedFactory {
