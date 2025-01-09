@@ -4,7 +4,7 @@
 #include "GlobalTime.h"
 #include "WeatherDataModel.h"
 #include "Widget.h"
-#include "config_helper.h"
+//#include "config_helper.h"
 #include <HTTPClientWrapper.h>
 
 class WeatherWidget : public Widget {

@@ -75,7 +75,7 @@ void loop() {
     if (wifiWidget->isConnected() == false) {
         wifiWidget->update();
         wifiWidget->draw();
-        widgetSet->setClearScreensOnDrawCurrent(); // Clear screen after wifiWidget
+        //widgetSet->setClearScreensOnDrawCurrent(); // Clear screen after wifiWidget
         delay(100);
     } else {
         if (!widgetSet->initialUpdateDone()) {

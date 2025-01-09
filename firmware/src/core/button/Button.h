@@ -2,6 +2,12 @@
 #define BUTTON_H
 #include <Arduino.h>
 
+enum OrbButton {
+    Left,
+    Middle,
+    Right
+};
+
 enum ButtonState {
     BTN_NOTHING,
     BTN_SHORT,
@@ -11,10 +17,10 @@ enum ButtonState {
 
 enum Buttons {
     BUTTON_INVALID = 0,
-    BUTTON_LEFT = 1,
-    BUTTON_MIDDLE = 2,
-    BUTTON_OK = 2, // backwards compatibility
-    BUTTON_RIGHT = 3,
+    LeftButton = 1,
+    MiddleButton = 2,
+    OkButton = 2, // backwards compatibility
+    RightButton = 3,
 };
 
 class Button {
