@@ -2,9 +2,10 @@
 #define SETTINGS_H
 
 #include <Arduino.h>
+#include <vector>
 #include "GlobalTime.h"
 #include "Utils.h"
-#include "GadgetSettings.h"
+#include "PageSettings.h"
 
 
 // TODO: serialize!
@@ -12,7 +13,7 @@
 struct Settings {
 private:
     uint8_t _GadgetCount;
-    GadgetSettings* _GadgetSettings;
+    std::vector<PageSettings> _PageSettings;
 
     ScreenMode _ScreenMode = Dark;
     uint8_t _LightStartHour = 7;
@@ -39,7 +40,6 @@ public:
     Settings() {
         // TODO temporary static
         _GadgetCount = 1;
-        _GadgetSettings = new GadgetSettings[_GadgetCount];
     }
 
 

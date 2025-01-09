@@ -5,9 +5,8 @@
 #include "../../core/Orb.h"
 #include "DateTimeWeekDayOrb.h"
 
-class OrbFactory {
-public:
-    static Orb* CreateOrb(OrbId orbId, const Settings& settings, Feeds& feeds)
+struct OrbFactory {
+    static Orb* CreateOrb(OrbId orbId, const Settings& settings, Feeds* feeds)
     {
         Orb* newOrb;
         switch (orbId)
@@ -15,7 +14,7 @@ public:
             case OrbDateTimeWeekday: newOrb = new DateTimeWeekdayOrb(settings);
         }
 
-        feeds.registerFeed(newOrb->getFeedId());
+        feeds->registerFeed(newOrb->getFeedId());
         return newOrb;
     }
 };

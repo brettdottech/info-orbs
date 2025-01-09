@@ -1,14 +1,14 @@
-#ifndef GADGETS_H
-#define GADGETS_H
+#ifndef CONTENTMANAGER_H
+#define CONTENTMANAGER_H
 
 #include <Arduino.h>
 #include "Settings.h"
 #include "Button.h"
 
-struct Gadgets
+struct ContentManager
 {
 public:
-    Gadgets(const Settings& settings);
+    ContentManager(const Settings& settings);
     void prev();
     void next();
     void buttonPressed(OrbButton whichButton, ButtonState state);

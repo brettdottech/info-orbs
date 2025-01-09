@@ -6,8 +6,7 @@
 #include "../../core/Settings.h"
 #include "../../core/Orb.h"
 
-class DateTimeWeekdayOrb : public Orb {
-public:    
+struct DateTimeWeekdayOrb : public Orb {
     DateTimeWeekdayOrb(const Settings& settings) : Orb(settings) {}
 
     FeedId getFeedId() { return FeedId::FeedDateTime; }
