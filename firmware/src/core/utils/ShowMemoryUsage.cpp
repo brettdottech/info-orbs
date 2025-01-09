@@ -8,7 +8,7 @@ static unsigned long s_lastMemoryUsageShownAt = 0;
 #ifdef MEMORY_DEBUG_INTERVAL
 static const unsigned long interval_ms = MEMORY_DEBUG_INTERVAL;
 #else
-static const unsigned long interval_ms = 1000;
+static const unsigned long interval_ms = 1000; // default is needed for cases of where this method is called without MEMORY_DEBUG_INTERVAL being set
 #endif
 
 void ShowMemoryUsage::printSerial(bool force, bool newLine) {
