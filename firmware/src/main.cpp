@@ -95,7 +95,7 @@ void loop() {
         HTTPClientWrapper::getInstance()->processRequestQueue();
         HTTPClientWrapper::getInstance()->processResponseQueue();
     }
-#ifdef MEMORY_DEBUG
+#ifdef MEMORY_DEBUG_INTERVAL
     ShowMemoryUsage::printSerial();
 #endif
     MainHelper::restartIfNecessary();

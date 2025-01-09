@@ -136,4 +136,7 @@
 
 #define MAX_RETRIES 3
 
+// if not defined, then no memory debugging is emitted
+// #define MEMORY_DEBUG_INTERVAL 5000
+
 #endif
