@@ -8,8 +8,7 @@ enum FeedId
     FeedDateTime = 0,
     FeedWeather = 1,
     FeedStock = 2,
-    FeedMQTT = 3,
-    MAXFEEDID = 4
+    FeedMQTT = 3
 };
 
 struct Feed {
