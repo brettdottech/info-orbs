@@ -1,3 +1,4 @@
+#include "GlobalResources.h"
 #include "MainHelper.h"
 #include "clockwidget/ClockWidget.h"
 #include "mqttwidget/MQTTWidget.h"
@@ -43,6 +44,8 @@ void addWidgets() {
 }
 
 void setup() {
+    // Initialize global resources
+    initializeGlobalResources();
     Serial.begin(115200);
     Log.begin(LOG_LEVEL, &Serial);
     Log.noticeln("Starting up...");
@@ -92,8 +95,8 @@ void loop() {
 
         MainHelper::checkCycleWidgets();
         wifiManager->process();
-        HTTPClientWrapper::getInstance()->processRequestQueue();
-        HTTPClientWrapper::getInstance()->processResponseQueue();
+        TaskManager::getInstance()->processAwaitingTasks();
+        TaskManager::getInstance()->processTaskResponses();
     }
 #ifdef MEMORY_DEBUG_INTERVAL
     ShowMemoryUsage::printSerial();

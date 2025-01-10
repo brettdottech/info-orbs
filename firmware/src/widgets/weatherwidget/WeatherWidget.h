@@ -5,7 +5,7 @@
 #include "WeatherDataModel.h"
 #include "Widget.h"
 #include "config_helper.h"
-#include <HTTPClientWrapper.h>
+#include <TaskManager.h>
 
 class WeatherWidget : public Widget {
 public:

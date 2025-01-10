@@ -9,7 +9,7 @@
 // factor out the text wrapping (there's a utils for that already, if that doesn't work, why not?)
 
 #include "WeatherWidget.h"
-
+#include "TaskFactory.h"
 #include "icons.h"
 #include <ArduinoJson.h>
 
@@ -96,14 +96,20 @@ bool WeatherWidget::getWeatherData() {
                                 String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
                                 "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
-    return HTTPClientWrapper::getInstance()->addRequest(
-        httpRequestAddress,
-        [this](int httpCode, const String &response) {
-            processResponse(httpCode, response);
-        },
-        [this](int httpCode, String &response) {
-            preProcessResponse(httpCode, response);
-        });
+    auto task = TaskFactory::createHttpGetTask(
+        httpRequestAddress, [this](int httpCode, const String &response) { processResponse(httpCode, response); }, [this](int httpCode, String &response) { preProcessResponse(httpCode, response); });
+
+    if (!task) {
+        Serial.println("Failed to create weather task");
+        return false;
+    }
+
+    bool success = TaskManager::getInstance()->addTask(std::move(task));
+    if (!success) {
+        Serial.println("Failed to add weather task");
+    }
+
+    return success;
 }
 
 void WeatherWidget::preProcessResponse(int httpCode, String &response) {
