@@ -2,6 +2,7 @@
 #define TASK_MANAGER_H
 
 #include <Arduino.h>
+#include <ArduinoLog.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/semphr.h>
@@ -71,9 +72,9 @@ public:
 
     // Add a debug function to check for leaks
     static void checkForLeaks() {
-        Serial.printf("Current TaskParams count: %d\n", taskParamsCount);
+        Log.noticeln("Current TaskParams count: %d", taskParamsCount);
         if (taskParamsCount != 0) {
-            Serial.println("⚠️ Potential memory leak detected!");
+            Log.noticeln("⚠️ Potential memory leak detected!");
         }
     }
 
