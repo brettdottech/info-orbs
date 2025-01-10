@@ -54,7 +54,7 @@ void StockWidget::update(bool force) {
 
             StockDataModel &stock = m_stocks[i];
 
-            auto task = TaskFactory::createHttpTask(url, [this, &stock](int httpCode, const String &response) {
+            auto task = TaskFactory::createHttpGetTask(url, [this, &stock](int httpCode, const String &response) {
                 processResponse(stock, httpCode, response);
             });
 

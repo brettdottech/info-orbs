@@ -96,7 +96,7 @@ bool WeatherWidget::getWeatherData() {
                                 String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
                                 "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 
-    auto task = TaskFactory::createHttpTask(
+    auto task = TaskFactory::createHttpGetTask(
         httpRequestAddress, [this](int httpCode, const String &response) { processResponse(httpCode, response); }, [this](int httpCode, String &response) { preProcessResponse(httpCode, response); });
 
     if (!task) {

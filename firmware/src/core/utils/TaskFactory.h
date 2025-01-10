@@ -12,9 +12,9 @@ std::unique_ptr<T> make_unique(Args &&...args) {
 
 class TaskFactory {
 public:
-    static std::unique_ptr<Task> createHttpTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess = nullptr) {
+    static std::unique_ptr<Task> createHttpGetTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess = nullptr) {
         return make_unique<Task>(
-            url, callback, [url, callback, preProcess]() { TaskFactory::httpTask(url, callback, preProcess); }, preProcess);
+            url, callback, [url, callback, preProcess]() { TaskFactory::httpGetTask(url, callback, preProcess); }, preProcess);
     }
 
     static std::unique_ptr<Task> createMqttTask(const String &topic, Task::ResponseCallback callback) {
@@ -25,8 +25,8 @@ public:
             nullptr);
     }
 
-    // Declare the httpTask method
-    static void httpTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess);
+    // Declare the httpGetTask method
+    static void httpGetTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess);
 };
 
 #endif // TASK_FACTORY_H

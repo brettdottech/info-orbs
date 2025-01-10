@@ -2,10 +2,11 @@
 #include "GlobalResources.h"
 #include "TaskManager.h"
 #include "Utils.h"
+#include <ArduinoLog.h>
 #include <HTTPClient.h>
 
-void TaskFactory::httpTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess) {
-    Serial.printf("🔵 Starting HTTP request for: %s\n", url.c_str());
+void TaskFactory::httpGetTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess) {
+    Log.noticeln("🔵 Starting HTTP request for: %s", url.c_str());
 
     {
         HTTPClient http;
@@ -21,7 +22,7 @@ void TaskFactory::httpTask(const String &url, Task::ResponseCallback callback, T
         if (httpCode > 0) {
             response = http.getString();
         } else {
-            Serial.printf("🔴 HTTP request failed, error code: %d\n", httpCode);
+            Log.errorln("🔴 HTTP request failed, error code: %d", httpCode);
         }
 
         http.end();
@@ -40,16 +41,15 @@ void TaskFactory::httpTask(const String &url, Task::ResponseCallback callback, T
         auto *responseData = new TaskManager::ResponseData{httpCode, response, callback};
 
         if (xQueueSend(TaskManager::responseQueue, &responseData, 0) != pdPASS) {
-            Serial.println("Failed to queue response");
+            Log.errorln("Failed to queue response");
             delete responseData; // Ensure cleanup if queueing fails
         }
     }
     TaskManager::activeRequests--;
 
 #ifdef TASKMANAGER_DEBUG
-    Serial.printf("Active requests now: %d\n", TaskManager::activeRequests);
+    Log.noticeln("Active requests now: %d", TaskManager::activeRequests);
     UBaseType_t highWater = uxTaskGetStackHighWaterMark(NULL);
-    Serial.print("Remaining task stack space: ");
-    Serial.println(highWater);
+    Log.noticeln("Remaining task stack space: %d", highWater);
 #endif
 }

@@ -1,6 +1,7 @@
 #include "TaskManager.h"
 #include "GlobalResources.h"
 #include "Utils.h"
+#include <ArduinoLog.h>
 #include <HTTPClient.h>
 #include <memory>
 
@@ -29,20 +30,21 @@ TaskManager *TaskManager::getInstance() {
 
 bool TaskManager::addTask(std::unique_ptr<Task> task) {
     if (isUrlInQueue(task->url)) {
+        Log.errorln("Duplicate Task. Task already in the queue to waiting to be processed.");
         return false;
     }
 
     auto *params = new TaskParams{task->url, task->callback, task->preProcessResponse, task->taskExec};
     taskParamsCount++; // Increment the count
 #ifdef TASKMANAGER_DEBUG
-    Serial.printf("TaskParams created: %d\n", taskParamsCount);
+    Log.noticeln("TaskParams created: %d", taskParamsCount);
 #endif
 
     if (xQueueSend(requestQueue, &params, 0) != pdPASS) {
         delete params;
         taskParamsCount--;
 #ifdef TASKMANAGER_DEBUG
-        Serial.printf("TaskParams deleted (queue full): %d\n", taskParamsCount);
+        Log.noticeln("TaskParams deleted (queue full): %d", taskParamsCount);
 #endif
         return false;
     }
@@ -67,14 +69,14 @@ void TaskManager::processAwaitingTasks() {
         maxConcurrentRequests = activeRequests;
     }
 #ifdef TASKMANAGER_DEBUG
-    Serial.println("✅ Obtained semaphore");
-    Serial.printf("Active requests: %d (Max seen: %d)\n", activeRequests, maxConcurrentRequests);
+    Log.noticeln("✅ Obtained semaphore");
+    Log.noticeln("Active requests: %d (Max seen: %d)", activeRequests, maxConcurrentRequests);
 #endif
 
     // Get next request
     TaskParams *taskParams = nullptr;
     if (xQueueReceive(requestQueue, &taskParams, 0) != pdPASS) {
-        Serial.println("⚠️ Queue empty after size check!");
+        Log.noticeln("⚠️ Queue empty after size check!");
         activeRequests--;
         Utils::setBusy(false);
         xSemaphoreGive(taskSemaphore);
@@ -82,9 +84,9 @@ void TaskManager::processAwaitingTasks() {
     }
 
 #ifdef TASKMANAGER_DEBUG
-    Serial.printf("Processing request: %s (Remaining in queue: %d)\n",
-                  taskParams->url.c_str(),
-                  uxQueueMessagesWaiting(requestQueue));
+    Log.noticeln("Processing request: %s (Remaining in queue: %d)",
+                 taskParams->url.c_str(),
+                 uxQueueMessagesWaiting(requestQueue));
 #endif
 
     TaskHandle_t taskHandle;
@@ -98,7 +100,7 @@ void TaskManager::processAwaitingTasks() {
 
             Utils::setBusy(false);
             xSemaphoreGive(taskSemaphore);
-            Serial.println("✅ Released semaphore");
+            Log.noticeln("✅ Released semaphore");
             vTaskDelete(nullptr);
         },
         "TASK_EXEC",
@@ -108,10 +110,10 @@ void TaskManager::processAwaitingTasks() {
         &taskHandle);
 
     if (result != pdPASS) {
-        Serial.println("Failed to create HTTP request task");
+        Log.errorln("Failed to create HTTP request task");
         delete taskParams; // Ensure the object is deleted if task creation fails
         taskParamsCount--; // Decrement the count if task creation fails
-        Serial.printf("TaskParams deleted (task creation failed): %d\n", taskParamsCount);
+        Log.errorln("TaskParams deleted (task creation failed): %d", taskParamsCount);
         Utils::setBusy(false);
         xSemaphoreGive(taskSemaphore);
     }
