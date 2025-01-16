@@ -151,12 +151,14 @@ void ParqetWidget::updatePortfolio() {
         // Filter the response to save memory
         filter["holdings"][0]["assetType"] = true;
         filter["holdings"][0]["currency"] = true;
-        filter["holdings"][0]["asset"] = true;
+        filter["holdings"][0]["asset"]["identifier"] = true;
         filter["holdings"][0]["sharedAsset"]["name"] = true;
-        filter["holdings"][0]["performance"] = true;
-        filter["holdings"][0]["position"] = true;
+        filter["holdings"][0]["performance"]["priceAtIntervalStart"] = true;
+        filter["holdings"][0]["performance"]["purchaseValueForInterval"] = true;
+        filter["holdings"][0]["position"]["currentPrice"] = true;
+        filter["holdings"][0]["position"]["currentValue"] = true;
         filter["performance"]["purchaseValueForInterval"] = true;
-        filter["performance"]["portfolioValue"] = true;
+        filter["performance"]["value"] = true;
 
         PARQET_DEBUG_PRINT_MEM("Parsing portfolio JSON now...");
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
@@ -208,8 +210,8 @@ void ParqetWidget::updatePortfolio() {
                 h.setName("T O T A L");
                 h.setPurchasePrice(perf["purchaseValueForInterval"].as<float>());
                 h.setPurchaseValue(perf["purchaseValueForInterval"].as<float>());
-                h.setCurrentPrice(perf["portfolioValue"].as<float>());
-                h.setCurrentValue(perf["portfolioValue"].as<float>());
+                h.setCurrentPrice(perf["value"].as<float>());
+                h.setCurrentValue(perf["value"].as<float>());
                 h.setShares(1);
                 // AFAIK, the whole portfolio is shown in the same currency.
                 // To avoid another HTTP request, we just use the currency of the first holding
