@@ -446,14 +446,14 @@ String MQTTWidget::getName() {
     return "MQTTWidget";
 }
 
-const char* const buttonNames[] = {"invalid", "left", "middle", "right"};
+const char *const buttonNames[] = {"invalid", "left", "middle", "right"};
 #define NAME_SIZE ((sizeof(buttonNames) / sizeof(buttonNames[0])) - 1)
-const char* const buttonStates[] = {"nothing", "short", "medium", "long"};
+const char *const buttonStates[] = {"nothing", "short", "medium", "long"};
 #define STATE_SIZE ((sizeof(buttonStates) / sizeof(buttonStates[0])) - 1)
 
 void MQTTWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if(!buttonTopic.isEmpty()) {
-        //generate a json dictionary to publish to the button topic
+    if (!buttonTopic.isEmpty()) {
+        // generate a json dictionary to publish to the button topic
         JsonDocument doc;
         doc["button"] = buttonNames[buttonId > NAME_SIZE ? 0 : buttonId];
         doc["state"] = buttonStates[state > STATE_SIZE ? 0 : state];
