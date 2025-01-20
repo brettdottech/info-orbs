@@ -2,8 +2,8 @@
 #define STOCK_WIDGET_H
 
 #include <ArduinoJson.h>
-#include <HTTPClientWrapper.h>
 #include <TFT_eSPI.h>
+#include <TaskManager.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -26,8 +26,6 @@ public:
     void changeMode();
 
 private:
-    void getStockData(StockDataModel &stock);
-    static void taskGetStockData(void *pvParameters);
     void processResponse(StockDataModel &stock, int httpCode, const String &response);
     void displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
 
@@ -42,6 +40,12 @@ private:
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
+
+#ifndef STOCK_CHANGE_FORMAT
+    #define STOCK_CHANGE_FORMAT 0
+#endif
+
+    int m_stockchangeformat = STOCK_CHANGE_FORMAT; // Show percent change (0) or price change (1) for stocks
 };
 
 #endif // STOCK_WIDGET_H

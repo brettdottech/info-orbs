@@ -1,4 +1,5 @@
 #include "StockWidget.h"
+#include "TaskFactory.h"
 #include <ArduinoJson.h>
 #include <iomanip>
 
@@ -9,6 +10,9 @@ StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget
                            "Choose 5 securities to track. You can track forex, crypto (symbol/USD) or stocks from any exchange (if one ticker is part of multiple exchanges you can add on '&country = Canada' to narrow down to your ticker)");
     char stockList[m_stockList.size()];
     strcpy(stockList, m_stockList.c_str());
+
+    String stockchangeFormats[] = {"Percent", "Price"};
+    m_config.addConfigComboBox("StockWidget", "stockchgFmt", &m_stockchangeformat, stockchangeFormats, 2, "Show percent or price change", true);
 
     char *symbol = strtok(stockList, ",");
     m_stockCount = 0;
@@ -49,10 +53,12 @@ void StockWidget::update(bool force) {
             String url = "https://api.twelvedata.com/quote?apikey=e03fc53524454ab8b65d91b23c669cc5&symbol=" + m_stocks[i].getSymbol();
 
             StockDataModel &stock = m_stocks[i];
-            HTTPClientWrapper::getInstance()->addRequest(url,
-                                                         [this, &stock](int httpCode, const String &response) {
-                                                             processResponse(stock, httpCode, response);
-                                                         });
+
+            auto task = TaskFactory::createHttpGetTask(url, [this, &stock](int httpCode, const String &response) {
+                processResponse(stock, httpCode, response);
+            });
+
+            TaskManager::getInstance()->addTask(std::move(task));
         }
 
         m_stockDelayPrev = millis();
@@ -131,7 +137,11 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
         m_manager.fillTriangle(110 + arrowOffsetX, 132 + arrowOffsetY, 130 + arrowOffsetX, 132 + arrowOffsetY, 120 + arrowOffsetX, 120 + arrowOffsetY, TFT_GREEN);
         m_manager.drawArc(centre, centre, 120, 118, 0, 360, TFT_GREEN, TFT_GREEN);
     }
-    m_manager.drawString(stock.getPercentChange(2) + "%", centre, 48, bigFontSize, Align::MiddleCenter);
+    if (!m_stockchangeformat) {
+        m_manager.drawString(stock.getPercentChange(2) + "%", centre, 48, bigFontSize, Align::MiddleCenter);
+    } else {
+        m_manager.drawString(stock.getCurrencySymbol() + stock.getPriceChange(2), centre, 48, bigFontSize, Align::MiddleCenter);
+    }
     // Draw stock data
     m_manager.setFontColor(TFT_BLACK, TFT_WHITE);
 
