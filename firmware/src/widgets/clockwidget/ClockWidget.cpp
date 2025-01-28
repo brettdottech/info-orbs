@@ -9,15 +9,16 @@ ClockWidget::~ClockWidget() {
 }
 
 void ClockWidget::addConfigToManager() {
-    String optClockType[2 + USE_CLOCK_CUSTOM] = {
+    String optClockType[3 + USE_CLOCK_CUSTOM] = {
         "Normal Clock",
-        "Nixie Clock"};
+        "Nixie Clock",
+        "Flip Clock"};
     if (!USE_CLOCK_NIXIE)
         optClockType[(int) ClockType::NIXIE] += " (n/a)";
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
         optClockType[(int) ClockType::CUSTOM0 + i] = "Custom Clock " + String(i);
     }
-    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 3 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
 #if USE_CLOCK_CUSTOM > 0
     // Get enabled setting here to know which clocks are valid,
     // because we did not add the config key for it yet (this happens some lines below)
@@ -188,6 +189,8 @@ bool ClockWidget::isValidClockType(int clockType) {
         return true; // Always enabled
     else if (clockType == (int) ClockType::NIXIE)
         return USE_CLOCK_NIXIE > 0;
+    else if (clockType == (int) ClockType::FLIP)
+        return USE_CLOCK_FLIP > 0;
     else if (isCustomClock(clockType)) {
         int customClockNumber = clockType - (int) ClockType::CUSTOM0;
         return USE_CLOCK_CUSTOM > customClockNumber && m_customEnabled[customClockNumber];
@@ -231,7 +234,7 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
     uint32_t start = millis();
-    if (m_type == (int) ClockType::NIXIE || isCustomClock(m_type)) {
+    if (m_type == (int) ClockType::NIXIE || m_type == (int) ClockType::FLIP || isCustomClock(m_type)) {
         if (digit == ":" && color == m_shadowColor) {
             // Show colon off
             displayDigitImage(displayIndex, " ");
@@ -318,6 +321,8 @@ void ClockWidget::displayDigitImage(int displayIndex, const String &digit) {
     }
     if (m_type == (int) ClockType::NIXIE) {
         displayNixie(displayIndex, index);
+    } else if (m_type == (int) ClockType::FLIP) {
+        displayFlip(displayIndex, index);
     } else if (isCustomClock(m_type)) {
         displayCustom(displayIndex, m_type - (int) ClockType::CUSTOM0, index);
     }
@@ -326,6 +331,12 @@ void ClockWidget::displayDigitImage(int displayIndex, const String &digit) {
 void ClockWidget::displayNixie(int displayIndex, uint8_t index) {
 #if USE_CLOCK_NIXIE > 0
     displayClockGraphics(displayIndex, clock_nixie, index, m_overrideNixieColor);
+#endif
+}
+
+void ClockWidget::displayFlip(int displayIndex, uint8_t index) {
+#if USE_CLOCK_FLIP > 0
+    displayFlipClockGraphics(displayIndex, clock_flip, index, m_overrideNixieColor);
 #endif
 }
 
@@ -344,6 +355,95 @@ void ClockWidget::displayClockGraphics(int displayIndex, const byte *clockArray[
     const byte *start = clockArray[index][0];
     const byte *end = clockArray[index][1];
     m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+}
+
+void ClockWidget::displayFlipClockGraphics(int displayIndex, const byte *clockFlipArray[72][2], uint8_t index, int colorOverride) {
+    Serial.println("diplayIndex: " + String(displayIndex));
+    m_manager.selectScreen(displayIndex);
+    if (displayIndex != 2) {
+        if ((m_lastDisplay1Digit != "" || m_lastDisplay2Digit != "" || m_lastDisplay4Digit != "" || m_lastDisplay5Digit != "") && flipanimation == false) {
+            flipanimation = true;
+        } else {
+            const byte *start = clockFlipArray[index][0];
+            const byte *end = clockFlipArray[index][1];
+            m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+        }
+        if (flipanimation == true) {
+            animIndex = 0;
+            while (animIndex < 4) {
+                // Numbers can be either from 0-1 or 0-2 depending on 12/24h format
+                if (displayIndex == 0) {
+                    if (m_format == CLOCK_FORMAT_24_HOUR) {
+                        if (index == 0) {
+                            flipindex = 56 + animIndex;
+                        } else {
+                            flipindex = ((index - 1) * 4) + 12 + animIndex;
+                        }
+                    }
+                    if (m_format == CLOCK_FORMAT_12_HOUR) {
+                        if (index == 0) {
+                            flipindex = 52 + animIndex;
+                        } else {
+                            flipindex = ((index - 1) * 4) + 12 + animIndex;
+                        }
+                    }
+                }
+                // Number are from 0-9 and can switch from 3->0
+                if (displayIndex == 1) {
+                    if (index == 0) {
+                        if (m_format == CLOCK_FORMAT_12_HOUR && m_amPm == "PM") {
+                            // Switch from 2 to 0 when PM
+                            flipindex = 56 + animIndex;
+                        }
+                        if (m_format == CLOCK_FORMAT_12_HOUR && m_amPm == "AM") {
+                            // Switch from 2 to 1 when AM
+                            flipindex = 64 + animIndex;
+                        }
+                        if (m_format == CLOCK_FORMAT_24_HOUR && m_amPm == "PM") {
+                            // Switch from 3 to 0 when AM
+                            flipindex = 68 + animIndex;
+                        }
+                    } else {
+                        flipindex = ((index - 1) * 4) + 12 + animIndex;
+                    }
+                }
+                // Numbers are from 0-5
+                if (displayIndex == 3) {
+                    if (index == 0) {
+                        flipindex = 60 + animIndex;
+                    } else {
+                        flipindex = ((index - 1) * 4) + 12 + animIndex;
+                    }
+                }
+                // Numbers are from 0-9
+                if (displayIndex == 4) {
+                    if (index == 0) {
+                        flipindex = (9 * 4) + 11 + animIndex;
+                    } else {
+                        flipindex = ((index - 1) * 4) + 12 + animIndex;
+                    }
+                }
+                const byte *start = clockFlipArray[flipindex][0];
+                const byte *end = clockFlipArray[flipindex][1];
+                m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+                animIndex += 1;
+                Serial.println("Index: " + String(index) + " - flipindex: " + String(flipindex) + " - animIndex: " + String(animIndex));
+            }
+            flipanimation = false;
+            const byte *start = clockFlipArray[index][0];
+            const byte *end = clockFlipArray[index][1];
+            m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+        } else {
+            const byte *start = clockFlipArray[index][0];
+            const byte *end = clockFlipArray[index][1];
+            m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+        }
+    } else {
+        m_manager.selectScreen(displayIndex);
+        const byte *start = clockFlipArray[index][0];
+        const byte *end = clockFlipArray[index][1];
+        m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+    }
 }
 
 String ClockWidget::getName() {
