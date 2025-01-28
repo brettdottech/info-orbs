@@ -6,6 +6,9 @@ StockDataModel::StockDataModel() {
 }
 
 StockDataModel &StockDataModel::setCurrencySymbol(String currencySymbol) {
+    Serial.println(currencySymbol);
+    currencySymbol.toUpperCase();
+    Serial.println(currencySymbol);
     if (currencySymbol == "EUR") {
         m_currencySymbol = m_currencySymbolEUR;
     } else if (currencySymbol == "GBP") {
