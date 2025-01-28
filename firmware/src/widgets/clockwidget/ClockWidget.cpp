@@ -358,7 +358,6 @@ void ClockWidget::displayClockGraphics(int displayIndex, const byte *clockArray[
 }
 
 void ClockWidget::displayFlipClockGraphics(int displayIndex, const byte *clockFlipArray[72][2], uint8_t index, int colorOverride) {
-    Serial.println("diplayIndex: " + String(displayIndex));
     m_manager.selectScreen(displayIndex);
     if (displayIndex != 2) {
         if ((m_lastDisplay1Digit != "" || m_lastDisplay2Digit != "" || m_lastDisplay4Digit != "" || m_lastDisplay5Digit != "") && flipanimation == false) {
@@ -427,7 +426,6 @@ void ClockWidget::displayFlipClockGraphics(int displayIndex, const byte *clockFl
                 const byte *end = clockFlipArray[flipindex][1];
                 m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
                 animIndex += 1;
-                Serial.println("Index: " + String(index) + " - flipindex: " + String(flipindex) + " - animIndex: " + String(animIndex));
             }
             flipanimation = false;
             const byte *start = clockFlipArray[index][0];
