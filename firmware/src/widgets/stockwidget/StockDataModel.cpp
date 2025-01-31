@@ -6,6 +6,7 @@ StockDataModel::StockDataModel() {
 }
 
 StockDataModel &StockDataModel::setCurrencySymbol(String currencySymbol) {
+    currencySymbol.toUpperCase();
     if (currencySymbol == "EUR") {
         m_currencySymbol = m_currencySymbolEUR;
     } else if (currencySymbol == "GBP") {
