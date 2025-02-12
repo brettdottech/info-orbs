@@ -157,6 +157,8 @@ void ParqetWidget::updatePortfolio() {
         filter["holdings"][0]["performance"]["purchaseValueForInterval"] = true;
         filter["holdings"][0]["position"]["currentPrice"] = true;
         filter["holdings"][0]["position"]["currentValue"] = true;
+        filter["holdings"][0]["position"]["shares"] = true;
+        filter["holdings"][0]["position"]["isSold"] = true;
         filter["performance"]["purchaseValueForInterval"] = true;
         filter["performance"]["value"] = true;
 
@@ -172,6 +174,8 @@ void ParqetWidget::updatePortfolio() {
             int count = 0;
             for (JsonVariant holding : holdings) {
                 String type = holding["assetType"].as<String>();
+                // Make sure the type is in lower case
+                type.toLowerCase();
                 if (type == "security" || type == "crypto") {
                     // stocks or etf/funds
                     String id = holding["asset"]["identifier"].as<String>();
