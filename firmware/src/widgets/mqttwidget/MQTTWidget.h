@@ -79,6 +79,9 @@ private:
     // Data storage: maps topicSrc to latest message
     std::map<String, String> orbDataMap;
 
+    // Topic for button press
+    String buttonTopic;
+
     // Static callback proxy
     static void staticCallback(char *topic, byte *payload, unsigned int length);
 
