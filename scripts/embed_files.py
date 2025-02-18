@@ -31,7 +31,8 @@ embed_map = {
              "341.jpg", "342.jpg", "343.jpg", "344.jpg", "451.jpg", "452.jpg", "453.jpg", "454.jpg", "561.jpg", "562.jpg", "563.jpg", "564.jpg",
              "671.jpg", "672.jpg", "673.jpg", "674.jpg", "781.jpg", "782.jpg", "783.jpg", "784.jpg", "891.jpg", "892.jpg", "893.jpg", "894.jpg",
              "901.jpg", "902.jpg", "903.jpg", "904.jpg", "101.jpg", "102.jpg", "103.jpg", "104.jpg", "201.jpg", "202.jpg", "203.jpg", "204.jpg", 
-             "501.jpg", "502.jpg", "503.jpg", "504.jpg", "211.jpg", "212.jpg", "213.jpg", "214.jpg", "301.jpg", "302.jpg", "303.jpg", "304.jpg"]], # Files
+             "501.jpg", "502.jpg", "503.jpg", "504.jpg", "211.jpg", "212.jpg", "213.jpg", "214.jpg", "301.jpg", "302.jpg", "303.jpg", "304.jpg",
+             "colonon1.jpg","colonon2.jpg","colonon3.jpg","colonon4.jpg","colonoff1.jpg","colonoff2.jpg","colonoff3.jpg","colonoff4.jpg"]], # Files
     ],
 }
 
