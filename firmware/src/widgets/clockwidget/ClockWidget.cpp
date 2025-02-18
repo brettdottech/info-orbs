@@ -357,7 +357,7 @@ void ClockWidget::displayClockGraphics(int displayIndex, const byte *clockArray[
     m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
 }
 
-void ClockWidget::displayFlipClockGraphics(int displayIndex, const byte *clockFlipArray[72][2], uint8_t index, int colorOverride) {
+void ClockWidget::displayFlipClockGraphics(int displayIndex, const byte *clockFlipArray[80][2], uint8_t index, int colorOverride) {
     m_manager.selectScreen(displayIndex);
     if (displayIndex != 2) {
         if ((m_lastDisplay1Digit != "" || m_lastDisplay2Digit != "" || m_lastDisplay4Digit != "" || m_lastDisplay5Digit != "") && flipanimation == false) {
@@ -437,13 +437,33 @@ void ClockWidget::displayFlipClockGraphics(int displayIndex, const byte *clockFl
             m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
         }
     } else {
-        m_manager.selectScreen(displayIndex);
+        if (colonanimation == false) {
+            colonanimation = true;
+        }
+        if (colonanimation == true) {
+            animcolon = 0;
+            while (animcolon < 4) {
+                // Switch colon from on to off
+                if (index == 10) {
+                    colonindex = 72 + animcolon;
+                }
+                // Switch colon from off to on
+                if (index == 11) {
+                    colonindex = 76 + animcolon;
+                }
+                const byte *start = clockFlipArray[colonindex][0];
+                const byte *end = clockFlipArray[colonindex][1];
+                m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+                animcolon += 1;
+            }
+        }
+        colonanimation = false;
         const byte *start = clockFlipArray[index][0];
         const byte *end = clockFlipArray[index][1];
         m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
     }
 }
-
+    
 String ClockWidget::getName() {
-    return "Clock";
-}
+        return "Clock";
+    }

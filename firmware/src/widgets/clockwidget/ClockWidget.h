@@ -104,7 +104,7 @@ private:
     void displayFlip(int displayIndex, uint8_t index);
     void displayCustom(int displayIndex, uint8_t clockNumber, uint8_t index);
     void displayClockGraphics(int displayIndex, const byte *clockArray[12][2], uint8_t index, int colorOverride);
-    void displayFlipClockGraphics(int displayIndex, const byte *clockArray[72][2], uint8_t index, int colorOverride);
+    void displayFlipClockGraphics(int displayIndex, const byte *clockArray[80][2], uint8_t index, int colorOverride);
     void changeClockType();
     bool isValidClockType(int clockType);
     bool isCustomClock(int clockType);
@@ -155,6 +155,9 @@ private:
     int animIndex;
     bool flipanimation = false;
     int flipindex;
+    bool colonanimation = false;
+    int colonindex;
+    int animcolon;
 
     DigitOffset m_digitOffsets[10] = CLOCK_DIGITS_OFFSET;
 };

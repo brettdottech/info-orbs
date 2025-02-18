@@ -12,7 +12,7 @@
 #endif
 
 #if defined(USE_CLOCK_FLIP) && (USE_CLOCK_FLIP == FLIPS)
-extern const byte *clock_flip[72][2];
+extern const byte *clock_flip[80][2];
 #endif
 
 #endif

@@ -145,8 +145,24 @@ extern const byte flip_3_0_3_start[] asm("_binary_images_clock_flip_303_jpg_star
 extern const byte flip_3_0_3_end[] asm("_binary_images_clock_flip_303_jpg_end");
 extern const byte flip_3_0_4_start[] asm("_binary_images_clock_flip_304_jpg_start");
 extern const byte flip_3_0_4_end[] asm("_binary_images_clock_flip_304_jpg_end");
+extern const byte flip_colon_on_1_start[] asm("_binary_images_clock_flip_colonon1_jpg_start");
+extern const byte flip_colon_on_1_end[] asm("_binary_images_clock_flip_colonon1_jpg_end");
+extern const byte flip_colon_on_2_start[] asm("_binary_images_clock_flip_colonon2_jpg_start");
+extern const byte flip_colon_on_2_end[] asm("_binary_images_clock_flip_colonon2_jpg_end");
+extern const byte flip_colon_on_3_start[] asm("_binary_images_clock_flip_colonon3_jpg_start");
+extern const byte flip_colon_on_3_end[] asm("_binary_images_clock_flip_colonon3_jpg_end");
+extern const byte flip_colon_on_4_start[] asm("_binary_images_clock_flip_colonon4_jpg_start");
+extern const byte flip_colon_on_4_end[] asm("_binary_images_clock_flip_colonon4_jpg_end");
+extern const byte flip_colon_off_1_start[] asm("_binary_images_clock_flip_colonoff1_jpg_start");
+extern const byte flip_colon_off_1_end[] asm("_binary_images_clock_flip_colonoff1_jpg_end");
+extern const byte flip_colon_off_2_start[] asm("_binary_images_clock_flip_colonoff2_jpg_start");
+extern const byte flip_colon_off_2_end[] asm("_binary_images_clock_flip_colonoff2_jpg_end");
+extern const byte flip_colon_off_3_start[] asm("_binary_images_clock_flip_colonoff3_jpg_start");
+extern const byte flip_colon_off_3_end[] asm("_binary_images_clock_flip_colonoff3_jpg_end");
+extern const byte flip_colon_off_4_start[] asm("_binary_images_clock_flip_colonoff4_jpg_start");
+extern const byte flip_colon_off_4_end[] asm("_binary_images_clock_flip_colonoff4_jpg_end");
 
-const byte *clock_flip[72][2] = {
+const byte *clock_flip[80][2] = {
     {flip_0_1_start, flip_0_1_end},
     {flip_1_2_start, flip_1_2_end},
     {flip_2_3_start, flip_2_3_end},
@@ -218,6 +234,14 @@ const byte *clock_flip[72][2] = {
     {flip_3_0_1_start, flip_3_0_1_end},
     {flip_3_0_2_start, flip_3_0_2_end},
     {flip_3_0_3_start, flip_3_0_3_end},
-    {flip_3_0_4_start, flip_3_0_4_end}};
+    {flip_3_0_4_start, flip_3_0_4_end},
+    {flip_colon_on_1_start, flip_colon_on_1_end},
+    {flip_colon_on_2_start, flip_colon_on_2_end},
+    {flip_colon_on_3_start, flip_colon_on_3_end},
+    {flip_colon_on_4_start, flip_colon_on_4_end},
+    {flip_colon_off_1_start, flip_colon_off_1_end},
+    {flip_colon_off_2_start, flip_colon_off_2_end},
+    {flip_colon_off_3_start, flip_colon_off_3_end},
+    {flip_colon_off_4_start, flip_colon_off_4_end}};
 
 #endif
