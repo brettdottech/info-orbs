@@ -6,7 +6,7 @@
 
 ScreenManager *ScreenManager::instance = nullptr;
 
-ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
+ScreenManager::ScreenManager(TFT_eSPI &tft, TFT_eSprite &spr) : m_tft(tft), m_spr(spr) {
 
     for (int i = 0; i < NUM_SCREENS; i++) {
         pinMode(m_screen_cs[i], OUTPUT);
@@ -18,6 +18,11 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
+
+    // Init Sprite
+    
+    m_spr.createSprite(116, 224);
+    m_spr.fillSprite(TFT_BLACK);
 
     // Init TJpg_Decode
     TJpgDec.setSwapBytes(true); // JPEG rendering setup
@@ -362,4 +367,17 @@ JRESULT ScreenManager::drawFsJpg(int32_t x, int32_t y, const char *filename, uin
     // Reset image color
     m_imageColor = 0;
     return result;
+}
+
+void ScreenManager::S_pushSprite(int32_t x, int32_t y){
+    m_spr.pushSprite(x, y);
+}
+void ScreenManager::S_fillSprite(uint32_t color){
+    m_spr.fillSprite(dim(color));
+}
+void ScreenManager::S_fillRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t r, uint32_t color){
+    m_spr.fillRoundRect(x, y, w, h, r, dim(color));
+}
+void ScreenManager::S_fillCircle(int32_t x, int32_t y, int32_t r, uint32_t color) {
+    m_spr.fillCircle(x, y, r, dim(color));
 }
