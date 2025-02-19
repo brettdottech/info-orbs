@@ -16,12 +16,23 @@ static WidgetSet *s_widgetSet = nullptr;
 static int s_widgetCycleDelay = WIDGET_CYCLE_DELAY;
 static unsigned long s_widgetCycleDelayPrev = 0;
 static int s_orbRotation = ORB_ROTATION;
-static std::string s_timezoneLocation = TIMEZONE_API_LOCATION;
+static std::string s_zone0 = TIMEZONE_API_LOCATION;
+static std::string s_cityName0 = TIMEZONE_API_NAME;
+static std::string s_zone1 = TIMEZONE_API_LOCATION1;
+static std::string s_cityName1 = TIMEZONE_API_NAME1;
+static std::string s_zone2 = TIMEZONE_API_LOCATION2;
+static std::string s_cityName2 = TIMEZONE_API_NAME2;
+static std::string s_zone3 = TIMEZONE_API_LOCATION3;
+static std::string s_cityName3 = TIMEZONE_API_NAME3;
+static std::string s_zone4 = TIMEZONE_API_LOCATION4;
+static std::string s_cityName4 = TIMEZONE_API_NAME4;
 static std::string s_ntpServer = NTP_SERVER;
 static int s_tftBrightness = TFT_BRIGHTNESS;
 static bool s_nightMode = DIM_ENABLED;
 static int s_dimStartHour = DIM_START_HOUR;
+static int s_dimStartMinute = DIM_START_MINUTE;
 static int s_dimEndHour = DIM_END_HOUR;
+static int s_dimEndMinute = DIM_END_MINUTE;
 static int s_dimBrightness = DIM_BRIGHTNESS;
 
 void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws) {
@@ -60,9 +71,19 @@ void MainHelper::setupButtons() {
 }
 
 void MainHelper::setupConfig() {
-    s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
-    s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
+    s_configManager->addConfigString("General", "timezone0", &s_zone0, 30, "Timezone Location (Local)");
+    s_configManager->addConfigString("General", "timezoneName0", &s_cityName0, 50, "Timezone Name");
+    s_configManager->addConfigString("General", "timezone1", &s_zone1, 30, "Timezone Location 1");
+    s_configManager->addConfigString("General", "timezoneName1", &s_cityName1, 50, "Timezone Name");
+    s_configManager->addConfigString("General", "timezone2", &s_zone2, 30, "Timezone Location 2");
+    s_configManager->addConfigString("General", "timezoneName2", &s_cityName2, 50, "Timezone Name");
+    s_configManager->addConfigString("General", "timezone3", &s_zone3, 30, "Timezone Location 3");
+    s_configManager->addConfigString("General", "timezoneName3", &s_cityName3, 50, "Timezone Name");
+    s_configManager->addConfigString("General", "timezone4", &s_zone4, 30, "Timezone Location 4");
+    s_configManager->addConfigString("General", "timezoneName4", &s_cityName4, 50, "Timezone Name");
+
     s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, "NTP server", true);
+    s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
 
     String optRotation[] = {"No rotation", "Rotate 90° clockwise", "Rotate 180°", "Rotate 270° clockwise"};
     s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, 4, "Orb rotation");
@@ -70,8 +91,12 @@ void MainHelper::setupConfig() {
     s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, "TFT Brightness [0-255]", true);
     String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
                          "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
+    String optMinutes[] = {"00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29",
+                           "30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59"};
     s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, "Nighttime Start [24h format]", true);
+    s_configManager->addConfigComboBox("TFT Settings", "dimStartMinute", &s_dimStartMinute, optMinutes, 60, "Nighttime Start [60M format]", true);
     s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, "Nighttime End [24h format]", true);
+    s_configManager->addConfigComboBox("TFT Settings", "dimEndMinute", &s_dimEndMinute, optMinutes, 60, "Nighttime End [60M format]", true);
     s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, "Nighttime Brightness [0-255]", true);
 }
 
@@ -442,16 +467,27 @@ void MainHelper::resetCycleTimer() {
     s_widgetCycleDelayPrev = millis();
 }
 
-void MainHelper::updateBrightnessByTime(uint8_t hour24) {
+void MainHelper::updateBrightnessByTime(uint8_t hour24, uint8_t minute) {
     uint8_t newBrightness;
+
+    GlobalTime *time = GlobalTime::getInstance();
+    int local = 0;
+    int utcOffset = time->getUTCoffset(local);
+    time->setTZforTime(utcOffset);
+    time->updateTime(true);
+    int lv_time = ((time->getHour24()*60) + time->getMinute());
+
     if (s_nightMode) {
         bool isInDimRange;
-        if (s_dimStartHour < s_dimEndHour) {
+        int lv_dimStartTime = (s_dimStartHour*60 + s_dimStartMinute);
+        int lv_dimEndTime   = (s_dimEndHour*60 + s_dimEndMinute);
+
+        if (lv_dimStartTime < lv_dimEndTime) {
             // Normal case: the range does not cross midnight
-            isInDimRange = (hour24 >= s_dimStartHour && hour24 < s_dimEndHour);
+            isInDimRange = (lv_time >= lv_dimStartTime && lv_time < lv_dimEndTime);
         } else {
             // Case where the range crosses midnight
-            isInDimRange = (hour24 >= s_dimStartHour || hour24 < s_dimEndHour);
+            isInDimRange = (lv_time >= lv_dimStartTime || lv_time < lv_dimEndTime);
         }
         newBrightness = isInDimRange ? s_dimBrightness : s_tftBrightness;
     } else {

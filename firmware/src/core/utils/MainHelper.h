@@ -10,6 +10,7 @@
 #include "WidgetSet.h"
 #include "git_info.h"
 #include <Arduino.h>
+#include "GlobalTime.h"
 
 // Set defaults if not set in config.h
 #ifndef TFT_BRIGHTNESS
@@ -78,7 +79,7 @@ public:
     static void watchdogInit();
     static void watchdogReset();
 
-    static void updateBrightnessByTime(uint8_t hour24);
+    static void updateBrightnessByTime(uint8_t hour24, uint8_t minute);
 };
 
 #endif
