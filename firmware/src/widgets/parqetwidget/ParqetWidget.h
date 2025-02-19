@@ -32,7 +32,7 @@
 
 #define PARQET_MODE_COUNT 10
 #define PARQET_PERF_COUNT 6
-#define PARQET_PERF_CHART_COUNT 5
+#define PARQET_PERF_CHART_COUNT 4
 #define PARQET_MAX_STOCKNAME_LINES 3
 
 class ParqetWidget : public Widget {
@@ -74,7 +74,7 @@ private:
     int m_defaultPerfMeasure = 0;
     int m_curPerfMeasure = 0;
 
-    String m_perfChartMeasures[PARQET_PERF_CHART_COUNT] = {"perfHistory", "perfHistoryUnrealized", "ttwror", "drawdown", "none"};
+    String m_perfChartMeasures[PARQET_PERF_CHART_COUNT] = {"perfHistory", "perfHistoryUnrealized", "ttwror", "drawdown"};
     int m_defaultPerfChartMeasure = 0;
     int m_curPerfChartMeasure = 0;
 
