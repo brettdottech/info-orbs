@@ -17,6 +17,7 @@ public:
     void setCurrentValue(float currentValue);
     void setShares(float shares);
     void setCurrency(String currency);
+    void setPerf(float perf);
 
     String getId();
     String getName();
@@ -27,9 +28,9 @@ public:
     float getCurrentValue();
     String getCurrentValue(int8_t digits);
     String getShares(int8_t digits);
-    float getPercentChange();
-    String getPercentChange(int8_t digits);
     String getCurrency();
+    float getPerf();
+    String getPerf(int8_t digits);
 
 private:
     String m_id = "";
@@ -40,6 +41,7 @@ private:
     float m_currentValue = 0;
     float m_shares = 0;
     String m_currency = "";
+    float m_perf = 0;
 };
 
 #endif // PARQET_HOLDING_DATA_MODEL_H

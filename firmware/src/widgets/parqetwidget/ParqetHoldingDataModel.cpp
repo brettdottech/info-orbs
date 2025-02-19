@@ -30,6 +30,10 @@ void ParqetHoldingDataModel::setCurrency(String currency) {
     m_currency = currency;
 }
 
+void ParqetHoldingDataModel::setPerf(float perf) {
+    m_perf = perf;
+}
+
 String ParqetHoldingDataModel::getId() {
     return m_id;
 }
@@ -57,12 +61,11 @@ String ParqetHoldingDataModel::getCurrentValue(int8_t digits) {
 String ParqetHoldingDataModel::getShares(int8_t digits) {
     return Utils::formatFloat(m_shares, digits);
 }
-float ParqetHoldingDataModel::getPercentChange() {
-    // return 100 * (m_currentPrice-m_purchasePrice)/m_purchasePrice;
-    return 100 * (m_currentValue / m_purchaseValue - 1);
+float ParqetHoldingDataModel::getPerf() {
+    return m_perf;
 }
-String ParqetHoldingDataModel::getPercentChange(int8_t digits) {
-    return Utils::formatFloat(getPercentChange(), digits);
+String ParqetHoldingDataModel::getPerf(int8_t digits) {
+    return Utils::formatFloat(m_perf, digits);
 }
 String ParqetHoldingDataModel::getCurrency() {
     return m_currency;
