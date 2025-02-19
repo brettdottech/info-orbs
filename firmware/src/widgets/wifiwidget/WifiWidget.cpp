@@ -59,6 +59,7 @@ void WifiWidget::setup() {
 
     m_wifiManager.setCleanConnect(true);
     m_wifiManager.setConnectRetries(5);
+    m_wifiManager.setHostname("ESP32-Obs");
 
     // WiFiManager automatically connects using saved credentials...
     if (m_wifiManager.autoConnect(m_apssid.c_str())) {
