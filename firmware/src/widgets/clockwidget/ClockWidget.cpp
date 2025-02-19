@@ -9,15 +9,21 @@ ClockWidget::~ClockWidget() {
 }
 
 void ClockWidget::addConfigToManager() {
-    String optClockType[2 + USE_CLOCK_CUSTOM] = {
+    String optClockType[3 + USE_CLOCK_CUSTOM] = {
         "Normal Clock",
+        "Morph Clock",
         "Nixie Clock"};
-    if (!USE_CLOCK_NIXIE)
+    if (!USE_CLOCK_MORPH || !m_config.getConfigBool("MorphEnable",m_enableMorph))
+        optClockType[(int) ClockType::MORPH] += " (n/a)";
+    if (!USE_CLOCK_NIXIE || !m_config.getConfigBool("NixieEnable",m_enableNixie))
         optClockType[(int) ClockType::NIXIE] += " (n/a)";
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
         optClockType[(int) ClockType::CUSTOM0 + i] = "Custom Clock " + String(i);
+        String enKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "en");
+        if(!m_config.getConfigBool(enKey.c_str(), m_customEnabled[i]))
+            optClockType[(int) ClockType::CUSTOM0 + i] += " (n/a)";
     }
-    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 3 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
 #if USE_CLOCK_CUSTOM > 0
     // Get enabled setting here to know which clocks are valid,
     // because we did not add the config key for it yet (this happens some lines below)
@@ -36,7 +42,12 @@ void ClockWidget::addConfigToManager() {
     m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock Color", true);
     m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing", true);
     m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock Shadow Color", true);
+#if USE_CLOCK_MORPH > 0
+    m_config.addConfigBool("ClockWidget", "MorphEnable", &m_enableMorph, "Enable MORPH clock type", true);
+    m_config.addConfigInt("ClockWidget", "MorphAnimRate", &animDelay, "Morph clock animation rate (in ms)", true);
+#endif
 #if USE_CLOCK_NIXIE > 0
+    m_config.addConfigBool("ClockWidget", "NixieEnable", &m_enableNixie, "Enable NIXIE clock type", true);
     m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "Override Nixie color (black=disable)", true);
 #endif
 #if USE_CLOCK_CUSTOM > 0
@@ -65,23 +76,6 @@ void ClockWidget::draw(bool force) {
     m_manager.setFont(CLOCK_FONT);
     GlobalTime *time = GlobalTime::getInstance();
 
-    if (m_lastDisplay1Digit != m_display1Digit || force) {
-        displayDigit(0, m_lastDisplay1Digit, m_display1Digit, m_fgColor);
-        m_lastDisplay1Digit = m_display1Digit;
-    }
-    if (m_lastDisplay2Digit != m_display2Digit || force) {
-        displayDigit(1, m_lastDisplay2Digit, m_display2Digit, m_fgColor);
-        m_lastDisplay2Digit = m_display2Digit;
-    }
-    if (m_lastDisplay4Digit != m_display4Digit || force) {
-        displayDigit(3, m_lastDisplay4Digit, m_display4Digit, m_fgColor);
-        m_lastDisplay4Digit = m_display4Digit;
-    }
-    if (m_lastDisplay5Digit != m_display5Digit || force) {
-        displayDigit(4, m_lastDisplay5Digit, m_display5Digit, m_fgColor);
-        m_lastDisplay5Digit = m_display5Digit;
-    }
-
     if (m_secondSingle != m_lastSecondSingle || force) {
         if (m_secondSingle % 2 == 0) {
             displayDigit(2, "", ":", m_fgColor, false);
@@ -95,8 +89,7 @@ void ClockWidget::draw(bool force) {
             }
             displaySeconds(2, m_secondSingle, m_fgColor);
         }
-        m_lastSecondSingle = m_secondSingle;
-        if (m_type == (int) ClockType::NORMAL) {
+        if (m_type == (int) ClockType::NORMAL || m_type == (int) ClockType::MORPH) {
             if (m_format == CLOCK_FORMAT_12_HOUR_AMPM) {
                 if (m_amPm != m_lastAmPm) {
                     // Clear old AM/PM
@@ -105,26 +98,76 @@ void ClockWidget::draw(bool force) {
                 }
                 displayAmPm(m_amPm, m_fgColor);
             }
+            displayTZ(m_fgColor);
         }
+        m_lastSecondSingle = m_secondSingle;
+        m_manager.setFont(CLOCK_FONT);
+    } 
+
+    if (m_lastDisplay5Digit != m_display5Digit || force) {
+        if (force) m_lastDisplay5Digit = m_display5Digit;
+        displayDigit(4, m_lastDisplay5Digit, m_display5Digit, m_fgColor);
+        m_lastDisplay5Digit = m_display5Digit;
     }
+
+    if (m_lastDisplay4Digit != m_display4Digit || force) {
+        if (force) m_lastDisplay4Digit = m_display4Digit;
+        displayDigit(3, m_lastDisplay4Digit, m_display4Digit, m_fgColor);
+        m_lastDisplay4Digit = m_display4Digit;
+    }
+
+    if (m_lastDisplay2Digit != m_display2Digit || force) {
+        if (force) m_lastDisplay2Digit = m_display2Digit;
+        displayDigit(1, m_lastDisplay2Digit, m_display2Digit, m_fgColor);
+        m_lastDisplay2Digit = m_display2Digit;
+    }
+
+    if (m_lastDisplay1Digit != m_display1Digit || force) {
+        if (force) m_lastDisplay1Digit = m_display1Digit;
+        displayDigit(0, m_lastDisplay1Digit, m_display1Digit, m_fgColor);
+        m_lastDisplay1Digit = m_display1Digit;
+    }  
 }
+
+void ClockWidget::changeZone(int dir) {
+    GlobalTime *time = GlobalTime::getInstance();
+    m_timeZonePrev = m_timeZone;
+
+    if (dir == 0) {
+        m_timeZone--;
+        if (m_timeZone < 0)
+            m_timeZone = MAX_ZONES - 1;
+    } else {
+        m_timeZone++;
+        if (m_timeZone == MAX_ZONES)
+            m_timeZone = 0;
+    }
+    update(true);
+    draw(true);
+}
+
+void ClockWidget::displayTZ(uint32_t color) {
+    GlobalTime *time = GlobalTime::getInstance();
+
+    m_manager.selectScreen(2);
+    m_manager.setFont(DEFAULT_FONT);
+
+    if (m_timeZonePrev != m_timeZone) {
+        m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
+        m_manager.drawString(time->getZoneName(m_timeZonePrev), 20, SCREEN_SIZE / 2, 20, Align::MiddleLeft);
+        m_timeZonePrev = m_timeZone;
+    }
+    m_manager.setFontColor(color, TFT_BLACK);
+    m_manager.drawString(time->getZoneName(m_timeZone), 20, SCREEN_SIZE / 2, 20, Align::MiddleLeft);
+}
+
 
 void ClockWidget::displayAmPm(String &amPm, uint32_t color) {
     m_manager.selectScreen(2);
     m_manager.setFontColor(color, TFT_BLACK);
-    // Workaround for 12h AM/PM problem
-    // The colon is slightly offset and that's a problem because to remove them, we paint over them
-    // I think this is related to the TTF cache
-    // The problem disappears if we reload the font here
-    if (CLOCK_FONT == TTF_Font::DSEG7) {
-        // We set a new font anyway
-        m_manager.setFont(TTF_Font::DSEG14);
-    } else {
-        // Force reloading the font
-        m_manager.setFont(TTF_Font::NONE);
-        m_manager.setFont(CLOCK_FONT);
-    }
-    m_manager.drawString(amPm, SCREEN_SIZE / 5 * 4, SCREEN_SIZE / 2, 25, Align::MiddleCenter);
+    m_manager.setFont(DEFAULT_FONT);
+    m_manager.drawString(amPm, (SCREEN_SIZE / 5 * 4) - 5, (SCREEN_SIZE / 2) + 40, 20, Align::MiddleCenter);
+    m_manager.setFont(CLOCK_FONT);
 }
 
 void ClockWidget::update(bool force) {
@@ -136,6 +179,10 @@ void ClockWidget::update(bool force) {
     if (force) {
         time->updateTime(true);
     }
+
+    int utcOffset = time->getUTCoffset(m_timeZone);
+    time->setTZforTime(utcOffset);
+    time->updateTime(true);
 
     m_hourSingle = time->getHour();
     m_minuteSingle = time->getMinute();
@@ -170,9 +217,11 @@ void ClockWidget::update(bool force) {
 void ClockWidget::changeFormat() {
     GlobalTime *time = GlobalTime::getInstance();
     m_format++;
-    if (m_format > 2) {
-        m_format = 0;
+    if (m_type == (int) ClockType::NORMAL || m_type == (int) ClockType::MORPH){
+        if (m_format > 2) m_format = 0;
     }
+    else 
+        if (m_format > 1) m_format = 0;
     time->setFormat24Hour(m_format == CLOCK_FORMAT_24_HOUR);
     m_manager.clearAllScreens();
     update(true);
@@ -186,7 +235,9 @@ bool ClockWidget::isCustomClock(int clockType) {
 bool ClockWidget::isValidClockType(int clockType) {
     if (clockType == (int) ClockType::NORMAL)
         return true; // Always enabled
-    else if (clockType == (int) ClockType::NIXIE)
+    if (clockType == (int) ClockType::MORPH)
+        return m_enableMorph;  // USE_CLOCK_MORPH; 
+    else if (clockType == (int) ClockType::NIXIE && m_enableNixie)
         return USE_CLOCK_NIXIE > 0;
     else if (isCustomClock(clockType)) {
         int customClockNumber = clockType - (int) ClockType::CUSTOM0;
@@ -214,6 +265,10 @@ void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
         changeClockType();
     } else if (buttonId == BUTTON_OK && state == BTN_MEDIUM) {
         changeFormat();
+    } else if (buttonId == BUTTON_LEFT && state == BTN_MEDIUM) {
+        changeZone(0);
+    } else if (buttonId == BUTTON_RIGHT && state == BTN_MEDIUM) {
+        changeZone(1);
     }
 }
 
@@ -239,38 +294,55 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
             displayDigitImage(displayIndex, digit);
         }
     } else {
-        // Normal clock
-        int fontSize = CLOCK_FONT_SIZE;
-        char c = digit.charAt(0);
-        bool isDigit = c >= '0' && c <= '9' || c == ' ';
-        int defaultX = SCREEN_SIZE / 2 + (isDigit ? CLOCK_OFFSET_X_DIGITS : CLOCK_OFFSET_X_COLON);
-        int defaultY = SCREEN_SIZE / 2;
-        DigitOffset digitOffset = getOffsetForDigit(digit);
-        DigitOffset lastDigitOffset = getOffsetForDigit(lastDigit);
         m_manager.selectScreen(displayIndex);
-        if (shadowing) {
-            m_manager.setFontColor(m_shadowColor, TFT_BLACK);
-            if (CLOCK_FONT == DSEG14) {
-                // DSEG14 (from DSEGstended) uses # to fill all segments
-                m_manager.drawString("#", defaultX, defaultY, fontSize, Align::MiddleCenter);
-            } else if (CLOCK_FONT == DSEG7) {
-                // DESG7 uses 8 to fill all segments
-                m_manager.drawString("8", defaultX, defaultY, fontSize, Align::MiddleCenter);
-            } else {
-                // Other fonts can't be shadowed
-                m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
-                m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
+        if (displayIndex == 2){
+            if(digit == ":") {
+                m_manager.fillCircle(120,(120-40),12,color);
+                m_manager.fillCircle(120,(120+40),12,color);
+            } 
+            else {
+                    m_manager.fillCircle(120,(120-40),12,TFT_BLACK);
+                    m_manager.fillCircle(120,(120+40),12,TFT_BLACK);  
             }
-        } else {
-            m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
-            m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
         }
-        m_manager.setFontColor(color, TFT_BLACK);
-        m_manager.drawString(digit, defaultX + digitOffset.x, defaultY + digitOffset.y, fontSize, Align::MiddleCenter);
+        else {
+    		if(m_type == (int) ClockType::MORPH) {
+		    	displayMorphDigit(displayIndex, lastDigit, digit, color);
+	    	}
+    		else {
+                // Normal clock
+                int fontSize = CLOCK_FONT_SIZE;
+                char c = digit.charAt(0);
+                bool isDigit = c >= '0' && c <= '9' || c == ' ';
+                int defaultX = SCREEN_SIZE / 2 + (isDigit ? CLOCK_OFFSET_X_DIGITS : CLOCK_OFFSET_X_COLON);
+                int defaultY = SCREEN_SIZE / 2;
+                DigitOffset digitOffset = getOffsetForDigit(digit);
+                DigitOffset lastDigitOffset = getOffsetForDigit(lastDigit);
+                if (shadowing) {
+                    m_manager.setFontColor(m_shadowColor, TFT_BLACK);
+                    if (CLOCK_FONT == DSEG14) {
+                        // DSEG14 (from DSEGstended) uses # to fill all segments
+                        m_manager.drawString("#", defaultX, defaultY, fontSize, Align::MiddleCenter);
+                    } else if (CLOCK_FONT == DSEG7) {
+                        // DESG7 uses 8 to fill all segments
+                        m_manager.drawString("8", defaultX, defaultY, fontSize, Align::MiddleCenter);
+                    } else {
+                        // Other fonts can't be shadowed
+                        m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
+                        m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
+                    }
+                } else {
+                    m_manager.setFontColor(TFT_BLACK, TFT_BLACK);
+                    m_manager.drawString(lastDigit, defaultX + lastDigitOffset.x, defaultY + lastDigitOffset.y, fontSize, Align::MiddleCenter);
+                }
+                m_manager.setFontColor(color, TFT_BLACK);
+                m_manager.drawString(digit, defaultX + digitOffset.x, defaultY + digitOffset.y, fontSize, Align::MiddleCenter);
+            }
+        }
     }
     uint32_t end = millis();
 #ifdef CLOCK_DEBUG
-    Serial.printf("displayDigit(%s) took %dms\n", digit, end - start);
+    if (digit != ":") Serial.printf("displayDigit(%s) took %dms\n", digit, end - start);
 #endif
 }
 
@@ -279,7 +351,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (color != m_fgColor && m_type != (int) ClockType::NORMAL) {
+    if (color != m_fgColor && ( isCustomClock(m_type) || m_type == (int) ClockType::NIXIE) ) {
         // ignore clear tick (we draw the whole image anyway)
         return;
     }
@@ -344,6 +416,183 @@ void ClockWidget::displayClockGraphics(int displayIndex, const byte *clockArray[
     const byte *start = clockArray[index][0];
     const byte *end = clockArray[index][1];
     m_manager.drawJpg(0, 0, start, end - start, 1, colorOverride);
+}
+
+// Used for drawing segments which have not changed and initial set-up
+void ClockWidget::drawSegment(int seg, uint32_t color){  
+  m_manager.S_fillRoundRect(segLoc[seg][0], segLoc[seg][1], segLoc[seg][2], segLoc[seg][3], 8, color);
+}
+
+void ClockWidget::drawDisappearBT(int seg, int seq){
+  int x; int y; int l; int w;
+    x = segLoc[seg][0];
+    y = segLoc[seg][1];
+    l = segLoc[seg][2];
+  if (seg == 0 || seg == 3 || seg == 6) {
+  }
+  else {
+    w = (20 * (4 - seq));
+    if(seq == 4) l = 0;
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawDisappearTB(int seg, int seq){
+  int x; int y; int l; int w;
+    x = segLoc[seg][0];
+    l = segLoc[seg][2];
+  if (seg == 0 || seg == 3 || seg == 6) {
+  }
+  else {
+    y = segLoc[seg][1] + (20 * (seq));
+    w = (20 * (4 - seq));
+    if(seq == 4) l = 0;
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawAppearTB(int seg, int seq){
+  int x; int y; int l; int w;
+    x = segLoc[seg][0];
+    y = segLoc[seg][1];
+    l = segLoc[seg][2];
+  if (seg == 0 || seg == 3 || seg == 6) {
+  }
+  else {
+    w = (20 * (seq));
+    if(seq == 0) l = 0;
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawAppearBT(int seg, int seq){
+  int x; int y; int l; int w;
+    x = segLoc[seg][0];
+    l = segLoc[seg][2];
+  if (seg == 0 || seg == 3 || seg == 6) {
+  }
+  else {
+    y = segLoc[seg][1] + (20 * (4 - seq));
+    w = (20 * (seq));
+    if(seq == 0) l = 0;
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawAppearRL(int seg, int seq){
+  int x; int y; int l; int w;
+    y = segLoc[seg][1];
+    w = segLoc[seg][3];
+  if (seg == 0 || seg == 3 || seg == 6) {
+    x = segLoc[seg][0] + (20 * (4 - seq));
+    l = ((seq) * 20);
+  }
+  else {
+    x = segLoc[seg][0] + (25 * (4 - seq));
+    l = segLoc[seg][2];
+    if (seq > 0 && seq < 4) {
+      y = y + 8;
+      w = w - 20;
+    }  
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawAppearLR(int seg, int seq){
+  int x; int y; int l; int w;
+    y = segLoc[seg][1];
+    w = segLoc[seg][3];
+  if (seg == 0 || seg == 3 || seg == 6) {
+    x = segLoc[seg][0];
+    l = ((seq) * 20);
+  }
+  else {
+    x = segLoc[seg][0] - (25 * (4 - seq));
+    l = segLoc[seg][2];
+    if (seq > 0 && seq < 4) {
+      y = y + 8;
+      w = w - 20;
+    }  
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawDisappearLR(int seg, int seq){
+  int x; int y; int l; int w;
+    y = segLoc[seg][1];
+    w = segLoc[seg][3];
+  if (seg == 0 || seg == 3 || seg == 6) {
+    x = segLoc[seg][0] + (20 * (seq));
+    l = ((4 - seq) * 20);
+  }
+  else {
+    x = segLoc[seg][0] + (25 * (seq));
+    l = segLoc[seg][2];
+    if (seq > 0 && seq < 4) {
+      y = y + 8;
+      w = w - 20;
+    }  
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::drawDisappearRL(int seg, int seq){
+  int x; int y; int l; int w;
+    y = segLoc[seg][1];
+    w = segLoc[seg][3];
+  if (seg == 0 || seg == 3 || seg == 6) {
+    x = segLoc[seg][0];
+    l = ((4 - seq) * 20);
+  }
+  else {
+    x = segLoc[seg][0] + (25 * (seq));
+    l = segLoc[seg][2];
+    if (seq > 0 && seq < 4) {
+      y = y + 8;
+      w = w - 20;
+    }  
+  }
+  m_manager.S_fillRoundRect(x, y, l, w, 8,m_fgColor );
+}
+
+void ClockWidget::displayMorphDigit(int orb, const String m_digitlast, const String m_digit, uint32_t color){
+    int tranForSeg;
+    int m_dig = 0;
+    if(m_digit != " ") m_dig = m_digit.toInt();
+
+    for (int lv_anim = 0; lv_anim < 5; lv_anim++){           // Loop for the animation
+        m_manager.S_fillSprite(TFT_BLACK);                // Clear sprite
+        for (int lv_seg = 0; lv_seg < 7; lv_seg++){       // Draw each segment in the sprite
+            if       (m_digit == " " && m_digitlast == " ")  tranForSeg = 9;
+            else  if (m_digit == " " || m_digitlast == " ")  tranForSeg = trans_0_B[m_dig][lv_seg]; 
+            else  if (m_digit == m_digitlast) tranForSeg = 0;
+            else  if (m_digit == "0") {
+                if(m_digitlast == "2") tranForSeg = trans_0_2[m_dig][lv_seg];
+                if(m_digitlast == "3") tranForSeg = trans_0_3[m_dig][lv_seg];
+                if(m_digitlast == "5") tranForSeg = trans_0_5[m_dig][lv_seg];
+                if(m_digitlast == "9") tranForSeg = trans_0_9[m_dig][lv_seg]; }
+            else if (m_digit == "1") {
+                if(m_digitlast == "0") tranForSeg = trans_0_9[m_dig][lv_seg]; 
+                if(m_digitlast == "2") tranForSeg = trans_0_2[m_dig][lv_seg]; }
+            else                       tranForSeg = trans_0_9[m_dig][lv_seg];
+
+            switch(tranForSeg){                  // Use the transition on each segment
+            case 0 : if(digits[m_dig][lv_seg] == 1) drawSegment(lv_seg, m_fgColor); break;  // Draw the segment
+            case 1 : drawDisappearBT(lv_seg, lv_anim); break;
+            case 2 : drawAppearTB(lv_seg, lv_anim);    break;
+            case 3 : drawDisappearRL(lv_seg, lv_anim); break;
+            case 4 : drawDisappearLR(lv_seg, lv_anim); break;
+            case 5 : drawAppearRL(lv_seg, lv_anim);    break;
+            case 6 : drawAppearLR(lv_seg, lv_anim);    break;
+            case 7 : drawDisappearTB(lv_seg, lv_anim); break;
+            case 8 : drawAppearBT(lv_seg, lv_anim);    break;
+            case 9 : break;
+            }
+        }
+        delay(animDelay);
+        m_manager.S_pushSprite(62, 28);
+//Serial.printf("displayDigit : %i + %s + %s + %d + %d\n",orb, m_digitlast, m_digit, m_dig, tranForSeg);
+    }
 }
 
 String ClockWidget::getName() {
