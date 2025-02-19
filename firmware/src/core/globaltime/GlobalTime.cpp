@@ -7,11 +7,22 @@
 GlobalTime *GlobalTime::m_instance = nullptr;
 
 GlobalTime::GlobalTime() {
+
     ConfigManager *cm = ConfigManager::getInstance();
-    m_timezoneLocation = cm->getConfigString("timezoneLoc", m_timezoneLocation); // config added in MainHelper
+    m_zones[0].zone = cm->getConfigString("timezoneLoc0", m_zone0); // config added in MainHelper
+    m_zones[0].cityName = cm->getConfigString("timezoneName0", m_cityName0);
+    m_zones[1].zone = cm->getConfigString("timezoneLoc1", m_zone1);
+    m_zones[1].cityName = cm->getConfigString("timezoneName1", m_cityName1);
+    m_zones[2].zone = cm->getConfigString("timezoneLoc2", m_zone2);
+    m_zones[2].cityName = cm->getConfigString("timezoneName2", m_cityName2);
+    m_zones[3].zone = cm->getConfigString("timezoneLoc3", m_zone3);
+    m_zones[3].cityName = cm->getConfigString("timezoneName3", m_cityName3);
+    m_zones[4].zone = cm->getConfigString("timezoneLoc4", m_zone4);
+    m_zones[4].cityName = cm->getConfigString("timezoneName4", m_cityName4);
+
     int clockFormat = cm->getConfigInt("clockFormat", CLOCK_FORMAT); // config added in ClockWidget
     m_ntpServer = cm->getConfigString("ntpServer", m_ntpServer); // config added in MainHelper
-    Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d, ntpServer=%s\n", m_timezoneLocation.c_str(), clockFormat, m_ntpServer.c_str());
+    Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d, ntpServer=%s\n", m_zones[0].zone.c_str(), clockFormat, m_ntpServer.c_str());
     m_format24hour = (clockFormat == CLOCK_FORMAT_24_HOUR);
     m_timeClient = new NTPClient(m_udp, m_ntpServer.c_str());
     m_timeClient->begin();
@@ -30,9 +41,8 @@ GlobalTime *GlobalTime::getInstance() {
 
 void GlobalTime::updateTime(bool force) {
     if (force || millis() - m_updateTimer > m_oneSecond) {
-        if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
-            getTimeZoneOffsetFromAPI();
-        }
+        getTimeZoneOffsetFromAPI();
+        m_timeClient->setUpdateInterval(600000);  // 10 mins in ms
         m_timeClient->update();
         m_unixEpoch = m_timeClient->getEpochTime();
         m_updateTimer = millis();
@@ -136,33 +146,86 @@ bool GlobalTime::isPM() {
     return hour(m_unixEpoch) >= 12;
 }
 
+int GlobalTime::getUTCoffset(int &zoneId){
+    int utcOffset;
+    utcOffset = m_zones[zoneId].utcOffset;
+    return utcOffset;
+}
+
+void GlobalTime::setTZforTime(int &offSet){
+    m_timeClient->setTimeOffset(offSet);
+}
+
+String GlobalTime::getZoneName(int &zoneId){
+    String zoneName;
+    zoneName = m_zones[zoneId].cityName.c_str();
+    return zoneName;
+}
+
 void GlobalTime::getTimeZoneOffsetFromAPI() {
     HTTPClient http;
-    http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + String(m_timezoneLocation.c_str()));
-    int httpCode = http.GET();
+    for (int i = 0; i < MAX_ZONES; i++) {
+        if (m_zones[i].zone != ""){
+        if (!m_zones[i].tzLoaded || (m_zones[i].m_nextTimeZoneChange > 0 && m_zones[i].dstActive && m_unixEpoch > m_zones[i].m_nextTimeZoneChange)){
 
-    if (httpCode > 0) {
-        JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, http.getString());
-        if (!error) {
-            m_timeZoneOffset = doc["gmtOffset"].as<int>();
-            if (doc["zoneEnd"].isNull()) {
-                // Timezone does not use DST, no futher updates necessary
-                m_nextTimeZoneUpdate = 0;
+            #ifdef TIMEZONE_API
+                http.begin(String(TIMEZONE_API_URL) + "?key=" + TIMEZONE_API_KEY + "&format=json&fields=gmtOffset,zoneEnd&by=zone&zone=" + String(m_zones[i].zone.c_str()));
+            #else
+                http.begin(String(TIMEZONE_API_URL) + "?timeZone=" + String(m_zones[i].zone.c_str()));
+            #endif
+            int httpCode = http.GET();
+
+            if (httpCode > 0) {
+                JsonDocument doc;
+                DeserializationError error = deserializeJson(doc, http.getString());
+                if (!error) {
+                    #ifdef TIMEZONE_API
+                        m_zones[i].utcOffset = doc["gmtOffset"].as<int>();
+                        if (doc["zoneEnd"].isNull()) {
+                            // Timezone does not use DST, no futher updates necessary
+                            m_zones[i].m_nextTimeZoneChange = 0;
+                        } else {
+                            // Timezone uses DST, update when necessary
+                            m_zones[i].m_nextTimeZoneChange = doc["zoneEnd"].as<unsigned long>() + random(5 * 60); // Randomize update by 5 minutes to avoid flooding the API
+                        }
+                    #else
+                        m_zones[i].utcOffset = doc["currentUtcOffset"]["seconds"].as<int>();
+                        if (doc["hasDayLightSaving"].as<bool>()) {
+                            m_zones[i].dstStart = doc["dstInterval"]["dstStart"].as<String>();
+                            m_zones[i].dstEnd = doc["dstInterval"]["dstEnd"].as<String>();
+                            m_zones[i].dstActive = doc["isDayLightSavingActive"].as<bool>();   
+                            if (m_zones[i].dstActive) {
+                                m_temp_t.Year = m_zones[i].dstEnd.substring(0,4).toInt() - 1970;
+                                m_temp_t.Month = m_zones[i].dstEnd.substring(5,7).toInt();
+                                m_temp_t.Day = m_zones[i].dstEnd.substring(8,10).toInt();
+                                m_temp_t.Hour = m_zones[i].dstEnd.substring(11,13).toInt();
+                                m_temp_t.Minute = m_zones[i].dstEnd.substring(14,16).toInt();
+                                m_temp_t.Second = m_zones[i].dstEnd.substring(17,19).toInt();
+                            } else {
+                                m_temp_t.Year = m_zones[i].dstStart.substring(0,4).toInt() - 1970;
+                                m_temp_t.Month = m_zones[i].dstStart.substring(5,7).toInt();
+                                m_temp_t.Day = m_zones[i].dstStart.substring(8,10).toInt();
+                                m_temp_t.Hour = m_zones[i].dstStart.substring(11,13).toInt();
+                                m_temp_t.Minute = m_zones[i].dstStart.substring(14,16).toInt();
+                                m_temp_t.Second = m_zones[i].dstStart.substring(17,19).toInt();
+                            }
+                            m_zones[i].m_nextTimeZoneChange = makeTime(m_temp_t);
+                        }   
+                        m_zones[i].tzLoaded = true;
+                    #endif
+                    Serial.print("Timezone Offset from API: ");
+                    Serial.println(m_zones[0].utcOffset);
+                    Serial.print("Next timezone update: ");
+                    Serial.println(m_zones[0].m_nextTimeZoneChange);
+                    // m_timeClient->setTimeOffset(m_timeZoneOffset);
+                } else {
+                    Serial.println("Deserialization error on timezone offset API response");
+                }
             } else {
-                // Timezone uses DST, update when necessary
-                m_nextTimeZoneUpdate = doc["zoneEnd"].as<unsigned long>() + random(5 * 60); // Randomize update by 5 minutes to avoid flooding the API
+                Serial.println("Failed to get timezone offset from API");
             }
-            Serial.print("Timezone Offset from API: ");
-            Serial.println(m_timeZoneOffset);
-            Serial.print("Next timezone update: ");
-            Serial.println(m_nextTimeZoneUpdate);
-            m_timeClient->setTimeOffset(m_timeZoneOffset);
-        } else {
-            Serial.println("Deserialization error on timezone offset API response");
         }
-    } else {
-        Serial.println("Failed to get timezone offset from API");
+        }
     }
 }
 

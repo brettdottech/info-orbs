@@ -44,6 +44,19 @@ enum ClockFormat {
     #endif
 #endif
 
+struct TimeZone {
+    std::string zone = "";
+    std::string cityName = "";      // Display name of the city
+    int dst = 0;
+    int utcOffset = 0;       // UTC offset in hours
+    int offsetToLocal = 0;
+    String dstStart = "";
+    String dstEnd = "";
+    bool dstActive = false;
+    bool tzLoaded = false;
+    int m_nextTimeZoneChange = 0;
+};
+
 class GlobalTime {
 public:
     static GlobalTime *getInstance();
@@ -67,6 +80,9 @@ public:
     bool isPM();
     bool getFormat24Hour();
     bool setFormat24Hour(bool format24hour);
+    void setTZforTime(int &offSet);
+    int getUTCoffset(int &zoneId);
+    String getZoneName(int &zoneId);
 
 private:
     GlobalTime();
@@ -85,9 +101,26 @@ private:
     int m_year = 0;
     String m_time;
     String m_weekday;
-    std::string m_timezoneLocation = TIMEZONE_API_LOCATION;
+    
+    TimeZone m_zones[MAX_ZONES];
+    tmElements_t m_temp_t;
+    String m_dstStart;
+    String m_dstEnd;
+    bool m_dstActive;
+
     int m_timeZoneOffset = -1; // A value that will be overwritten by the API
     unsigned long m_nextTimeZoneUpdate = 0;
+
+    std::string m_zone0{TIMEZONE_API_LOCATION};
+    std::string m_cityName0{TIMEZONE_API_NAME};
+    std::string m_zone1{TIMEZONE_API_LOCATION1};
+    std::string m_cityName1{TIMEZONE_API_NAME1};
+    std::string m_zone2{TIMEZONE_API_LOCATION2};
+    std::string m_cityName2{TIMEZONE_API_NAME2};
+    std::string m_zone3{TIMEZONE_API_LOCATION3};
+    std::string m_cityName3{TIMEZONE_API_NAME3};
+    std::string m_zone4{TIMEZONE_API_LOCATION4};
+    std::string m_cityName4{TIMEZONE_API_NAME4};
 
     WiFiUDP m_udp;
     NTPClient *m_timeClient{nullptr};
