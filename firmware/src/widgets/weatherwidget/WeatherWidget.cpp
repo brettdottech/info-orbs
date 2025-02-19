@@ -16,13 +16,18 @@
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
     m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
-    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
+    config.addConfigString("WeatherWidget", "weatherLocation0", &m_weatherLocation0, 40, "Label for this weather");
+    config.addConfigFloat("WeatherWidget", "weatherLat", &m_lat0,"Weather Latitude");
+    config.addConfigFloat("WeatherWidget", "weatherLon", &m_long0,"Weather Longitude");
+    config.addConfigString("WeatherWidget", "weatherLocation1", &m_weatherLocation1, 40, "Label for weather 1 location", true);
+    config.addConfigFloat("WeatherWidget", "weatherLat1", &m_lat1,"Weather 1 Latitude", true);
+    config.addConfigFloat("WeatherWidget", "weatherLon1", &m_long1,"Weather 1 Longitude", true);
     String optUnits[] = {"Celsius", "Fahrenheit"};
     config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
     String optModes[] = {"Light", "Dark"};
     config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
     config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, "Switch between Highs and Lows every X seconds, set to 0 to disable", true);
-    Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
+    Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation0.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }
 
@@ -37,11 +42,27 @@ void WeatherWidget::changeMode() {
     threeDayWeather(4);
 }
 
+void WeatherWidget::changeLocation(){
+    if(t_weatherLocation == m_weatherLocation0){
+        t_weatherLocation = m_weatherLocation1;
+        t_lat = m_lat1;
+        t_long = m_long1;
+    }
+    else{
+        t_weatherLocation = m_weatherLocation0;
+        t_lat = m_lat0;
+        t_long = m_long0;
+    }
+    update(true);
+}
+
 void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
     if (buttonId == BUTTON_OK && state == BTN_SHORT)
         changeMode();
     if (buttonId == BUTTON_OK && state == BTN_MEDIUM)
         update(true);
+    if ((buttonId == BUTTON_LEFT || buttonId == BUTTON_RIGHT) && state == BTN_MEDIUM)
+        changeLocation();
 }
 
 void WeatherWidget::setup() {
@@ -92,10 +113,16 @@ void WeatherWidget::update(bool force) {
 
 bool WeatherWidget::getWeatherData() {
     String weatherUnits = m_weatherUnits == 0 ? "metric" : "us";
-    String httpRequestAddress = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
-                                String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + "&unitGroup=" + weatherUnits +
-                                "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
-
+    #ifdef WEATHER_API_1
+        String httpRequestAddress = String(WEATHER_API_URL) + String(t_lat) + "," + String(t_long) + + "/next3days?key=" + weatherApiKey + 
+        "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
+//        String httpRequestAddress = String(WEATHER_API_URL) + String(m_weatherLocation.c_str()) + "/next3days?key=" + weatherApiKey + 
+//        "&unitGroup=" + weatherUnits + "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
+    #else
+        String httpRequestAddress = String(WEATHER_API_URL) + "?lat=" + String(t_lat) + "&lon=" + String(t_long) +
+        + "&appid=" + weatherApiKey + "&units=" + weatherUnits
+        + "&exclude=minutely,hourly,alerts&lang=" + LOC_LANG;
+    #endif
     auto task = TaskFactory::createHttpGetTask(
         httpRequestAddress, [this](int httpCode, const String &response) { processResponse(httpCode, response); }, [this](int httpCode, String &response) { preProcessResponse(httpCode, response); });
 
@@ -115,6 +142,7 @@ bool WeatherWidget::getWeatherData() {
 void WeatherWidget::preProcessResponse(int httpCode, String &response) {
     if (httpCode > 0) {
         JsonDocument filter;
+    #ifdef WEATHER_API_1
         filter["resolvedAddress"] = true;
         filter["currentConditions"]["temp"] = true;
         filter["days"][0]["description"] = true;
@@ -122,7 +150,13 @@ void WeatherWidget::preProcessResponse(int httpCode, String &response) {
         filter["days"][0]["icon"] = true;
         filter["days"][0]["tempmax"] = true;
         filter["days"][0]["tempmin"] = true;
-
+    #else
+        filter["current"]["temp"] = true;
+        filter["daily"][0]["summary"] = true;
+        filter["daily"][0]["weather"][0]["icon"] = true;
+        filter["daily"][0]["temp"]["max"] = true;
+        filter["daily"][0]["temp"]["min"] = true;
+    #endif
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
 
@@ -141,7 +175,9 @@ void WeatherWidget::processResponse(int httpCode, const String &response) {
         DeserializationError error = deserializeJson(doc, response);
 
         if (!error) {
-            model.setCityName(doc["resolvedAddress"].as<String>());
+            #ifdef WEATHER_API_1
+            model.setCityName(String(t_weatherLocation.c_str()));
+//            model.setCityName(doc["resolvedAddress"].as<String>());
             model.setCurrentTemperature(doc["currentConditions"]["temp"].as<float>());
             model.setCurrentText(doc["days"][0]["description"].as<String>());
 
@@ -153,6 +189,20 @@ void WeatherWidget::processResponse(int httpCode, const String &response) {
                 model.setDayHigh(i, doc["days"][i + 1]["tempmax"].as<float>());
                 model.setDayLow(i, doc["days"][i + 1]["tempmin"].as<float>());
             }
+            #else
+            model.setCityName(String(t_weatherLocation.c_str()));
+            model.setCurrentTemperature(doc["current"]["temp"].as<float>());
+            model.setCurrentText(doc["daily"][0]["summary"].as<String>());
+
+            model.setCurrentIcon(doc["daily"][0]["weather"][0]["icon"].as<String>());
+            model.setTodayHigh(doc["daily"][0]["temp"]["max"].as<float>());
+            model.setTodayLow(doc["daily"][0]["temp"]["min"].as<float>());
+            for (int i = 0; i < 3; i++) {
+                model.setDayIcon(i, doc["daily"][i + 1]["weather"][0]["icon"].as<String>());
+                model.setDayHigh(i, doc["daily"][i + 1]["temp"]["max"].as<float>());
+                model.setDayLow(i, doc["daily"][i + 1]["temp"]["min"].as<float>());
+            }
+            #endif
         } else {
             // Handle JSON deserialization error
             Serial.println("Deserialization failed: " + String(error.c_str()));
@@ -197,25 +247,28 @@ void WeatherWidget::drawWeatherIcon(int displayIndex, const String &condition, i
     const byte *iconStart = NULL;
     const byte *iconEnd = NULL;
 
-    if (condition == "partly-cloudy-night") {
+    if (condition == "partly-cloudy-night" || condition == "02n") {
         iconStart = m_screenMode == Light ? moonCloudW_start : moonCloudB_start;
         iconEnd = m_screenMode == Light ? moonCloudW_end : moonCloudB_end;
-    } else if (condition == "partly-cloudy-day") {
+    } else if (condition == "partly-cloudy-day" || condition == "02d") {
         iconStart = m_screenMode == Light ? sunCloudsW_start : sunCloudsB_start;
         iconEnd = m_screenMode == Light ? sunCloudsW_end : sunCloudsB_end;
-    } else if (condition == "clear-day") {
+    } else if (condition == "clear-day" || condition == "01d") {
         iconStart = m_screenMode == Light ? sunW_start : sunB_start;
         iconEnd = m_screenMode == Light ? sunW_end : sunB_end;
-    } else if (condition == "clear-night") {
+    } else if (condition == "clear-night" || condition == "01n") {
         iconStart = m_screenMode == Light ? moonW_start : moonB_start;
         iconEnd = m_screenMode == Light ? moonW_end : moonB_end;
-    } else if (condition == "snow") {
+    } else if (condition == "snow" || condition == "13d" || condition == "13n") {
         iconStart = m_screenMode == Light ? snowW_start : snowB_start;
         iconEnd = m_screenMode == Light ? snowW_end : snowB_end;
-    } else if (condition == "rain") {
+    } else if (condition == "rain" || condition == "10d" || condition == "10n") {
         iconStart = m_screenMode == Light ? rainW_start : rainB_start;
         iconEnd = m_screenMode == Light ? rainW_end : rainB_end;
-    } else if (condition == "fog" || condition == "wind" || condition == "cloudy") {
+    } else if (condition == "fog" || condition == "wind" || condition == "cloudy" ||
+               condition == "03d" || condition == "03n" || condition == "04d" || condition == "04n" ||
+               condition == "09d" || condition == "09n" || condition == "11d" || condition == "11n" ||
+               condition == "50d" || condition == "50n") {
         iconStart = m_screenMode == Light ? cloudsW_start : cloudsB_start;
         iconEnd = m_screenMode == Light ? cloudsW_end : cloudsB_end;
     } else {
