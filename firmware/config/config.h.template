@@ -61,12 +61,12 @@
 #define HIGH_LOW_INTERVAL 0             // Switch between Highs and Lows on 3 day forecast in X seconds - set to 0 to disable
 
 #define WEATHER_LOCATION0 "Victoria, BC" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data
-#define WEATHER_LAT0 "49.287675"
-#define WEATHER_LON0 "-123.113702"
+#define WEATHER_LAT0 49.287675
+#define WEATHER_LON0 -123.113702
 
 #define WEATHER_LOCATION1 "London, UK" // City/state for the weather, look it up on https://www.visualcrossing.com/weather-data
-#define WEATHER_LAT1 "51.502090"
-#define WEATHER_LON1 "-0.140218"
+#define WEATHER_LAT1 51.502090
+#define WEATHER_LON1 -0.140218
 
 //#define WEATHER_API_1
 #ifdef WEATHER_API_1
