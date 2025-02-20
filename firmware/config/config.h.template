@@ -73,7 +73,7 @@
     #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
     #define WEATHER_API_URL "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
 #else
-    #define WEATHER_API_KEY "3bfb4142edadfeb29e3c30ded1d0c8f9"
+    #define WEATHER_API_KEY "Enter_your_key_here"
     #define WEATHER_API_URL "https://api.openweathermap.org/data/3.0/onecall"
 #endif
 
