@@ -1,0 +1,5 @@
+welcome=Welcome
+infoorbs=InfoOrbs
+by=by
+brett.tech=brett.tech
+version=Version \1

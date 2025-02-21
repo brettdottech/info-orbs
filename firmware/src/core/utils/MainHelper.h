@@ -3,6 +3,7 @@
 
 #include "Button.h"
 #include "ConfigManager.h"
+#include "I18n.h"
 #include "OrbsWiFiManager.h"
 #include "ScreenManager.h"
 #include "ShowMemoryUsage.h"
@@ -79,6 +80,7 @@ public:
     static void watchdogReset();
 
     static void updateBrightnessByTime(uint8_t hour24);
+    static void setupI18n();
 };
 
 #endif

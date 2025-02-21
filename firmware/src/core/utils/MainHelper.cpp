@@ -419,7 +419,7 @@ void MainHelper::showWelcome() {
     s_screenManager->setFontColor(TFT_WHITE);
 
     s_screenManager->selectScreen(0);
-    s_screenManager->drawCentreString("Welcome", ScreenCenterX, ScreenCenterY, 29);
+    s_screenManager->drawCentreString(I18n::get("welcome"), ScreenCenterX, ScreenCenterY, 29);
     if (GIT_BRANCH != "main" && GIT_BRANCH != "unknown" && GIT_BRANCH != "HEAD") {
         s_screenManager->setFontColor(TFT_RED);
         s_screenManager->drawCentreString(GIT_BRANCH, ScreenCenterX, ScreenCenterY - 40, 15);
@@ -428,11 +428,11 @@ void MainHelper::showWelcome() {
     }
 
     s_screenManager->selectScreen(1);
-    s_screenManager->drawCentreString("Info Orbs", ScreenCenterX, ScreenCenterY - 50, 22);
-    s_screenManager->drawCentreString("by", ScreenCenterX, ScreenCenterY - 5, 22);
-    s_screenManager->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 22);
+    s_screenManager->drawCentreString(I18n::get("infoorbs"), ScreenCenterX, ScreenCenterY - 50, 22);
+    s_screenManager->drawCentreString(I18n::get("by"), ScreenCenterX, ScreenCenterY - 5, 22);
+    s_screenManager->drawCentreString(I18n::get("brett.tech"), ScreenCenterX, ScreenCenterY + 30, 22);
     s_screenManager->setFontColor(TFT_RED);
-    s_screenManager->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 15);
+    s_screenManager->drawCentreString(I18n::get("version", "1.1.0"), ScreenCenterX, ScreenCenterY + 65, 15);
 
     s_screenManager->selectScreen(2);
     s_screenManager->drawJpg(0, 0, logo_start, logo_end - logo_start);
@@ -503,4 +503,11 @@ void MainHelper::watchdogInit() {
 
 void MainHelper::watchdogReset() {
     esp_task_wdt_reset();
+}
+
+void MainHelper::setupI18n() {
+    String langFile = "i18n/en.txt"; // TODO add to GUI
+    if (I18n::load(langFile.c_str())) {
+        Log.noticeln("Loaded language file: %s", langFile.c_str());
+    }
 }
