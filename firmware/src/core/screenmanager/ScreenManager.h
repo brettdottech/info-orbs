@@ -8,6 +8,7 @@
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <TJpg_Decoder.h>
+#include "ScreenSaverwidget/DigitalRainAnimation.hpp"
 
 #define NUM_SCREENS 5
 
@@ -83,6 +84,8 @@ public:
     static bool tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
     JRESULT drawJpg(int32_t x, int32_t y, const uint8_t jpeg_data[], uint32_t data_size, uint8_t scale = 1, uint32_t imageColor = 0);
     JRESULT drawFsJpg(int32_t x, int32_t y, const char *filename, uint8_t scale = 1, uint32_t imageColor = 0);
+
+    DigitalRainAnimation<TFT_eSPI> m_matrix_effect = DigitalRainAnimation<TFT_eSPI>();
 
 private:
     static ScreenManager *instance;
