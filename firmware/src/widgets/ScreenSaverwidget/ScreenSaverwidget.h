@@ -1,7 +1,7 @@
 #ifndef SCREEN_SAVER_WIDGET_H
 #define SCREEN_SAVER_WIDGET_H
 
-#include "widget.h"
+#include "Widget.h"
 #include "config_helper.h"
 #include "DigitalRainAnimation.hpp"
 
