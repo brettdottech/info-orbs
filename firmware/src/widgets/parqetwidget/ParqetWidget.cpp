@@ -116,13 +116,12 @@ ParqetDataModel ParqetWidget::getPortfolio() {
 
 void ParqetWidget::updatePortfolio() {
     PARQET_DEBUG_PRINT_MEM("Begin .updatePortfolio()");
-    String portfolioId = String(m_portfolioId.c_str());
-    if (portfolioId.isEmpty() || m_parquetProxyUrl.empty()) {
+    if (m_portfolioId.empty() || m_parquetProxyUrl.empty()) {
         return;
     }
-    Serial.printf("Parqet: Update Portfolio %s\n", portfolioId.c_str());
+    Serial.printf("Parqet: Update Portfolio %s\n", m_portfolioId.c_str());
     String httpRequestAddress = String(m_parquetProxyUrl.c_str());
-    httpRequestAddress += "?id=" + portfolioId + "&timeframe=" + getTimeframe() + "&perf=" + m_perfMeasures[m_curPerfMeasure] + "&perfChart=" + m_perfChartMeasures[m_curPerfChartMeasure];
+    httpRequestAddress += "?id=" + String(m_portfolioId.c_str()) + "&timeframe=" + getTimeframe() + "&perf=" + m_perfMeasures[m_curPerfMeasure] + "&perfChart=" + m_perfChartMeasures[m_curPerfChartMeasure];
 
     auto task = TaskFactory::createHttpGetTask(
         httpRequestAddress, [this](int httpCode, const String &response) {
