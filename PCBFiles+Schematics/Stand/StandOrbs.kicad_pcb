@@ -150,7 +150,7 @@
 		(uuid "0e30b31f-b163-4e87-a7e2-c597a7e2fc23")
 	)
 	(gr_line
-		(start 98.97 80.44)
+		(start 98.97 80.34)
 		(end 98.97 83.27)
 		(stroke
 			(width 0.05)
@@ -160,7 +160,7 @@
 		(uuid "151577ac-696b-4c13-9e6b-91ae5c8d4e7e")
 	)
 	(gr_line
-		(start 101.03 80.44)
+		(start 101.03 80.34)
 		(end 101.03 83.27)
 		(stroke
 			(width 0.05)
@@ -200,8 +200,8 @@
 		(uuid "35378fb2-9c5c-4c34-b03e-074af2939ebe")
 	)
 	(gr_line
-		(start 101.03 83.27)
-		(end 101.03 80.44)
+		(start 101.03 83.17)
+		(end 101.03 80.34)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -218,6 +218,17 @@
 		)
 		(layer "Edge.Cuts")
 		(uuid "41a37730-5643-4271-8e69-3f4de8ef4165")
+	)
+	(gr_arc
+		(start 86.582025 80.338752)
+		(mid 86.036307 80.597081)
+		(end 85.49 80.34)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "4abdd5d6-5801-4658-9f29-aeae26a485b9")
 	)
 	(gr_line
 		(start 125.125 100.44)
@@ -241,7 +252,7 @@
 	)
 	(gr_line
 		(start 114.49 79.04)
-		(end 114.49 80.44)
+		(end 114.49 80.34)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -281,7 +292,7 @@
 	)
 	(gr_line
 		(start 85.49 79.04)
-		(end 85.49 80.44)
+		(end 85.49 80.34)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -290,8 +301,8 @@
 		(uuid "861f0f0a-3765-4a06-9f15-b71a200ebced")
 	)
 	(gr_line
-		(start 98.97 80.44)
-		(end 98.97 83.27)
+		(start 98.97 80.34)
+		(end 98.97 83.17)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -320,8 +331,8 @@
 		(uuid "a9f5e100-4232-405c-b858-0faa6f3d189b")
 	)
 	(gr_line
-		(start 85.49 80.44)
-		(end 98.97 80.44)
+		(start 86.582025 80.338752)
+		(end 98.97 80.34)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -370,8 +381,8 @@
 		(uuid "d515dd03-87f1-4834-91e6-d425765fa943")
 	)
 	(gr_line
-		(start 101.03 80.44)
-		(end 114.49 80.44)
+		(start 101.03 80.34)
+		(end 113.397975 80.341248)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -399,6 +410,17 @@
 		(layer "Edge.Cuts")
 		(uuid "fdcff59c-fcd8-44b1-af7a-a846f5ad836f")
 	)
+	(gr_arc
+		(start 114.49 80.34)
+		(mid 113.944292 80.598329)
+		(end 113.397975 80.341248)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "ff63b572-8520-4d6b-ac87-d9849b1b3d31")
+	)
 	(gr_text "die by the orbs"
 		(at 111.96 99.68 0)
 		(layer "F.SilkS")
@@ -419,6 +441,19 @@
 			(font
 				(size 0.8 1)
 				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "v2.1 - close gap by 0.1mm"
+		(at 85.9 82.2 0)
+		(layer "F.SilkS")
+		(uuid "8f84c969-2c6b-4439-9484-7c44d0e363ea")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.125)
+				(bold yes)
 			)
 			(justify left bottom)
 		)
