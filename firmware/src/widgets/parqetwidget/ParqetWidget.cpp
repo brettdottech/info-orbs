@@ -130,13 +130,13 @@ void ParqetWidget::updatePortfolio() {
         });
 
     if (!task) {
-        Serial.println("Failed to create pqValues task");
+        Serial.println("Failed to create parqet task");
         return;
     }
 
     bool success = TaskManager::getInstance()->addTask(std::move(task));
     if (!success) {
-        Serial.println("Failed to add pqValues task");
+        Serial.println("Failed to add parqet task");
         return;
     }
 }
@@ -162,30 +162,27 @@ void ParqetWidget::processResponse(int httpCode, const String &response) {
             int count = 0;
             for (JsonVariant holding : holdings) {
                 String type = holding["assetType"].as<String>();
-                if (type == "security" || type == "crypto") {
-                    // stocks or etf/funds
-                    String id = holding["id"].as<String>();
-                    String name = holding["name"].as<String>();
-                    float purchasePrice = holding["priceStart"].as<float>();
-                    float purchaseValue = holding["valueStart"].as<float>();
-                    float currentPrice = holding["priceNow"].as<float>();
-                    float currentValue = holding["valueNow"].as<float>();
-                    float shares = holding["shares"].as<float>();
-                    float perf = holding["perf"].as<float>();
-                    String currency = holding["currency"].as<String>();
-                    if (currentValue > 0) {
-                        ParqetHoldingDataModel h = ParqetHoldingDataModel();
-                        h.setId(id);
-                        h.setName(name);
-                        h.setPurchasePrice(purchasePrice);
-                        h.setPurchaseValue(purchaseValue);
-                        h.setCurrentPrice(currentPrice);
-                        h.setCurrentValue(currentValue);
-                        h.setShares(shares);
-                        h.setCurrency(currency);
-                        h.setPerf(perf);
-                        holdingArray[count++] = h;
-                    }
+                String id = holding["id"].as<String>();
+                String name = holding["name"].as<String>();
+                float purchasePrice = holding["priceStart"].as<float>();
+                float purchaseValue = holding["valueStart"].as<float>();
+                float currentPrice = holding["priceNow"].as<float>();
+                float currentValue = holding["valueNow"].as<float>();
+                float shares = holding["shares"].as<float>();
+                float perf = holding["perf"].as<float>();
+                String currency = holding["currency"].as<String>();
+                if (currentValue > 0) {
+                    ParqetHoldingDataModel h = ParqetHoldingDataModel();
+                    h.setId(id);
+                    h.setName(name);
+                    h.setPurchasePrice(purchasePrice);
+                    h.setPurchaseValue(purchaseValue);
+                    h.setCurrentPrice(currentPrice);
+                    h.setCurrentValue(currentValue);
+                    h.setShares(shares);
+                    h.setCurrency(currency);
+                    h.setPerf(perf);
+                    holdingArray[count++] = h;
                 }
             }
             // Add total
