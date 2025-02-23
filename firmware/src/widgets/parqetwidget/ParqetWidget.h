@@ -54,6 +54,8 @@ public:
 
 private:
     String getTimeframe();
+    String getPerfMeasure();
+    String getPerfChartMeasure();
     void updatePortfolio();
     void processResponse(int httpCode, const String &response);
     void updatePortfolioChart();

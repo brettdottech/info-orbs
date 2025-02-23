@@ -107,7 +107,27 @@ void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 String ParqetWidget::getTimeframe() {
-    return m_modes[m_curMode];
+    if (m_curMode < PARQET_MODE_COUNT) {
+        return m_modes[m_curMode];
+    } else {
+        return m_modes[0];
+    }
+}
+
+String ParqetWidget::getPerfMeasure() {
+    if (m_curPerfMeasure < PARQET_PERF_COUNT) {
+        return m_perfMeasures[m_curPerfMeasure];
+    } else {
+        return m_perfMeasures[0];
+    }
+}
+
+String ParqetWidget::getPerfChartMeasure() {
+    if (m_curPerfChartMeasure < PARQET_PERF_CHART_COUNT) {
+        return m_perfChartMeasures[m_curPerfChartMeasure];
+    } else {
+        return m_perfChartMeasures[0];
+    }
 }
 
 ParqetDataModel ParqetWidget::getPortfolio() {
@@ -121,7 +141,7 @@ void ParqetWidget::updatePortfolio() {
     }
     Serial.printf("Parqet: Update Portfolio %s\n", m_portfolioId.c_str());
     String httpRequestAddress = String(m_parquetProxyUrl.c_str());
-    httpRequestAddress += "?id=" + String(m_portfolioId.c_str()) + "&timeframe=" + getTimeframe() + "&perf=" + m_perfMeasures[m_curPerfMeasure] + "&perfChart=" + m_perfChartMeasures[m_curPerfChartMeasure];
+    httpRequestAddress += "?id=" + String(m_portfolioId.c_str()) + "&timeframe=" + getTimeframe() + "&perf=" + getPerfMeasure() + "&perfChart=" + getPerfChartMeasure();
 
     auto task = TaskFactory::createHttpGetTask(
         httpRequestAddress, [this](int httpCode, const String &response) {
