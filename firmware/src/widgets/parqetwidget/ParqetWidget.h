@@ -58,8 +58,6 @@ private:
     String getPerfChartMeasure();
     void updatePortfolio();
     void processResponse(int httpCode, const String &response);
-    void updatePortfolioChart();
-    void processResponseChart(int httpCode, const String &response);
     void displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor);
     ParqetDataModel getPortfolio();
     void clearScreen(int8_t displayIndex, int32_t background);
