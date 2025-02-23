@@ -96,7 +96,7 @@ private:
     int m_showValues = 0; // Show current price (0) or value in portfolio (1)
 
     std::string m_portfolioId = PARQET_PORTFOLIO_ID;
-    std::string m_parquetProxyUrl = PARQET_PROXY_URL;
+    std::string m_proxyUrl = PARQET_PROXY_URL;
     ParqetDataModel m_portfolio;
     int m_holdingsDisplayFrom = 0;
     boolean m_changed = false;

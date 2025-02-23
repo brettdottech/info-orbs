@@ -19,7 +19,7 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, "Show total portfolio value", true);
     String optPriceVal[] = {"Show current price", "Show current value"};
     m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks", true);
-    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_parquetProxyUrl, 75, "ParqetProxy URL", true);
+    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, "ParqetProxy URL", true);
     m_curMode = m_defaultMode;
     m_curPerfMeasure = m_defaultPerfMeasure;
     m_curPerfChartMeasure = m_defaultPerfChartMeasure;
@@ -136,11 +136,11 @@ ParqetDataModel ParqetWidget::getPortfolio() {
 
 void ParqetWidget::updatePortfolio() {
     PARQET_DEBUG_PRINT_MEM("Begin .updatePortfolio()");
-    if (m_portfolioId.empty() || m_parquetProxyUrl.empty()) {
+    if (m_portfolioId.empty() || m_proxyUrl.empty()) {
         return;
     }
     Serial.printf("Parqet: Update Portfolio %s\n", m_portfolioId.c_str());
-    String httpRequestAddress = String(m_parquetProxyUrl.c_str());
+    String httpRequestAddress = String(m_proxyUrl.c_str());
     httpRequestAddress += "?id=" + String(m_portfolioId.c_str()) + "&timeframe=" + getTimeframe() + "&perf=" + getPerfMeasure() + "&perfChart=" + getPerfChartMeasure();
 
     auto task = TaskFactory::createHttpGetTask(
@@ -200,7 +200,7 @@ void ParqetWidget::processResponse(int httpCode, const String &response) {
                     h.setCurrentValue(currentValue);
                     h.setShares(shares);
                     h.setCurrency(currency);
-                    h.setPerf(perf);
+                    h.setPerformance(perf);
                     holdingArray[count++] = h;
                 }
             }
@@ -214,7 +214,7 @@ void ParqetWidget::processResponse(int httpCode, const String &response) {
                 h.setPurchaseValue(perf["valueStart"].as<float>());
                 h.setCurrentPrice(perf["valueNow"].as<float>());
                 h.setCurrentValue(perf["valueNow"].as<float>());
-                h.setPerf(perf["perf"].as<float>());
+                h.setPerformance(perf["perf"].as<float>());
                 h.setShares(1);
                 // AFAIK, the whole portfolio is shown in the same currency.
                 // To avoid another HTTP request, we just use the currency of the first holding
@@ -367,9 +367,9 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     }
 
     uint32_t stockColor = TFT_DARKGREY;
-    if (stock.getPerf() < 0) {
+    if (stock.getPerformance() < 0) {
         stockColor = TFT_RED;
-    } else if (stock.getPerf() > 0) {
+    } else if (stock.getPerformance() > 0) {
         stockColor = TFT_DARKGREEN;
     }
 
@@ -377,7 +377,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     m_manager.fillRect(0, 80, ScreenWidth, 5, stockColor);
     m_manager.fillRect(0, 176, ScreenWidth, 5, stockColor);
     m_manager.drawArc(120, 120, 120, 115, 0, 360, stockColor, backgroundColor);
-    m_manager.drawString(stock.getPerf(2) + "%", ScreenCenterX, 205, 22, Align::MiddleCenter);
+    m_manager.drawString(stock.getPerformance(2) + "%", ScreenCenterX, 205, 22, Align::MiddleCenter);
 }
 
 String ParqetWidget::getName() {
