@@ -35,6 +35,14 @@
 #define PARQET_PERF_CHART_COUNT 4
 #define PARQET_MAX_STOCKNAME_LINES 3
 
+#ifndef PARQET_PORTFOLIO_ID
+    #define PARQET_PORTFOLIO_ID ""
+#endif
+
+#ifndef PARQET_PROXY_URL
+    #define PARQET_PROXY_URL "https://parqet-proxy.ce-data.net/proxy"
+#endif
+
 class ParqetWidget : public Widget {
 public:
     ParqetWidget(ScreenManager &manager, ConfigManager &config);
@@ -85,12 +93,8 @@ private:
     String m_overrideTotalChartToday = "1w"; // Show this chart for "today" to have a chart there as well, set to empty string to disable
     int m_showValues = 0; // Show current price (0) or value in portfolio (1)
 
-#ifdef PARQET_PORTFOLIO_ID
     std::string m_portfolioId = PARQET_PORTFOLIO_ID;
-#else
-    std::string m_portfolioId = "";
-#endif
-    std::string m_parquetProxyUrl = "https://parqet-proxy.ce-data.net/proxy";
+    std::string m_parquetProxyUrl = PARQET_PROXY_URL;
     ParqetDataModel m_portfolio;
     int m_holdingsDisplayFrom = 0;
     boolean m_changed = false;
