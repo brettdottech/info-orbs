@@ -9,28 +9,28 @@ class ParqetHoldingDataModel {
 public:
     ParqetHoldingDataModel();
 
-    void setId(String id);
-    void setName(String name);
+    void setId(const String &id);
+    void setName(const String &name);
     void setPurchasePrice(float purchasePrice);
     void setPurchaseValue(float purchaseValue);
     void setCurrentPrice(float currentPrice);
     void setCurrentValue(float currentValue);
     void setShares(float shares);
-    void setCurrency(String currency);
+    void setCurrency(const String &currency);
     void setPerformance(float perf);
 
-    String getId();
-    String getName();
-    String getPurchasePrice(int8_t digits);
-    String getPurchaseValue(int8_t digits);
-    float getCurrentPrice();
-    String getCurrentPrice(int8_t digits);
-    float getCurrentValue();
-    String getCurrentValue(int8_t digits);
-    String getShares(int8_t digits);
-    String getCurrency();
-    float getPerformance();
-    String getPerformance(int8_t digits);
+    String getId() const;
+    String getName() const;
+    String getPurchasePrice(int8_t digits) const;
+    String getPurchaseValue(int8_t digits) const;
+    float getCurrentPrice() const;
+    String getCurrentPrice(int8_t digits) const;
+    float getCurrentValue() const;
+    String getCurrentValue(int8_t digits) const;
+    String getShares(int8_t digits) const;
+    String getCurrency() const;
+    float getPerformance() const;
+    String getPerformance(int8_t digits) const;
 
 private:
     String m_id = "";
