@@ -27,7 +27,7 @@ public:
     static String *getAllLanguages();
 
     static void loadExtraTranslations(const String &extraName);
-    static String get(const String &key);
+    static const char *get(const String &key);
 
     template <typename... Args>
     static String get(const String &key, Args... args) {
@@ -39,8 +39,9 @@ public:
 private:
     static String s_allLanguages[];
     static int s_languageId;
-    static std::map<String, String> s_translations;
+    static std::map<String, const char *> s_translations;
 
+    static void clearTranslations();
     static bool loadFile(const String &filename);
     static bool loadFile(int langId);
 

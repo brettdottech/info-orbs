@@ -1,1 +1,2 @@
 parqet.name=Parqet
+parqet.enter_portfolio_id=Portfolio ID (must be set to public!)

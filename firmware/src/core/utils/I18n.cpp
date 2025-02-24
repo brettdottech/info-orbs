@@ -2,19 +2,26 @@
 
 #include <ArduinoLog.h>
 #include <LittleFS.h>
+#include <cstring> // For strdup and free
 
 String I18n::s_allLanguages[] = ALL_LANGUAGES;
-std::map<String, String> I18n::s_translations;
+std::map<String, const char *> I18n::s_translations;
 int I18n::s_languageId = DEFAULT_LANGUAGE;
 
 void I18n::setLanguageId(const int langId) {
+    clearTranslations(); // Clear previous translations
     s_languageId = langId;
     if (s_languageId != DEFAULT_LANGUAGE) {
-        // Load default translations (fallback)
-        loadFile(DEFAULT_LANGUAGE);
+        loadFile(DEFAULT_LANGUAGE); // Fallback translations
     }
-    // Load actual language file
-    loadFile(langId);
+    loadFile(langId); // Load selected language
+}
+
+void I18n::clearTranslations() {
+    for (auto &entry : s_translations) {
+        free((void *) entry.second); // Free allocated memory
+    }
+    s_translations.clear();
 }
 
 String I18n::getLanguageString(const int langId) {
@@ -69,7 +76,13 @@ bool I18n::loadFile(const String &filename) {
             String value = line.substring(sepIndex + 1);
             key.trim();
             value.trim();
-            s_translations[key] = value;
+            // Free existing value if key already exists
+            if (s_translations.count(key)) {
+                free((void *) s_translations[key]);
+            }
+
+            // Store as const char*
+            s_translations[key] = strdup(value.c_str());
         }
     }
     file.close();
@@ -77,11 +90,11 @@ bool I18n::loadFile(const String &filename) {
     return true;
 }
 
-String I18n::get(const String &key) {
-    if (s_translations.find(key) != s_translations.end()) {
+const char *I18n::get(const String &key) {
+    if (s_translations.count(key)) {
         return s_translations[key];
     }
-    return key;
+    return key.c_str();
 }
 
 void I18n::replacePlaceholder(String &str, int index, const String &value) {

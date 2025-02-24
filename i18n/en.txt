@@ -4,3 +4,4 @@ by=by
 brett.tech=brett.tech
 version=Version \1
 loading_data=Loading data:
+enable_widget=Enable Widget

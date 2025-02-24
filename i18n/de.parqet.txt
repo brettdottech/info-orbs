@@ -1,0 +1,2 @@
+parqet.name=Parqet
+parqet.enter_portfolio_id=Portfolio ID (muss auf öffentlich stehen!)

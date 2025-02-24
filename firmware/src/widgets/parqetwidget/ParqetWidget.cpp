@@ -9,8 +9,10 @@
 
 ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
-    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, "Enable Widget");
-    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
+    // Load widget specific translations
+    I18n::loadExtraTranslations(ParqetWidget::getName());
+    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, I18n::get("enable_widget"));
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, I18n::get("parqet.enter_portfolio_id"));
     m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, "Default timeframe (you can change timeframes by medium pressing the middle button)", true);
     m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, m_perfMeasures, PARQET_PERF_COUNT, "Performance measure", true);
     m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, m_perfChartMeasures, PARQET_PERF_CHART_COUNT, "Chart measure", true);

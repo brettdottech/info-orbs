@@ -4,3 +4,4 @@ by=von
 brett.tech=brett.tech
 version=Version \1
 loading_data=Lade Daten:
+enable_widget=Widget aktivieren
