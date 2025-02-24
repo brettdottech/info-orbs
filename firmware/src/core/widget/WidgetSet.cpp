@@ -11,9 +11,8 @@ void WidgetSet::add(Widget *widget) {
     m_widgets[m_widgetCount] = widget;
     m_widgets[m_widgetCount]->setup();
     m_widgetCount++;
-    if (!widget->getName().isEmpty()) {
-        I18n::loadExtraTranslations(widget->getName());
-    }
+    // Load widget specific translations
+    I18n::loadExtraTranslations(widget->getName());
 }
 
 Widget **WidgetSet::getAllWidgets() {

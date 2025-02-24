@@ -16,6 +16,9 @@ String I18n::getLanguage() {
 }
 
 void I18n::loadExtraTranslations(const String &suffix) {
+    if (suffix.isEmpty() == 0) {
+        return;
+    }
     auto lower = suffix;
     lower.toLowerCase();
     loadFile(s_language + "." + lower, true);
