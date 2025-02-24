@@ -1,7 +1,21 @@
 welcome=Willkommen
-infoorbs=InfoOrbs
+infoOrbs=InfoOrbs
 by=von
 brett.tech=brett.tech
 version=Version \1
-loading_data=Lade Daten:
-enable_widget=Widget aktivieren
+loadingData=Lade Daten:
+enableWidget=Widget aktivieren
+timezoneLoc=Zeitzone, verwende eine aus <a href='https://timezonedb.com/time-zones' target='blank'>dieser Liste</a>
+language=Sprache
+widgetCycleDelay=Widgets automatisch alle X Sekunden wechseln, 0 zum Deaktivieren
+ntpServer=NTP-Server
+orbRotation=Orb-Drehung
+orbRotation.0=Keine Drehung
+orbRotation.1=90° im Uhrzeigersinn
+orbRotation.2=180° drehen
+orbRotation.3=270° im Uhrzeigersinn
+nightmode=Nachtmodus aktivieren
+tftBrightness=TFT-Helligkeit [0-255]
+dimStartHour=Startzeit Nachtmodus [24h-Format]
+dimEndHour=Endzeit Nachtmodus [24h-Format]
+dimBrightness=Helligkeit im Nachtmodus [0-255]

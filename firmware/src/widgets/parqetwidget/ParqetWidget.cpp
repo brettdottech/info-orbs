@@ -11,14 +11,14 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
     // Load widget specific translations
     I18n::loadExtraTranslations(ParqetWidget::getName());
-    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, i18n("enable_widget"));
-    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, i18n("pq.cnf.portfolio_id"));
+    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, i18n("enableWidget"));
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, i18n("pq.cnf.portfolioId"));
     m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, i18n("pq.cnf.mode"), true);
     m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, m_perfMeasures, PARQET_PERF_COUNT, "Performance measure", true);
     m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, m_perfChartMeasures, PARQET_PERF_CHART_COUNT, "Chart measure", true);
     m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, i18n("pq.cnf.clock"), true);
     m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, i18n("pq.cnf.totals"), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, i18n("pq.cnf.total_val"), true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, i18n("pq.cnf.totalVal"), true);
     String optPriceVal[] = {"Show current price", "Show current value"};
     m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, i18n("pq.cnf.values"), true);
     m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, "ParqetProxy URL", true);

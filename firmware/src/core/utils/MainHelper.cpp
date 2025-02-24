@@ -61,22 +61,22 @@ void MainHelper::setupButtons() {
 }
 
 void MainHelper::setupConfig() {
-    s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
+    // Set language here to get i18n strings for the configuration
+    I18n::setLanguageId(s_configManager->getConfigInt("lang", DEFAULT_LANGUAGE));
+    s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, i18n("timezoneLoc"));
     String *optLang = I18n::getAllLanguages();
-    s_configManager->addConfigComboBox("General", "lang", &s_languageId, optLang, LANG_NUM, "Language");
-    s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
-    s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, "NTP server", true);
-    String optRotation[] = {"No rotation", "Rotate 90° clockwise", "Rotate 180°", "Rotate 270° clockwise"};
-    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, 4, "Orb rotation");
-    s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, "Enable Nighttime mode");
-    s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, "TFT Brightness [0-255]", true);
+    s_configManager->addConfigComboBox("General", "lang", &s_languageId, optLang, LANG_NUM, i18n("language"));
+    s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, i18n("widgetCycleDelay"));
+    s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, i18n("ntpServer"), true);
+    String optRotation[] = {i18n("orbRotation.0"), i18n("orbRotation.1"), i18n("orbRotation.2"), i18n("orbRotation.3")};
+    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, 4, i18n("orbRotation"));
+    s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, i18n("nightmode"));
+    s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, i18n("tftBrightness"), true);
     String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
                          "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
-    s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, "Nighttime Start [24h format]", true);
-    s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, "Nighttime End [24h format]", true);
-    s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, "Nighttime Brightness [0-255]", true);
-
-    I18n::setLanguageId(s_languageId);
+    s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, i18n("dimStartHour"), true);
+    s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, i18n("dimEndHour"), true);
+    s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, i18n("dimBrightness"), true);
 }
 
 void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {
@@ -432,7 +432,7 @@ void MainHelper::showWelcome() {
     }
 
     s_screenManager->selectScreen(1);
-    s_screenManager->drawCentreString(I18n::get("infoorbs"), ScreenCenterX, ScreenCenterY - 50, 22);
+    s_screenManager->drawCentreString(I18n::get("infoOrbs"), ScreenCenterX, ScreenCenterY - 50, 22);
     s_screenManager->drawCentreString(I18n::get("by"), ScreenCenterX, ScreenCenterY - 5, 22);
     s_screenManager->drawCentreString(I18n::get("brett.tech"), ScreenCenterX, ScreenCenterY + 30, 22);
     s_screenManager->setFontColor(TFT_RED);
@@ -507,4 +507,8 @@ void MainHelper::watchdogInit() {
 
 void MainHelper::watchdogReset() {
     esp_task_wdt_reset();
+}
+
+const char *MainHelper::i18n(const String &key) {
+    return I18n::get(key);
 }

@@ -80,7 +80,8 @@ public:
     static void watchdogReset();
 
     static void updateBrightnessByTime(uint8_t hour24);
-    static void setupI18n();
+
+    static const char *i18n(const String &key);
 };
 
 #endif

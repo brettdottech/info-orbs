@@ -91,7 +91,7 @@ void WidgetSet::showCenteredLine(int screen, const String &text) {
 }
 
 void WidgetSet::showLoading() {
-    showCenteredLine(3, I18n::get("loading_data"));
+    showCenteredLine(3, I18n::get("loadingData"));
 }
 
 void WidgetSet::updateAll() {

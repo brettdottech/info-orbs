@@ -92,9 +92,12 @@ bool I18n::loadFile(const String &filename) {
 
 const char *I18n::get(const String &key) {
     if (s_translations.count(key)) {
-        return s_translations[key];
+        const auto val = s_translations[key];
+        Log.traceln("Translation found: %s -> %s", key.c_str(), val);
+        return val;
     }
-    return key.c_str();
+    Log.warningln("Translation not found: %s", key.c_str());
+    return "@missingTranslation@";
 }
 
 void I18n::replacePlaceholder(String &str, int index, const String &value) {
