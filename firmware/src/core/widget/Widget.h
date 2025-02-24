@@ -18,6 +18,7 @@ public:
     virtual String getName() = 0;
     void setBusy(bool busy);
     bool isEnabled();
+    static const char *i18n(const String &key);
 
 protected:
     ScreenManager &m_manager;

@@ -11,16 +11,16 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
     // Load widget specific translations
     I18n::loadExtraTranslations(ParqetWidget::getName());
-    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, I18n::get("enable_widget"));
-    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, I18n::get("parqet.enter_portfolio_id"));
-    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, "Default timeframe (you can change timeframes by medium pressing the middle button)", true);
+    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, i18n("enable_widget"));
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, i18n("pq.cnf.portfolio_id"));
+    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, i18n("pq.cnf.mode"), true);
     m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, m_perfMeasures, PARQET_PERF_COUNT, "Performance measure", true);
     m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, m_perfChartMeasures, PARQET_PERF_CHART_COUNT, "Chart measure", true);
-    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, "Show clock on first screen", true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, "Show totals screen", true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, "Show total portfolio value", true);
+    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, i18n("pq.cnf.clock"), true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, i18n("pq.cnf.totals"), true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, i18n("pq.cnf.total_val"), true);
     String optPriceVal[] = {"Show current price", "Show current value"};
-    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks", true);
+    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, i18n("pq.cnf.values"), true);
     m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, "ParqetProxy URL", true);
     m_curMode = m_defaultMode;
     m_curPerfMeasure = m_defaultPerfMeasure;
@@ -292,7 +292,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
             m_manager.drawString(stock.getCurrentPrice(2), ScreenCenterX, 58, 26, Align::MiddleCenter);
         }
     } else {
-        m_manager.drawString("Portfolio", ScreenCenterX, 58, 26, Align::MiddleCenter);
+        m_manager.drawString(i18n("pq.portfolio"), ScreenCenterX, 58, 26, Align::MiddleCenter);
     }
 
     if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() >= 7) {

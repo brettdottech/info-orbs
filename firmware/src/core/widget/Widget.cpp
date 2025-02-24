@@ -13,3 +13,7 @@ void Widget::setBusy(bool busy) {
 bool Widget::isEnabled() {
     return m_enabled;
 }
+
+const char *Widget::i18n(const String &key) {
+    return I18n::get(key);
+}

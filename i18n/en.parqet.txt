@@ -1,2 +1,8 @@
-parqet.name=Parqet
-parqet.enter_portfolio_id=Portfolio ID (must be set to public!)
+pq.portfolio=Portfolio
+pq.total=T O T A L
+pq.cnf.portfolio_id=Portfolio ID (must be set to public!)
+pq.cnf.mode=Default timeframe (you can change timeframes by medium pressing the middle button)
+pq.cnf.clock=Show clock on first screen
+pq.cnf.totals=Show totals screen
+pq.cnf.total_val=Show total portfolio value
+pq.cnf.values=Show price or value for stocks
