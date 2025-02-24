@@ -9,14 +9,22 @@
     #define I18N_DIR "/i18n/"
 #endif
 
-#ifndef DEFAULT_LANGUAGE
-    #define DEFAULT_LANGUAGE "en"
-#endif
+#define ALL_LANGUAGES {"en", "de", "fr"}
+
+enum Language {
+    LANG_EN = 0,
+    LANG_DE,
+    LANG_FR,
+    LANG_NUM
+};
+
+#define DEFAULT_LANGUAGE LANG_EN
 
 class I18n {
 public:
-    static void setLanguage(const String &language);
-    static String getLanguage();
+    static void setLanguageId(int langId);
+    static String getLanguageString(int langId);
+    static String *getAllLanguages();
 
     static void loadExtraTranslations(const String &extraName);
     static String get(const String &key);
@@ -29,10 +37,12 @@ public:
     }
 
 private:
-    static String s_language;
+    static String s_allLanguages[];
+    static int s_languageId;
     static std::map<String, String> s_translations;
 
-    static bool loadFile(const String &filename, bool clear = false);
+    static bool loadFile(const String &filename);
+    static bool loadFile(int langId);
 
     static void replacePlaceholder(String &str, int index, const String &value);
 

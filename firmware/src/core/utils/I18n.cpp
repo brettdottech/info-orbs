@@ -3,38 +3,50 @@
 #include <ArduinoLog.h>
 #include <LittleFS.h>
 
+String I18n::s_allLanguages[] = ALL_LANGUAGES;
 std::map<String, String> I18n::s_translations;
-String I18n::s_language = DEFAULT_LANGUAGE;
+int I18n::s_languageId = DEFAULT_LANGUAGE;
 
-void I18n::setLanguage(const String &lang) {
-    s_language = lang;
-    if (s_language != DEFAULT_LANGUAGE) {
+void I18n::setLanguageId(const int langId) {
+    s_languageId = langId;
+    if (s_languageId != DEFAULT_LANGUAGE) {
         // Load default translations (fallback)
         loadFile(DEFAULT_LANGUAGE);
     }
     // Load actual language file
-    loadFile(lang);
+    loadFile(langId);
 }
 
-String I18n::getLanguage() {
-    return s_language;
+String I18n::getLanguageString(const int langId) {
+    if (langId >= 0 && langId < LANG_NUM) {
+        return s_allLanguages[langId];
+    }
+    return "invalid";
+}
+
+String *I18n::getAllLanguages() {
+    return s_allLanguages;
 }
 
 void I18n::loadExtraTranslations(const String &extraName) {
-    if (extraName.isEmpty() == 0) {
+    if (extraName.isEmpty()) {
         return;
     }
     // Convert Widget name to lowercase for file name
     auto lowercaseName = extraName;
     lowercaseName.toLowerCase();
-    if (s_language != DEFAULT_LANGUAGE) {
+    if (s_languageId != DEFAULT_LANGUAGE) {
         // Load default translations (fallback)
-        loadFile(String(DEFAULT_LANGUAGE) + "." + lowercaseName);
+        loadFile(getLanguageString(DEFAULT_LANGUAGE) + "." + lowercaseName);
     }
-    loadFile(s_language + "." + lowercaseName);
+    loadFile(getLanguageString(s_languageId) + "." + lowercaseName);
 }
 
-bool I18n::loadFile(const String &filename, const bool clear) {
+bool I18n::loadFile(const int langId) {
+    return loadFile(getLanguageString(langId));
+}
+
+bool I18n::loadFile(const String &filename) {
     if (filename.isEmpty()) {
         return false;
     }
@@ -43,9 +55,6 @@ bool I18n::loadFile(const String &filename, const bool clear) {
     if (!file) {
         Log.warningln("Failed to open language file %s", fullName.c_str());
         return false;
-    }
-    if (clear) {
-        s_translations.clear();
     }
     while (file.available()) {
         String line = file.readStringUntil('\n');

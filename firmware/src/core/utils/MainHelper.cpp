@@ -23,6 +23,7 @@ static bool s_nightMode = DIM_ENABLED;
 static int s_dimStartHour = DIM_START_HOUR;
 static int s_dimEndHour = DIM_END_HOUR;
 static int s_dimBrightness = DIM_BRIGHTNESS;
+static int s_languageId = LANG_EN;
 
 void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws) {
     s_wifiManager = wm;
@@ -61,9 +62,10 @@ void MainHelper::setupButtons() {
 
 void MainHelper::setupConfig() {
     s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, "Timezone Location, use one from <a href='https://timezonedb.com/time-zones' target='blank'>this list</a>");
+    String *optLang = I18n::getAllLanguages();
+    s_configManager->addConfigComboBox("General", "lang", &s_languageId, optLang, LANG_NUM, "Language");
     s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, "Automatically cycle widgets every X seconds, set to 0 to disable");
     s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, "NTP server", true);
-
     String optRotation[] = {"No rotation", "Rotate 90° clockwise", "Rotate 180°", "Rotate 270° clockwise"};
     s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, 4, "Orb rotation");
     s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, "Enable Nighttime mode");
@@ -73,6 +75,8 @@ void MainHelper::setupConfig() {
     s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, "Nighttime Start [24h format]", true);
     s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, "Nighttime End [24h format]", true);
     s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, "Nighttime Brightness [0-255]", true);
+
+    I18n::setLanguageId(s_languageId);
 }
 
 void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {
@@ -503,8 +507,4 @@ void MainHelper::watchdogInit() {
 
 void MainHelper::watchdogReset() {
     esp_task_wdt_reset();
-}
-
-void MainHelper::setupI18n() {
-    I18n::setLanguage("en"); // TODO add to GUI
 }

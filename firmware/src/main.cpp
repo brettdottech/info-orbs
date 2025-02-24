@@ -60,7 +60,6 @@ void setup() {
     MainHelper::setupLittleFS();
     MainHelper::setupConfig();
     MainHelper::setupButtons();
-    MainHelper::setupI18n();
     MainHelper::showWelcome();
 
     pinMode(BUSY_PIN, OUTPUT);
