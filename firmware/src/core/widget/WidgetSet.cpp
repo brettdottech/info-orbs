@@ -63,9 +63,10 @@ void WidgetSet::next() {
 }
 
 void WidgetSet::prev() {
-    m_currentWidget--;
-    if (m_currentWidget < 0) {
+    if (m_currentWidget == 0) {
         m_currentWidget = m_widgetCount - 1;
+    } else {
+        m_currentWidget--;
     }
     if (!getCurrent()->isEnabled()) {
         // Recursive call to next()
