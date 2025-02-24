@@ -27,8 +27,16 @@ public:
     static String *getAllLanguages();
 
     static void loadExtraTranslations(const String &extraName);
+
+    // Returning const char* here allows us to use it in ConfigManager.addConfig*()
+    // because it will never go out of scope (as long as the translation is not removed)
     static const char *get(const String &key);
 
+    // Returning String here instead of const char* as it ensures the memory
+    // is managed properly and avoids the risk of accessing invalid memory
+    // from dynamic translations. However, this approach does not allow us to
+    // use it in ConfigManager.addConfig*(), because the String and its
+    // c_str might go out of scope
     template <typename... Args>
     static String get(const String &key, Args... args) {
         String result = get(key);
