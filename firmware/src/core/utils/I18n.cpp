@@ -2,7 +2,6 @@
 
 #include <ArduinoLog.h>
 #include <LittleFS.h>
-#include <MainHelper.h>
 
 std::map<String, String> I18n::s_translations;
 String I18n::s_language = "en";

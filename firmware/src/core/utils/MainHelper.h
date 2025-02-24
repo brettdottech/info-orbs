@@ -47,10 +47,6 @@
     #define WDT_TIMEOUT 60 // Timeout in seconds
 #endif
 
-#ifndef I18N_DIR
-    #define I18N_DIR "/i18n/"
-#endif
-
 class MainHelper {
 public:
     static void init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws);

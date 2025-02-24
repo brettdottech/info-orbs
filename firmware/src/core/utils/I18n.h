@@ -4,6 +4,10 @@
 #include <Arduino.h>
 #include <map>
 
+#ifndef I18N_DIR
+    #define I18N_DIR "/i18n/"
+#endif
+
 class I18n {
 public:
     static void setLanguage(const String &language);
