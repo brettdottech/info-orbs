@@ -1,6 +1,7 @@
 #ifndef I18N_H
 #define I18N_H
 
+#include "config_helper.h"
 #include <Arduino.h>
 #include <map>
 
@@ -8,12 +9,16 @@
     #define I18N_DIR "/i18n/"
 #endif
 
+#ifndef DEFAULT_LANGUAGE
+    #define DEFAULT_LANGUAGE "en"
+#endif
+
 class I18n {
 public:
     static void setLanguage(const String &language);
     static String getLanguage();
 
-    static void loadExtraTranslations(const String &suffix);
+    static void loadExtraTranslations(const String &extraName);
     static String get(const String &key);
 
     template <typename... Args>
@@ -27,7 +32,7 @@ private:
     static String s_language;
     static std::map<String, String> s_translations;
 
-    static bool loadFile(const String &filename, bool append);
+    static bool loadFile(const String &filename, bool clear = false);
 
     static void replacePlaceholder(String &str, int index, const String &value);
 
