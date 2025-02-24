@@ -3,3 +3,4 @@ infoorbs=InfoOrbs
 by=by
 brett.tech=brett.tech
 version=Version \1
+loading_data=Loading data:
