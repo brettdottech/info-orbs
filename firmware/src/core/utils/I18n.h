@@ -6,8 +6,10 @@
 
 class I18n {
 public:
-    static bool load(const char *filename);
+    static void setLanguage(const String &language);
+    static String getLanguage();
 
+    static void loadExtraTranslations(const String &suffix);
     static String get(const String &key);
 
     template <typename... Args>
@@ -18,7 +20,10 @@ public:
     }
 
 private:
-    static std::map<String, String> translations;
+    static String s_language;
+    static std::map<String, String> s_translations;
+
+    static bool loadFile(const String &filename, bool append);
 
     static void replacePlaceholder(String &str, int index, const String &value);
 

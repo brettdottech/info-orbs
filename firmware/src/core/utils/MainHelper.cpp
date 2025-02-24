@@ -506,8 +506,5 @@ void MainHelper::watchdogReset() {
 }
 
 void MainHelper::setupI18n() {
-    String langFile = "i18n/en.txt"; // TODO add to GUI
-    if (I18n::load(langFile.c_str())) {
-        Log.noticeln("Loaded language file: %s", langFile.c_str());
-    }
+    I18n::setLanguage("en"); // TODO add to GUI
 }

@@ -1,16 +1,37 @@
 #include "I18n.h"
+
+#include <ArduinoLog.h>
 #include <LittleFS.h>
+#include <MainHelper.h>
 
-std::map<String, String> I18n::translations;
+std::map<String, String> I18n::s_translations;
+String I18n::s_language = "en";
 
-bool I18n::load(const char *filename) {
-    File file = LittleFS.open(filename, "r");
+void I18n::setLanguage(const String &lang) {
+    s_language = lang;
+    loadFile(lang, false);
+}
+
+String I18n::getLanguage() {
+    return s_language;
+}
+
+void I18n::loadExtraTranslations(const String &suffix) {
+    auto lower = suffix;
+    lower.toLowerCase();
+    loadFile(s_language + "." + lower, true);
+}
+
+bool I18n::loadFile(const String &filename, const bool append) {
+    const String fullName = I18N_DIR + filename + ".txt";
+    File file = LittleFS.open(fullName, "r");
     if (!file) {
-        Serial.println("Failed to open language file");
+        Log.warningln("Failed to open language file %s", fullName.c_str());
         return false;
     }
-
-    translations.clear();
+    if (!append) {
+        s_translations.clear();
+    }
     while (file.available()) {
         String line = file.readStringUntil('\n');
         line.trim();
@@ -24,16 +45,17 @@ bool I18n::load(const char *filename) {
             String value = line.substring(sepIndex + 1);
             key.trim();
             value.trim();
-            translations[key] = value;
+            s_translations[key] = value;
         }
     }
     file.close();
+    Log.noticeln("Loaded language file %s", fullName.c_str());
     return true;
 }
 
 String I18n::get(const String &key) {
-    if (translations.find(key) != translations.end()) {
-        return translations[key];
+    if (s_translations.find(key) != s_translations.end()) {
+        return s_translations[key];
     }
     return key;
 }

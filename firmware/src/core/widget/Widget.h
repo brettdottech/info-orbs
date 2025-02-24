@@ -3,6 +3,7 @@
 
 #include "Button.h"
 #include "ConfigManager.h"
+#include "I18n.h"
 #include "ScreenManager.h"
 #include "config_helper.h"
 

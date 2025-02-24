@@ -11,6 +11,17 @@ void WidgetSet::add(Widget *widget) {
     m_widgets[m_widgetCount] = widget;
     m_widgets[m_widgetCount]->setup();
     m_widgetCount++;
+    if (!widget->getName().isEmpty()) {
+        I18n::loadExtraTranslations(widget->getName());
+    }
+}
+
+Widget **WidgetSet::getAllWidgets() {
+    return m_widgets;
+}
+
+uint8_t WidgetSet::getWidgetCount() const {
+    return m_widgetCount;
 }
 
 void WidgetSet::drawCurrent(bool force) {
@@ -86,7 +97,7 @@ void WidgetSet::showLoading() {
 }
 
 void WidgetSet::updateAll() {
-    for (int8_t i; i < m_widgetCount; i++) {
+    for (uint8_t i = 0; i < m_widgetCount; i++) {
         if (m_widgets[i]->isEnabled()) {
             Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
             showCenteredLine(4, m_widgets[i]->getName());
