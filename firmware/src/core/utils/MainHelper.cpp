@@ -1,10 +1,10 @@
 #include "MainHelper.h"
 #include "LittleFSHelper.h"
+#include "Translations.h"
 #include "config_helper.h"
 #include "icons.h"
 #include <ArduinoLog.h>
 #include <HTTPClient.h>
-#include <Translations.h>
 #include <esp_task_wdt.h>
 
 static Button buttonLeft;
@@ -24,7 +24,7 @@ static bool s_nightMode = DIM_ENABLED;
 static int s_dimStartHour = DIM_START_HOUR;
 static int s_dimEndHour = DIM_END_HOUR;
 static int s_dimBrightness = DIM_BRIGHTNESS;
-static int s_languageId = LANG_EN;
+static int s_languageId = DEFAULT_LANGUAGE;
 
 void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, WidgetSet *ws) {
     s_wifiManager = wm;
@@ -437,6 +437,7 @@ void MainHelper::showWelcome() {
     s_screenManager->drawCentreString(i18n(t_by), ScreenCenterX, ScreenCenterY - 5, 22);
     s_screenManager->drawCentreString(i18n(t_brettTech), ScreenCenterX, ScreenCenterY + 30, 22);
     s_screenManager->setFontColor(TFT_RED);
+    // VERSION is defined in MainHelper.h
     const auto version = String(i18n(t_version)) + " " + String(VERSION);
     s_screenManager->drawCentreString(version, ScreenCenterX, ScreenCenterY + 65, 15);
 

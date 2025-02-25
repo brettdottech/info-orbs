@@ -13,14 +13,6 @@ void WidgetSet::add(Widget *widget) {
     m_widgetCount++;
 }
 
-Widget **WidgetSet::getAllWidgets() {
-    return m_widgets;
-}
-
-uint8_t WidgetSet::getWidgetCount() const {
-    return m_widgetCount;
-}
-
 void WidgetSet::drawCurrent(bool force) {
     if (m_clearScreensOnDrawCurrent) {
         m_screenManager->clearAllScreens();

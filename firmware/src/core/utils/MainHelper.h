@@ -3,7 +3,6 @@
 
 #include "Button.h"
 #include "ConfigManager.h"
-#include "I18n.h"
 #include "OrbsWiFiManager.h"
 #include "ScreenManager.h"
 #include "ShowMemoryUsage.h"

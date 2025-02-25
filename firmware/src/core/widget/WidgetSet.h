@@ -11,8 +11,6 @@ class WidgetSet {
 public:
     WidgetSet(ScreenManager *sm);
     void add(Widget *widget);
-    Widget **getAllWidgets();
-    uint8_t getWidgetCount() const;
     void drawCurrent(bool force = false);
     void updateCurrent();
     Widget *getCurrent();
