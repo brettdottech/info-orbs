@@ -40,10 +40,9 @@
 
 // Not all digits in DSEG7/14 are aligned identically, therefore we need to offset them
 #ifndef CLOCK_DIGITS_OFFSET
-    #define CLOCK_DIGITS_OFFSET                                                                 \
-        {                                                                                       \
-            {0, 0}, {1, -5}, {0, 0}, {1, 0}, {0, -5}, {0, 0}, {0, 0}, {0, -5}, {0, 0}, { 0, 0 } \
-        }
+    #define CLOCK_DIGITS_OFFSET \
+        {                       \
+            {0, 0}, {1, -5}, {0, 0}, {1, 0}, {0, -5}, {0, 0}, {0, 0}, {0, -5}, {0, 0}, {0, 0}}
 // Use zero offset for other fonts (or adjust)
 // #define CLOCK_DIGITS_OFFSET { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 #endif
