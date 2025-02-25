@@ -4,6 +4,7 @@
 #include "Button.h"
 #include "ConfigManager.h"
 #include "ScreenManager.h"
+#include "Translations.h" // include for use by all Widgets
 #include "config_helper.h"
 
 class Widget {

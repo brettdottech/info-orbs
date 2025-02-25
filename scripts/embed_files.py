@@ -6,7 +6,7 @@
 # You do NOT need to run it manually
 ###########################################################################################################
 
-import re
+import re, os.path, glob
 from os.path import basename, join
 from SCons.Script import Import
 
@@ -16,19 +16,22 @@ config_header_path = "firmware/config/config.h"
 # Map macros to directories and their respective files
 # The final filename is constructed as "dir + file" so the dir should end with a "/" unless you know what you are doing
 embed_map = {
-    "USE_CLOCK_NIXIE == NIXIE_NOHOLES": [ # Condition
-        ["images/clock/nixie.no-holes/", # Source directory
-            ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]], # Files
+    "USE_CLOCK_NIXIE == NIXIE_NOHOLES": [  # Condition
+        ["images/clock/nixie.no-holes/",  # Source directory
+         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg",
+          "11.jpg"]],  # Files
     ],
     "USE_CLOCK_NIXIE == NIXIE_HOLES": [
-        ["images/clock/nixie.holes/", 
-            ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"]],
+        ["images/clock/nixie.holes/",
+         ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg",
+          "11.jpg"]],
     ],
 }
 
 Import("env")
 
 board = env.BoardConfig()
+
 
 #################################################### begin copy ####################################################
 # Copied from ~/.platformio/platforms/espressif32/builder/frameworks/_embed_files.py
@@ -43,6 +46,7 @@ def embed_files(files, files_type):
             env.AddPostAction(file_target, revert_original_file)
         env.AppendUnique(PIOBUILDFILES=[env.File(join("$BUILD_DIR", filename))])
 
+
 mcu = board.get("build.mcu", "esp32")
 env.Append(
     BUILDERS=dict(
@@ -56,9 +60,9 @@ env.Append(
                         "--input-target",
                         "binary",
                         "--output-target",
-                        "elf32-littleriscv" if mcu in ("esp32c3","esp32c6") else "elf32-xtensa-le",
+                        "elf32-littleriscv" if mcu in ("esp32c3", "esp32c6") else "elf32-xtensa-le",
                         "--binary-architecture",
-                        "riscv" if mcu in ("esp32c3","esp32c6") else "xtensa",
+                        "riscv" if mcu in ("esp32c3", "esp32c6") else "xtensa",
                         "--rename-section",
                         ".data=.rodata.embedded",
                         "$SOURCE",
@@ -71,6 +75,8 @@ env.Append(
         )
     )
 )
+
+
 ##################################################### end copy #####################################################
 
 # Function to extract macros and their values from a header file
@@ -103,16 +109,19 @@ def extract_macros_with_values(file_path):
         print(f"Warning: Header file '{file_path}' not found.")
     return macros
 
+
 def action():
     # Extract -D flags from BUILD_FLAGS
     build_flags = env.get("BUILD_FLAGS", [])
-    cpp_defines = {flag[2:].split("=")[0].strip(): flag[2:].split("=")[1].strip() if "=" in flag else None for flag in build_flags if flag.startswith("-D")}
+    cpp_defines = {flag[2:].split("=")[0].strip(): flag[2:].split("=")[1].strip() if "=" in flag else None for flag in
+                   build_flags if flag.startswith("-D")}
 
     # Extract macros from the config header file
     header_macros = extract_macros_with_values(config_header_path)
 
     # Combine all macros
     all_macros = {**header_macros, **cpp_defines}
+
     # Uncomment for debugging
     # print("Extracted macros with values:", all_macros)
 
@@ -135,7 +144,10 @@ def action():
     for condition, directories in embed_map.items():
         if evaluate_condition(condition, all_macros):
             for directory, files in directories:
-                to_embed.extend(["../" + directory + file for file in files])
+                matched_files = []
+                for file in files:
+                    matched_files.extend(glob.glob(os.path.join(directory, file)))
+                to_embed.extend(["../" + mfile for mfile in matched_files])
 
     # Update the build environment with embedded files
     if len(to_embed) > 0:
@@ -143,6 +155,7 @@ def action():
         embed_files(to_embed, "embed_files")
     else:
         print("No files selected for embedding.")
+
 
 # I would prefer to use
 # env.AddPreAction("buildprog", action)

@@ -53,9 +53,10 @@ void WidgetSet::next() {
 }
 
 void WidgetSet::prev() {
-    m_currentWidget--;
-    if (m_currentWidget < 0) {
+    if (m_currentWidget == 0) {
         m_currentWidget = m_widgetCount - 1;
+    } else {
+        m_currentWidget--;
     }
     if (!getCurrent()->isEnabled()) {
         // Recursive call to next()
@@ -82,11 +83,11 @@ void WidgetSet::showCenteredLine(int screen, const String &text) {
 }
 
 void WidgetSet::showLoading() {
-    showCenteredLine(3, "Loading data:");
+    showCenteredLine(3, I18n::get(t_loadingData));
 }
 
 void WidgetSet::updateAll() {
-    for (int8_t i; i < m_widgetCount; i++) {
+    for (uint8_t i = 0; i < m_widgetCount; i++) {
         if (m_widgets[i]->isEnabled()) {
             Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
             showCenteredLine(4, m_widgets[i]->getName());

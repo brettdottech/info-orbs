@@ -28,8 +28,8 @@ private:
     ScreenManager *m_screenManager;
     bool m_clearScreensOnDrawCurrent = true;
     Widget *m_widgets[MAX_WIDGETS];
-    int8_t m_widgetCount = 0;
-    int8_t m_currentWidget = 0;
+    uint8_t m_widgetCount = 0;
+    uint8_t m_currentWidget = 0;
 
     bool m_initialized = false;
 

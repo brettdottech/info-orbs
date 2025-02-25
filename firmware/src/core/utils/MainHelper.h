@@ -11,6 +11,8 @@
 #include "git_info.h"
 #include <Arduino.h>
 
+#define VERSION "1.2beta"
+
 // Set defaults if not set in config.h
 #ifndef TFT_BRIGHTNESS
     #define TFT_BRIGHTNESS 255
