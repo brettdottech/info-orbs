@@ -23,6 +23,7 @@ struct OrbConfig {
     String orbvalunit; // value unit
     int orbsize; // font size
     String jsonField; // JSON field to extract
+    int drawscript; //subscribed value is actually the instructions to draw the orb
     std::map<String, String> lastValuesMap; // Store last values for fields
 };
 
