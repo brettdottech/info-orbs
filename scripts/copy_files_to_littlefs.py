@@ -18,11 +18,6 @@ clear_out_dir = True
 # Map macros to directories and their respective files
 # The final filename is constructed as "dir + file" so the dir should end with a "/" unless you know what you are doing
 embed_map = {
-    "CONFIG_H != 0": [  # Always true
-        ["i18n/",  # Source directory
-         ["*.txt"],  # Files
-         0],  # Do not skip parent directories
-    ],
     "USE_CLOCK_CUSTOM > 0": [  # Condition
         ["images/clock/CustomClock0/",  # Source directory
          ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
