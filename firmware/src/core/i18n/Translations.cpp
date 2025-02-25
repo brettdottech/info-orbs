@@ -80,7 +80,7 @@ constexpr Translation t_orbRotation = {
     "Rotation des Orbes" // FR
 };
 
-constexpr Translation t_orbRot[4] = {
+constexpr TranslationMulti<4> t_orbRot = {
     {
         "No rotation", // EN
         "Keine Drehung", // DE
