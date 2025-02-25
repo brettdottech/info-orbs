@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <StreamUtils.h>
+#include <TaskFactory.h>
 
 #include <iomanip>
 
@@ -11,12 +12,17 @@ ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widg
     m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, "Enable Widget");
     m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, "Portfolio ID (must be set to public!)");
     m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, "Default timeframe (you can change timeframes by medium pressing the middle button)", true);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, m_perfMeasures, PARQET_PERF_COUNT, "Performance measure", true);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, m_perfChartMeasures, PARQET_PERF_CHART_COUNT, "Chart measure", true);
     m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, "Show clock on first screen", true);
     m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, "Show totals screen", true);
     m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, "Show total portfolio value", true);
     String optPriceVal[] = {"Show current price", "Show current value"};
     m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, "Show price or value for stocks", true);
+    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, "ParqetProxy URL", true);
     m_curMode = m_defaultMode;
+    m_curPerfMeasure = m_defaultPerfMeasure;
+    m_curPerfChartMeasure = m_defaultPerfChartMeasure;
 }
 
 void ParqetWidget::setup() {
@@ -73,16 +79,11 @@ void ParqetWidget::draw(bool force) {
 
 void ParqetWidget::update(bool force) {
     if (force || m_stockDelayPrev == 0 || (millis() - m_stockDelayPrev) >= m_stockDelay) {
-        setBusy(true);
         Serial.println("Update ParqetPortfolio");
         if (m_everDrawn && m_showClock) {
             displayClock(0, TFT_BLACK, TFT_WHITE, "Updating", TFT_RED);
         }
         updatePortfolio();
-        updatePortfolioChart();
-        m_holdingsDisplayFrom = 0;
-        m_changed = true;
-        setBusy(false);
         m_stockDelayPrev = millis();
     }
 }
@@ -106,7 +107,27 @@ void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 String ParqetWidget::getTimeframe() {
-    return m_modes[m_curMode];
+    if (m_curMode < PARQET_MODE_COUNT) {
+        return m_modes[m_curMode];
+    } else {
+        return m_modes[0];
+    }
+}
+
+String ParqetWidget::getPerfMeasure() {
+    if (m_curPerfMeasure < PARQET_PERF_COUNT) {
+        return m_perfMeasures[m_curPerfMeasure];
+    } else {
+        return m_perfMeasures[0];
+    }
+}
+
+String ParqetWidget::getPerfChartMeasure() {
+    if (m_curPerfChartMeasure < PARQET_PERF_CHART_COUNT) {
+        return m_perfChartMeasures[m_curPerfChartMeasure];
+    } else {
+        return m_perfChartMeasures[0];
+    }
 }
 
 ParqetDataModel ParqetWidget::getPortfolio() {
@@ -115,89 +136,72 @@ ParqetDataModel ParqetWidget::getPortfolio() {
 
 void ParqetWidget::updatePortfolio() {
     PARQET_DEBUG_PRINT_MEM("Begin .updatePortfolio()");
-    String portfolioId = String(m_portfolioId.c_str());
-    if (portfolioId.isEmpty()) {
+    if (m_portfolioId.empty() || m_proxyUrl.empty()) {
         return;
     }
-    Serial.printf("Parqet: Update Portfolio %s\n", portfolioId.c_str());
-    String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble";
-    String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"timeframe\": \"" + getTimeframe() + "\"}";
-    PARQET_DEBUG_PRINT("POST Payload: %s", postPayload.c_str());
-    HTTPClient http;
-    const char *keys[] = {"Transfer-Encoding"};
-    http.collectHeaders(keys, 1);
-    http.begin(httpRequestAddress);
-    PARQET_DEBUG_PRINT_MEM("after http.begin()");
-    http.addHeader("Content-Type", "application/json");
+    Serial.printf("Parqet: Update Portfolio %s\n", m_portfolioId.c_str());
+    String httpRequestAddress = String(m_proxyUrl.c_str());
+    httpRequestAddress += "?id=" + String(m_portfolioId.c_str()) + "&timeframe=" + getTimeframe() + "&perf=" + getPerfMeasure() + "&perfChart=" + getPerfChartMeasure();
 
-    int httpCode = http.POST(postPayload);
-    PARQET_DEBUG_PRINT("HTTP %d, Size %d", httpCode, http.getSize());
+    auto task = TaskFactory::createHttpGetTask(
+        httpRequestAddress, [this](int httpCode, const String &response) {
+            processResponse(httpCode, response);
+        });
+
+    if (!task) {
+        Serial.println("Failed to create parqet task");
+        return;
+    }
+
+    bool success = TaskManager::getInstance()->addTask(std::move(task));
+    if (!success) {
+        Serial.println("Failed to add parqet task");
+        return;
+    }
+}
+
+void ParqetWidget::processResponse(int httpCode, const String &response) {
+    PARQET_DEBUG_PRINT_MEM("start processResponse()");
+    PARQET_DEBUG_PRINT("HTTP %d, Size %d", httpCode, response.length());
 
     // Check for the returning code
     if (httpCode == 200) {
-        Stream &rawStream = http.getStream();
-        PARQET_DEBUG_PRINT_MEM("after getStream()");
-        ChunkDecodingStream decodedStream(rawStream);
-        PARQET_DEBUG_PRINT_MEM("after decodedStream()");
-
-        // Choose the right stream depending on the Transfer-Encoding header
-        // Parqet might send chunked responses
-        Stream &response =
-            http.header("Transfer-Encoding") == "chunked" ? decodedStream : rawStream;
-
         // Parse response
         JsonDocument doc;
-        JsonDocument filter;
-        // Filter the response to save memory
-        filter["holdings"][0]["assetType"] = true;
-        filter["holdings"][0]["currency"] = true;
-        filter["holdings"][0]["asset"] = true;
-        filter["holdings"][0]["sharedAsset"]["name"] = true;
-        filter["holdings"][0]["performance"] = true;
-        filter["holdings"][0]["position"] = true;
-        filter["performance"]["purchaseValueForInterval"] = true;
-        filter["performance"]["portfolioValue"] = true;
 
         PARQET_DEBUG_PRINT_MEM("Parsing portfolio JSON now...");
-        DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
+        DeserializationError error = deserializeJson(doc, response);
         PARQET_DEBUG_PRINT_MEM("after deserializeJson()");
 
         if (!error) {
             JsonArray holdings = doc["holdings"];
             // Initialize a new array (reserver one extra element for totals)
-            ParqetHoldingDataModel *holdingArray = new ParqetHoldingDataModel[holdings.size() + 1];
+            auto *holdingArray = new ParqetHoldingDataModel[holdings.size() + 1];
             PARQET_DEBUG_PRINT_MEM("after new holdingArray");
             int count = 0;
             for (JsonVariant holding : holdings) {
                 String type = holding["assetType"].as<String>();
-                if (type == "security" || type == "crypto") {
-                    // stocks or etf/funds
-                    String id = holding["asset"]["identifier"].as<String>();
-                    String name = holding["sharedAsset"]["name"].as<String>();
-                    float purchasePrice = holding["performance"]["priceAtIntervalStart"].as<float>();
-                    float purchaseValue = holding["performance"]["purchaseValueForInterval"].as<float>();
-                    float currentPrice = holding["position"]["currentPrice"].as<float>();
-                    float currentValue = holding["position"]["currentValue"].as<float>();
-                    float shares = holding["position"]["shares"].as<float>();
-                    bool isSold = holding["position"]["isSold"].as<bool>();
-                    String currency = holding["currency"].as<String>();
-                    if (isSold || currentValue == 0) {
-                        // Serial.printf("Skipping %s, %s\n", name.c_str(), id.c_str());
-                    } else {
-                        // Serial.printf("Name: %s, id: %s, cur: %s, start: %.2f, now: %.2f, curValue: %.2f\n", name.c_str(), id.c_str(), currency.c_str(), purchasePrice, currentPrice, currentValue);
-                        ParqetHoldingDataModel h = ParqetHoldingDataModel();
-                        h.setId(id);
-                        h.setName(name);
-                        h.setPurchasePrice(purchasePrice);
-                        h.setPurchaseValue(purchaseValue);
-                        h.setCurrentPrice(currentPrice);
-                        h.setCurrentValue(currentValue);
-                        h.setShares(shares);
-                        h.setCurrency(currency);
-                        holdingArray[count++] = h;
-                    }
-                } else {
-                    PARQET_DEBUG_PRINT("Invalid type: %s, id: %s", type.c_str(), holding["_id"].as<String>().c_str());
+                String id = holding["id"].as<String>();
+                String name = holding["name"].as<String>();
+                float purchasePrice = holding["priceStart"].as<float>();
+                float purchaseValue = holding["valueStart"].as<float>();
+                float currentPrice = holding["priceNow"].as<float>();
+                float currentValue = holding["valueNow"].as<float>();
+                float shares = holding["shares"].as<float>();
+                float perf = holding["perf"].as<float>();
+                String currency = holding["currency"].as<String>();
+                if (currentValue > 0) {
+                    ParqetHoldingDataModel h = ParqetHoldingDataModel();
+                    h.setId(id);
+                    h.setName(name);
+                    h.setPurchasePrice(purchasePrice);
+                    h.setPurchaseValue(purchaseValue);
+                    h.setCurrentPrice(currentPrice);
+                    h.setCurrentValue(currentValue);
+                    h.setShares(shares);
+                    h.setCurrency(currency);
+                    h.setPerformance(perf);
+                    holdingArray[count++] = h;
                 }
             }
             // Add total
@@ -206,10 +210,11 @@ void ParqetWidget::updatePortfolio() {
                 ParqetHoldingDataModel h = ParqetHoldingDataModel();
                 h.setId("total");
                 h.setName("T O T A L");
-                h.setPurchasePrice(perf["purchaseValueForInterval"].as<float>());
-                h.setPurchaseValue(perf["purchaseValueForInterval"].as<float>());
-                h.setCurrentPrice(perf["portfolioValue"].as<float>());
-                h.setCurrentValue(perf["portfolioValue"].as<float>());
+                h.setPurchasePrice(perf["valueStart"].as<float>());
+                h.setPurchaseValue(perf["valueStart"].as<float>());
+                h.setCurrentPrice(perf["valueNow"].as<float>());
+                h.setCurrentValue(perf["valueNow"].as<float>());
+                h.setPerformance(perf["perf"].as<float>());
                 h.setShares(1);
                 // AFAIK, the whole portfolio is shown in the same currency.
                 // To avoid another HTTP request, we just use the currency of the first holding
@@ -218,89 +223,17 @@ void ParqetWidget::updatePortfolio() {
                 }
                 holdingArray[count++] = h;
             }
+            PARQET_DEBUG_PRINT_MEM("pre setHoldings()");
             m_portfolio.setHoldings(holdingArray, count);
             PARQET_DEBUG_PRINT_MEM("after setHoldings()");
-        } else {
-            // Handle JSON deserialization error
-            Serial.println("deserializeJson() failed");
-            Serial.println(error.c_str());
-        }
-    } else {
-        // Handle HTTP request error
-        Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
-    }
-
-    http.end();
-    PARQET_DEBUG_PRINT_MEM("Parqet portfolio update complete");
-}
-
-void ParqetWidget::updatePortfolioChart() {
-    PARQET_DEBUG_PRINT_MEM("Begin .updatePortfolioChart()");
-    String portfolioId = String(m_portfolioId.c_str());
-    if (portfolioId.isEmpty()) {
-        return;
-    }
-    String timeframe = getTimeframe();
-    Serial.printf("Parqet: Update Portfolio Chart %s\n", portfolioId.c_str());
-    if (!m_showTotalChart || (timeframe == "today" && m_overrideTotalChartToday == "")) {
-        // We don't need a chart -> clear the existing data
-        m_portfolio.clearChartData();
-        return;
-    }
-    String httpRequestAddress = "https://api.parqet.com/v1/portfolios/assemble/charts?resolution=200";
-
-    if (timeframe == "today") {
-        timeframe = m_overrideTotalChartToday;
-    }
-    String postPayload = "{ \"portfolioIds\": [\"" + portfolioId + "\"], \"holdingIds\": [], \"assetTypes\": [], \"perfChartConfig\": [\"u\"], \"timeframe\": \"" + timeframe + "\"}";
-    PARQET_DEBUG_PRINT("POST Payload: %s", postPayload.c_str());
-    HTTPClient http;
-    const char *keys[] = {"Transfer-Encoding"};
-    http.collectHeaders(keys, 1);
-    http.begin(httpRequestAddress);
-    http.addHeader("Content-Type", "application/json");
-
-    int httpCode = http.POST(postPayload);
-    PARQET_DEBUG_PRINT("HTTP %d, Size %d", httpCode, http.getSize());
-
-    // Check for the returning code
-    if (httpCode == 200) {
-        Stream &rawStream = http.getStream();
-        PARQET_DEBUG_PRINT_MEM("after .getStream()");
-        ChunkDecodingStream decodedStream(rawStream);
-        PARQET_DEBUG_PRINT_MEM("after .decodedStream()");
-
-        // Choose the right stream depending on the Transfer-Encoding header
-        // Parqet might send chunked responses
-        Stream &response =
-            http.header("Transfer-Encoding") == "chunked" ? decodedStream : rawStream;
-
-        // Parse response
-        JsonDocument doc;
-        JsonDocument filter;
-        // Filter the response to save memory
-        filter["charts"][0]["values"]["perfHistory"] = true;
-        PARQET_DEBUG_PRINT_MEM("Parsing chart JSON now...");
-        DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));
-        PARQET_DEBUG_PRINT_MEM("after deserializeJson()");
-
-        if (!error) {
-            JsonArray charts = doc["charts"];
-            bool first = true;
-            // Initialize a new array
-            float *chartsArray = new float[charts.size()];
-            int count = 0;
-            for (JsonVariant chart : charts) {
-                if (first) {
-                    // Skip first data point (because the first two will be SOD/EOD of the same date and SOD always has perf==0)
-                    first = false;
-                } else {
-                    float perf = chart["values"]["perfHistory"];
-                    chartsArray[count++] = perf;
-                    // printf("Chart data %d: %.2f\n", count, perf);
-                }
+            JsonArray chart = doc["chart"];
+            float *chartsArray = new float[chart.size()];
+            count = 0;
+            for (JsonVariant val : chart) {
+                chartsArray[count++] = val.as<float>();
             }
             m_portfolio.setChartData(chartsArray, count);
+
         } else {
             // Handle JSON deserialization error
             Serial.println("deserializeJson() failed");
@@ -308,11 +241,12 @@ void ParqetWidget::updatePortfolioChart() {
         }
     } else {
         // Handle HTTP request error
-        Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
+        Serial.printf("HTTP request failed, error: %d\n", httpCode);
     }
 
-    http.end();
-    PARQET_DEBUG_PRINT_MEM("Parqet chart update complete");
+    PARQET_DEBUG_PRINT_MEM("Parqet portfolio update complete");
+    m_holdingsDisplayFrom = 0;
+    m_changed = true;
 }
 
 void ParqetWidget::clearScreen(int8_t displayIndex, int32_t background) {
@@ -433,9 +367,9 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     }
 
     uint32_t stockColor = TFT_DARKGREY;
-    if (stock.getPercentChange() < 0) {
+    if (stock.getPerformance() < 0) {
         stockColor = TFT_RED;
-    } else if (stock.getPercentChange() > 0) {
+    } else if (stock.getPerformance() > 0) {
         stockColor = TFT_DARKGREEN;
     }
 
@@ -443,7 +377,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
     m_manager.fillRect(0, 80, ScreenWidth, 5, stockColor);
     m_manager.fillRect(0, 176, ScreenWidth, 5, stockColor);
     m_manager.drawArc(120, 120, 120, 115, 0, 360, stockColor, backgroundColor);
-    m_manager.drawString(stock.getPercentChange(2) + "%", ScreenCenterX, 205, 22, Align::MiddleCenter);
+    m_manager.drawString(stock.getPerformance(2) + "%", ScreenCenterX, 205, 22, Align::MiddleCenter);
 }
 
 String ParqetWidget::getName() {
