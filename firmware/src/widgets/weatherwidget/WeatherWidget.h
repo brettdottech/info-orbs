@@ -31,6 +31,7 @@ private:
     void configureColors();
     void preProcessResponse(int httpCode, String &response);
     void processResponse(int httpCode, const String &response);
+    void changeLocation();
 
     GlobalTime *m_time;
     int8_t m_mode;
@@ -56,10 +57,19 @@ private:
 
 // This is a hack to support old config.h files that have WEATHER_LOCAION instead of LOCATION.
 #ifndef WEATHER_LOCATION
-    #define WEATHER_LOCATION WEATHER_LOCAION
+    #define WEATHER_LOCATION WEATHER_LOCAION0
 #endif
 
-    std::string m_weatherLocation = WEATHER_LOCATION;
+    std::string  m_weatherLocation0 = WEATHER_LOCATION0;
+    float  m_lat0 = WEATHER_LAT0;
+    float  m_long0 = WEATHER_LON0;
+    std::string  m_weatherLocation1 = WEATHER_LOCATION1;
+    float  m_lat1 = WEATHER_LAT1;
+    float  m_long1 = WEATHER_LON1;
+    std::string  t_weatherLocation = m_weatherLocation0;
+    float  t_lat = m_lat0;
+    float  t_long = m_long0;
+
 
 #ifdef WEATHER_UNITS_METRIC
     int m_weatherUnits = 0;

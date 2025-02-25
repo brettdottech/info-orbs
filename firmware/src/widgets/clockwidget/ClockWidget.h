@@ -6,6 +6,8 @@
 #include "config_helper.h"
 #include "nixie.h"
 
+#define CLOCK_DEBUG
+
 #ifndef CLOCK_NIXIE_COLOR
     #define CLOCK_NIXIE_COLOR 0
 #endif
@@ -63,20 +65,21 @@ struct DigitOffset {
 
 enum class ClockType {
     NORMAL = 0,
-    NIXIE = 1,
-    CUSTOM0 = 2,
-    CUSTOM1 = 3,
-    CUSTOM2 = 4,
-    CUSTOM3 = 5,
-    CUSTOM4 = 6,
-    CUSTOM5 = 7,
-    CUSTOM6 = 8,
-    CUSTOM7 = 9,
-    CUSTOM8 = 10,
-    CUSTOM9 = 11
+    MORPH = 1,
+    NIXIE = 2,
+    CUSTOM0 = 3,
+    CUSTOM1 = 4,
+    CUSTOM2 = 5,
+    CUSTOM3 = 6,
+    CUSTOM4 = 7,
+    CUSTOM5 = 8,
+    CUSTOM6 = 9,
+    CUSTOM7 = 10,
+    CUSTOM8 = 11,
+    CUSTOM9 = 12
 };
 
-#define CLOCK_TYPE_NUM 12
+#define CLOCK_TYPE_NUM 13
 
 class ClockWidget : public Widget {
 public:
@@ -91,6 +94,7 @@ public:
 private:
     void addConfigToManager();
     void changeFormat();
+    void changeZone(int dir);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
@@ -103,6 +107,17 @@ private:
     void changeClockType();
     bool isValidClockType(int clockType);
     bool isCustomClock(int clockType);
+    void displayTZ(uint32_t color);
+	void displayMorphDigit(int orb, const String m_digitlast, const String m_digit, uint32_t color);
+	void drawDisappearRL(int seg, int seq);
+	void drawDisappearLR(int seg, int seq);
+	void drawAppearLR(int seg, int seq);
+	void drawAppearRL(int seg, int seq);
+	void drawAppearBT(int seg, int seq);
+	void drawAppearTB(int seg, int seq);
+	void drawDisappearTB(int seg, int seq);
+	void drawDisappearBT(int seg, int seq);
+	void drawSegment(int seg, uint32_t color);
 
     int m_type = (int) DEFAULT_CLOCK;
 
@@ -112,6 +127,7 @@ private:
     int m_shadowColor = CLOCK_SHADOW_COLOR;
     bool m_shadowing = CLOCK_SHADOWING;
     int m_overrideNixieColor = CLOCK_NIXIE_COLOR;
+    bool m_enableNixie = USE_CLOCK_NIXIE > 0;
 
     // Colors for CustomClocks
     int m_customTickColor[10]{TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE, TFT_WHITE};
@@ -120,6 +136,8 @@ private:
 
     time_t m_unixEpoch;
     int m_timeZoneOffset;
+    int m_timeZone = 0;
+    int m_timeZonePrev = 4;
 
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
     unsigned long m_secondTimer = 2000; // This time is used to refressh/check the clock every second.
@@ -138,7 +156,7 @@ private:
     String m_lastDisplay1Digit{""};
     String m_display2Digit;
     String m_lastDisplay2Digit{""};
-    // Display 3 is :
+    // Display 3 is ':'
     String m_display4Digit;
     String m_lastDisplay4Digit{""};
     String m_display5Digit;
@@ -148,5 +166,52 @@ private:
     String m_lastAmPm{""};
 
     DigitOffset m_digitOffsets[10] = CLOCK_DIGITS_OFFSET;
+
+	// Stuff for Morph Clock
+    int animDelay = 35; // Set the animation speed in ms per step and 5 steps per segment
+    bool m_enableMorph = USE_CLOCK_MORPH;
+//    #define animDelay 35 // Set the animation speed in ms per step and 5 steps per segment
+	// Segment location in format : X , Y, L, W
+	const int segLoc[7][4] = { 
+		{18,0,80,16},      //A
+		{100,10,16,80},    //B
+		{100,96,16,80},    //C
+		{18,170,80,16},    //D
+		{00,96,16,80},     //E
+		{00,10,16,80},     //F
+		{18,84,80,16}};    //G
+
+	// Which segments for each digit
+	const int digits[10][7] = {
+		{1,1,1,1,1,1,0},    //0
+		{0,1,1,0,0,0,0},    //1
+		{1,1,0,1,1,0,1},    //2
+		{1,1,1,1,0,0,1},    //3
+		{0,1,1,0,0,1,1},    //4
+		{1,0,1,1,0,1,1},    //5
+		{1,0,1,1,1,1,1},    //6
+		{1,1,1,0,0,0,0},    //7
+		{1,1,1,1,1,1,1},    //8
+		{1,1,1,1,0,1,1}};   //9
+
+	const int trans_0_2[2][7] = {
+        {0,0,2,0,0,2,3},    //2-0 
+		{4,0,2,4,1,0,4}};   //2-1
+	const int trans_0_3[1][7] = {{0,0,0,0,2,2,3}};   //3-0
+	const int trans_0_5[1][7] = {{0,2,0,0,2,0,3}};   //5-0
+	const int trans_0_9[10][7] = {     //Key is current digit
+		{0,0,0,0,2,0,3},    //9-0
+		{4,0,0,4,4,4,0},    //0-1
+		{5,0,0,5,5,0,5},    //1-2
+		{0,0,6,0,0,0,0},    //2-3
+		{3,0,0,4,0,2,0},    //3-4
+		{5,1,0,5,0,0,0},    //4-5
+		{0,0,0,0,5,0,0},    //5-6
+		{0,6,0,4,4,4,4},    //6-7
+		{0,0,0,5,5,5,5},    //7-8
+		{0,0,0,0,4,0,0}};   //8-9
+	const int trans_0_B[2][7] = {     //Key is current digit
+		{9,7,1,9,9,9,9},    //1-  
+		{9,8,2,9,9,9,9}};   // -1
 };
 #endif // CLOCKWIDGET_H

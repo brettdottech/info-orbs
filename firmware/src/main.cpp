@@ -10,6 +10,7 @@
 #include <ArduinoLog.h>
 
 TFT_eSPI tft = TFT_eSPI();
+TFT_eSprite spr = TFT_eSprite(&tft);
 
 GlobalTime *globalTime{nullptr};
 WifiWidget *wifiWidget{nullptr};
@@ -52,7 +53,7 @@ void setup() {
 
     wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
-    sm = new ScreenManager(tft);
+    sm = new ScreenManager(tft, spr);
     widgetSet = new WidgetSet(sm);
 
     // Pass references to MainHelper
@@ -90,7 +91,7 @@ void loop() {
         MainHelper::checkButtons();
 
         widgetSet->updateCurrent();
-        MainHelper::updateBrightnessByTime(globalTime->getHour24());
+        MainHelper::updateBrightnessByTime(globalTime->getHour24(),globalTime->getMinute());
         widgetSet->drawCurrent();
 
         MainHelper::checkCycleWidgets();
