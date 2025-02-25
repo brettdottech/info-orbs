@@ -3,8 +3,8 @@
 
 #include "Button.h"
 #include "ConfigManager.h"
-#include "I18n.h"
 #include "ScreenManager.h"
+#include "Translations.h" // include for use by all Widgets
 #include "config_helper.h"
 
 class Widget {
@@ -18,7 +18,6 @@ public:
     virtual String getName() = 0;
     void setBusy(bool busy);
     bool isEnabled();
-    static const char *i18n(const String &key);
 
 protected:
     ScreenManager &m_manager;
