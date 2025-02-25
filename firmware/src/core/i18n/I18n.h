@@ -27,7 +27,7 @@ public:
     static String getLanguageString(int langId);
     static String *getAllLanguages();
 
-    static const char *get(Translation(&translations)) {
+    static const char *get(Translation &translations) {
         const char *text = translations[s_languageId];
         if (text == nullptr) {
             text = translations[DEFAULT_LANGUAGE];
@@ -36,7 +36,7 @@ public:
     }
 
     template <size_t N>
-    static const char *get(TranslationMulti<N>(&translations), size_t index) {
+    static const char *get(TranslationMulti<N> &translations, size_t index) {
         if (index >= N) {
             return "@invalidIndex@";
         }
@@ -54,13 +54,13 @@ private:
 };
 
 // I18n helper
-static const char *i18n(Translation(&translations)) {
+static const char *i18n(Translation &translations) {
     return I18n::get(translations);
 }
 
 // I18n helper (with index)
 template <size_t N>
-static const char *i18n(TranslationMulti<N>(&translations), size_t index) {
+static const char *i18n(TranslationMulti<N> &translations, size_t index) {
     return I18n::get(translations, index);
 }
 
