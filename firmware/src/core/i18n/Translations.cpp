@@ -76,19 +76,19 @@ constexpr const char *const t_ntpServer[LANG_NUM] = {
 
 constexpr const char *const t_orbRotation[LANG_NUM] = {
     "Orb rotation", // EN
-    "Orb-Rotation", // DE
+    "Orb-Drehung", // DE
     "Rotation des Orbes" // FR
 };
 
 constexpr const char *const t_orbRot[4][LANG_NUM] = {
     {
         "No rotation", // EN
-        "Keine Rotation", // DE
+        "Keine Drehung", // DE
         "Pas de rotation" // FR
     },
     {
-        "Rotate 90° clockwise", // EN
-        "90° im Uhrzeigersinn", // DE
+        "Rotate 90°", // EN
+        "90° gedreht", // DE
         "Tourné de 90°" // FR
     },
     {
@@ -97,8 +97,8 @@ constexpr const char *const t_orbRot[4][LANG_NUM] = {
         "Tourné de 180°" // FR
     },
     {
-        "Rotate 270° clockwise", // EN
-        "270° im Uhrzeigersinn", // DE
+        "Rotate 270°", // EN
+        "270° gedreht", // DE
         "Tourné de 270°" // FR
     }};
 
