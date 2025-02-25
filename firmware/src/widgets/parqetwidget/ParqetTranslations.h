@@ -5,16 +5,16 @@
 
 // All translation variables should start with "t_"
 
-extern const char *const t_portfolio[LANG_NUM];
-extern const char *const t_total[LANG_NUM];
-extern const char *const t_cnfPortfolioId[LANG_NUM];
-extern const char *const t_cnfMode[LANG_NUM];
-extern const char *const t_cnfPerfMeasure[LANG_NUM];
-extern const char *const t_cnfChartMeasure[LANG_NUM];
-extern const char *const t_cnfClock[LANG_NUM];
-extern const char *const t_cnfTotals[LANG_NUM];
-extern const char *const t_cnfTotalVal[LANG_NUM];
-extern const char *const t_cnfValues[LANG_NUM];
-extern const char *const t_cnfProxyUrl[LANG_NUM];
+extern Translation t_portfolio;
+extern Translation t_total;
+extern Translation t_cnfPortfolioId;
+extern Translation t_cnfMode;
+extern Translation t_cnfPerfMeasure;
+extern Translation t_cnfChartMeasure;
+extern Translation t_cnfClock;
+extern Translation t_cnfTotals;
+extern Translation t_cnfTotalVal;
+extern Translation t_cnfValues;
+extern Translation t_cnfProxyUrl;
 
 #endif // PARQETTRANSLATIONS_H
