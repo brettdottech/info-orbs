@@ -18,6 +18,13 @@ ScreenManager::ScreenManager(TFT_eSPI &tft) : m_tft(tft) {
     m_tft.fillScreen(TFT_WHITE);
     m_tft.setTextDatum(MC_DATUM);
     reset();
+    #ifdef INCLUDE_SCREENSAVER
+        ConfigManager *cm = ConfigManager::getInstance();
+        bool l_smallFont = cm->getConfigBool("SmallFont", false);
+        if (l_smallFont) m_matrix_effect.init(&tft, true, false);
+        else m_matrix_effect.init(&m_tft);
+    #endif
+
 
     // Init TJpg_Decode
     TJpgDec.setSwapBytes(true); // JPEG rendering setup

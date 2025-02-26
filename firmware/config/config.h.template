@@ -15,6 +15,7 @@
 #define INCLUDE_PARQET        // include ParqetWidget
 //#define INCLUDE_WEBDATA       // include WebDataWidget
 //#define INCLUDE_MQTT          // include MQTTWidget
+#define INCLUDE_SCREENSAVER
 
 // NIGHTTIME DIMMING
 //#define DIM_START_HOUR 22  // Dim the screens at this time (24h format)

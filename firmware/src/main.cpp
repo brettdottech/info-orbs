@@ -7,9 +7,11 @@
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
+#include "ScreenSaverwidget/ScreenSaverwidget.h"
 #include <ArduinoLog.h>
 
 TFT_eSPI tft = TFT_eSPI();
+DigitalRainAnimation<TFT_eSPI> matrix_effect = DigitalRainAnimation<TFT_eSPI>();
 
 GlobalTime *globalTime{nullptr};
 WifiWidget *wifiWidget{nullptr};
@@ -40,6 +42,9 @@ void addWidgets() {
 #endif
 #ifdef INCLUDE_MQTT
     widgetSet->add(new MQTTWidget(*sm, *config));
+#endif
+#ifdef INCLUDE_SCREENSAVER
+    widgetSet->add(new ScreenSaverwidget(*sm, *config));
 #endif
 }
 
