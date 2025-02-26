@@ -4,6 +4,7 @@
 #include "GlobalTime.h"
 #include "Widget.h"
 #include "config_helper.h"
+#include "flip.h"
 #include "nixie.h"
 
 #ifndef CLOCK_NIXIE_COLOR
@@ -64,19 +65,20 @@ struct DigitOffset {
 enum class ClockType {
     NORMAL = 0,
     NIXIE = 1,
-    CUSTOM0 = 2,
-    CUSTOM1 = 3,
-    CUSTOM2 = 4,
-    CUSTOM3 = 5,
-    CUSTOM4 = 6,
-    CUSTOM5 = 7,
-    CUSTOM6 = 8,
-    CUSTOM7 = 9,
-    CUSTOM8 = 10,
-    CUSTOM9 = 11
+    FLIP = 2,
+    CUSTOM0 = 3,
+    CUSTOM1 = 4,
+    CUSTOM2 = 5,
+    CUSTOM3 = 6,
+    CUSTOM4 = 7,
+    CUSTOM5 = 8,
+    CUSTOM6 = 9,
+    CUSTOM7 = 10,
+    CUSTOM8 = 11,
+    CUSTOM9 = 12
 };
 
-#define CLOCK_TYPE_NUM 12
+#define CLOCK_TYPE_NUM 13
 
 class ClockWidget : public Widget {
 public:
@@ -98,8 +100,10 @@ private:
     DigitOffset getOffsetForDigit(const String &digit);
     void displayDigitImage(int displayIndex, const String &digit);
     void displayNixie(int displayIndex, uint8_t index);
+    void displayFlip(int displayIndex, uint8_t index);
     void displayCustom(int displayIndex, uint8_t clockNumber, uint8_t index);
     void displayClockGraphics(int displayIndex, const byte *clockArray[12][2], uint8_t index, int colorOverride);
+    void displayFlipClockGraphics(int displayIndex, const byte *clockArray[80][2], uint8_t index, int colorOverride);
     void changeClockType();
     bool isValidClockType(int clockType);
     bool isCustomClock(int clockType);
@@ -146,6 +150,13 @@ private:
 
     String m_amPm;
     String m_lastAmPm{""};
+
+    int animIndex;
+    bool flipanimation = false;
+    int flipindex;
+    bool colonanimation = false;
+    int colonindex;
+    int animcolon;
 
     DigitOffset m_digitOffsets[10] = CLOCK_DIGITS_OFFSET;
 };
