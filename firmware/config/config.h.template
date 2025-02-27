@@ -93,11 +93,12 @@
 #define TFT_MOSI 17
 #define TFT_MISO -1
 #define TFT_SCLK 23
-#define TFT_CS 15
+#define TFT_CS -1
 #define TFT_DC 19
 #define TFT_RST 18
 
 #define SCREEN_1_CS 13
+// #define SCREEN_1_CS 0 // If doing breakpoint debugging set to a pin that is not 12, 13, 14, or 15
 #define SCREEN_2_CS 33
 #define SCREEN_3_CS 32
 #define SCREEN_4_CS 25
@@ -106,6 +107,7 @@
 #define BUTTON_LEFT_PIN 26
 #define BUTTON_MIDDLE_PIN 27
 #define BUTTON_RIGHT_PIN 14
+// #define BUTTON_RIGHT_PIN 5 // If doing breakpoint debugging set to a pin that is not 12, 13, 14, or 15 
 
 #define BUTTON_DEBOUNCE_TIME 35        // Debounce buttons for X ms
 #define BUTTON_MEDIUM_PRESS_TIME 500    // Medium press is registered after X ms
