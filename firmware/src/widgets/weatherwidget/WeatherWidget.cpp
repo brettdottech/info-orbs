@@ -10,18 +10,21 @@
 
 #include "WeatherWidget.h"
 #include "TaskFactory.h"
+#include "WeatherTranslations.h"
 #include "icons.h"
 #include <ArduinoJson.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
-    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
-    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
-    String optUnits[] = {"Celsius", "Fahrenheit"};
-    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
-    String optModes[] = {"Light", "Dark"};
-    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
-    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, "Switch between Highs and Lows every X seconds, set to 0 to disable", true);
+    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, i18n(t_enableWidget));
+    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, i18n(t_weatherLocation));
+    String optUnits[2];
+    int optUnitsSize = i18nMultiStr(t_temperatureUnits, optUnits);
+    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, optUnitsSize, i18n(t_temperatureUnit), true);
+    String optModes[2];
+    int optModesSize = i18nMultiStr(t_screenModes, optModes);
+    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, optModesSize, i18n(t_screenMode), true);
+    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, i18n(t_weatherCycleHL), true);
     Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }
