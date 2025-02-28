@@ -45,13 +45,13 @@ void ClockWidget::addConfigToManager() {
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
         // We allocate some char buffers here (for the WebPortal GUI) that will never be released
         // but it should not be a problem because this is only done once after boot
-        const char *enKey = strdup((String("clkCust") + " " + String(i) + "en").c_str());
+        const char *enKey = strdup((String("clkCust") + String(i) + "en").c_str());
         const char *enDesc = strdup((i18nStr(t_clockCustom) + " " + String(i) + ": " + i18n(t_clockEnable)).c_str());
         m_config.addConfigBool("ClockWidget", enKey, &m_customEnabled[i], enDesc, true);
-        const char *tickKey = strdup((String("clkCust") + " " + String(i) + "tckCol").c_str());
+        const char *tickKey = strdup((String("clkCust") + String(i) + "tckCol").c_str());
         const char *tickDesc = strdup((i18nStr(t_clockCustom) + " " + String(i) + ": " + i18nStr(t_clockSecondsTickColor)).c_str());
         m_config.addConfigColor("ClockWidget", tickKey, &m_customTickColor[i], tickDesc, true);
-        const char *overrideKey = strdup((String("clkCust") + " " + String(i) + "ovrCol").c_str());
+        const char *overrideKey = strdup((String("clkCust") + String(i) + "ovrCol").c_str());
         const char *overrideDesc = strdup((i18nStr(t_clockCustom) + " " + String(i) + ": " + i18nStr(t_clockOverrideColor)).c_str());
         m_config.addConfigColor("ClockWidget", overrideKey, &m_customOverrideColor[i], overrideDesc, true);
     }
