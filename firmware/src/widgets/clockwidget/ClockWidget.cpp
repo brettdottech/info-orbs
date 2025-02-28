@@ -1,4 +1,5 @@
 #include "ClockWidget.h"
+#include "ClockTranslations.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Always enabled, do not add a config setting for it
@@ -10,19 +11,19 @@ ClockWidget::~ClockWidget() {
 
 void ClockWidget::addConfigToManager() {
     String optClockType[2 + USE_CLOCK_CUSTOM] = {
-        "Normal Clock",
-        "Nixie Clock"};
+        i18nStr(t_clockNormal),
+        i18nStr(t_clockNixie)};
     if (!USE_CLOCK_NIXIE)
-        optClockType[(int) ClockType::NIXIE] += " (n/a)";
+        optClockType[(int) ClockType::NIXIE] += i18nStr(t_clockNotAvailable);
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
-        optClockType[(int) ClockType::CUSTOM0 + i] = "Custom Clock " + String(i);
+        optClockType[(int) ClockType::CUSTOM0 + i] = i18nStr(t_clockCustom) + " " + String(i);
     }
-    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, "Default Clock Type (you can also switch types with the middle button)");
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, i18n(t_clockDefaultType));
 #if USE_CLOCK_CUSTOM > 0
     // Get enabled setting here to know which clocks are valid,
     // because we did not add the config key for it yet (this happens some lines below)
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
-        String enKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "en");
+        String enKey = String("clkCust") + String(i) + "en";
         m_customEnabled[i] = m_config.getConfigBool(enKey.c_str(), m_customEnabled[i]);
     }
 #endif
@@ -30,25 +31,28 @@ void ClockWidget::addConfigToManager() {
         // Invalid Clock Type
         m_type = (int) ClockType::NORMAL;
     }
-    String optFormats[] = {"24h mode", "12h mode", "12h mode (with am/pm)"};
-    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, optFormats, 3, "Clock Format");
-    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, "Show Second Ticks", true);
-    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, "Clock Color", true);
-    m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, "Clock Shadowing", true);
-    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, "Clock Shadow Color", true);
+    String clockFormats[3];
+    int clockFormatsSize = i18nMultiStr(t_clockFormats, clockFormats);
+    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, clockFormats, clockFormatsSize, i18n(t_clockFormat));
+    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, i18n(t_clockShowSecondTicks), true);
+    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, i18n(t_clockColor), true);
+    m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, i18n(t_clockShadowing), true);
+    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, i18n(t_clockShadowColor), true);
 #if USE_CLOCK_NIXIE > 0
-    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, "Override Nixie color (black=disable)", true);
+    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, i18n(t_clockOverrideNixieColor), true);
 #endif
 #if USE_CLOCK_CUSTOM > 0
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
-        const char *enKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "en");
-        const char *enDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Enable");
+        // We allocate some char buffers here (for the WebPortal GUI) that will never be released
+        // but it should not be a problem because this is only done once after boot
+        const char *enKey = strdup((String("clkCust") + " " + String(i) + "en").c_str());
+        const char *enDesc = strdup((i18nStr(t_clockCustom) + " " + String(i) + ": " + i18n(t_clockEnable)).c_str());
         m_config.addConfigBool("ClockWidget", enKey, &m_customEnabled[i], enDesc, true);
-        const char *tickKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "tckCol");
-        const char *tickDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Second Tick Color");
+        const char *tickKey = strdup((String("clkCust") + " " + String(i) + "tckCol").c_str());
+        const char *tickDesc = strdup((i18nStr(t_clockCustom) + " " + String(i) + ": " + i18nStr(t_clockSecondsTickColor)).c_str());
         m_config.addConfigColor("ClockWidget", tickKey, &m_customTickColor[i], tickDesc, true);
-        const char *overrideKey = Utils::createConstCharBufferAndConcat("clkCust", String(i).c_str(), "ovrCol");
-        const char *overrideDesc = Utils::createConstCharBufferAndConcat("CustomClock", String(i).c_str(), ": Override color (black=disable)");
+        const char *overrideKey = strdup((String("clkCust") + " " + String(i) + "ovrCol").c_str());
+        const char *overrideDesc = strdup((i18nStr(t_clockCustom) + " " + String(i) + ": " + i18nStr(t_clockOverrideColor)).c_str());
         m_config.addConfigColor("ClockWidget", overrideKey, &m_customOverrideColor[i], overrideDesc, true);
     }
 #endif
