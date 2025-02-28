@@ -1,7 +1,7 @@
 #ifndef MQTTTRANSLATIONS_H
 #define MQTTTRANSLATIONS_H
 
-#include "i18n.h"
+#include "I18n.h"
 
 // All translation variables for MQTTWidget should start with "t_mqtt"
 

@@ -1,7 +1,7 @@
 #ifndef CLOCKTRANSLATIONS_H
 #define CLOCKTRANSLATIONS_H
 
-#include "i18n.h"
+#include "I18n.h"
 
 // All translation variables for ClockWidget should start with "t_clock"
 extern Translation t_clockNormal;
