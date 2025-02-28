@@ -53,15 +53,36 @@ private:
     static int s_languageId;
 };
 
-// I18n helper
+// I18n helper function for single translation array (returns const char*)
 static const char *i18n(Translation &translations) {
     return I18n::get(translations);
 }
 
-// I18n helper (with index)
+// I18n helper function for single translation array (returns String)
+static String i18nStr(Translation &translations) {
+    return I18n::get(translations);
+}
+
+// I18n helper function for multi-dimensional translation arrays (returns const char*)
 template <size_t N>
 static const char *i18n(TranslationMulti<N> &translations, size_t index) {
     return I18n::get(translations, index);
+}
+
+// I18n helper function for multi-dimensional translation arrays (returns String)
+template <size_t N>
+static String i18nStr(TranslationMulti<N> &translations, size_t index) {
+    return I18n::get(translations, index);
+}
+
+// Helper function to populate a buffer with translated strings and return its size
+template <size_t N, size_t BufSize>
+static int i18nMultiStr(TranslationMulti<N> &translations, String (&buffer)[BufSize]) {
+    static_assert(BufSize >= N, "Buffer size is too small");
+    for (size_t index = 0; index < N; index++) {
+        buffer[index] = I18n::get(translations, index);
+    }
+    return N;
 }
 
 #endif // I18N_H
