@@ -69,8 +69,9 @@ void MainHelper::setupConfig() {
     s_configManager->addConfigComboBox("General", "lang", &s_languageId, optLang, LANG_NUM, i18n(t_language));
     s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, i18n(t_widgetCycleDelay));
     s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, i18n(t_ntpServer), true);
-    String optRotation[] = {i18n(t_orbRot, 0), i18n(t_orbRot, 1), i18n(t_orbRot, 2), i18n(t_orbRot, 3)};
-    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, 4, i18n(t_orbRotation));
+    String optRotation[4];
+    int optRotationSize = i18nMultiStr(t_orbRot, optRotation);
+    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, optRotationSize, i18n(t_orbRotation));
     s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, i18n(t_nightmode));
     s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, i18n(t_tftBrightness), true);
     String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",

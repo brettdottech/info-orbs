@@ -26,5 +26,13 @@ extern Translation t_tftBrightness;
 extern Translation t_dimStartHour;
 extern Translation t_dimEndHour;
 extern Translation t_dimBrightness;
+extern Translation t_high;
+extern Translation t_low;
+extern Translation t_highShort;
+extern Translation t_lowShort;
+extern Translation t_temperatureUnit;
+extern TranslationMulti<2> t_temperatureUnits;
+extern Translation t_screenMode;
+extern TranslationMulti<2> t_screenModes;
 
 #endif // TRANSLATIONS_H

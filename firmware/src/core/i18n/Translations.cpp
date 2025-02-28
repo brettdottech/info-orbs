@@ -131,3 +131,51 @@ constexpr Translation t_dimBrightness = {
     "Nachtmodus Helligkeit [0-255]", // DE
     "Luminosité nocturne [0-255]" // FR
 };
+
+constexpr Translation t_high = {
+    "High", // EN
+    nullptr, // DE
+    nullptr, // FR
+};
+
+constexpr Translation t_low = {
+    "Low", // EN
+    nullptr, // DE
+    nullptr, // FR
+};
+
+constexpr Translation t_highShort = {
+    "H", // EN
+    nullptr, // DE
+    nullptr, // FR
+};
+
+constexpr Translation t_lowShort = {
+    "L", // EN
+    nullptr, // DE
+    nullptr, // FR
+};
+
+constexpr Translation t_temperatureUnit = {
+    "Temperature Unit", // EN
+};
+
+constexpr TranslationMulti<2> t_temperatureUnits = {
+    {
+        "Celsius", // EN
+    },
+    {
+        "Fahrenheit", // EN
+    }};
+
+constexpr Translation t_screenMode = {
+    "Screen Mode", // EN
+};
+
+constexpr TranslationMulti<2> t_screenModes = {
+    {
+        "Light", // EN
+    },
+    {
+        "Dark", // EN
+    }};
