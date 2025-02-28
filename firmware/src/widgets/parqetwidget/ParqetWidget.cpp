@@ -10,16 +10,23 @@
 ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
     m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, i18n(t_enableWidget));
-    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, i18n(t_cnfPortfolioId));
-    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, m_modes, PARQET_MODE_COUNT, i18n(t_cnfMode), true);
-    m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, m_perfMeasures, PARQET_PERF_COUNT, i18n(t_cnfPerfMeasure), true);
-    m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, m_perfChartMeasures, PARQET_PERF_CHART_COUNT, i18n(t_cnfChartMeasure), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, i18n(t_cnfClock), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, i18n(t_cnfTotals), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, i18n(t_cnfTotalVal), true);
-    String optPriceVal[] = {"Show current price", "Show current value"};
-    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, 2, i18n(t_cnfValues), true);
-    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, i18n(t_cnfProxyUrl), true);
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, i18n(t_pqPortfolioId));
+    String timeframes[PARQET_MODE_COUNT];
+    int timeframesSize = i18nMultiStr(t_pqTimeframes, timeframes);
+    String perfMeasures[PARQET_PERF_COUNT];
+    int perfMeasuresSize = i18nMultiStr(t_pqPerfMeasures, perfMeasures);
+    String perfChartMeasures[PARQET_PERF_CHART_COUNT];
+    int perfChartMeasuresSize = i18nMultiStr(t_pqPerfChartMeasures, perfChartMeasures);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, timeframes, timeframesSize, i18n(t_pqTimeframe), true);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, perfMeasures, perfMeasuresSize, i18n(t_pqPerfMeasure), true);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, perfChartMeasures, perfChartMeasuresSize, i18n(t_pqChartMeasure), true);
+    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, i18n(t_pqClock), true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, i18n(t_pqTotals), true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, i18n(t_pqTotalVal), true);
+    String optPriceVal[2];
+    int optPriceValSize = i18nMultiStr(t_pqShowPriceOrValuesOptions, optPriceVal);
+    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, optPriceValSize, i18n(t_pqShowPriceOrValues), true);
+    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, i18n(t_pqProxyUrl), true);
     m_curMode = m_defaultMode;
     m_curPerfMeasure = m_defaultPerfMeasure;
     m_curPerfChartMeasure = m_defaultPerfChartMeasure;
@@ -262,7 +269,7 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
 
     m_manager.fillScreen(background);
     m_manager.setFontColor(color);
-    m_manager.drawString(m_time->getDayAndMonth(), ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
+    m_manager.drawString(m_time->getDayAndMonth(), ScreenCenterX, clky + 60, 16, Align::MiddleCenter);
 
     m_manager.drawString(m_time->getHourPadded(), ScreenCenterX - 10, clky, 66, Align::MiddleRight);
     m_manager.drawString(m_time->getMinutePadded(), ScreenCenterX + 10, clky, 66, Align::MiddleLeft);
@@ -273,7 +280,8 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
     m_manager.drawString(extra, ScreenCenterX, 27, 18, Align::MiddleCenter);
 
     m_manager.fillRect(0, 190, 240, 50, extraColor);
-    m_manager.drawString(getTimeframe(), ScreenCenterX, 212, 22, Align::MiddleCenter);
+    const String timeframe = i18nStr(t_pqTimeframes, m_curMode);
+    m_manager.drawString(timeframe, ScreenCenterX, 210, 16, Align::MiddleCenter);
 }
 
 void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
@@ -290,7 +298,7 @@ void ParqetWidget::displayStock(int8_t displayIndex, ParqetHoldingDataModel &sto
             m_manager.drawString(stock.getCurrentPrice(2), ScreenCenterX, 58, 26, Align::MiddleCenter);
         }
     } else {
-        m_manager.drawString(i18n(t_portfolio), ScreenCenterX, 58, 26, Align::MiddleCenter);
+        m_manager.drawString(i18n(t_pqPortfolio), ScreenCenterX, 58, 26, Align::MiddleCenter);
     }
 
     if (m_showTotalChart && stock.getId() == "total" && m_portfolio.getChartDataCount() >= 7) {

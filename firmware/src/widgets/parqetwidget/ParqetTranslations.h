@@ -2,19 +2,24 @@
 #define PARQETTRANSLATIONS_H
 
 #include "I18n.h"
+#include "ParqetWidget.h"
 
-// All translation variables should start with "t_"
+// All translation variables for ParqetWidget should start with "t_pq"
 
-extern Translation t_portfolio;
-extern Translation t_total;
-extern Translation t_cnfPortfolioId;
-extern Translation t_cnfMode;
-extern Translation t_cnfPerfMeasure;
-extern Translation t_cnfChartMeasure;
-extern Translation t_cnfClock;
-extern Translation t_cnfTotals;
-extern Translation t_cnfTotalVal;
-extern Translation t_cnfValues;
-extern Translation t_cnfProxyUrl;
+extern Translation t_pqPortfolio;
+extern Translation t_pqTotal;
+extern Translation t_pqPortfolioId;
+extern Translation t_pqTimeframe;
+extern TranslationMulti<PARQET_MODE_COUNT> t_pqTimeframes;
+extern Translation t_pqPerfMeasure;
+extern TranslationMulti<PARQET_PERF_COUNT> t_pqPerfMeasures;
+extern Translation t_pqChartMeasure;
+extern TranslationMulti<PARQET_PERF_CHART_COUNT> t_pqPerfChartMeasures;
+extern Translation t_pqClock;
+extern Translation t_pqTotals;
+extern Translation t_pqTotalVal;
+extern Translation t_pqShowPriceOrValues;
+extern TranslationMulti<2> t_pqShowPriceOrValuesOptions;
+extern Translation t_pqProxyUrl;
 
 #endif // PARQETTRANSLATIONS_H
