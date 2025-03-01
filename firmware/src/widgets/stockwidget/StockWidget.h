@@ -40,6 +40,7 @@ private:
 
     StockDataModel m_stocks[MAX_STOCKS];
     int8_t m_stockCount;
+    boolean m_initialized = false;
 
 #ifndef STOCK_CHANGE_FORMAT
     #define STOCK_CHANGE_FORMAT 0
