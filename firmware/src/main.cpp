@@ -46,6 +46,14 @@ void addWidgets() {
 void setup() {
     // Initialize global resources
     initializeGlobalResources();
+
+    // Add a delay to allow the serial interface to initialize
+    delay(4000);
+    // Clear the serial buffer of any garbage
+    while (Serial.available() > 0) {
+        Serial.read();
+    }
+
     Serial.begin(115200);
     Log.begin(LOG_LEVEL, &Serial);
     Log.noticeln("Starting up...");
