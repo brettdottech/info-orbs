@@ -3,6 +3,7 @@
 #include "ConfigManager.h"
 #include "config_helper.h"
 #include <ArduinoJson.h>
+#include <ArduinoLog.h>
 
 GlobalTime *GlobalTime::m_instance = nullptr;
 
@@ -13,7 +14,7 @@ GlobalTime::GlobalTime() {
     m_ntpServer = cm->getConfigString("ntpServer", m_ntpServer); // config added in MainHelper
     Serial.printf("GlobalTime initialized, tzLoc=%s, clockFormat=%d, ntpServer=%s\n", m_timezoneLocation.c_str(), clockFormat, m_ntpServer.c_str());
     m_format24hour = (clockFormat == CLOCK_FORMAT_24_HOUR);
-    m_timeClient = new NTPClient(m_udp, m_ntpServer.c_str());
+    m_timeClient = new NTPClient(m_udp, m_ntpServer.c_str(), 0, m_updateInterval);
     m_timeClient->begin();
 }
 
@@ -33,8 +34,17 @@ void GlobalTime::updateTime(bool force) {
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
             getTimeZoneOffsetFromAPI();
         }
-        m_timeClient->update();
+        bool updated = m_timeClient->update();
         m_unixEpoch = m_timeClient->getEpochTime();
+        if (updated) {
+            if (year(m_unixEpoch) < m_lowYearTest || year(m_unixEpoch) > m_highYearTest) {
+                Log.warningln("NTP updated but year is not in acceptable range, skipping update, trying again...");
+                m_timeClient->setUpdateInterval(3000); // try again in 3 seconds
+                return;
+            }
+            Log.noticeln("NTP updated successful - Year is: %d", year(m_unixEpoch));
+            m_timeClient->setUpdateInterval(m_updateInterval); // reset update interval
+        }
         m_updateTimer = millis();
         m_minute = minute(m_unixEpoch);
         if (m_format24hour) {
