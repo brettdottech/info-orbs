@@ -56,7 +56,7 @@ void setup() {
 
     Serial.begin(115200);
     Log.begin(LOG_LEVEL, &Serial);
-    Log.noticeln("Starting up...");
+    Log.noticeln("🚀 Starting up...");
 
     wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
