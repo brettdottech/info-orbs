@@ -75,6 +75,9 @@
 // LOG_LEVEL_WARNING, LOG_LEVEL_NOTICE, LOG_LEVEL_VERBOSE
 #define LOG_LEVEL LOG_LEVEL_VERBOSE
 
+// Enable if you're having issues with the app outputting garbage characters on startup, delay in ms
+// #define SERIAL_INTERFACE_INIT_DELAY 4000
+
 // ============= END OF USER CONFIGURATION =================================================================
 
 
