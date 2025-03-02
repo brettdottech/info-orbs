@@ -60,6 +60,11 @@ void WifiWidget::setup() {
     m_wifiManager.setCleanConnect(true);
     m_wifiManager.setConnectRetries(5);
 
+    // Set hostname to InfoOrbs-<last 6 digits of MAC address> so it can be found on the network
+    String mac = WiFi.macAddress();
+    mac.replace(":", "");
+    m_wifiManager.setHostname("InfoOrbs-" + mac.substring(mac.length() - 6));
+
     // WiFiManager automatically connects using saved credentials...
     if (m_wifiManager.autoConnect(m_apssid.c_str())) {
         Serial.print("WifiManager connected.");
