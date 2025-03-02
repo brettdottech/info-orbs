@@ -93,8 +93,8 @@ private:
     NTPClient *m_timeClient{nullptr};
 
     unsigned long m_updateInterval = 900000; // Update every 15 min
-    int m_lowYearTest = 2020;
-    int m_highYearTest = 2030;
+    const int m_lowYearTest = 2025;
+    const int m_highYearTest = 2035;
     unsigned long m_oneSecond = 1000;
     unsigned long m_updateTimer = 0;
 
