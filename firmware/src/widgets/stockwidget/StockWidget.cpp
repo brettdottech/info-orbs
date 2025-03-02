@@ -38,7 +38,7 @@ void StockWidget::setup() {
 void StockWidget::draw(bool force) {
     m_manager.setFont(DEFAULT_FONT);
     for (int8_t i = 0; i < m_stockCount; i++) {
-        if (!m_initialized) {
+        if (!m_initialized && !m_stocks[i].getSymbol().isEmpty() && m_stocks[i].getTicker().isEmpty()) {
             m_manager.selectScreen(i);
             m_manager.fillScreen(TFT_BLACK);
             m_manager.setFontColor(TFT_WHITE);
