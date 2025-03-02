@@ -268,19 +268,19 @@ void ConfigManager::addConfigComboBox(const char *section, const char *varName, 
     addConfigComboBox(section, varName, var, options, numOptions, i18n(description), advanced);
 }
 
-std::string ConfigManager::getConfigString(const char *varName, std::string defaultValue) {
+std::string ConfigManager::getConfigString(const char *varName, const std::string &defaultValue) {
     return m_preferences.getString(varName, defaultValue.c_str()).c_str();
 }
 
-bool ConfigManager::getConfigBool(const char *varName, bool defaultValue) {
+bool ConfigManager::getConfigBool(const char *varName, const bool defaultValue) {
     return m_preferences.getBool(varName, defaultValue);
 }
 
-int ConfigManager::getConfigInt(const char *varName, int defaultValue) {
+int ConfigManager::getConfigInt(const char *varName, const int defaultValue) {
     return m_preferences.getInt(varName, defaultValue);
 }
 
-float ConfigManager::getConfigFloat(const char *varName, float defaultValue) {
+float ConfigManager::getConfigFloat(const char *varName, const float defaultValue) {
     return m_preferences.getFloat(varName, defaultValue);
 }
 

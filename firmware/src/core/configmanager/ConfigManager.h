@@ -70,7 +70,7 @@ public:
     }
 
     // Retrieve a string configuration value, with a default fallback
-    std::string getConfigString(const char *varName, std::string defaultValue);
+    std::string getConfigString(const char *varName, const std::string &defaultValue);
     // Retrieve a boolean configuration value, with a default fallback
     bool getConfigBool(const char *varName, bool defaultValue);
     // Retrieve an integer configuration value, with a default fallback
@@ -88,7 +88,7 @@ public:
         const std::function<void(const char *section, const char *varName)> &callback);
 
     // Check if a restart is required
-    bool requiresRestart() { return m_requiresRestart; }
+    bool requiresRestart() const { return m_requiresRestart; }
 
 private:
     struct Parameter {
