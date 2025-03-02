@@ -47,8 +47,11 @@ void setup() {
     // Initialize global resources
     initializeGlobalResources();
 
+#ifdef SERIAL_INTERFACE_INIT_DELAY
     // Add a delay to allow the serial interface to initialize
     delay(4000);
+#endif
+
     // Clear the serial buffer of any garbage
     while (Serial.available() > 0) {
         Serial.read();
