@@ -49,6 +49,7 @@ void setup() {
     Serial.begin(115200);
     Log.begin(LOG_LEVEL, &Serial);
     Log.noticeln("Starting up...");
+    Log.noticeln("PCB Version: %s", PCB_VERSION);
 
     wifiManager = new OrbsWiFiManager();
     config = new ConfigManager(*wifiManager);
