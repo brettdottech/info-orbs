@@ -10,18 +10,17 @@
 
 #include "WeatherWidget.h"
 #include "TaskFactory.h"
+#include "WeatherTranslations.h"
 #include "icons.h"
 #include <ArduinoJson.h>
 
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
-    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, "Enable Widget");
-    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, "City/State for the weather");
-    String optUnits[] = {"Celsius", "Fahrenheit"};
-    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, 2, "Temperature Unit", true);
-    String optModes[] = {"Light", "Dark"};
-    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, 2, "Weather Screen Mode", true);
-    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, "Switch between Highs and Lows every X seconds, set to 0 to disable", true);
+    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, t_enableWidget);
+    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, t_weatherLocation);
+    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, t_temperatureUnits, t_temperatureUnit, true);
+    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, t_screenModes, t_screenMode, true);
+    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, t_weatherCycleHL, true);
     Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }

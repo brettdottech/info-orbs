@@ -193,7 +193,7 @@ void ConfigManager::addConfig(ParamType paramType, const char *section, const ch
     m_parameters.push_back({param, paramType, section, varName, advanced, saveLambda});
 }
 
-void ConfigManager::addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description, bool advanced) {
+void ConfigManager::addConfigString(const char *section, const char *varName, std::string *var, const size_t length, const char *description, const bool advanced) {
     addConfig<std::string, StringParameter>(
         ParamType::String, section, varName, var, description, length, advanced,
         [this, varName](std::string &var) { var = m_preferences.getString(varName, var.c_str()).c_str(); },
@@ -201,7 +201,11 @@ void ConfigManager::addConfigString(const char *section, const char *varName, st
         [this, varName](std::string &var) { m_preferences.putString(varName, var.c_str()); });
 }
 
-void ConfigManager::addConfigInt(const char *section, const char *varName, int *var, const char *description, bool advanced) {
+void ConfigManager::addConfigString(const char *section, const char *varName, std::string *var, const size_t length, Translation &description, const bool advanced) {
+    addConfigString(section, varName, var, length, i18n(description), advanced);
+}
+
+void ConfigManager::addConfigInt(const char *section, const char *varName, int *var, const char *description, const bool advanced) {
     addConfig<int, IntParameter>(
         ParamType::Int, section, varName, var, description, 10, advanced,
         [this, varName](int &var) { var = m_preferences.getInt(varName, var); },
@@ -209,7 +213,11 @@ void ConfigManager::addConfigInt(const char *section, const char *varName, int *
         [this, varName](int &var) { m_preferences.putInt(varName, var); });
 }
 
-void ConfigManager::addConfigBool(const char *section, const char *varName, bool *var, const char *description, bool advanced) {
+void ConfigManager::addConfigInt(const char *section, const char *varName, int *var, Translation &description, const bool advanced) {
+    addConfigInt(section, varName, var, i18n(description), advanced);
+}
+
+void ConfigManager::addConfigBool(const char *section, const char *varName, bool *var, const char *description, const bool advanced) {
     addConfig<bool, BoolParameter>(
         ParamType::Bool, section, varName, var, description, 2, advanced,
         [this, varName](bool &var) { var = m_preferences.getBool(varName, var); },
@@ -217,7 +225,11 @@ void ConfigManager::addConfigBool(const char *section, const char *varName, bool
         [this, varName](bool &var) { m_preferences.putBool(varName, var); });
 }
 
-void ConfigManager::addConfigFloat(const char *section, const char *varName, float *var, const char *description, bool advanced) {
+void ConfigManager::addConfigBool(const char *section, const char *varName, bool *var, Translation &description, const bool advanced) {
+    addConfigBool(section, varName, var, i18n(description), advanced);
+}
+
+void ConfigManager::addConfigFloat(const char *section, const char *varName, float *var, const char *description, const bool advanced) {
     addConfig<float, FloatParameter>(
         ParamType::Float, section, varName, var, description, 10, advanced,
         [this, varName](float &var) { var = m_preferences.getFloat(varName, var); },
@@ -225,7 +237,11 @@ void ConfigManager::addConfigFloat(const char *section, const char *varName, flo
         [this, varName](float &var) { m_preferences.putFloat(varName, var); });
 }
 
-void ConfigManager::addConfigColor(const char *section, const char *varName, int *var, const char *description, bool advanced) {
+void ConfigManager::addConfigFloat(const char *section, const char *varName, float *var, Translation &description, const bool advanced) {
+    addConfigFloat(section, varName, var, i18n(description), advanced);
+}
+
+void ConfigManager::addConfigColor(const char *section, const char *varName, int *var, const char *description, const bool advanced) {
     addConfig<int, ColorParameter>(
         ParamType::Color, section, varName, var, description, 8, advanced,
         [this, varName](int &var) { var = m_preferences.getInt(varName, var); },
@@ -233,7 +249,11 @@ void ConfigManager::addConfigColor(const char *section, const char *varName, int
         [this, varName](int &var) { m_preferences.putInt(varName, var); });
 }
 
-void ConfigManager::addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description, bool advanced) {
+void ConfigManager::addConfigColor(const char *section, const char *varName, int *var, Translation &description, const bool advanced) {
+    addConfigColor(section, varName, var, i18n(description), advanced);
+}
+
+void ConfigManager::addConfigComboBox(const char *section, const char *varName, int *var, String options[], const int numOptions, const char *description, const bool advanced) {
     addConfig<int, ComboBoxParameter>(
         ParamType::ComboBox, section, varName, var, description, 0, advanced,
         [this, varName](int &var) { var = m_preferences.getInt(varName, var); },
@@ -244,19 +264,23 @@ void ConfigManager::addConfigComboBox(const char *section, const char *varName, 
     );
 }
 
-std::string ConfigManager::getConfigString(const char *varName, std::string defaultValue) {
+void ConfigManager::addConfigComboBox(const char *section, const char *varName, int *var, String options[], const int numOptions, Translation &description, const bool advanced) {
+    addConfigComboBox(section, varName, var, options, numOptions, i18n(description), advanced);
+}
+
+std::string ConfigManager::getConfigString(const char *varName, const std::string &defaultValue) {
     return m_preferences.getString(varName, defaultValue.c_str()).c_str();
 }
 
-bool ConfigManager::getConfigBool(const char *varName, bool defaultValue) {
+bool ConfigManager::getConfigBool(const char *varName, const bool defaultValue) {
     return m_preferences.getBool(varName, defaultValue);
 }
 
-int ConfigManager::getConfigInt(const char *varName, int defaultValue) {
+int ConfigManager::getConfigInt(const char *varName, const int defaultValue) {
     return m_preferences.getInt(varName, defaultValue);
 }
 
-float ConfigManager::getConfigFloat(const char *varName, float defaultValue) {
+float ConfigManager::getConfigFloat(const char *varName, const float defaultValue) {
     return m_preferences.getFloat(varName, defaultValue);
 }
 
