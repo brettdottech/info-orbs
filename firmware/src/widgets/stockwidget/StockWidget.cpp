@@ -38,11 +38,17 @@ void StockWidget::setup() {
 void StockWidget::draw(bool force) {
     m_manager.setFont(DEFAULT_FONT);
     for (int8_t i = 0; i < m_stockCount; i++) {
-        if (m_stocks[i].isChanged() || force) {
+        if (!m_initialized && !m_stocks[i].getSymbol().isEmpty() && m_stocks[i].getTicker().isEmpty()) {
+            m_manager.selectScreen(i);
+            m_manager.fillScreen(TFT_BLACK);
+            m_manager.setFontColor(TFT_WHITE);
+            m_manager.drawCentreString(I18n::get(t_loadingData), ScreenCenterX, ScreenCenterY, 16);
+        } else if (m_stocks[i].isChanged() || force) {
             displayStock(i, m_stocks[i], TFT_WHITE, TFT_BLACK);
             m_stocks[i].setChangedStatus(false);
         }
     }
+    m_initialized = true;
 }
 
 void StockWidget::update(bool force) {
