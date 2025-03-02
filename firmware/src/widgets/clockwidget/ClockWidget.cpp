@@ -18,7 +18,7 @@ void ClockWidget::addConfigToManager() {
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {
         optClockType[(int) ClockType::CUSTOM0 + i] = i18nStr(t_clockCustom) + " " + String(i);
     }
-    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, i18n(t_clockDefaultType));
+    m_config.addConfigComboBox("ClockWidget", "defaultType", &m_type, optClockType, 2 + USE_CLOCK_CUSTOM, t_clockDefaultType);
 #if USE_CLOCK_CUSTOM > 0
     // Get enabled setting here to know which clocks are valid,
     // because we did not add the config key for it yet (this happens some lines below)
@@ -31,15 +31,13 @@ void ClockWidget::addConfigToManager() {
         // Invalid Clock Type
         m_type = (int) ClockType::NORMAL;
     }
-    String clockFormats[3];
-    int clockFormatsSize = i18nMultiStr(t_clockFormats, clockFormats);
-    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, clockFormats, clockFormatsSize, i18n(t_clockFormat));
-    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, i18n(t_clockShowSecondTicks), true);
-    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, i18n(t_clockColor), true);
-    m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, i18n(t_clockShadowing), true);
-    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, i18n(t_clockShadowColor), true);
+    m_config.addConfigComboBox("ClockWidget", "clockFormat", &m_format, t_clockFormats, t_clockFormat);
+    m_config.addConfigBool("ClockWidget", "showSecondTicks", &m_showSecondTicks, t_clockShowSecondTicks, true);
+    m_config.addConfigColor("ClockWidget", "clkColor", &m_fgColor, t_clockColor, true);
+    m_config.addConfigBool("ClockWidget", "clkShadowing", &m_shadowing, t_clockShadowing, true);
+    m_config.addConfigColor("ClockWidget", "clkShColor", &m_shadowColor, t_clockShadowColor, true);
 #if USE_CLOCK_NIXIE > 0
-    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, i18n(t_clockOverrideNixieColor), true);
+    m_config.addConfigColor("ClockWidget", "clkNixieColor", &m_overrideNixieColor, t_clockOverrideNixieColor, true);
 #endif
 #if USE_CLOCK_CUSTOM > 0
     for (int i = 0; i < USE_CLOCK_CUSTOM; i++) {

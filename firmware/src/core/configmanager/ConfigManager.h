@@ -1,6 +1,7 @@
 #ifndef CONFIG_MANAGER_H
 #define CONFIG_MANAGER_H
 
+#include "I18n.h"
 #include "OrbsWiFiManager.h"
 #include "WifiManagerCustomParameters.h"
 #include <Preferences.h>
@@ -31,19 +32,50 @@ public:
     void setupWebPortal();
     void saveAllConfigs();
 
-    // Register different types of variables with descriptions
+    // Add a string configuration variable
     void addConfigString(const char *section, const char *varName, std::string *var, size_t length, const char *description, bool advanced = false);
-    void addConfigInt(const char *section, const char *varName, int *var, const char *description, bool advanced = false);
-    void addConfigFloat(const char *section, const char *varName, float *var, const char *description, bool advanced = false);
-    void addConfigIP(const char *section, const char *varName, IPAddress *var, const char *description, bool advanced = false);
-    void addConfigBool(const char *section, const char *varName, bool *var, const char *description, bool advanced = false);
-    void addConfigColor(const char *section, const char *varName, int *var, const char *description, bool advanced = false);
-    void addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description, bool advanced = false);
+    // Add a string configuration variable with a localized description
+    void addConfigString(const char *section, const char *varName, std::string *var, size_t length, Translation &description, bool advanced = false);
 
-    // Get stored values
+    // Add an integer configuration variable
+    void addConfigInt(const char *section, const char *varName, int *var, const char *description, bool advanced = false);
+    // Add an integer configuration variable with a localized description
+    void addConfigInt(const char *section, const char *varName, int *var, Translation &description, bool advanced = false);
+
+    // Add a float configuration variable
+    void addConfigFloat(const char *section, const char *varName, float *var, const char *description, bool advanced = false);
+    // Add a float configuration variable with a localized description
+    void addConfigFloat(const char *section, const char *varName, float *var, Translation &description, bool advanced = false);
+
+    // Add a boolean configuration variable
+    void addConfigBool(const char *section, const char *varName, bool *var, const char *description, bool advanced = false);
+    // Add a boolean configuration variable with a localized description
+    void addConfigBool(const char *section, const char *varName, bool *var, Translation &description, bool advanced = false);
+
+    // Add a color configuration variable
+    void addConfigColor(const char *section, const char *varName, int *var, const char *description, bool advanced = false);
+    // Add a color configuration variable with a localized description
+    void addConfigColor(const char *section, const char *varName, int *var, Translation &description, bool advanced = false);
+
+    // Add a ComboBox configuration variable
+    void addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, const char *description, bool advanced = false);
+    // Add a ComboBox configuration variable with a localized description
+    void addConfigComboBox(const char *section, const char *varName, int *var, String options[], int numOptions, Translation &description, bool advanced = false);
+    // Add a ComboBox configuration variable with localized options and description
+    template <size_t N>
+    void addConfigComboBox(const char *section, const char *varName, int *var, TranslationMulti<N> &options, Translation &description, const bool advanced = false) {
+        String optionsArray[N];
+        i18nMultiStr(options, optionsArray);
+        addConfigComboBox(section, varName, var, optionsArray, N, description, advanced);
+    }
+
+    // Retrieve a string configuration value, with a default fallback
     std::string getConfigString(const char *varName, std::string defaultValue);
+    // Retrieve a boolean configuration value, with a default fallback
     bool getConfigBool(const char *varName, bool defaultValue);
+    // Retrieve an integer configuration value, with a default fallback
     int getConfigInt(const char *varName, int defaultValue);
+    // Retrieve a float configuration value, with a default fallback
     float getConfigFloat(const char *varName, float defaultValue);
 
     // Register callbacks for changes

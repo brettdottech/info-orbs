@@ -64,21 +64,19 @@ void MainHelper::setupButtons() {
 void MainHelper::setupConfig() {
     // Set language here to get i18n strings for the configuration
     I18n::setLanguageId(s_configManager->getConfigInt("lang", DEFAULT_LANGUAGE));
-    s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, i18n(t_timezoneLoc));
+    s_configManager->addConfigString("General", "timezoneLoc", &s_timezoneLocation, 30, t_timezoneLoc);
     String *optLang = I18n::getAllLanguages();
-    s_configManager->addConfigComboBox("General", "lang", &s_languageId, optLang, LANG_NUM, i18n(t_language));
-    s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, i18n(t_widgetCycleDelay));
-    s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, i18n(t_ntpServer), true);
-    String optRotation[4];
-    int optRotationSize = i18nMultiStr(t_orbRot, optRotation);
-    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, optRotation, optRotationSize, i18n(t_orbRotation));
-    s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, i18n(t_nightmode));
-    s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, i18n(t_tftBrightness), true);
+    s_configManager->addConfigComboBox("General", "lang", &s_languageId, optLang, LANG_NUM, t_language);
+    s_configManager->addConfigInt("General", "widgetCycDelay", &s_widgetCycleDelay, t_widgetCycleDelay);
+    s_configManager->addConfigString("General", "ntpServer", &s_ntpServer, 30, t_ntpServer, true);
+    s_configManager->addConfigComboBox("TFT Settings", "orbRotation", &s_orbRotation, t_orbRot, t_orbRotation);
+    s_configManager->addConfigBool("TFT Settings", "nightmode", &s_nightMode, t_nightmode);
+    s_configManager->addConfigInt("TFT Settings", "tftBrightness", &s_tftBrightness, t_tftBrightness, true);
     String optHours[] = {"0:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00",
                          "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"};
-    s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, i18n(t_dimStartHour), true);
-    s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, i18n(t_dimEndHour), true);
-    s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, i18n(t_dimBrightness), true);
+    s_configManager->addConfigComboBox("TFT Settings", "dimStartHour", &s_dimStartHour, optHours, 24, t_dimStartHour, true);
+    s_configManager->addConfigComboBox("TFT Settings", "dimEndHour", &s_dimEndHour, optHours, 24, t_dimEndHour, true);
+    s_configManager->addConfigInt("TFT Settings", "dimBrightness", &s_dimBrightness, t_dimBrightness, true);
 }
 
 void MainHelper::buttonPressed(uint8_t buttonId, ButtonState state) {

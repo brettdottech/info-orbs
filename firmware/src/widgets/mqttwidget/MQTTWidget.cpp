@@ -35,12 +35,12 @@ MQTTWidget::MQTTWidget(ScreenManager &manager, ConfigManager &config)
     mqttPass = MQTT_WIDGET_PASS;
 #endif
 
-    m_config.addConfigBool("MqttWidget", "mqttEnabled", &m_enabled, i18n(t_enableWidget));
-    m_config.addConfigString("MqttWidget", "mqttHost", &mqttHost, 30, i18n(t_mqttHost), true);
-    m_config.addConfigInt("MqttWidget", "mqttPort", &mqttPort, i18n(t_mqttPort), true);
-    m_config.addConfigString("MqttWidget", "mqttSetupTopic", &mqttSetupTopic, 100, i18n(t_mqttSetupTopic), true);
-    m_config.addConfigString("MqttWidget", "mqttUser", &mqttUser, 20, i18n(t_mqttUser), true);
-    m_config.addConfigString("MqttWidget", "mqttPass", &mqttPass, 50, i18n(t_mqttPass), true);
+    m_config.addConfigBool("MqttWidget", "mqttEnabled", &m_enabled, t_enableWidget);
+    m_config.addConfigString("MqttWidget", "mqttHost", &mqttHost, 30, t_mqttHost, true);
+    m_config.addConfigInt("MqttWidget", "mqttPort", &mqttPort, t_mqttPort, true);
+    m_config.addConfigString("MqttWidget", "mqttSetupTopic", &mqttSetupTopic, 100, t_mqttSetupTopic, true);
+    m_config.addConfigString("MqttWidget", "mqttUser", &mqttUser, 20, t_mqttUser, true);
+    m_config.addConfigString("MqttWidget", "mqttPass", &mqttPass, 50, t_mqttPass, true);
 
     // Set MQTT broker server and port
     mqttClient.setServer(mqttHost.c_str(), mqttPort);

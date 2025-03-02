@@ -9,24 +9,16 @@
 
 ParqetWidget::ParqetWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     Serial.printf("Constructing ParqetWidget, portfolioId=%s\n", m_portfolioId.c_str());
-    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, i18n(t_enableWidget));
-    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, i18n(t_pqPortfolioId));
-    String timeframes[PARQET_MODE_COUNT];
-    int timeframesSize = i18nMultiStr(t_pqTimeframes, timeframes);
-    String perfMeasures[PARQET_PERF_COUNT];
-    int perfMeasuresSize = i18nMultiStr(t_pqPerfMeasures, perfMeasures);
-    String perfChartMeasures[PARQET_PERF_CHART_COUNT];
-    int perfChartMeasuresSize = i18nMultiStr(t_pqPerfChartMeasures, perfChartMeasures);
-    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, timeframes, timeframesSize, i18n(t_pqTimeframe), true);
-    m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, perfMeasures, perfMeasuresSize, i18n(t_pqPerfMeasure), true);
-    m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, perfChartMeasures, perfChartMeasuresSize, i18n(t_pqChartMeasure), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, i18n(t_pqClock), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, i18n(t_pqTotals), true);
-    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, i18n(t_pqTotalVal), true);
-    String optPriceVal[2];
-    int optPriceValSize = i18nMultiStr(t_pqShowPriceOrValuesOptions, optPriceVal);
-    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, optPriceVal, optPriceValSize, i18n(t_pqShowPriceOrValues), true);
-    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, i18n(t_pqProxyUrl), true);
+    m_config.addConfigBool("ParqetWidget", "pqEnabled", &m_enabled, t_enableWidget);
+    m_config.addConfigString("ParqetWidget", "pqportfoId", &m_portfolioId, 50, t_pqPortfolioId);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefMode", &m_defaultMode, t_pqTimeframes, t_pqTimeframe, true);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefPerf", &m_defaultPerfMeasure, t_pqPerfMeasures, t_pqPerfMeasure, true);
+    m_config.addConfigComboBox("ParqetWidget", "pqDefPerfCh", &m_defaultPerfChartMeasure, t_pqPerfChartMeasures, t_pqChartMeasure, true);
+    m_config.addConfigBool("ParqetWidget", "pqShowClock", &m_showClock, t_pqClock, true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalScr", &m_showTotalScreen, t_pqTotals, true);
+    m_config.addConfigBool("ParqetWidget", "pqShowTotalVal", &m_showTotalValue, t_pqTotalVal, true);
+    m_config.addConfigComboBox("ParqetWidget", "pqShowValues", &m_showValues, t_pqShowPriceOrValuesOptions, t_pqShowPriceOrValues, true);
+    m_config.addConfigString("ParqetWidget", "pqProxyUrl", &m_proxyUrl, 75, t_pqProxyUrl, true);
     m_curMode = m_defaultMode;
     m_curPerfMeasure = m_defaultPerfMeasure;
     m_curPerfChartMeasure = m_defaultPerfChartMeasure;

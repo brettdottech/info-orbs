@@ -16,15 +16,11 @@
 
 WeatherWidget::WeatherWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
-    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, i18n(t_enableWidget));
-    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, i18n(t_weatherLocation));
-    String optUnits[2];
-    int optUnitsSize = i18nMultiStr(t_temperatureUnits, optUnits);
-    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, optUnits, optUnitsSize, i18n(t_temperatureUnit), true);
-    String optModes[2];
-    int optModesSize = i18nMultiStr(t_screenModes, optModes);
-    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, optModes, optModesSize, i18n(t_screenMode), true);
-    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, i18n(t_weatherCycleHL), true);
+    m_config.addConfigBool("WeatherWidget", "weatherEnabled", &m_enabled, t_enableWidget);
+    config.addConfigString("WeatherWidget", "weatherLocation", &m_weatherLocation, 40, t_weatherLocation);
+    config.addConfigComboBox("WeatherWidget", "weatherUnits", &m_weatherUnits, t_temperatureUnits, t_temperatureUnit, true);
+    config.addConfigComboBox("WeatherWidget", "weatherScrMode", &m_screenMode, t_screenModes, t_screenMode, true);
+    config.addConfigInt("WeatherWidget", "weatherCycleHL", &m_switchinterval, t_weatherCycleHL, true);
     Serial.printf("WeatherWidget initialized, loc=%s, mode=%d\n", m_weatherLocation.c_str(), m_screenMode);
     m_mode = MODE_HIGHS;
 }

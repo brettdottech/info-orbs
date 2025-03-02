@@ -6,14 +6,12 @@
 
 StockWidget::StockWidget(ScreenManager &manager, ConfigManager &config) : Widget(manager, config) {
     m_enabled = true; // Enabled by default
-    m_config.addConfigBool("StockWidget", "stocksEnabled", &m_enabled, i18n(t_enableWidget));
-    config.addConfigString("StockWidget", "stockList", &m_stockList, 200, i18n(t_stockList));
+    m_config.addConfigBool("StockWidget", "stocksEnabled", &m_enabled, t_enableWidget);
+    config.addConfigString("StockWidget", "stockList", &m_stockList, 200, t_stockList);
     char stockList[m_stockList.size()];
     strcpy(stockList, m_stockList.c_str());
 
-    String stockchangeFormats[2];
-    int stockChangeFormatsSize = i18nMultiStr(t_stockChangeFormats, stockchangeFormats);
-    m_config.addConfigComboBox("StockWidget", "stockchgFmt", &m_stockchangeformat, stockchangeFormats, stockChangeFormatsSize, i18n(t_stockChangeFormat), true);
+    m_config.addConfigComboBox("StockWidget", "stockchgFmt", &m_stockchangeformat, t_stockChangeFormats, t_stockChangeFormat, true);
 
     char *symbol = strtok(stockList, ",");
     m_stockCount = 0;
