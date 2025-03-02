@@ -122,7 +122,7 @@ private:
     int m_timeZoneOffset;
 
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
-    unsigned long m_secondTimer = 2000; // This time is used to refressh/check the clock every second.
+    unsigned long m_secondTimer = 1000; // This time is used to refressh/check the clock every second.
     unsigned long m_secondTimerPrev = 0;
 
     int m_minuteSingle;
