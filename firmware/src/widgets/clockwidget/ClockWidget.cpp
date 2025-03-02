@@ -165,6 +165,8 @@ void ClockWidget::update(bool force) {
 
         m_lastMinuteSingle = m_minuteSingle;
     }
+
+    m_secondTimerPrev = millis();
 }
 
 void ClockWidget::changeFormat() {
