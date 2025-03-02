@@ -49,15 +49,16 @@ void setup() {
 
 #ifdef SERIAL_INTERFACE_INIT_DELAY
     // Add a delay to allow the serial interface to initialize
-    delay(4000);
+    delay(SERIAL_INTERFACE_INIT_DELAY);
 #endif
+
+    Serial.begin(115200);
 
     // Clear the serial buffer of any garbage
     while (Serial.available() > 0) {
         Serial.read();
     }
 
-    Serial.begin(115200);
     Log.begin(LOG_LEVEL, &Serial);
     Log.noticeln("🚀 Starting up...");
 
