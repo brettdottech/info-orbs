@@ -9,6 +9,7 @@
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
+#include "DimmingManager.h"
 #include <ArduinoLog.h>
 
 TFT_eSPI tft = TFT_eSPI();
@@ -97,6 +98,10 @@ void setup() {
     addWidgets();
     config->setupWebPortal();
     MainHelper::resetCycleTimer();
+
+    if (AUTO_DIMMING_ENABLED) {
+      DimmingManager::getInstance().setup();
+    }
 }
 
 void loop() {
@@ -116,7 +121,14 @@ void loop() {
         MainHelper::checkButtons();
 
         widgetSet->updateCurrent();
-        MainHelper::updateBrightnessByTime(globalTime->getHour24());
+
+        if (AUTO_DIMMING_ENABLED) {
+          DimmingManager::getInstance().updateBrightness(sm, widgetSet);
+        }
+        else {
+          MainHelper::updateBrightnessByTime(globalTime->getHour24());
+        }
+
         widgetSet->drawCurrent();
 
         MainHelper::checkCycleWidgets();

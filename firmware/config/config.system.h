@@ -77,6 +77,13 @@
     #define BUSY_PIN 2
 #endif
 
+// Ambient light sensing for auto dimming. Must have photoresistor hardware mod.
+// This entails wiring a photoresistor (200 ohm to 10 Mohm range measured) between
+// GPIO34 and 3.3v; and a 22K resistor between GPIO34 and gnd.
+#define LIGHT_SENSE_PIN 34
+#define LIGHT_MIN 0    // (0-4095)
+#define LIGHT_MAX 4095 // (0-4095)
+
 #ifndef NTP_SERVER
     #define NTP_SERVER "pool.ntp.org"
 #endif
