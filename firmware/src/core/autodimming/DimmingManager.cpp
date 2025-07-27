@@ -1,3 +1,5 @@
+#if AUTO_DIMMING_ENABLED
+
 #include "DimmingManager.h"
 #include <Arduino.h>
 #include <ArduinoLog.h>
@@ -162,3 +164,5 @@ int16_t DimmingManager::hysteresis(uint16_t newLightIntensity) {
 
     return static_cast<int16_t>(brightnessLevel);
 }
+
+#endif  // AUTO_DIMMING_ENABLED

@@ -99,9 +99,9 @@ void setup() {
     config->setupWebPortal();
     MainHelper::resetCycleTimer();
 
-    if (AUTO_DIMMING_ENABLED) {
-      DimmingManager::getInstance().setup();
-    }
+#if AUTO_DIMMING_ENABLED
+    DimmingManager::getInstance().setup();
+#endif
 }
 
 void loop() {
@@ -122,12 +122,11 @@ void loop() {
 
         widgetSet->updateCurrent();
 
-        if (AUTO_DIMMING_ENABLED) {
+#if AUTO_DIMMING_ENABLED
           DimmingManager::getInstance().updateBrightness(sm, widgetSet);
-        }
-        else {
+#else
           MainHelper::updateBrightnessByTime(globalTime->getHour24());
-        }
+#endif
 
         widgetSet->drawCurrent();
 

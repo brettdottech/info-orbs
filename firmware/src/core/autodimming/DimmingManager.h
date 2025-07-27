@@ -1,3 +1,5 @@
+#if AUTO_DIMMING_ENABLED
+
 #ifndef DIMMINGMANAGER_H
 #define DIMMINGMANAGER_H
 
@@ -44,3 +46,5 @@ private:
 };
 
 #endif // Include guard
+
+#endif  // AUTO_DIMMING_ENABLED
