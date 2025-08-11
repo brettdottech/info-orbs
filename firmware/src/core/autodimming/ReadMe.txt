@@ -1,19 +1,16 @@
 Automatic dimming requires a minor hardware modification to the InfoOrbs circuit. This entails
-adding a photoresistor and a 22K fixed resistor to the breakout section of the circuit board. The
-circuit is shown below. The photoresistor used in the prototype measured about 200 ohms in bright
-sunlight, and about 10 Mohms in darkness. It was obtained from an Elegoo arduino starter kit. It is
-probably a 5549, but photoresistors vary a lot, so the value of the fixed resistor may need to
-be adjusted proportionally to compensate for a photoresistor with different characteristics.
+adding a GL5537 photoresistor and a 22K fixed resistor to the breakout section of the circuit
+board. The circuit is shown below. Note that photoresistors vary a lot, so it may be necessary
+to experiment with the value of the fixed resistor to get the amount of dimming you want. You
+can also try changing the values of AUTO_BRIGHTNESS_MIN and AUTO_BRIGHTNESS_MAX in config.h
 
-Be aware that small values for the fixed resistor will draw more current and could damage
-the resistor or the board. Don't go below about 1K unless you know what you are doing.
 
                     ^ 3.3V
                     |
                     |
                     \
                     /
-                  --\-> Photoresistor
+                  --\-> GL5537 Photoresistor
                     /
                     \
                     |
