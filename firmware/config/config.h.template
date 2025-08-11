@@ -29,6 +29,12 @@
 // #define DIM_END_HOUR 7     // Undim the screens at this time (24h format)
 // #define DIM_BRIGHTNESS 128 // Dim brightness (0-255)
 
+// AUTO DIMMING (requires hardware mod -- SEE config.system.h)
+#define AUTO_DIMMING_ENABLED false // (true or false)
+#define AUTO_BRIGHTNESS_MIN 80     // (0-255)
+#define AUTO_BRIGHTNESS_MAX 255    // (0-255)
+#define NUM_BRIGHTNESS_LEVELS 10   // (2 or greater)
+
 // TRUETYPE FONT CONFIGURATION
 // #define DEFAULT_FONT ROBOTO_REGULAR
 
