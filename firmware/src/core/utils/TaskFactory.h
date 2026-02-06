@@ -4,25 +4,19 @@
 #include "TaskManager.h"
 #include <memory>
 
-// Implementation of make_unique for older C++ standards
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&...args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 class TaskFactory {
 public:
     static std::unique_ptr<Task> createHttpGetTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess = nullptr) {
-        return make_unique<Task>(
-            url, callback, [url, callback, preProcess]() { TaskFactory::httpGetTask(url, callback, preProcess); }, preProcess);
+        return std::unique_ptr<Task>(new Task(
+            url, callback, [url, callback, preProcess]() { TaskFactory::httpGetTask(url, callback, preProcess); }, preProcess));
     }
 
     static std::unique_ptr<Task> createMqttTask(const String &topic, Task::ResponseCallback callback) {
-        return make_unique<Task>(
+        return std::unique_ptr<Task>(new Task(
             topic, callback, []() {
                 // Placeholder for MQTT task execution logic
             },
-            nullptr);
+            nullptr));
     }
 
     // Declare the httpGetTask method

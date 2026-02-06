@@ -4,6 +4,8 @@
 #include "Utils.h"
 #include <ArduinoLog.h>
 #include <HTTPClient.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
 
 void TaskFactory::httpGetTask(const String &url, Task::ResponseCallback callback, Task::PreProcessCallback preProcess) {
     Log.noticeln("🔵 Starting HTTP request for: %s", url.c_str());

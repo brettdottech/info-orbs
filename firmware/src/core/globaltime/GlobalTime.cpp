@@ -148,6 +148,7 @@ bool GlobalTime::isPM() {
 void GlobalTime::getTimeZoneOffsetFromAPI() {
     HTTPClient http;
     http.begin(String(TIMEZONE_API_URL) + "?timeZone=" + String(m_timezoneLocation.c_str()));
+    http.setTimeout(5000); // Set 5 second timeout to prevent hanging
 
     int httpCode = http.GET();
 
@@ -184,8 +185,9 @@ void GlobalTime::getTimeZoneOffsetFromAPI() {
             Log.warningln("Deserialization error on timezone offset API response");
         }
     } else {
-        Log.warningln("Failed to get timezone offset from API");
+        Log.warningln("Failed to get timezone offset from API, HTTP code: %d", httpCode);
     }
+    http.end(); // Always close the connection
 }
 
 bool GlobalTime::getFormat24Hour() {

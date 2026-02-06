@@ -1,0 +1,86 @@
+n.V�+ in ConfigManager
+I: ConfigManager initialized
+I: ScreenManager initialized
+I: TFT_MOSI: 17
+I: TFT_MISO: -1
+I: TFT_SCLK: 23
+I: TFT_CS: -1
+I: TFT_DC: 19
+I: TFT_RST: 18
+I: SCREEN_1_CS: 13
+I: SCREEN_2_CS: 33
+I: SCREEN_3_CS: 32
+I: SCREEN_4_CS: 25
+I: SCREEN_5_CS: 21
+I: Initializing watchdog timer to 60 seconds... 
+E (403) task_wdt: esp_task_wdt_init(515): TWDT already initialized
+E: failed!
+I: LittleFS mounted successfully.
+[   459][E][Preferences.cpp:506] getString(): nvs_get_str len fail: timezoneLoc NOT_FOUND
+[   470][E][Preferences.cpp:506] getString(): nvs_get_str len fail: ntpServer NOT_FOUND
+I: Connecting to WiFi
+I: Hostname: InfoOrbs-000000
+*wm:AutoConnect 
+*wm:Connect Wifi, ATTEMPT # 1 of 5
+*wm:Connecting to SAVED AP: TaxHawk-IoT
+*wm:connectTimeout not set, ESP waitForConnectResult... 
+*wm:AutoConnect: SUCCESS 
+*wm:STA IP Address: 10.2.110.60
+I: WifiManager connected.
+[  3702][E][Preferences.cpp:506] getString(): nvs_get_str len fail: timezoneLoc NOT_FOUND
+[  3716][E][Preferences.cpp:506] getString(): nvs_get_str len fail: ntpServer NOT_FOUND
+I: GlobalTime initialized, tzLoc=America/Denver, clockFormat=1, ntpServer=pool.ntp.org
+[  3731][E][Preferences.cpp:506] getString(): nvs_get_str len fail: weatherLocation NOT_FOUND
+I: WeatherWidget initialized, mode=1
+[  3744][E][Preferences.cpp:506] getString(): nvs_get_str len fail: stockList NOT_FOUND
+I: StockWidget initialized
+Constructing ParqetWidget, portfolioId=
+[  3757][E][Preferences.cpp:506] getString(): nvs_get_str len fail: pqportfoId NOT_FOUND
+[  3774][E][Preferences.cpp:506] getString(): nvs_get_str len fail: pqProxyUrl NOT_FOUND
+I: Widget Parqet is disabled
+[  3783][E][Preferences.cpp:506] getString(): nvs_get_str len fail: mqttHost NOT_FOUND
+[  3793][E][Preferences.cpp:506] getString(): nvs_get_str len fail: mqttSetupTopic NOT_FOUND
+[  3802][E][Preferences.cpp:506] getString(): nvs_get_str len fail: mqttUser NOT_FOUND
+[  3810][E][Preferences.cpp:506] getString(): nvs_get_str len fail: mqttPass NOT_FOUND
+I: Widget MQTTWidget is disabled
+[  3819][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneName0 NOT_FOUND
+[  3829][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneInfo0 NOT_FOUND
+[  3838][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneName1 NOT_FOUND
+[  3847][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneInfo1 NOT_FOUND
+[  3855][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneName2 NOT_FOUND
+[  3864][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneInfo2 NOT_FOUND
+[  3873][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneName3 NOT_FOUND
+[  3882][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneInfo3 NOT_FOUND
+[  3890][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneName4 NOT_FOUND
+[  3899][E][Preferences.cpp:506] getString(): nvs_get_str len fail: 5zoZoneInfo4 NOT_FOUND
+I: Widget 5 Zone Clock is disabled
+I: Widget Matrix Screen is disabled
+[  3916][E][Preferences.cpp:506] getString(): nvs_get_str len fail: teamName NOT_FOUND
+I: BaseballWidget initialized for team: Mets
+I: Widget Baseball is disabled
+[  3928][E][Preferences.cpp:506] getString(): nvs_get_str len fail: teamAbbrev NOT_FOUND
+I: NHLWidget initialized for team: UTA
+I: New config section: General
+I: New config section: TFT Settings
+I: New config section: ClockWidget
+I: New config section: WeatherWidget
+I: New config section: StockWidget
+I: New config section: ParqetWidget
+I: New config section: MqttWidget
+I: New config section: FiveZoneWidget
+I: New config section: MatrixWidget
+I: New config section: BaseballWidget
+I: New config section: NHLWidget
+E (3938) task_wdt: esp_task_wdt_reset(705): task not found
+I: IP address: 10.2.110.60
+*wm:Starting Web Portal 
+I: Connected to WiFi
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x3 (DOWNLOAD_BOOT(UART0/UART1/SDIO_REI_REO_V2))
+waiting for download
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x3 (DOWNLOAD_BOOT(UART0/UART1/SDIO_REI_REO_V2))
+waiting for download
+����������������������������������������������������������������

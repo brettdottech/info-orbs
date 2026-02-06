@@ -65,6 +65,8 @@ void ClockWidget::setup() {
     m_lastDisplay2Digit = "";
     m_lastDisplay4Digit = "";
     m_lastDisplay5Digit = "";
+    // Update to populate current time values (without forcing NTP/timezone refresh)
+    update(false);
 }
 
 void ClockWidget::draw(bool force) {

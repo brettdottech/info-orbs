@@ -40,6 +40,7 @@ void FiveZoneWidget::getTZoneOffset(int8_t zoneIndex) {
     TimeZone &zone = m_timeZones[zoneIndex];
     HTTPClient http;
     http.begin(String(TIMEZONE_API_URL) + "?timeZone=" + String(zone.tzInfo.c_str()));
+    http.setTimeout(5000); // Set 5 second timeout to prevent hanging
 
     Serial.println(String(TIMEZONE_API_URL) + "?timeZone=" + String(zone.tzInfo.c_str()));
 
@@ -75,8 +76,9 @@ void FiveZoneWidget::getTZoneOffset(int8_t zoneIndex) {
             Log.warningln("Deserialization error on timezone offset API response");
         }
     } else {
-        Log.warningln("Failed to get timezone offset from API");
+        Log.warningln("Failed to get timezone offset from API, HTTP code: %d", httpCode);
     }
+    http.end(); // Always close the connection
 }
 
 void FiveZoneWidget::update(bool force) {
