@@ -137,10 +137,28 @@ void MainHelper::checkButtons() {
 }
 
 void MainHelper::checkCycleWidgets() {
-    if (s_widgetSet && s_widgetCycleDelay > 0 && (s_widgetCycleDelayPrev == 0 || (millis() - s_widgetCycleDelayPrev) >= s_widgetCycleDelay * 1000)) {
-        s_widgetSet->next();
-        s_widgetCycleDelayPrev = millis();
+    if (!s_widgetSet) {
+        return;
     }
+
+    Widget *current = s_widgetSet->getCurrent();
+    unsigned long cycleDelayMs = 0;
+    if (current != nullptr) {
+        const unsigned long perWidgetDelay = current->getWidgetCyclePageDelayMs();
+        cycleDelayMs = perWidgetDelay > 0 ? perWidgetDelay : static_cast<unsigned long>(s_widgetCycleDelay) * 1000UL;
+    } else {
+        cycleDelayMs = static_cast<unsigned long>(s_widgetCycleDelay) * 1000UL;
+    }
+
+    if (cycleDelayMs <= 0) {
+        return;
+    }
+    if (s_widgetCycleDelayPrev != 0 && (millis() - s_widgetCycleDelayPrev) < cycleDelayMs) {
+        return;
+    }
+
+    s_widgetSet->next();
+    s_widgetCycleDelayPrev = millis();
 }
 
 // Handle simulated button state

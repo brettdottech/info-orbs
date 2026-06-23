@@ -9,6 +9,9 @@
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
+#if INCLUDE_PLANE_RADAR != WIDGET_DISABLED
+    #include "planeradarwidget/PlaneRadarWidget.h"
+#endif
 #include <ArduinoLog.h>
 
 TFT_eSPI tft = TFT_eSPI();
@@ -50,6 +53,9 @@ void addWidgets() {
 #endif
 #if INCLUDE_MATRIXSCREEN != WIDGET_DISABLED
     widgetSet->add(new MatrixWidget(*sm, *config));
+#endif
+#if INCLUDE_PLANE_RADAR != WIDGET_DISABLED
+    widgetSet->add(new PlaneRadarWidget(*sm, *config));
 #endif
 }
 
