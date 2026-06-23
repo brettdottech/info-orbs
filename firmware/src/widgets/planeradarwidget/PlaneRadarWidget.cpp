@@ -380,6 +380,7 @@ void PlaneRadarWidget::setup() {
         m_lastDetail[i].occupied = false;
         m_lastDetail[i].route[0] = '\0';
         m_slotCallsign[i][0] = '\0';
+        m_detailDrawn[i] = false;
     }
 
     if (m_prefs.begin(kPrefsNamespace, true)) {
@@ -527,7 +528,7 @@ void PlaneRadarWidget::draw(bool force) {
     }
 
     drawAircraftLayer();
-    drawChangedDetails();
+    drawChangedDetails(force);
     m_dataChanged = false;
 }
 
@@ -798,7 +799,7 @@ void PlaneRadarWidget::drawEmptyDetail(int screenIndex) {
     m_manager.drawString("No aircraft", kCenterX, kCenterY, 18, Align::MiddleCenter, kColorLabel, kColorBackground);
 }
 
-void PlaneRadarWidget::drawChangedDetails() {
+void PlaneRadarWidget::drawChangedDetails(bool force) {
     for (int slot = 0; slot < kDetailSlots; ++slot) {
         const int rank = resolveDetailRank(slot);
 
@@ -827,7 +828,7 @@ void PlaneRadarWidget::drawChangedDetails() {
                              strncmp(next.alt, prev.alt, sizeof(next.alt)) != 0 || speedChanged ||
                              next.dbFlags != prev.dbFlags || movementLabelChanged;
 
-        if (!changed) {
+        if (!changed && !force && m_detailDrawn[slot]) {
             continue;
         }
 
@@ -837,6 +838,7 @@ void PlaneRadarWidget::drawChangedDetails() {
             drawEmptyDetail(slot + 1);
         }
         m_lastDetail[slot] = next;
+        m_detailDrawn[slot] = true;
     }
 }
 

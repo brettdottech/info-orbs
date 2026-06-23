@@ -71,7 +71,7 @@ private:
 
     void updateAircraftDetail(int screenIndex, int rank, const DetailSnapshot &prev, const DetailSnapshot &next);
     void drawEmptyDetail(int screenIndex);
-    void drawChangedDetails();
+    void drawChangedDetails(bool force = false);
 
     float m_configLat;
     float m_configLon;
@@ -91,6 +91,7 @@ private:
     size_t m_routeFetchSlot = 0;
     DetailSnapshot m_lastDetail[kDetailSlots];
     char m_slotCallsign[kDetailSlots][9];
+    bool m_detailDrawn[kDetailSlots] = {};
 
     DrawnPlane m_lastDrawnPlanes[AdsbClient::kMaxAircraft];
     size_t m_lastDrawnCount = 0;
