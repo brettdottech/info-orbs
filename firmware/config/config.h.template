@@ -16,6 +16,7 @@
 #define INCLUDE_MQTT WIDGET_DISABLED
 #define INCLUDE_5ZONE WIDGET_OFF
 #define INCLUDE_MATRIXSCREEN WIDGET_OFF
+#define INCLUDE_PLANE_RADAR WIDGET_OFF
 
 // WEATHER FEED SELECTION (ONLY SET ONE FEED TO TRUE)
 #define WEATHER_VISUALCROSSING_FEED true
@@ -100,6 +101,14 @@
 // WEB DATA CONFIGURATION
 // #define WEB_DATA_WIDGET_URL "" // Use this to make your own widgets using an API/Webdata source
 // #define WEB_DATA_STOCK_WIDGET_URL "http://<insert host here>/stocks.php?stocks=SPY,VT,GOOG,TSLA,GME" // Use this as an alternative to the stock ticker widget
+
+// PLANE RADAR (live ADS-B — inspired by https://github.com/MatixYo/ESP32-Plane-Radar)
+// #define PLANE_RADAR_LAT 48.4284
+// #define PLANE_RADAR_LON -123.3656
+// #define PLANE_RADAR_RANGE_INDEX 1
+// #define PLANE_RADAR_FETCH_INTERVAL_SEC 3
+// #define PLANE_RADAR_CYCLE_DELAY 180
+// #define PLANE_RADAR_UNITS_METRIC
 
 // MQTT CONFIGURATION
 // #define MQTT_WIDGET_HOST "192.168.3.40" // MQTT broker host

@@ -238,3 +238,22 @@
 #endif
 
 #endif
+
+#ifndef INCLUDE_PLANE_RADAR
+    #define INCLUDE_PLANE_RADAR WIDGET_OFF
+#endif
+#ifndef PLANE_RADAR_LAT
+    #define PLANE_RADAR_LAT 48.4284f
+#endif
+#ifndef PLANE_RADAR_LON
+    #define PLANE_RADAR_LON -123.3656f
+#endif
+#ifndef PLANE_RADAR_RANGE_INDEX
+    #define PLANE_RADAR_RANGE_INDEX 1
+#endif
+#ifndef PLANE_RADAR_FETCH_INTERVAL_SEC
+    #define PLANE_RADAR_FETCH_INTERVAL_SEC 3
+#endif
+#ifndef PLANE_RADAR_CYCLE_DELAY
+    #define PLANE_RADAR_CYCLE_DELAY 180
+#endif

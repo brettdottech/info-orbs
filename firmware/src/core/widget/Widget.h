@@ -18,6 +18,8 @@ public:
     virtual void draw(bool force = false) = 0;
     virtual void buttonPressed(uint8_t buttonId, ButtonState state) = 0;
     virtual String getName() = 0;
+    // Non-zero overrides global widget cycle delay while this widget is active.
+    virtual unsigned long getWidgetCyclePageDelayMs() const { return 0; }
 
     WidgetTimer &addDrawRefreshFrequency(TimeFrequency frequency);
     WidgetTimer &addUpdateRefreshFrequency(TimeFrequency frequency);
