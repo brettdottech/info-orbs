@@ -45,6 +45,7 @@ const uint16_t kColorPia = 0xF81F;
 const uint16_t kColorLadd = TFT_DARKGREY;
 
 constexpr float kKtToMph = 1.15078f;
+constexpr int kSpeedRedrawThresholdMph = 2;
 constexpr uint8_t kDbFlagMilitary = 1;
 constexpr uint8_t kDbFlagInteresting = 2;
 constexpr uint8_t kDbFlagPia = 4;
@@ -357,6 +358,7 @@ PlaneRadarWidget::PlaneRadarWidget(ScreenManager &manager, ConfigManager &config
     for (int i = 0; i < kDetailSlots; ++i) {
         m_lastDetail[i].occupied = false;
         m_lastDetail[i].callsign[0] = '\0';
+        m_slotCallsign[i][0] = '\0';
     }
 }
 
@@ -371,10 +373,13 @@ void PlaneRadarWidget::setup() {
     m_sortedCount = 0;
     m_routeFetchSlot = 0;
     m_lastAircraftCount = UINT_MAX;
+    m_fullRedrawNeeded = true;
+    m_lastDrawnCount = 0;
     RouteClient::clearCache();
     for (int i = 0; i < kDetailSlots; ++i) {
         m_lastDetail[i].occupied = false;
         m_lastDetail[i].route[0] = '\0';
+        m_slotCallsign[i][0] = '\0';
     }
 
     if (m_prefs.begin(kPrefsNamespace, true)) {
@@ -396,6 +401,10 @@ void PlaneRadarWidget::cycleRange() {
     saveRangeIndex();
     m_fetchPrev = 0;
     m_dataChanged = true;
+    m_fullRedrawNeeded = true;
+    for (int i = 0; i < kDetailSlots; ++i) {
+        m_slotCallsign[i][0] = '\0';
+    }
 }
 
 const PlaneRadarWidget::RangePreset &PlaneRadarWidget::currentRange() const {
@@ -473,19 +482,20 @@ void PlaneRadarWidget::update(bool force) {
 }
 
 void PlaneRadarWidget::refreshRouteData() {
-    const int slots = m_sortedCount < static_cast<size_t>(kDetailSlots) ? static_cast<int>(m_sortedCount)
-                                                                        : kDetailSlots;
-    if (slots <= 0) {
+    const char *callsigns[kDetailSlots];
+    size_t count = 0;
+    for (int i = 0; i < kDetailSlots; ++i) {
+        const int rank = resolveDetailRank(i);
+        if (rank >= 0) {
+            callsigns[count++] = AdsbClient::aircraftList()[m_sorted[rank].index].callsign;
+        }
+    }
+    if (count == 0) {
         return;
     }
 
-    const char *callsigns[kDetailSlots];
-    for (int i = 0; i < slots; ++i) {
-        callsigns[i] = AdsbClient::aircraftList()[m_sorted[i].index].callsign;
-    }
-
     setBusy(true);
-    const bool fetched = RouteClient::prefetchOne(callsigns, static_cast<size_t>(slots), &m_routeFetchSlot);
+    const bool fetched = RouteClient::prefetchOne(callsigns, count, &m_routeFetchSlot);
     setBusy(false);
 
     if (fetched) {
@@ -502,12 +512,20 @@ void PlaneRadarWidget::draw(bool force) {
     if (!m_hasData) {
         if (force) {
             drawLoadingRadar(0);
+            m_fullRedrawNeeded = true;
         }
         m_dataChanged = false;
         return;
     }
 
-    drawStaticRadarGrid(0);
+    if (force || m_fullRedrawNeeded) {
+        drawStaticRadarGrid(0, true);
+        m_fullRedrawNeeded = false;
+    } else {
+        eraseOldPlanes();
+        drawStaticRadarGrid(0, false);
+    }
+
     drawAircraftLayer();
     drawChangedDetails();
     m_dataChanged = false;
@@ -516,13 +534,17 @@ void PlaneRadarWidget::draw(bool force) {
 void PlaneRadarWidget::drawLoadingRadar(int screenIndex) {
     m_manager.selectScreen(screenIndex);
     m_manager.fillScreen(kColorBackground);
-    m_manager.drawCentreString("Plane Radar", kCenterX, kCenterY - 20, 22);
-    m_manager.drawCentreString("Loading...", kCenterX, kCenterY + 20, 18);
+    m_manager.drawString("Plane Radar", kCenterX, kCenterY - 20, 22, Align::MiddleCenter, kColorLabel,
+                         kColorBackground);
+    m_manager.drawString("Loading...", kCenterX, kCenterY + 20, 18, Align::MiddleCenter, kColorLabel,
+                         kColorBackground);
 }
 
-void PlaneRadarWidget::drawStaticRadarGrid(int screenIndex) {
+void PlaneRadarWidget::drawStaticRadarGrid(int screenIndex, bool fullRedraw) {
     m_manager.selectScreen(screenIndex);
-    m_manager.fillScreen(kColorBackground);
+    if (fullRedraw) {
+        m_manager.fillScreen(kColorBackground);
+    }
 
     drawGridRing(m_manager, kCenterX, kCenterY, kGridOuterRadius, kColorGrid);
     for (int i = 1; i < kRingCount; ++i) {
@@ -548,8 +570,24 @@ void PlaneRadarWidget::drawStaticRadarGrid(int screenIndex) {
     m_manager.setLegacyTextDatum(MR_DATUM);
     m_manager.drawLegacyString(rangeLabel, kCenterX + kGridOuterRadius - 6, kCenterY, 2);
 
-    m_lastAircraftCount = UINT_MAX;
-    updateCountLabel(static_cast<unsigned>(AdsbClient::aircraftCount()));
+    if (fullRedraw) {
+        m_lastAircraftCount = UINT_MAX;
+        updateCountLabel(static_cast<unsigned>(AdsbClient::aircraftCount()));
+    }
+}
+
+void PlaneRadarWidget::eraseOldPlanes() {
+    m_manager.selectScreen(0);
+    for (size_t i = 0; i < m_lastDrawnCount; ++i) {
+        const DrawnPlane &p = m_lastDrawnPlanes[i];
+        if (p.isDot) {
+            m_manager.fillCircle(p.x, p.y, kBeyondRingDotRadiusPx, kColorBackground);
+        } else {
+            drawSpeedVector(m_manager, p.x, p.y, p.headingDeg, p.trackDeg, p.gsKnots, kColorBackground);
+            drawHeadingTriangle(m_manager, p.x, p.y, p.headingDeg, kColorBackground);
+        }
+    }
+    m_lastDrawnCount = 0;
 }
 
 void PlaneRadarWidget::drawAircraftLayer() {
@@ -562,6 +600,7 @@ void PlaneRadarWidget::drawAircraftLayer() {
 
     DrawItem items[AdsbClient::kMaxAircraft];
     size_t drawCount = 0;
+    m_lastDrawnCount = 0;
 
     for (size_t i = 0; i < n; ++i) {
         float dxKm = 0.0f;
@@ -579,6 +618,10 @@ void PlaneRadarWidget::drawAircraftLayer() {
             items[drawCount].distSq = distSqFromCenter(x, y);
             items[drawCount].isRim = false;
             ++drawCount;
+            
+            if (m_lastDrawnCount < AdsbClient::kMaxAircraft) {
+                m_lastDrawnPlanes[m_lastDrawnCount++] = {x, y, planes[i].noseDeg, planes[i].trackDeg, planes[i].gsKnots, false};
+            }
             continue;
         }
 
@@ -586,6 +629,9 @@ void PlaneRadarWidget::drawAircraftLayer() {
         int dotY = 0;
         if (beyondRingEdgeDot(m_configLat, m_configLon, outerKm, planes[i].lat, planes[i].lon, &dotX, &dotY)) {
             m_manager.fillCircle(dotX, dotY, kBeyondRingDotRadiusPx, kColorAircraft);
+            if (m_lastDrawnCount < AdsbClient::kMaxAircraft) {
+                m_lastDrawnPlanes[m_lastDrawnCount++] = {dotX, dotY, 0.0f, 0.0f, 0.0f, true};
+            }
         }
     }
 
@@ -617,9 +663,9 @@ void PlaneRadarWidget::updateCountLabel(unsigned count) {
     m_manager.drawLegacyString(countLabel, kCenterX, kSize - 18, 2);
 }
 
-void PlaneRadarWidget::drawAircraftDetail(int screenIndex, int rank) {
+void PlaneRadarWidget::updateAircraftDetail(int screenIndex, int rank, const DetailSnapshot &prev,
+                                            const DetailSnapshot &next) {
     m_manager.selectScreen(screenIndex);
-    m_manager.fillScreen(kColorBackground);
 
     if (rank < 0 || rank >= static_cast<int>(m_sortedCount)) {
         drawEmptyDetail(screenIndex);
@@ -627,93 +673,166 @@ void PlaneRadarWidget::drawAircraftDetail(int screenIndex, int rank) {
     }
 
     const AdsbClient::Aircraft &plane = AdsbClient::aircraftList()[m_sorted[rank].index];
+    const bool newPlane =
+        !prev.occupied || strncmp(prev.callsign, next.callsign, sizeof(prev.callsign)) != 0;
 
-    if (hasSpecialDbFlags(plane.dbFlags)) {
-        drawSpecialOrbOutline(m_manager, dbFlagsOutlineColor(plane.dbFlags));
+    if (newPlane) {
+        m_manager.fillScreen(kColorBackground);
     }
 
-    String callsign = plane.callsign[0] != '\0' ? String(plane.callsign) : String("Unknown");
-
-    String description;
-    if (plane.desc[0] != '\0') {
-        description = String(plane.desc);
-    } else if (plane.type[0] != '\0') {
-        description = String(plane.type);
-    } else {
-        description = "Unknown";
-    }
-
-    String speed;
-    if (plane.gsKnots > 0.0f) {
-        speed = String(knotsToMph(plane.gsKnots)) + " mph";
-    } else {
-        speed = "— mph";
-    }
-
-    String altitude = plane.alt[0] != '\0' ? String(plane.alt) : String("—");
-
-    char route[56];
-    RouteClient::formatRoute(plane.callsign, route, sizeof(route));
-
-    m_manager.drawString(callsign, kCenterX, 32, 22, Align::MiddleCenter, kColorLabel, kColorBackground);
-    m_manager.drawFittedString(description, kCenterX, 68, 200, 32, Align::MiddleCenter);
-    if (route[0] != '\0') {
-        m_manager.drawFittedString(String(route), kCenterX, 102, 200, 28, Align::MiddleCenter);
-    }
-    m_manager.drawString(speed, kCenterX, 132, 18, Align::MiddleCenter, kColorLabel, kColorBackground);
-    m_manager.drawString(altitude, kCenterX, 164, 18, Align::MiddleCenter, kColorAlt, kColorBackground);
-
-    if (hasSpecialDbFlags(plane.dbFlags)) {
-        char flagLabel[48];
-        formatDbFlagsLabel(plane.dbFlags, flagLabel, sizeof(flagLabel));
-        m_manager.drawString(String(flagLabel), kCenterX, 204, 14, Align::MiddleCenter,
-                             dbFlagsOutlineColor(plane.dbFlags), kColorBackground);
-    } else {
-        const MovementHint movement = classifyMovement(plane);
-        const char *label = movementLabel(movement);
-        if (label != nullptr) {
-            m_manager.drawString(String(label), kCenterX, 204, 14, Align::MiddleCenter, movementColor(movement),
-                                 kColorBackground);
+    if (newPlane || next.dbFlags != prev.dbFlags) {
+        if (hasSpecialDbFlags(plane.dbFlags)) {
+            drawSpecialOrbOutline(m_manager, dbFlagsOutlineColor(plane.dbFlags));
+        } else {
+            drawSpecialOrbOutline(m_manager, kColorBackground);
         }
     }
+
+    if (newPlane || strncmp(next.callsign, prev.callsign, sizeof(next.callsign)) != 0) {
+        m_manager.fillRect(0, 14, kSize, 36, kColorBackground);
+        const String callsign = next.callsign[0] != '\0' ? String(next.callsign) : String("Unknown");
+        m_manager.drawString(callsign, kCenterX, 32, 22, Align::MiddleCenter, kColorLabel, kColorBackground);
+    }
+
+    if (newPlane || strncmp(next.desc, prev.desc, sizeof(next.desc)) != 0) {
+        m_manager.fillRect(0, 50, kSize, 40, kColorBackground);
+        m_manager.setFontColor(kColorLabel, kColorBackground);
+        const String description = next.desc[0] != '\0' ? String(next.desc) : String("Unknown");
+        m_manager.drawFittedString(description, kCenterX, 68, 200, 32, Align::MiddleCenter);
+    }
+
+    if (newPlane || strncmp(next.route, prev.route, sizeof(next.route)) != 0) {
+        m_manager.fillRect(0, 88, kSize, 32, kColorBackground);
+        if (next.route[0] != '\0') {
+            m_manager.setFontColor(kColorLabel, kColorBackground);
+            m_manager.drawFittedString(String(next.route), kCenterX, 102, 200, 28, Align::MiddleCenter);
+        }
+    }
+
+    if (newPlane || abs(next.speedMph - prev.speedMph) >= kSpeedRedrawThresholdMph) {
+        m_manager.fillRect(0, 118, kSize, 30, kColorBackground);
+        const String speed = next.speedMph > 0 ? String(next.speedMph) + " mph" : String("— mph");
+        m_manager.drawString(speed, kCenterX, 132, 18, Align::MiddleCenter, kColorLabel, kColorBackground);
+    }
+
+    if (newPlane || strncmp(next.alt, prev.alt, sizeof(next.alt)) != 0) {
+        m_manager.fillRect(0, 150, kSize, 38, kColorBackground);
+        const String altitude = next.alt[0] != '\0' ? String(next.alt) : String("—");
+        m_manager.drawString(altitude, kCenterX, 164, 18, Align::MiddleCenter, kColorAlt, kColorBackground);
+    }
+
+    const MovementHint movement = static_cast<MovementHint>(next.movement);
+    const char *movementLabelText = movementLabel(movement);
+    const MovementHint prevMovement = static_cast<MovementHint>(prev.movement);
+    const char *prevMovementLabelText = movementLabel(prevMovement);
+    const bool movementLabelChanged = (movementLabelText == nullptr) != (prevMovementLabelText == nullptr) ||
+                                      (movementLabelText != nullptr && prevMovementLabelText != nullptr &&
+                                       strcmp(movementLabelText, prevMovementLabelText) != 0);
+
+    if (newPlane || next.dbFlags != prev.dbFlags || movementLabelChanged) {
+        m_manager.fillRect(0, 188, kSize, 32, kColorBackground);
+        if (hasSpecialDbFlags(plane.dbFlags)) {
+            char flagLabel[48];
+            formatDbFlagsLabel(plane.dbFlags, flagLabel, sizeof(flagLabel));
+            m_manager.drawString(String(flagLabel), kCenterX, 204, 14, Align::MiddleCenter,
+                                 dbFlagsOutlineColor(plane.dbFlags), kColorBackground);
+        } else if (movementLabelText != nullptr) {
+            m_manager.drawString(String(movementLabelText), kCenterX, 204, 14, Align::MiddleCenter,
+                                 movementColor(movement), kColorBackground);
+        }
+    }
+}
+
+void PlaneRadarWidget::buildDetailSnapshot(int rank, DetailSnapshot *out) const {
+    *out = {};
+    if (rank < 0 || rank >= static_cast<int>(m_sortedCount)) {
+        return;
+    }
+
+    const AdsbClient::Aircraft &plane = AdsbClient::aircraftList()[m_sorted[rank].index];
+    strncpy(out->callsign, plane.callsign, sizeof(out->callsign) - 1);
+    strncpy(out->desc, plane.desc[0] != '\0' ? plane.desc : plane.type, sizeof(out->desc) - 1);
+    RouteClient::formatRoute(plane.callsign, out->route, sizeof(out->route));
+    strncpy(out->alt, plane.alt, sizeof(out->alt) - 1);
+    out->speedMph = knotsToMph(plane.gsKnots);
+    out->dbFlags = plane.dbFlags;
+    out->movement = static_cast<int8_t>(classifyMovement(plane));
+    out->occupied = true;
+}
+
+int PlaneRadarWidget::resolveDetailRank(int slot) const {
+    if (m_sortedCount == 0) {
+        return -1;
+    }
+
+    if (m_slotCallsign[slot][0] != '\0') {
+        for (size_t i = 0; i < m_sortedCount; ++i) {
+            const char *callsign = AdsbClient::aircraftList()[m_sorted[i].index].callsign;
+            if (strncmp(callsign, m_slotCallsign[slot], sizeof(m_slotCallsign[slot])) == 0) {
+                return static_cast<int>(i);
+            }
+        }
+    }
+
+    for (size_t i = 0; i < m_sortedCount; ++i) {
+        const char *callsign = AdsbClient::aircraftList()[m_sorted[i].index].callsign;
+        bool used = false;
+        for (int s = 0; s < kDetailSlots; ++s) {
+            if (s != slot && m_slotCallsign[s][0] != '\0' &&
+                strncmp(m_slotCallsign[s], callsign, sizeof(m_slotCallsign[s])) == 0) {
+                used = true;
+                break;
+            }
+        }
+        if (!used) {
+            return static_cast<int>(i);
+        }
+    }
+
+    return -1;
 }
 
 void PlaneRadarWidget::drawEmptyDetail(int screenIndex) {
     m_manager.selectScreen(screenIndex);
     m_manager.fillScreen(kColorBackground);
-    m_manager.drawCentreString("No aircraft", kCenterX, kCenterY, 18);
+    m_manager.drawString("No aircraft", kCenterX, kCenterY, 18, Align::MiddleCenter, kColorLabel, kColorBackground);
 }
 
 void PlaneRadarWidget::drawChangedDetails() {
     for (int slot = 0; slot < kDetailSlots; ++slot) {
+        const int rank = resolveDetailRank(slot);
+
         DetailSnapshot next{};
-        if (slot < static_cast<int>(m_sortedCount)) {
-            const AdsbClient::Aircraft &plane = AdsbClient::aircraftList()[m_sorted[slot].index];
-            strncpy(next.callsign, plane.callsign, sizeof(next.callsign) - 1);
-            strncpy(next.desc, plane.desc[0] != '\0' ? plane.desc : plane.type, sizeof(next.desc) - 1);
-            RouteClient::formatRoute(plane.callsign, next.route, sizeof(next.route));
-            strncpy(next.alt, plane.alt, sizeof(next.alt) - 1);
-            next.speedMph = knotsToMph(plane.gsKnots);
-            next.dbFlags = plane.dbFlags;
-            next.movement = static_cast<int8_t>(classifyMovement(plane));
-            next.occupied = true;
+        if (rank >= 0) {
+            buildDetailSnapshot(rank, &next);
+            strncpy(m_slotCallsign[slot], next.callsign, sizeof(m_slotCallsign[slot]) - 1);
+        } else {
+            m_slotCallsign[slot][0] = '\0';
         }
 
         const DetailSnapshot &prev = m_lastDetail[slot];
+        const MovementHint movement = static_cast<MovementHint>(next.movement);
+        const char *movementLabelText = next.occupied ? movementLabel(movement) : nullptr;
+        const MovementHint prevMovement = static_cast<MovementHint>(prev.movement);
+        const char *prevMovementLabelText = prev.occupied ? movementLabel(prevMovement) : nullptr;
+        const bool movementLabelChanged = (movementLabelText == nullptr) != (prevMovementLabelText == nullptr) ||
+                                          (movementLabelText != nullptr && prevMovementLabelText != nullptr &&
+                                           strcmp(movementLabelText, prevMovementLabelText) != 0);
+        const bool speedChanged =
+            next.occupied && prev.occupied && abs(next.speedMph - prev.speedMph) >= kSpeedRedrawThresholdMph;
         const bool changed = next.occupied != prev.occupied ||
                              strncmp(next.callsign, prev.callsign, sizeof(next.callsign)) != 0 ||
                              strncmp(next.desc, prev.desc, sizeof(next.desc)) != 0 ||
                              strncmp(next.route, prev.route, sizeof(next.route)) != 0 ||
-                             strncmp(next.alt, prev.alt, sizeof(next.alt)) != 0 ||
-                             next.speedMph != prev.speedMph || next.dbFlags != prev.dbFlags ||
-                             next.movement != prev.movement;
+                             strncmp(next.alt, prev.alt, sizeof(next.alt)) != 0 || speedChanged ||
+                             next.dbFlags != prev.dbFlags || movementLabelChanged;
 
         if (!changed) {
             continue;
         }
 
         if (next.occupied) {
-            drawAircraftDetail(slot + 1, slot);
+            updateAircraftDetail(slot + 1, rank, prev, next);
         } else {
             drawEmptyDetail(slot + 1);
         }

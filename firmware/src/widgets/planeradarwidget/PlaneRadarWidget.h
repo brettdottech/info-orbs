@@ -39,6 +39,15 @@ private:
         bool occupied;
     };
 
+    struct DrawnPlane {
+        int x;
+        int y;
+        float headingDeg;
+        float trackDeg;
+        float gsKnots;
+        bool isDot;
+    };
+
     static const RangePreset kRangePresets[];
     static constexpr size_t kRangePresetCount = 4;
     static constexpr int kDetailSlots = NUM_SCREENS - 1;
@@ -51,13 +60,16 @@ private:
     void rebuildSortedList();
     float distanceKm(float lat, float lon) const;
     void refreshRouteData();
+    int resolveDetailRank(int slot) const;
+    void buildDetailSnapshot(int rank, DetailSnapshot *out) const;
 
-    void drawStaticRadarGrid(int screenIndex);
+    void drawStaticRadarGrid(int screenIndex, bool fullRedraw);
     void drawLoadingRadar(int screenIndex);
     void drawAircraftLayer();
+    void eraseOldPlanes();
     void updateCountLabel(unsigned count);
 
-    void drawAircraftDetail(int screenIndex, int rank);
+    void updateAircraftDetail(int screenIndex, int rank, const DetailSnapshot &prev, const DetailSnapshot &next);
     void drawEmptyDetail(int screenIndex);
     void drawChangedDetails();
 
@@ -78,6 +90,11 @@ private:
     size_t m_sortedCount = 0;
     size_t m_routeFetchSlot = 0;
     DetailSnapshot m_lastDetail[kDetailSlots];
+    char m_slotCallsign[kDetailSlots][9];
+
+    DrawnPlane m_lastDrawnPlanes[AdsbClient::kMaxAircraft];
+    size_t m_lastDrawnCount = 0;
+    bool m_fullRedrawNeeded = true;
 
     Preferences m_prefs;
 };
