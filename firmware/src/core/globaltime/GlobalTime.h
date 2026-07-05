@@ -52,6 +52,7 @@ public:
     bool isPM();
     bool getFormat24Hour();
     bool setFormat24Hour(bool format24hour);
+    int getTimeZoneOffsetSeconds(); // seconds, DST-aware; -1 sentinel if not yet fetched from the API
 
 private:
     GlobalTime();

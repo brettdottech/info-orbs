@@ -48,6 +48,10 @@
 //#define MQTT_WIDGET_USER "mqttuser" // Leave empty if authentication is not required
 //#define MQTT_WIDGET_PASS "mqttuser" // Leave empty if authentication is not required
 
+// CALENDAR CONFIGURATION
+//#define CALENDAR_ICS_URL "https://calendar.google.com/calendar/ical/xxxx/private-xxxx/basic.ics" // Secret ICS feed URL for your calendar - treat this like a password, do not share/commit it
+//#define CALENDAR_MAX_EVENTS 40 // Max number of upcoming events (incl. expanded recurring instances) to keep in memory
+
 // WIFI CONFIGURATION
 // Normally WiFi should be configured using a smartphone or computer to connect to the Info-Orbs
 // configuration portal. But as a fall-back method, WiFi can be setup by uncommenting these 2 lines and
@@ -124,5 +128,15 @@
 #define WEATHER_API_KEY "XW2RDGD6XK432AF25BNK2A3C7"
 
 #define MAX_RETRIES 3
+
+#ifndef CALENDAR_MAX_EVENTS
+    #define CALENDAR_MAX_EVENTS 40
+#endif
+#ifndef CALENDAR_WINDOW_DAYS
+    #define CALENDAR_WINDOW_DAYS 6
+#endif
+#ifndef CALENDAR_TITLE_MAX_LEN
+    #define CALENDAR_TITLE_MAX_LEN 48
+#endif
 
 #endif
