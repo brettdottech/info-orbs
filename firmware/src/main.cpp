@@ -100,7 +100,7 @@ void setup() {
     sm->drawCentreString("by", ScreenCenterX, ScreenCenterY - 5, 22);
     sm->drawCentreString("brett.tech", ScreenCenterX, ScreenCenterY + 30, 22);
     sm->setFontColor(TFT_RED);
-    sm->drawCentreString("version: 1.1.0", ScreenCenterX, ScreenCenterY + 65, 14);
+    sm->drawCentreString("version: 1.2.0", ScreenCenterX, ScreenCenterY + 65, 14);
 
     sm->selectScreen(2);
 

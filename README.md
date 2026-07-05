@@ -57,6 +57,10 @@ Shows your calendar right on the orbs: a clock, a month-at-a-glance grid, and an
 - timezones are handled correctly for a curated list of common named zones (not full `VTIMEZONE`-block parsing — see [ADR-001](docs/adr/ADR-001-calendar-widget.md) for the exact scope and rationale, and for anyone wanting the full technical design behind this widget). 
 - only been verified against Google Calendar and Outlook/Microsoft 365 `.ics` feeds so far — feedback on other providers (iCloud, etc.) is very welcome.
 
+## Changelog
+
+Notable changes in this fork (current version: **1.2.0**) are tracked in [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 This project (including this fork's additions) is licensed under AGPLv3 — see [LICENSE.txt](LICENSE.txt).
