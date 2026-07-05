@@ -54,6 +54,10 @@ void ScreenManager::setFont(TTF_Font font) {
         error = m_render.loadFont(robotoRegular_start, robotoRegular_end - robotoRegular_start);
         break;
 
+    case ROBOTO_BOLD:
+        error = m_render.loadFont(robotoBold_start, robotoBold_end - robotoBold_start);
+        break;
+
     case FINAL_FRONTIER:
         error = m_render.loadFont(finalFrontier_start, finalFrontier_end - finalFrontier_start);
         break;
@@ -170,6 +174,16 @@ unsigned int ScreenManager::calculateFitFontSize(uint32_t limit_width, uint32_t 
     unsigned int calcFontSize = m_render.calculateFitFontSize(limit_width, limit_height, layout, text.c_str());
     // Serial.printf("calcFitFontSize: t=%s, w=%d, h=%d -> fs=%d\n", str, limit_width, limit_height, calcFontSize);
     return calcFontSize;
+}
+
+unsigned int ScreenManager::getTextWidth(const String &text, unsigned int fontSize) {
+    if (fontSize == 0) {
+        fontSize = m_render.getFontSize();
+    } else {
+        fontSize = getScaledFontSize(fontSize);
+    }
+    FT_BBox box = m_render.calculateBoundingBox(0, 0, fontSize, Align::TopLeft, Layout::Horizontal, text.c_str());
+    return box.xMax - box.xMin;
 }
 
 void ScreenManager::drawString(const String &text, int x, int y) {

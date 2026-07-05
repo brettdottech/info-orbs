@@ -45,6 +45,12 @@ public:
     // Helper functions
     unsigned int calculateFitFontSize(uint32_t limit_width, uint32_t limit_height, Layout layout, const String &text);
 
+    // Rendered width (px) of `text` in the currently loaded font, at
+    // `fontSize` (0 = keep the current font size) - lets a caller measure
+    // one piece of text before drawing another right after it (e.g. a
+    // regular-weight time prefix followed by a bold title).
+    unsigned int getTextWidth(const String &text, unsigned int fontSize = 0);
+
     // Draw string functions
     void drawString(const String &text, int x, int y, unsigned int fontSize, Align align, int32_t fgColor = -1, int32_t bgColor = -1, bool applyScale = true);
     void drawString(const String &text, int x, int y);

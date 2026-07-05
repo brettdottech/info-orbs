@@ -265,10 +265,12 @@ void CalendarWidget::drawAgendaSlot(int screenIndex, const CalendarEvent *event,
     // since they're the parts most likely to need the extra width.
     m_manager.drawString(dayLabel, 120, 30, calendarFontSize, Align::MiddleCenter);
     m_manager.drawString(duration, 120, 52, calendarFontSize, Align::MiddleCenter);
+    m_manager.setFont(ROBOTO_BOLD);
     m_manager.drawString(titleLine1, kAgendaTitleLocationMargin, 80, calendarFontSize, Align::MiddleLeft);
     if (titleLine2.length() > 0) {
         m_manager.drawString(titleLine2, kAgendaTitleLocationMargin, 102, calendarFontSize, Align::MiddleLeft);
     }
+    m_manager.setFont(DEFAULT_FONT);
 
     if (strlen(event->location) > 0) {
         String locationLine1, locationLine2;
@@ -348,7 +350,12 @@ void CalendarWidget::drawAgendaDaySlot(int screenIndex, time_t dayStart) {
             titlePart = titlePart.substring(0, maxTitleCharsCompact - 3) + "...";
         }
         int y = firstEventY + i * eventRowSpacing;
-        m_manager.drawString(timePart + "  " + titlePart, kAgendaLeftMargin, y, calendarFontSize, Align::MiddleLeft);
+        String timePrefix = timePart + "  ";
+        m_manager.drawString(timePrefix, kAgendaLeftMargin, y, calendarFontSize, Align::MiddleLeft);
+        int titleX = kAgendaLeftMargin + m_manager.getTextWidth(timePrefix, calendarFontSize);
+        m_manager.setFont(ROBOTO_BOLD);
+        m_manager.drawString(titlePart, titleX, y, calendarFontSize, Align::MiddleLeft);
+        m_manager.setFont(DEFAULT_FONT);
     }
 
     if (totalCount > shown) {
