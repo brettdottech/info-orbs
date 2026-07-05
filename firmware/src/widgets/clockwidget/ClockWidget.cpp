@@ -13,6 +13,10 @@ void ClockWidget::setup() {
     m_lastDisplay2Digit = "";
     m_lastDisplay4Digit = "";
     m_lastDisplay5Digit = "";
+    m_lastAmPm = "";
+    m_lastSecondSingle = -1;
+    m_colonVisible = true;
+    m_colonBlinkPrev = millis();
 }
 
 void ClockWidget::draw(bool force) {
@@ -36,30 +40,51 @@ void ClockWidget::draw(bool force) {
         m_lastDisplay5Digit = m_display5Digit;
     }
 
+    // Colon blink: stable 500ms on / 500ms off, driven directly by millis()
+    // (rollover-safe unsigned arithmetic, drift-free rescheduling).
+    uint32_t now = millis();
+    uint32_t elapsed = now - (uint32_t) m_colonBlinkPrev;
+    if (elapsed >= m_colonBlinkInterval) {
+        // Advance in whole periods so no cumulative drift builds up,
+        // and catch up in one step if the loop was blocked for a while.
+        m_colonBlinkPrev += m_colonBlinkInterval * (elapsed / m_colonBlinkInterval);
+        m_colonVisible = !m_colonVisible;
+        displayColon();
+    } else if (force) {
+        displayColon();
+    }
+
     if (m_secondSingle != m_lastSecondSingle || force) {
-        if (m_secondSingle % 2 == 0) {
-            displayDigit(2, "", ":", CLOCK_COLOR, false);
-        } else {
-            displayDigit(2, "", ":", CLOCK_SHADOW_COLOR, false);
-        }
 #if SHOW_SECOND_TICKS == true
-        displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
-        displaySeconds(2, m_secondSingle, CLOCK_COLOR);
+        displaySeconds(SCREEN_STATUS, m_lastSecondSingle, TFT_BLACK);
+        displaySeconds(SCREEN_STATUS, m_secondSingle, CLOCK_COLOR);
 #endif
         m_lastSecondSingle = m_secondSingle;
-        if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
-            if (m_amPm != m_lastAmPm) {
+    }
+
+    if (!FORMAT_24_HOUR && SHOW_AM_PM_INDICATOR && m_type != ClockType::NIXIE) {
+        // Only redraw AM/PM when it actually changes (or on a forced redraw).
+        // Redrawing it every second forced a TTF font unload/reload cycle each
+        // time, which fragmented the heap over long uptimes.
+        if (m_amPm != m_lastAmPm || force) {
+            if (m_lastAmPm.length() > 0 && m_amPm != m_lastAmPm) {
                 // Clear old AM/PM
                 displayAmPm(m_lastAmPm, TFT_BLACK);
-                m_lastAmPm = m_amPm;
             }
             displayAmPm(m_amPm, CLOCK_COLOR);
+            m_lastAmPm = m_amPm;
         }
     }
 }
 
+void ClockWidget::displayColon() {
+    // The colon lives on the middle/status orb only
+    displayDigit(SCREEN_STATUS, "", ":", m_colonVisible ? CLOCK_COLOR : CLOCK_SHADOW_COLOR, false);
+}
+
 void ClockWidget::displayAmPm(String &amPm, uint32_t color) {
-    m_manager.selectScreen(2);
+    // The AM/PM indicator is owned by the middle/status orb
+    m_manager.selectScreen(SCREEN_STATUS);
     m_manager.setFontColor(color, TFT_BLACK);
     // Workaround for 12h AM/PM problem
     // The colon is slightly offset and that's a problem because to remove them, we paint over them
@@ -77,16 +102,22 @@ void ClockWidget::displayAmPm(String &amPm, uint32_t color) {
 }
 
 void ClockWidget::update(bool force) {
-    if (millis() - m_secondTimerPrev < m_secondTimer && !force) {
+    // Rollover-safe elapsed-time check (unsigned subtraction)
+    if (!force && (uint32_t) (millis() - m_secondTimerPrev) < m_secondTimer) {
         return;
     }
+    m_secondTimerPrev = millis();
 
     GlobalTime *time = GlobalTime::getInstance();
 
     m_hourSingle = time->getHour();
     m_minuteSingle = time->getMinute();
     m_secondSingle = time->getSecond();
-    m_amPm = time->isPM() ? "PM" : "AM";
+    const char *amPm = time->isPM() ? "PM" : "AM";
+    if (m_amPm != amPm) {
+        // Only reassign on change to avoid a heap allocation on every call
+        m_amPm = amPm;
+    }
 
     if (m_lastHourSingle != m_hourSingle || force) {
         if (m_hourSingle < 10) {
@@ -164,6 +195,10 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
+    if (displayIndex < 0 || displayIndex >= NUM_SCREENS) {
+        // Never draw to an invalid orb
+        return;
+    }
     if (m_type == ClockType::NIXIE || m_type == ClockType::CUSTOM) {
         if (digit == ":" && color == CLOCK_SHADOW_COLOR) {
             // Show colon off
@@ -208,6 +243,14 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
+    if (displayIndex != SCREEN_STATUS) {
+        // The seconds tick is owned by the middle/status orb; never draw it elsewhere
+        return;
+    }
+    if (seconds < 0 || seconds > 59) {
+        // Out-of-range (e.g. -1 before the first update): nothing to draw or clear
+        return;
+    }
     if (m_type == ClockType::NIXIE && color == CLOCK_COLOR) {
         // Special color (orange) for nixie
         color = 0xfd40;

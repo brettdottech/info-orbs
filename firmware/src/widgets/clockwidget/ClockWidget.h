@@ -85,7 +85,12 @@ public:
     String getName() override;
 
 private:
+    // The middle/status orb exclusively owns the colon, the seconds tick
+    // and the AM/PM indicator. Digit orbs (0, 1, 3, 4) must never receive them.
+    static constexpr int SCREEN_STATUS = 2;
+
     void change24hMode();
+    void displayColon();
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
@@ -102,8 +107,16 @@ private:
     int m_timeZoneOffset;
 
     // Delays for setting how often certain screens/functions are refreshed/checked. These include both the frequency which they need to be checked and a varibale to store the last checked value.
-    unsigned long m_secondTimer = 2000; // This time is used to refressh/check the clock every second.
+    // Sample the (cached) global time at 10Hz. Sampling well below 1s guarantees
+    // no second is ever skipped due to sampling/epoch aliasing.
+    unsigned long m_secondTimer = 100;
     unsigned long m_secondTimerPrev = 0;
+
+    // Colon blink: full 1s cycle (500ms on / 500ms off), independent of the
+    // seconds counter so it can never stall when a second is skipped/repeated.
+    unsigned long m_colonBlinkInterval = 500;
+    unsigned long m_colonBlinkPrev = 0;
+    bool m_colonVisible = true;
 
     int m_minuteSingle;
     int m_hourSingle;

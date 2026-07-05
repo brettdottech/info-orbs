@@ -83,10 +83,20 @@ OpenFontRender &ScreenManager::getRender() {
 
 // Selects a single screen
 void ScreenManager::selectScreen(int screen) {
+    // Deselect all screens first to prevent two screens being
+    // active on the SPI bus simultaneously during the transition
     for (int i = 0; i < NUM_SCREENS; i++) {
-        int currentDisplay = INVERTED_ORBS ? NUM_SCREENS - i - 1 : i;
-        digitalWrite(m_screen_cs[currentDisplay], i == screen ? LOW : HIGH);
+        digitalWrite(m_screen_cs[i], HIGH);
     }
+    if (screen < 0 || screen >= NUM_SCREENS) {
+        // Invalid index: leave all screens deselected instead of writing
+        // to an out-of-bounds CS pin / wrong panel
+        Serial.printf("selectScreen: invalid screen index %d\n", screen);
+        return;
+    }
+    // Now select the target screen
+    int targetDisplay = INVERTED_ORBS ? NUM_SCREENS - screen - 1 : screen;
+    digitalWrite(m_screen_cs[targetDisplay], LOW);
 }
 
 // Fills all screens with a color

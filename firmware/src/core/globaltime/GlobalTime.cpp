@@ -23,13 +23,19 @@ GlobalTime *GlobalTime::getInstance() {
 }
 
 void GlobalTime::updateTime() {
-    if (millis() - m_updateTimer > m_oneSecond) {
+    // Rollover-safe, drift-free 1s scheduler.
+    // Advancing m_updateTimer by whole periods (instead of setting it to now)
+    // keeps this sampler phase-locked to the 1000ms epoch grid of millis(),
+    // so displayed seconds are never skipped due to accumulated drift.
+    uint32_t now = millis();
+    uint32_t elapsed = now - (uint32_t) m_updateTimer;
+    if (elapsed >= m_oneSecond) {
+        m_updateTimer += m_oneSecond * (elapsed / m_oneSecond);
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
             getTimeZoneOffsetFromAPI();
         }
         m_timeClient->update();
         m_unixEpoch = m_timeClient->getEpochTime();
-        m_updateTimer = millis();
         m_minute = minute(m_unixEpoch);
         if (m_format24hour) {
             m_hour = hour(m_unixEpoch);
