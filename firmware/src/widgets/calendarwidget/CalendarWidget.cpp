@@ -4,6 +4,9 @@
 #include <TimeLib.h>
 #include <string.h>
 
+// Internal rendering-tuning constants (not user-facing config.h values).
+const time_t CALENDAR_STALE_THRESHOLD_SECONDS = 7200; // ~2 missed hourly syncs
+
 CalendarWidget::CalendarWidget(ScreenManager &manager, String icsUrl) : Widget(manager), m_icsUrl(icsUrl) {
 }
 
@@ -117,8 +120,19 @@ void CalendarWidget::drawMonthGrid(int screenIndex) {
 
     // Nudged down slightly to keep clearance from the last date row, which
     // also moved down with the half-row shift above.
-    String syncText = (m_lastSyncEpoch == 0) ? "Syncing..." : ("Synced " + formatEventTime(m_lastSyncEpoch));
+    String syncText;
+    uint32_t syncColor = TFT_WHITE;
+    if (m_lastSyncEpoch == 0) {
+        syncText = "Syncing...";
+    } else {
+        syncText = "Synced " + formatEventTime(m_lastSyncEpoch);
+        if (m_time->getUnixEpoch() - m_lastSyncEpoch > CALENDAR_STALE_THRESHOLD_SECONDS) {
+            syncColor = TFT_DARKGREY; // several hourly syncs in a row have failed
+        }
+    }
+    m_manager.setFontColor(syncColor, TFT_BLACK);
     m_manager.drawFittedString(syncText, 120, 214, 150, 18, Align::MiddleCenter);
+    m_manager.setFontColor(TFT_WHITE, TFT_BLACK); // restore in case anything else draws on this screen later
 }
 
 int CalendarWidget::findNextRelevantEvents(time_t now, const CalendarEvent *outEvents[], int maxCount) {
@@ -148,8 +162,7 @@ String CalendarWidget::formatEventTime(time_t t) {
     return String(h) + ":" + (m < 10 ? "0" + String(m) : String(m)) + (pm ? " PM" : " AM");
 }
 
-String CalendarWidget::formatAgendaDayLabel(const CalendarEvent &event, time_t now) {
-    time_t eventTime = (time_t)event.start;
+String CalendarWidget::formatAgendaDayLabel(time_t eventTime, time_t now) {
     bool sameDay = (day(now) == day(eventTime) && month(now) == month(eventTime) && year(now) == year(eventTime));
     if (sameDay) {
         return "Today";
@@ -176,7 +189,58 @@ String CalendarWidget::formatAgendaDuration(const CalendarEvent &event) {
     return timeStr;
 }
 
-void CalendarWidget::drawAgendaSlot(int screenIndex, const CalendarEvent *event) {
+// 34 was too optimistic - some titles/locations that should have wrapped
+// were instead rendered as a single line wide enough to run off-screen.
+// Back to a safer cap; width is gained via the smaller left margin instead.
+const int kAgendaTextMaxCharsPerLine = 28;
+// Title/location sit close to vertical center (y=80-152), where the circle
+// is near its widest, so they can push further left than rows nearer the
+// top/bottom of the orb.
+const int kAgendaTitleLocationMargin = 15;
+// Day-view event rows span a wider y-range (down to ~205), so they need the
+// more conservative margin already proven safe for the month grid's gridLeft.
+const int kAgendaLeftMargin = 35;
+
+void CalendarWidget::splitTextForDisplay(const String &text, int maxCharsPerLine, String &line1, String &line2) {
+    if ((int)text.length() <= maxCharsPerLine) {
+        line1 = text;
+        line2 = "";
+        return;
+    }
+
+    // Search outward from the midpoint for a space to break on, so we don't
+    // cut a word in half under normal conditions.
+    int mid = text.length() / 2;
+    int breakPos = -1;
+    for (int offset = 0; offset <= mid; offset++) {
+        if (mid - offset >= 0 && text.charAt(mid - offset) == ' ') {
+            breakPos = mid - offset;
+            break;
+        }
+        if (mid + offset < (int)text.length() && text.charAt(mid + offset) == ' ') {
+            breakPos = mid + offset;
+            break;
+        }
+    }
+    if (breakPos == -1) {
+        breakPos = maxCharsPerLine; // no space found - hard split
+    }
+
+    line1 = text.substring(0, breakPos);
+    line1.trim();
+    line2 = text.substring(breakPos);
+    line2.trim();
+
+    if ((int)line1.length() > maxCharsPerLine) {
+        line1 = line1.substring(0, maxCharsPerLine - 3) + "...";
+    }
+    if ((int)line2.length() > maxCharsPerLine) {
+        line2 = line2.substring(0, maxCharsPerLine - 3) + "...";
+    }
+}
+
+void CalendarWidget::drawAgendaSlot(int screenIndex, const CalendarEvent *event, bool isOngoing,
+                                     const String &emptyMessage) {
     const int calendarFontSize = 12; // matches the month-grid's date/weekday font size
 
     m_manager.selectScreen(screenIndex);
@@ -184,27 +248,113 @@ void CalendarWidget::drawAgendaSlot(int screenIndex, const CalendarEvent *event)
     m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
 
     if (event == nullptr) {
-        // Phase 2a: simple placeholder for an empty slot. The fuller "No
-        // events" vs "No more events in the next 6 days" distinction is
-        // Phase 2b.
-        m_manager.drawString("--", 120, 120, 18, Align::MiddleCenter);
+        m_manager.drawFittedString(emptyMessage, 120, 120, 200, 40, Align::MiddleCenter);
         return;
     }
 
     time_t now = m_time->getUnixEpoch();
-    String dayLabel = formatAgendaDayLabel(*event, now);
+    String dayLabel = formatAgendaDayLabel((time_t)event->start, now);
     String duration = formatAgendaDuration(*event);
-    String title = String(event->title);
+    String titleLine1, titleLine2;
+    splitTextForDisplay(String(event->title), kAgendaTextMaxCharsPerLine, titleLine1, titleLine2);
 
-    // Day, then duration, then the title (rendered larger for emphasis -
-    // this font set has no true bold weight, see note below), then
-    // location - all four in that order per request.
-    m_manager.drawString(dayLabel, 120, 55, calendarFontSize, Align::MiddleCenter);
-    m_manager.drawString(duration, 120, 82, calendarFontSize, Align::MiddleCenter);
-    m_manager.drawFittedString(title, 120, 128, 200, 50, Align::MiddleCenter);
+    // Packed tightly top-to-bottom: day, duration, title (up to 2 lines),
+    // location (up to 2 lines) - all six rows fit without the location
+    // getting pushed toward the bezel edge like before. Day/duration stay
+    // centered; title/location are left-aligned (and pushed further left)
+    // since they're the parts most likely to need the extra width.
+    m_manager.drawString(dayLabel, 120, 30, calendarFontSize, Align::MiddleCenter);
+    m_manager.drawString(duration, 120, 52, calendarFontSize, Align::MiddleCenter);
+    m_manager.drawString(titleLine1, kAgendaTitleLocationMargin, 80, calendarFontSize, Align::MiddleLeft);
+    if (titleLine2.length() > 0) {
+        m_manager.drawString(titleLine2, kAgendaTitleLocationMargin, 102, calendarFontSize, Align::MiddleLeft);
+    }
 
     if (strlen(event->location) > 0) {
-        m_manager.drawString(String(event->location), 120, 185, calendarFontSize, Align::MiddleCenter);
+        String locationLine1, locationLine2;
+        splitTextForDisplay(String(event->location), kAgendaTextMaxCharsPerLine, locationLine1, locationLine2);
+        m_manager.drawString(locationLine1, kAgendaTitleLocationMargin, 130, calendarFontSize, Align::MiddleLeft);
+        if (locationLine2.length() > 0) {
+            m_manager.drawString(locationLine2, kAgendaTitleLocationMargin, 152, calendarFontSize, Align::MiddleLeft);
+        }
+    } else {
+        m_manager.drawString("No location set", kAgendaTitleLocationMargin, 130, calendarFontSize, Align::MiddleLeft);
+    }
+
+    // Ongoing-event ring: same thin drawArc-at-the-edge technique StockWidget
+    // uses for its red/green price-direction ring (StockWidget.cpp:134,138),
+    // just in orange for "happening now" instead.
+    if (isOngoing) {
+        m_manager.drawArc(120, 120, 120, 118, 0, 360, TFT_ORANGE, TFT_ORANGE);
+    }
+}
+
+int CalendarWidget::collectEventsForDay(time_t dayStart, const CalendarEvent *outEvents[], int maxCount,
+                                          int &totalCount) {
+    totalCount = 0;
+    int shown = 0;
+    time_t dayEnd = dayStart + 86400;
+    int total = m_dataModel.getEventCount();
+    for (int i = 0; i < total; i++) {
+        const CalendarEvent &event = m_dataModel.getEvent(i);
+        // Overlaps this day if it starts before the day ends, and (for a
+        // timed event) ends after the day starts - so a multi-day or
+        // ongoing-from-yesterday event still shows up. A point-in-time
+        // event (no DTEND) belongs to the day its start falls in.
+        bool matches = event.start < (uint32_t)dayEnd &&
+                       (event.end == 0 ? event.start >= (uint32_t)dayStart : event.end > (uint32_t)dayStart);
+        if (matches) {
+            totalCount++;
+            if (shown < maxCount) {
+                outEvents[shown++] = &event;
+            }
+        }
+    }
+    return shown;
+}
+
+void CalendarWidget::drawAgendaDaySlot(int screenIndex, time_t dayStart) {
+    const int calendarFontSize = 12;
+
+    m_manager.selectScreen(screenIndex);
+    m_manager.fillScreen(TFT_BLACK);
+    m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
+
+    time_t now = m_time->getUnixEpoch();
+    String dayLabel = formatAgendaDayLabel(dayStart, now);
+    m_manager.drawString(dayLabel, 120, 32, calendarFontSize, Align::MiddleCenter);
+
+    const int maxDayEvents = 9; // bumped from 8 - one more fits within the same tight packing
+    const CalendarEvent *dayEvents[maxDayEvents] = {nullptr, nullptr, nullptr, nullptr, nullptr,
+                                                     nullptr, nullptr, nullptr, nullptr};
+    int totalCount = 0;
+    int shown = collectEventsForDay(dayStart, dayEvents, maxDayEvents, totalCount);
+
+    if (shown == 0) {
+        m_manager.drawString("No events", 120, 80, calendarFontSize, Align::MiddleCenter);
+        return;
+    }
+
+    // Half a row's gap after the day label, then events packed back-to-back
+    // with no blank line between them (just their own line height). Events
+    // stay left-aligned (day label and "+more" stay centered).
+    const int firstEventY = 52;
+    const int eventRowSpacing = 17;
+    const int maxTitleCharsCompact = 20; // shorter than the events-mode title cap - shares the row with a time prefix
+    for (int i = 0; i < shown; i++) {
+        String timePart = dayEvents[i]->allDay ? "All day" : formatEventTime((time_t)dayEvents[i]->start);
+        String titlePart = String(dayEvents[i]->title);
+        if ((int)titlePart.length() > maxTitleCharsCompact) {
+            titlePart = titlePart.substring(0, maxTitleCharsCompact - 3) + "...";
+        }
+        int y = firstEventY + i * eventRowSpacing;
+        m_manager.drawString(timePart + "  " + titlePart, kAgendaLeftMargin, y, calendarFontSize, Align::MiddleLeft);
+    }
+
+    if (totalCount > shown) {
+        int y = firstEventY + shown * eventRowSpacing;
+        m_manager.drawString("+" + String(totalCount - shown) + " more", 120, y, calendarFontSize,
+                              Align::MiddleCenter);
     }
 }
 
@@ -240,11 +390,22 @@ void CalendarWidget::localReevaluateIfDue() {
     if (millis() - m_lastLocalEvalMillis < 600000UL) {
         return;
     }
-    // Phase 1's draw() has no countdown/ongoing-ring rendering yet, so this
-    // re-evaluation has minimal visible effect - it exists as the timing
-    // scaffolding Phase 2's ongoing-event ring/countdown text plugs into.
+    // Re-derives what's "next"/ongoing from already-stored data - this is
+    // what lets a finished event drop off (and the ongoing-event ring
+    // appear/disappear) without waiting for the next hourly network fetch.
     m_needsRedraw = true;
     m_lastLocalEvalMillis = millis();
+}
+
+void CalendarWidget::toggleAgendaPage() {
+    m_agendaPage = 1 - m_agendaPage;
+    m_needsRedraw = true;
+}
+
+void CalendarWidget::changeAgendaMode() {
+    m_agendaMode = (m_agendaMode == AgendaMode::EVENTS) ? AgendaMode::DAYS : AgendaMode::EVENTS;
+    m_agendaPage = 0;
+    m_needsRedraw = true;
 }
 
 void CalendarWidget::update(bool force) {
@@ -271,11 +432,25 @@ void CalendarWidget::draw(bool force) {
         drawMonthGrid(1);
 
         time_t now = m_time->getUnixEpoch();
-        const CalendarEvent *nextEvents[3] = {nullptr, nullptr, nullptr};
-        int found = findNextRelevantEvents(now, nextEvents, 3);
 
-        for (int slot = 0; slot < 3; slot++) {
-            drawAgendaSlot(2 + slot, slot < found ? nextEvents[slot] : nullptr);
+        if (m_agendaMode == AgendaMode::EVENTS) {
+            const CalendarEvent *nextEvents[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+            int found = findNextRelevantEvents(now, nextEvents, 6);
+            int pageOffset = m_agendaPage * 3;
+
+            for (int slot = 0; slot < 3; slot++) {
+                int idx = pageOffset + slot;
+                const CalendarEvent *event = (idx < found) ? nextEvents[idx] : nullptr;
+                bool isOngoing = event && event->start <= (uint32_t)now &&
+                                  (event->end == 0 || event->end > (uint32_t)now);
+                drawAgendaSlot(2 + slot, event, isOngoing, "No more events in the next 6 days");
+            }
+        } else {
+            time_t todayStart = previousMidnight(now);
+            for (int slot = 0; slot < 3; slot++) {
+                time_t dayStart = todayStart + (time_t)(m_agendaPage * 3 + slot) * 86400;
+                drawAgendaDaySlot(2 + slot, dayStart);
+            }
         }
 
         m_needsRedraw = false;
@@ -283,10 +458,14 @@ void CalendarWidget::draw(bool force) {
 }
 
 void CalendarWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    // Only BTN_LONG (manual network sync, per ADR decision 6) is meaningful
-    // without real rendering. BTN_SHORT (page toggle) and BTN_MEDIUM (mode
-    // toggle) are no-ops until Phase 2 introduces that state.
-    if (buttonId == BUTTON_OK && state == BTN_LONG) {
+    if (buttonId != BUTTON_OK) {
+        return;
+    }
+    if (state == BTN_SHORT) {
+        toggleAgendaPage();
+    } else if (state == BTN_MEDIUM) {
+        changeAgendaMode();
+    } else if (state == BTN_LONG) {
         networkRefreshIfDue(true);
     }
 }

@@ -50,7 +50,7 @@
 
 // CALENDAR CONFIGURATION
 //#define CALENDAR_ICS_URL "https://calendar.google.com/calendar/ical/xxxx/private-xxxx/basic.ics" // Secret ICS feed URL for your calendar - treat this like a password, do not share/commit it
-//#define CALENDAR_MAX_EVENTS 40 // Max number of upcoming events (incl. expanded recurring instances) to keep in memory
+//#define CALENDAR_MAX_EVENTS 80 // Max number of upcoming events (incl. expanded recurring instances) to keep in memory
 
 // WIFI CONFIGURATION
 // Normally WiFi should be configured using a smartphone or computer to connect to the Info-Orbs
@@ -130,16 +130,25 @@
 #define MAX_RETRIES 3
 
 #ifndef CALENDAR_MAX_EVENTS
-    #define CALENDAR_MAX_EVENTS 40
+    #define CALENDAR_MAX_EVENTS 80
 #endif
 #ifndef CALENDAR_WINDOW_DAYS
     #define CALENDAR_WINDOW_DAYS 6
 #endif
 #ifndef CALENDAR_TITLE_MAX_LEN
-    #define CALENDAR_TITLE_MAX_LEN 48
+    #define CALENDAR_TITLE_MAX_LEN 120
 #endif
 #ifndef CALENDAR_LOCATION_MAX_LEN
-    #define CALENDAR_LOCATION_MAX_LEN 32
+    #define CALENDAR_LOCATION_MAX_LEN 120
+#endif
+#ifndef CALENDAR_MAX_PENDING_MASTERS
+    #define CALENDAR_MAX_PENDING_MASTERS 24
+#endif
+#ifndef CALENDAR_MAX_SUPPRESSED
+    #define CALENDAR_MAX_SUPPRESSED CALENDAR_MAX_EVENTS
+#endif
+#ifndef CALENDAR_MAX_EXDATES_PER_MASTER
+    #define CALENDAR_MAX_EXDATES_PER_MASTER 6
 #endif
 
 #endif

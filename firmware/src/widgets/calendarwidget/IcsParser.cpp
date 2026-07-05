@@ -25,7 +25,28 @@ int weekdayCodeToIndex(const String &code) {
         return 6;
     return -1;
 }
+
+// Cheap 32-bit fingerprint of a UID string, used so buffered masters/
+// suppression entries don't need to store full UIDs (real-world UIDs are
+// 100+ char opaque tokens). Collision risk is negligible at the scale this
+// parser operates at (at most a few dozen distinct UIDs in flight within a
+// 6-day window), and a false-positive collision only ever causes one
+// occurrence to be wrongly suppressed, not a crash or corruption.
+uint32_t fnv1aHash(const String &s) {
+    uint32_t hash = 2166136261u; // FNV offset basis
+    for (unsigned int i = 0; i < s.length(); i++) {
+        hash ^= (uint8_t)s.charAt(i);
+        hash *= 16777619u; // FNV prime
+    }
+    return hash;
+}
 } // namespace
+
+// Static (BSS, not stack) - see the rationale in IcsParser.h.
+IcsParser::PendingMaster IcsParser::m_pendingMasters[CALENDAR_MAX_PENDING_MASTERS];
+int IcsParser::m_pendingMasterCount = 0;
+IcsParser::SuppressedOccurrence IcsParser::m_suppressed[CALENDAR_MAX_SUPPRESSED];
+int IcsParser::m_suppressedCount = 0;
 
 IcsParser::IcsParser() {
 }
@@ -168,20 +189,13 @@ void IcsParser::copyTruncated(const String &text, char outBuf[], int maxLen) {
     }
 }
 
-bool IcsParser::expandRecurrence(const PendingEvent &pending, time_t baseStart, time_t baseEnd, bool allDay,
-                                  time_t windowStart, time_t windowEnd, CalendarEvent outEvents[], int maxEvents,
-                                  int &eventsWritten) {
+bool IcsParser::parseRRule(const String &rrule, ParsedRRule &out) {
     String freq;
-    int interval = 1;
-    int count = -1; // -1 = unbounded by COUNT (still bounded by UNTIL/window)
-    time_t until = 0; // 0 = none specified
-    bool hasByDay = false;
-    bool byDayFlags[7] = {false, false, false, false, false, false, false}; // 0=Sunday..6=Saturday
 
     int pos = 0;
-    while (pos < (int)pending.rrule.length()) {
-        int semi = pending.rrule.indexOf(';', pos);
-        String part = (semi == -1) ? pending.rrule.substring(pos) : pending.rrule.substring(pos, semi);
+    while (pos < (int)rrule.length()) {
+        int semi = rrule.indexOf(';', pos);
+        String part = (semi == -1) ? rrule.substring(pos) : rrule.substring(pos, semi);
         int eq = part.indexOf('=');
         if (eq != -1) {
             String key = part.substring(0, eq);
@@ -191,19 +205,19 @@ bool IcsParser::expandRecurrence(const PendingEvent &pending, time_t baseStart, 
                 freq = val;
                 freq.toUpperCase();
             } else if (key == "INTERVAL") {
-                interval = val.toInt();
-                if (interval < 1)
-                    interval = 1;
+                out.interval = val.toInt();
+                if (out.interval < 1)
+                    out.interval = 1;
             } else if (key == "COUNT") {
-                count = val.toInt();
+                out.count = val.toInt();
             } else if (key == "UNTIL") {
                 bool untilAllDayIgnored;
                 // UNTIL is normally Z-suffixed UTC per RFC5545; used only as
                 // a coarse cutoff alongside windowEnd, so treat with the
                 // same offset handling as any other timestamp.
-                until = parseDateTime(val, "", 0, untilAllDayIgnored);
+                out.until = parseDateTime(val, "", 0, untilAllDayIgnored);
             } else if (key == "BYDAY") {
-                hasByDay = true;
+                out.hasByDay = true;
                 int bpos = 0;
                 while (bpos < (int)val.length()) {
                     int comma = val.indexOf(',', bpos);
@@ -211,7 +225,7 @@ bool IcsParser::expandRecurrence(const PendingEvent &pending, time_t baseStart, 
                     dayCode.toUpperCase();
                     int idx = weekdayCodeToIndex(dayCode);
                     if (idx >= 0) {
-                        byDayFlags[idx] = true;
+                        out.byDayFlags[idx] = true;
                     }
                     if (comma == -1)
                         break;
@@ -224,81 +238,163 @@ bool IcsParser::expandRecurrence(const PendingEvent &pending, time_t baseStart, 
         pos = semi + 1;
     }
 
-    if (freq != "DAILY" && freq != "WEEKLY") {
-        return false; // unsupported FREQ - caller drops the whole event
+    if (freq == "DAILY") {
+        out.freq = RRuleFreq::Daily;
+        return true;
+    }
+    if (freq == "WEEKLY") {
+        out.freq = RRuleFreq::Weekly;
+        return true;
+    }
+    return false; // unsupported FREQ - caller drops the whole event
+}
+
+void IcsParser::bufferPendingMaster(const PendingEvent &pending, uint32_t uidHash, time_t baseStart, time_t baseEnd,
+                                     bool allDay) {
+    ParsedRRule rrule;
+    if (!parseRRule(pending.rrule, rrule)) {
+        return; // unsupported FREQ (e.g. MONTHLY/YEARLY) - drop the whole event, matching prior behavior
+    }
+    if (m_pendingMasterCount >= CALENDAR_MAX_PENDING_MASTERS) {
+        Serial.println("IcsParser: pending-masters table full, dropping a recurring series");
+        return;
     }
 
-    time_t duration = (baseEnd > baseStart) ? (baseEnd - baseStart) : 0;
-    time_t effectiveWindowEnd = (until > 0 && until < windowEnd) ? until : windowEnd;
+    PendingMaster &m = m_pendingMasters[m_pendingMasterCount++];
+    m.uidHash = uidHash;
+    m.rrule = rrule;
+    m.baseStart = baseStart;
+    m.baseEnd = baseEnd;
+    m.allDay = allDay;
+    copyTruncated(pending.title, m.title, CALENDAR_TITLE_MAX_LEN);
+    copyTruncated(pending.location, m.location, CALENDAR_LOCATION_MAX_LEN);
+    m.exdateCount = pending.exdateCount;
+    for (int i = 0; i < pending.exdateCount; i++) {
+        m.exdates[i] = pending.exdates[i];
+    }
+}
+
+void IcsParser::expandRecurrence(const PendingMaster &master, time_t windowStart, time_t windowEnd,
+                                  const SuppressedOccurrence suppressed[], int suppressedCount,
+                                  CalendarEvent outEvents[], int maxEvents, int &eventsWritten) {
+    time_t duration = (master.baseEnd > master.baseStart) ? (master.baseEnd - master.baseStart) : 0;
+    time_t effectiveWindowEnd =
+        (master.rrule.until > 0 && master.rrule.until < windowEnd) ? master.rrule.until : windowEnd;
     const time_t oneDay = 86400;
 
     int occurrencesEmitted = 0;
 
+    // An occurrence is skipped if it matches the master's own EXDATE list,
+    // or if it's been individually overridden elsewhere in the feed (a
+    // separate VEVENT with the same UID and a RECURRENCE-ID equal to this
+    // original slot time) - checked against the *original* slot time being
+    // generated here, never against wherever an override moved it to.
+    auto isSuppressed = [&](time_t occurrence) {
+        for (int i = 0; i < master.exdateCount; i++) {
+            if (master.exdates[i] == occurrence) {
+                return true;
+            }
+        }
+        for (int i = 0; i < suppressedCount; i++) {
+            if (suppressed[i].uidHash == master.uidHash && suppressed[i].originalTime == occurrence) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     auto emitIfInWindow = [&](time_t occurrence) {
+        if (isSuppressed(occurrence)) {
+            return;
+        }
         // An occurrence is still worth keeping if it hasn't *ended* yet
         // (not merely if it hasn't *started* yet) - otherwise a currently
         // ongoing occurrence (started before windowStart, still running)
         // would be wrongly dropped on the next hourly re-fetch, the same
-        // bug fixed in finalizeEvent() for non-recurring events.
+        // bug fixed for non-recurring events.
         time_t occurrenceEnd = duration > 0 ? occurrence + duration : occurrence;
         if (occurrenceEnd > windowStart && occurrence <= effectiveWindowEnd && eventsWritten < maxEvents) {
             CalendarEvent &e = outEvents[eventsWritten++];
             e.start = occurrence;
             e.end = duration > 0 ? occurrence + duration : 0;
-            e.allDay = allDay;
-            copyTruncated(pending.title, e.title, CALENDAR_TITLE_MAX_LEN);
-            copyTruncated(pending.location, e.location, CALENDAR_LOCATION_MAX_LEN);
+            e.allDay = master.allDay;
+            copyTruncated(master.title, e.title, CALENDAR_TITLE_MAX_LEN);
+            copyTruncated(master.location, e.location, CALENDAR_LOCATION_MAX_LEN);
         }
     };
 
-    if (freq == "DAILY") {
-        time_t cursor = baseStart;
+    if (master.rrule.freq == RRuleFreq::Daily) {
+        time_t cursor = master.baseStart;
         while (cursor <= effectiveWindowEnd) {
-            if (count > 0 && occurrencesEmitted >= count)
+            if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
                 break;
             emitIfInWindow(cursor);
             occurrencesEmitted++;
-            cursor += (time_t)interval * oneDay;
+            cursor += (time_t)master.rrule.interval * oneDay;
         }
-    } else if (!hasByDay) { // WEEKLY, no BYDAY
-        time_t cursor = baseStart;
+    } else if (!master.rrule.hasByDay) { // WEEKLY, no BYDAY
+        time_t cursor = master.baseStart;
         while (cursor <= effectiveWindowEnd) {
-            if (count > 0 && occurrencesEmitted >= count)
+            if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
                 break;
             emitIfInWindow(cursor);
             occurrencesEmitted++;
-            cursor += (time_t)interval * 7 * oneDay;
+            cursor += (time_t)master.rrule.interval * 7 * oneDay;
         }
     } else { // WEEKLY with BYDAY
-        int startWeekday = weekday(baseStart) - 1; // 0=Sunday..6=Saturday
-        time_t weekStart = baseStart - (time_t)startWeekday * oneDay;
+        int startWeekday = weekday(master.baseStart) - 1; // 0=Sunday..6=Saturday
+        time_t weekStart = master.baseStart - (time_t)startWeekday * oneDay;
         while (weekStart <= effectiveWindowEnd) {
             for (int wd = 0; wd < 7; wd++) {
-                if (!byDayFlags[wd])
+                if (!master.rrule.byDayFlags[wd])
                     continue;
                 time_t occurrence = weekStart + (time_t)wd * oneDay;
-                if (occurrence < baseStart)
+                if (occurrence < master.baseStart)
                     continue; // series hasn't started yet
                 if (occurrence > effectiveWindowEnd)
                     continue;
                 // Bounded by the (at most 6-day) window either way, so an
                 // approximate COUNT cutoff here (rather than a strict
                 // early-exit) is an acceptable simplification.
-                if (count > 0 && occurrencesEmitted >= count)
+                if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
                     continue;
                 emitIfInWindow(occurrence);
                 occurrencesEmitted++;
             }
-            weekStart += (time_t)interval * 7 * oneDay;
+            weekStart += (time_t)master.rrule.interval * 7 * oneDay;
         }
     }
+}
 
-    return true;
+void IcsParser::finalizeAllPendingMasters(time_t windowStart, time_t windowEnd, CalendarEvent outEvents[],
+                                           int maxEvents, int &eventsWritten) {
+    for (int i = 0; i < m_pendingMasterCount; i++) {
+        expandRecurrence(m_pendingMasters[i], windowStart, windowEnd, m_suppressed, m_suppressedCount, outEvents,
+                          maxEvents, eventsWritten);
+    }
 }
 
 void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, time_t windowEnd,
                                int localOffsetSeconds, CalendarEvent outEvents[], int maxEvents,
                                int &eventsWritten) {
+    uint32_t uidHash = pending.uid.length() > 0 ? fnv1aHash(pending.uid) : 0;
+
+    // Record RECURRENCE-ID suppression before any other filter runs - a
+    // stale master occurrence must be hidden regardless of whether this
+    // override itself ends up displayable (e.g. it was later cancelled or
+    // declined; the original slot still shouldn't show the master's version).
+    if (pending.hasRecurrenceId && pending.uid.length() > 0) {
+        bool recurAllDayIgnored;
+        time_t recurTime = parseDateTime(pending.recurrenceIdValue, pending.recurrenceIdParams, localOffsetSeconds,
+                                          recurAllDayIgnored);
+        if (recurTime > 0 && recurTime >= windowStart && recurTime <= windowEnd &&
+            m_suppressedCount < CALENDAR_MAX_SUPPRESSED) {
+            m_suppressed[m_suppressedCount].uidHash = uidHash;
+            m_suppressed[m_suppressedCount].originalTime = recurTime;
+            m_suppressedCount++;
+        }
+    }
+
     if (pending.title.length() == 0 || !pending.hasDtStart) {
         return; // incomplete VEVENT, discard
     }
@@ -306,6 +402,14 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
     String status = pending.status;
     status.toUpperCase();
     if (status == "CANCELLED") {
+        return;
+    }
+
+    // Outlook doesn't expose per-attendee decline via a parseable status
+    // field in personal ICS exports - it just prepends "Declined: " to the
+    // SUMMARY itself. Filtering on that prefix is the practical equivalent
+    // of skipping declined meetings.
+    if (pending.title.startsWith("Declined: ")) {
         return;
     }
 
@@ -322,9 +426,11 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
     }
 
     if (pending.hasRrule) {
-        // Unsupported RRULE shapes drop the whole event rather than falling
-        // back to the (likely long-past) base DTSTART.
-        expandRecurrence(pending, start, end, allDay, windowStart, windowEnd, outEvents, maxEvents, eventsWritten);
+        // Buffered for expansion after the whole feed is read, so any
+        // RECURRENCE-ID override seen later (or earlier - order doesn't
+        // matter, only that both are seen by the time expansion runs) can
+        // suppress the stale occurrence this master would otherwise emit.
+        bufferPendingMaster(pending, uidHash, start, end, allDay);
         return;
     }
 
@@ -354,6 +460,8 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
 int IcsParser::parse(Stream &stream, time_t windowStart, time_t windowEnd, int localOffsetSeconds,
                       CalendarEvent outEvents[], int maxEvents) {
     m_state = State::OUTSIDE;
+    m_pendingMasterCount = 0;
+    m_suppressedCount = 0;
     int eventsWritten = 0;
     PendingEvent pending;
 
@@ -402,9 +510,39 @@ int IcsParser::parse(Stream &stream, time_t windowStart, time_t windowEnd, int l
         } else if (name == "RRULE") {
             pending.rrule = value;
             pending.hasRrule = true;
+        } else if (name == "UID") {
+            pending.uid = value;
+        } else if (name == "RECURRENCE-ID") {
+            pending.recurrenceIdValue = value;
+            pending.recurrenceIdParams = params;
+            pending.hasRecurrenceId = true;
+        } else if (name == "EXDATE") {
+            // RFC5545 allows multiple comma-separated dates on one line, and/
+            // or multiple EXDATE lines within the same VEVENT (both just
+            // accumulate into pending.exdates here). Only in-window values
+            // are worth keeping - anything outside [windowStart, windowEnd]
+            // could never match an emitted occurrence anyway.
+            int epos = 0;
+            while (epos < (int)value.length()) {
+                int comma = value.indexOf(',', epos);
+                String token = (comma == -1) ? value.substring(epos) : value.substring(epos, comma);
+                bool exAllDayIgnored;
+                time_t exTime = parseDateTime(token, params, localOffsetSeconds, exAllDayIgnored);
+                if (exTime > 0 && exTime >= windowStart && exTime <= windowEnd &&
+                    pending.exdateCount < CALENDAR_MAX_EXDATES_PER_MASTER) {
+                    pending.exdates[pending.exdateCount++] = exTime;
+                }
+                if (comma == -1)
+                    break;
+                epos = comma + 1;
+            }
         }
-        // DESCRIPTION, UID, etc. are still ignored in v1
+        // DESCRIPTION, etc. are still ignored in v1
     }
+
+    // Every RECURRENCE-ID override in the feed has now been seen and
+    // recorded, so it's safe to expand the buffered recurring masters.
+    finalizeAllPendingMasters(windowStart, windowEnd, outEvents, maxEvents, eventsWritten);
 
     return eventsWritten;
 }
