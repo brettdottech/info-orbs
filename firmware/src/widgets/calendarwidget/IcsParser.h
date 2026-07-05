@@ -152,10 +152,17 @@ private:
     bool parseRRule(const String &rrule, ParsedRRule &out);
 
     // Buffers a recurring VEVENT for expansion after the whole feed has been
-    // read (see class-level comment). Drops the master (Serial-logged) if
-    // its RRULE shape is unsupported or the pending-masters table is full.
+    // read (see class-level comment). Silently skips (without consuming a
+    // pending-masters slot) a series that has already ended before
+    // `windowStart` or hasn't started by `windowEnd` - a real calendar can
+    // easily have 100+ recurring series across a year, most of them expired
+    // or not-yet-started relative to any given 6-day window, and buffering
+    // them anyway would starve the (bounded) table of slots for the
+    // handful of series actually active right now. Drops the master
+    // (Serial-logged) if its RRULE shape is unsupported or the table is
+    // still full after that filter.
     void bufferPendingMaster(const PendingEvent &pending, uint32_t uidHash, time_t baseStart, time_t baseEnd,
-                              bool allDay);
+                              bool allDay, time_t windowStart, time_t windowEnd);
 
     // Expands a buffered master's RRULE into individual occurrences within
     // [windowStart, windowEnd], skipping any occurrence that matches the

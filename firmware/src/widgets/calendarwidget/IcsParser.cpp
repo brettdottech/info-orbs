@@ -250,11 +250,23 @@ bool IcsParser::parseRRule(const String &rrule, ParsedRRule &out) {
 }
 
 void IcsParser::bufferPendingMaster(const PendingEvent &pending, uint32_t uidHash, time_t baseStart, time_t baseEnd,
-                                     bool allDay) {
+                                     bool allDay, time_t windowStart, time_t windowEnd) {
     ParsedRRule rrule;
     if (!parseRRule(pending.rrule, rrule)) {
         return; // unsupported FREQ (e.g. MONTHLY/YEARLY) - drop the whole event, matching prior behavior
     }
+
+    // A series that already ended before this window, or hasn't started by
+    // the time the window closes, can never produce an in-window occurrence
+    // - skip it without spending a pending-masters slot. A real calendar can
+    // have 100+ recurring series across a year; without this check, expired
+    // series from months ago (which appear earlier in a roughly
+    // chronological feed) fill the table before this year's still-active
+    // series are even reached.
+    if ((rrule.until > 0 && rrule.until < windowStart) || baseStart > windowEnd) {
+        return;
+    }
+
     if (m_pendingMasterCount >= CALENDAR_MAX_PENDING_MASTERS) {
         Serial.println("IcsParser: pending-masters table full, dropping a recurring series");
         return;
@@ -430,7 +442,7 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
         // RECURRENCE-ID override seen later (or earlier - order doesn't
         // matter, only that both are seen by the time expansion runs) can
         // suppress the stale occurrence this master would otherwise emit.
-        bufferPendingMaster(pending, uidHash, start, end, allDay);
+        bufferPendingMaster(pending, uidHash, start, end, allDay, windowStart, windowEnd);
         return;
     }
 
