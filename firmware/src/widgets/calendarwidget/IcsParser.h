@@ -10,12 +10,15 @@
 //
 // Consumes a Stream (e.g. HTTPClient::getStream(), optionally wrapped in a
 // ChunkDecodingStream) line by line, without loading the whole response into
-// RAM. Only events with a DTSTART falling within [windowStart, windowEnd] are
-// kept - the window bounds both which one-off events are retained and how
-// far RRULE expansion runs, so memory use stays bounded regardless of feed
-// size or how far in the past a recurring event's original DTSTART is.
+// RAM. An event is kept if it hasn't ended yet as of windowStart (so a
+// currently-ongoing event whose DTSTART already passed isn't dropped just
+// because a later re-fetch's windowStart moved past it) and its DTSTART
+// falls no later than windowEnd - the window bounds both which one-off
+// events are retained and how far RRULE expansion runs, so memory use stays
+// bounded regardless of feed size or how far in the past a recurring
+// event's original DTSTART is.
 //
-// v1 scope: SUMMARY/DTSTART/DTEND/STATUS/RRULE only. No VTIMEZONE table
+// v1 scope: SUMMARY/LOCATION/DTSTART/DTEND/STATUS/RRULE only. No VTIMEZONE table
 // parsing - only Z-suffixed (UTC) timestamps are timezone-correct, everything
 // else is treated as already being in the device's local time. RRULE
 // expansion covers FREQ=DAILY/WEEKLY with INTERVAL, COUNT/UNTIL, and a simple
@@ -47,6 +50,7 @@ private:
     // END:VEVENT decision (store/expand/discard) is made.
     struct PendingEvent {
         String title;
+        String location;
         String dtStartValue;
         String dtStartParams;
         String dtEndValue;
@@ -78,10 +82,12 @@ private:
     // \; -> semicolon, \\ -> backslash.
     String unescapeText(const String &value);
 
-    // Copies `text` into a fixed CALENDAR_TITLE_MAX_LEN buffer, truncating
-    // with an ASCII "..." (not a unicode ellipsis, to avoid missing-glyph
-    // risk in the project's TTF fonts) if it doesn't fit.
-    void copyTitleTruncated(const String &text, char outTitle[]);
+    // Copies `text` into a fixed `outBuf` (capacity `maxLen`+1, null-
+    // terminated), truncating with an ASCII "..." (not a unicode ellipsis,
+    // to avoid missing-glyph risk in the project's TTF fonts) if it doesn't
+    // fit. Used for both title (CALENDAR_TITLE_MAX_LEN) and location
+    // (CALENDAR_LOCATION_MAX_LEN).
+    void copyTruncated(const String &text, char outBuf[], int maxLen);
 
     // Expands a supported RRULE (FREQ=DAILY/WEEKLY with INTERVAL, COUNT/
     // UNTIL, and a simple BYDAY weekday list) into individual occurrences

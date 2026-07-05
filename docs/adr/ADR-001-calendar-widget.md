@@ -115,3 +115,4 @@ Event name + time, consistent with the stock ticker widget. Both agenda modes sh
 - Test strategy — collect real `.ics` fixtures from Google, Outlook, and iCloud; unit-test the parser (folding, escaping, all-day, cancelled, `RRULE`) independent of hardware.
 - Idea: make the widget configurable via a small on-device web server instead of `config.h`.
 - Reference implementations: nconner-06's async HTTP work, dreed47's `WidgetRegistry` PR.
+- Idea: add multiple ICS URLs (e.g. work + personal) and merge events into a single agenda, with a per-event source indicator.

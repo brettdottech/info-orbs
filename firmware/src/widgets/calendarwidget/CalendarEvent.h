@@ -13,6 +13,7 @@ struct CalendarEvent {
     uint32_t end = 0; // local-epoch seconds, 0 if no DTEND was present
     bool allDay = false;
     char title[CALENDAR_TITLE_MAX_LEN + 1] = {0}; // null-terminated, truncated with "..." if longer
+    char location[CALENDAR_LOCATION_MAX_LEN + 1] = {0}; // null-terminated, empty if no LOCATION was present
 
     bool isValid() const { return start != 0; }
 };

@@ -157,14 +157,14 @@ String IcsParser::unescapeText(const String &value) {
     return out;
 }
 
-void IcsParser::copyTitleTruncated(const String &text, char outTitle[]) {
-    if ((int)text.length() <= CALENDAR_TITLE_MAX_LEN) {
-        strncpy(outTitle, text.c_str(), CALENDAR_TITLE_MAX_LEN);
-        outTitle[text.length()] = '\0';
+void IcsParser::copyTruncated(const String &text, char outBuf[], int maxLen) {
+    if ((int)text.length() <= maxLen) {
+        strncpy(outBuf, text.c_str(), maxLen);
+        outBuf[text.length()] = '\0';
     } else {
-        String truncated = text.substring(0, CALENDAR_TITLE_MAX_LEN - 3) + "...";
-        strncpy(outTitle, truncated.c_str(), CALENDAR_TITLE_MAX_LEN);
-        outTitle[CALENDAR_TITLE_MAX_LEN] = '\0';
+        String truncated = text.substring(0, maxLen - 3) + "...";
+        strncpy(outBuf, truncated.c_str(), maxLen);
+        outBuf[maxLen] = '\0';
     }
 }
 
@@ -235,12 +235,19 @@ bool IcsParser::expandRecurrence(const PendingEvent &pending, time_t baseStart, 
     int occurrencesEmitted = 0;
 
     auto emitIfInWindow = [&](time_t occurrence) {
-        if (occurrence >= windowStart && occurrence <= effectiveWindowEnd && eventsWritten < maxEvents) {
+        // An occurrence is still worth keeping if it hasn't *ended* yet
+        // (not merely if it hasn't *started* yet) - otherwise a currently
+        // ongoing occurrence (started before windowStart, still running)
+        // would be wrongly dropped on the next hourly re-fetch, the same
+        // bug fixed in finalizeEvent() for non-recurring events.
+        time_t occurrenceEnd = duration > 0 ? occurrence + duration : occurrence;
+        if (occurrenceEnd > windowStart && occurrence <= effectiveWindowEnd && eventsWritten < maxEvents) {
             CalendarEvent &e = outEvents[eventsWritten++];
             e.start = occurrence;
             e.end = duration > 0 ? occurrence + duration : 0;
             e.allDay = allDay;
-            copyTitleTruncated(pending.title, e.title);
+            copyTruncated(pending.title, e.title, CALENDAR_TITLE_MAX_LEN);
+            copyTruncated(pending.location, e.location, CALENDAR_LOCATION_MAX_LEN);
         }
     };
 
@@ -321,8 +328,16 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
         return;
     }
 
-    if (start < windowStart || start > windowEnd) {
-        return; // outside the retained window
+    // Keep the event if it hasn't *ended* yet (not merely if it hasn't
+    // *started* yet) - otherwise a currently ongoing event (DTSTART already
+    // passed, DTEND still in the future) gets wrongly dropped on the next
+    // hourly re-fetch, since its DTSTART looks "in the past" relative to
+    // the new windowStart even though the event itself is still current.
+    // Point-in-time events with no DTEND fall back to treating DTSTART as
+    // the effective end.
+    time_t effectiveEnd = (end > 0) ? end : start;
+    if (effectiveEnd <= windowStart || start > windowEnd) {
+        return; // already fully in the past, or too far in the future
     }
     if (eventsWritten >= maxEvents) {
         return;
@@ -332,7 +347,8 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
     e.start = start;
     e.end = end;
     e.allDay = allDay;
-    copyTitleTruncated(pending.title, e.title);
+    copyTruncated(pending.title, e.title, CALENDAR_TITLE_MAX_LEN);
+    copyTruncated(pending.location, e.location, CALENDAR_LOCATION_MAX_LEN);
 }
 
 int IcsParser::parse(Stream &stream, time_t windowStart, time_t windowEnd, int localOffsetSeconds,
@@ -372,6 +388,8 @@ int IcsParser::parse(Stream &stream, time_t windowStart, time_t windowEnd, int l
 
         if (name == "SUMMARY") {
             pending.title = unescapeText(value);
+        } else if (name == "LOCATION") {
+            pending.location = unescapeText(value);
         } else if (name == "DTSTART") {
             pending.dtStartValue = value;
             pending.dtStartParams = params;
@@ -385,7 +403,7 @@ int IcsParser::parse(Stream &stream, time_t windowStart, time_t windowEnd, int l
             pending.rrule = value;
             pending.hasRrule = true;
         }
-        // DESCRIPTION, LOCATION, UID, etc. are ignored in v1
+        // DESCRIPTION, UID, etc. are still ignored in v1
     }
 
     return eventsWritten;

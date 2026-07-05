@@ -138,5 +138,8 @@
 #ifndef CALENDAR_TITLE_MAX_LEN
     #define CALENDAR_TITLE_MAX_LEN 48
 #endif
+#ifndef CALENDAR_LOCATION_MAX_LEN
+    #define CALENDAR_LOCATION_MAX_LEN 32
+#endif
 
 #endif
