@@ -1,7 +1,9 @@
 #include "IcsParser.h"
 
 #include "config_helper.h"
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 namespace {
 // Maps an RRULE BYDAY weekday code to an index matching TimeLib's
@@ -47,6 +49,37 @@ IcsParser::PendingMaster IcsParser::m_pendingMasters[CALENDAR_MAX_PENDING_MASTER
 int IcsParser::m_pendingMasterCount = 0;
 IcsParser::SuppressedOccurrence IcsParser::m_suppressed[CALENDAR_MAX_SUPPRESSED];
 int IcsParser::m_suppressedCount = 0;
+String IcsParser::m_activePosixTz;
+
+namespace {
+// Maps common named Windows/Outlook TZIDs to POSIX TZ rule strings, consumed
+// by setenv("TZ", ...)/tzset()/mktime() - these are the standard,
+// well-documented values (matching the widely-used posix_tz_db reference
+// table), not invented here. POSIX TZ offset sign is inverted from common
+// usage (zones west of UTC are positive). mktime() does the actual DST math,
+// so EU-rule zones (last Sunday March-last Sunday October) need no separate
+// code path from US-rule ones (2nd Sunday March-1st Sunday November) - both
+// are just a different rule string.
+struct TimezoneEntry {
+    const char *tzid;
+    const char *posixTz;
+};
+
+const TimezoneEntry kTimezoneTable[] = {
+    {"Tokyo Standard Time", "JST-9"},
+    {"China Standard Time", "CST-8"},
+    {"Singapore Standard Time", "SGT-8"},
+    {"India Standard Time", "IST-5:30"},
+    {"UTC", "UTC0"},
+    {"Pacific Standard Time", "PST8PDT,M3.2.0,M11.1.0/2"},
+    {"Mountain Standard Time", "MST7MDT,M3.2.0,M11.1.0/2"},
+    {"Central Standard Time", "CST6CDT,M3.2.0,M11.1.0/2"},
+    {"Eastern Standard Time", "EST5EDT,M3.2.0,M11.1.0/2"},
+    {"GMT Standard Time", "GMT0BST,M3.5.0/1,M10.5.0"},
+    {"W. Europe Standard Time", "CET-1CEST,M3.5.0,M10.5.0/3"},
+};
+const int kTimezoneTableSize = sizeof(kTimezoneTable) / sizeof(kTimezoneTable[0]);
+} // namespace
 
 IcsParser::IcsParser() {
 }
@@ -106,6 +139,52 @@ void IcsParser::splitContentLine(const String &line, String &name, String &param
     name.toUpperCase();
 }
 
+bool IcsParser::convertTzidToUtc(const String &tzid, int year, int month, int day, int hour, int minute, int second,
+                                  time_t &outUtc) {
+    const char *posixTz = nullptr;
+    for (int i = 0; i < kTimezoneTableSize; i++) {
+        if (tzid == kTimezoneTable[i].tzid) {
+            posixTz = kTimezoneTable[i].posixTz;
+            break;
+        }
+    }
+    if (posixTz == nullptr) {
+        return false; // unrecognized TZID - caller falls back to "treat as local"
+    }
+
+    // Skip the setenv()/tzset() round-trip if this zone is already active -
+    // tzset() re-parses its rule string every call, and a single feed can
+    // have hundreds of TZID-bearing timestamps sharing a handful of zones.
+    // Deliberately doesn't save/restore the process's original TZ env var
+    // after each call (that would defeat the point of this cache, since the
+    // next call would always have to re-set it) - safe because nothing else
+    // in this codebase reads the TZ environment variable or calls
+    // time()/localtime() (GlobalTime tracks "now" via NTPClient's own
+    // manually-applied offset instead), so leaving TZ pointed at whichever
+    // zone was last converted has no effect on the rest of the app.
+    if (m_activePosixTz != posixTz) {
+        setenv("TZ", posixTz, 1);
+        tzset();
+        m_activePosixTz = posixTz;
+    }
+
+    struct tm timeinfo = {};
+    timeinfo.tm_year = year - 1900;
+    timeinfo.tm_mon = month - 1;
+    timeinfo.tm_mday = day;
+    timeinfo.tm_hour = hour;
+    timeinfo.tm_min = minute;
+    timeinfo.tm_sec = second;
+    timeinfo.tm_isdst = -1; // let mktime() determine DST from the active TZ rule
+
+    time_t utc = mktime(&timeinfo);
+    if (utc == (time_t)-1) {
+        return false;
+    }
+    outUtc = utc;
+    return true;
+}
+
 time_t IcsParser::parseDateTime(const String &value, const String &params, int localOffsetSeconds, bool &outAllDay) {
     String v = value;
     v.trim();
@@ -149,8 +228,30 @@ time_t IcsParser::parseDateTime(const String &value, const String &params, int l
 
     if (isUtc) {
         epoch += localOffsetSeconds; // convert true UTC into the same local-epoch space GlobalTime uses
+        return epoch;
     }
-    // else: TZID or floating value - treated as already local, no adjustment (documented Phase 1 limitation)
+
+    // Not Z-suffixed: check for a recognized TZID before falling back to
+    // "treat as already device-local".
+    int tzidIdx = params.indexOf("TZID=");
+    if (tzidIdx != -1) {
+        String tzid = params.substring(tzidIdx + 5);
+        int semiIdx = tzid.indexOf(';');
+        if (semiIdx != -1) {
+            tzid = tzid.substring(0, semiIdx);
+        }
+        tzid.trim();
+        if (tzid.startsWith("\"") && tzid.endsWith("\"") && tzid.length() >= 2) {
+            tzid = tzid.substring(1, tzid.length() - 1);
+        }
+
+        time_t utc;
+        if (convertTzidToUtc(tzid, year, month, day, hour, minute, second, utc)) {
+            return utc + localOffsetSeconds; // land in the same device-local-epoch space as everything else
+        }
+        // unrecognized TZID - fall through to "treat as local" below
+    }
+    // No TZID, or unrecognized - treated as already local, no adjustment (documented limitation)
 
     return epoch;
 }
@@ -189,7 +290,29 @@ void IcsParser::copyTruncated(const String &text, char outBuf[], int maxLen) {
     }
 }
 
-bool IcsParser::parseRRule(const String &rrule, ParsedRRule &out) {
+int IcsParser::parseByDayToken(const String &token, int &outOrdinal) {
+    outOrdinal = 0;
+    int i = 0;
+    bool negative = false;
+    if (i < (int)token.length() && token.charAt(i) == '-') {
+        negative = true;
+        i++;
+    }
+    int numStart = i;
+    while (i < (int)token.length() && isDigit(token.charAt(i))) {
+        i++;
+    }
+    if (i > numStart) {
+        outOrdinal = token.substring(numStart, i).toInt();
+        if (negative) {
+            outOrdinal = -outOrdinal;
+        }
+    }
+    String code = token.substring(i);
+    return weekdayCodeToIndex(code);
+}
+
+bool IcsParser::parseRRule(const String &rrule, int localOffsetSeconds, ParsedRRule &out) {
     String freq;
 
     int pos = 0;
@@ -212,25 +335,45 @@ bool IcsParser::parseRRule(const String &rrule, ParsedRRule &out) {
                 out.count = val.toInt();
             } else if (key == "UNTIL") {
                 bool untilAllDayIgnored;
-                // UNTIL is normally Z-suffixed UTC per RFC5545; used only as
-                // a coarse cutoff alongside windowEnd, so treat with the
-                // same offset handling as any other timestamp.
-                out.until = parseDateTime(val, "", 0, untilAllDayIgnored);
+                // UNTIL is RFC5545-required to be Z-suffixed when DTSTART is
+                // TZID/local (true for every real example seen) - pass the
+                // real localOffsetSeconds (not a hardcoded 0, which was a
+                // latent bug: it left `until` in true-UTC space instead of
+                // the device-local-epoch space windowStart/windowEnd/every
+                // emitted occurrence live in). UNTIL's own params are still
+                // "" since it carries no TZID in valid ICS.
+                out.until = parseDateTime(val, "", localOffsetSeconds, untilAllDayIgnored);
             } else if (key == "BYDAY") {
                 out.hasByDay = true;
                 int bpos = 0;
                 while (bpos < (int)val.length()) {
                     int comma = val.indexOf(',', bpos);
-                    String dayCode = (comma == -1) ? val.substring(bpos) : val.substring(bpos, comma);
-                    dayCode.toUpperCase();
-                    int idx = weekdayCodeToIndex(dayCode);
+                    String dayToken = (comma == -1) ? val.substring(bpos) : val.substring(bpos, comma);
+                    dayToken.toUpperCase();
+                    int ordinal = 0;
+                    int idx = parseByDayToken(dayToken, ordinal);
                     if (idx >= 0) {
                         out.byDayFlags[idx] = true;
+                        if (ordinal != 0) {
+                            out.byDayOrdinal = ordinal; // last ordinal-bearing token wins - see ParsedRRule's scope note
+                        }
                     }
                     if (comma == -1)
                         break;
                     bpos = comma + 1;
                 }
+            } else if (key == "BYMONTHDAY") {
+                // Single-value only (matches all real data); a comma-
+                // separated list takes just the first value.
+                int comma = val.indexOf(',');
+                String first = (comma == -1) ? val : val.substring(0, comma);
+                out.byMonthDay = first.toInt();
+                out.hasByMonthDay = (out.byMonthDay != 0);
+            } else if (key == "BYMONTH") {
+                int comma = val.indexOf(',');
+                String first = (comma == -1) ? val : val.substring(0, comma);
+                out.byMonth = first.toInt();
+                out.hasByMonth = (out.byMonth >= 1 && out.byMonth <= 12);
             }
         }
         if (semi == -1)
@@ -246,14 +389,67 @@ bool IcsParser::parseRRule(const String &rrule, ParsedRRule &out) {
         out.freq = RRuleFreq::Weekly;
         return true;
     }
+    if (freq == "MONTHLY") {
+        out.freq = RRuleFreq::Monthly;
+        return true;
+    }
+    if (freq == "YEARLY") {
+        out.freq = RRuleFreq::Yearly;
+        return true;
+    }
     return false; // unsupported FREQ - caller drops the whole event
 }
 
+int IcsParser::naiveWeekdayFromDateValue(const String &value) {
+    if (value.length() < 8) {
+        return 0;
+    }
+    int year = value.substring(0, 4).toInt();
+    int month = value.substring(4, 6).toInt();
+    int day = value.substring(6, 8).toInt();
+
+    tmElements_t tm;
+    tm.Year = year - 1970;
+    tm.Month = month;
+    tm.Day = day;
+    tm.Hour = 0;
+    tm.Minute = 0;
+    tm.Second = 0;
+    return weekday(makeTime(tm)) - 1; // 0=Sunday..6=Saturday
+}
+
 void IcsParser::bufferPendingMaster(const PendingEvent &pending, uint32_t uidHash, time_t baseStart, time_t baseEnd,
-                                     bool allDay, time_t windowStart, time_t windowEnd) {
+                                     bool allDay, time_t windowStart, time_t windowEnd, int localOffsetSeconds) {
     ParsedRRule rrule;
-    if (!parseRRule(pending.rrule, rrule)) {
-        return; // unsupported FREQ (e.g. MONTHLY/YEARLY) - drop the whole event, matching prior behavior
+    if (!parseRRule(pending.rrule, localOffsetSeconds, rrule)) {
+        return; // unsupported RRULE shape - drop the whole event, matching prior behavior
+    }
+
+    // BYDAY weekday codes are authored relative to DTSTART's own literal
+    // calendar date, but baseStart has already been shifted into
+    // device-local-epoch space (by a UTC offset, or via TZID conversion) -
+    // which can land on a different calendar day than the digits were
+    // written on (e.g. a Pacific evening DTSTART becomes early the next
+    // morning in Tokyo). Rotate the flags by the observed day-shift so
+    // expansion checks the correct device-local weekday(s) rather than the
+    // pre-shift ones - otherwise a series authored as e.g. "every Tuesday"
+    // in a zone that shifts a day ahead of the device's zone would silently
+    // expand as "every Monday" once converted.
+    if (rrule.hasByDay) {
+        int naiveWd = naiveWeekdayFromDateValue(pending.dtStartValue);
+        int deviceWd = weekday(baseStart) - 1;
+        int dayShift = (deviceWd - naiveWd + 7) % 7;
+        if (dayShift != 0) {
+            bool shifted[7] = {false, false, false, false, false, false, false};
+            for (int wd = 0; wd < 7; wd++) {
+                if (rrule.byDayFlags[wd]) {
+                    shifted[(wd + dayShift) % 7] = true;
+                }
+            }
+            for (int wd = 0; wd < 7; wd++) {
+                rrule.byDayFlags[wd] = shifted[wd];
+            }
+        }
     }
 
     // A series that already ended before this window, or hasn't started by
@@ -284,6 +480,86 @@ void IcsParser::bufferPendingMaster(const PendingEvent &pending, uint32_t uidHas
     for (int i = 0; i < pending.exdateCount; i++) {
         m.exdates[i] = pending.exdates[i];
     }
+}
+
+time_t IcsParser::firstOfMonthEpoch(int year, int month) {
+    tmElements_t tm;
+    tm.Year = year - 1970;
+    tm.Month = month;
+    tm.Day = 1;
+    tm.Hour = 0;
+    tm.Minute = 0;
+    tm.Second = 0;
+    return makeTime(tm);
+}
+
+int IcsParser::daysInMonthCalc(int year, int month) {
+    int nextMonth = month + 1;
+    int nextYear = year;
+    if (nextMonth > 12) {
+        nextMonth = 1;
+        nextYear++;
+    }
+    time_t firstOfNextMonth = firstOfMonthEpoch(nextYear, nextMonth);
+    return day(firstOfNextMonth - 86400);
+}
+
+int IcsParser::nthWeekdayOfMonth(int year, int month, int targetWeekday, int ordinal) {
+    time_t firstOfMonth = firstOfMonthEpoch(year, month);
+    int firstWeekday = weekday(firstOfMonth) - 1; // 0=Sunday..6=Saturday
+    int firstOccurrenceDay = 1 + ((targetWeekday - firstWeekday + 7) % 7);
+    int totalDays = daysInMonthCalc(year, month);
+
+    if (ordinal == -1) { // last occurrence
+        int lastOccurrenceDay = firstOccurrenceDay;
+        while (lastOccurrenceDay + 7 <= totalDays) {
+            lastOccurrenceDay += 7;
+        }
+        return lastOccurrenceDay;
+    }
+
+    int candidateDay = firstOccurrenceDay + (ordinal - 1) * 7;
+    if (candidateDay > totalDays) {
+        return 0; // that ordinal doesn't exist this month
+    }
+    return candidateDay;
+}
+
+time_t IcsParser::computeMonthlyYearlyCandidate(const ParsedRRule &rrule, time_t baseStart, int year, int month) {
+    int dayOfMonth = 0;
+    if (rrule.hasByDay) {
+        int targetWeekday = -1;
+        for (int wd = 0; wd < 7; wd++) {
+            if (rrule.byDayFlags[wd]) {
+                targetWeekday = wd; // single-BYDAY-token scope - see ParsedRRule's comment
+                break;
+            }
+        }
+        if (targetWeekday == -1) {
+            return 0;
+        }
+        int ordinal = (rrule.byDayOrdinal != 0) ? rrule.byDayOrdinal : 1;
+        dayOfMonth = nthWeekdayOfMonth(year, month, targetWeekday, ordinal);
+    } else if (rrule.hasByMonthDay) {
+        dayOfMonth = (rrule.byMonthDay <= daysInMonthCalc(year, month)) ? rrule.byMonthDay : 0;
+    } else {
+        // Plain FREQ=MONTHLY/YEARLY with no BY* qualifier - repeats on
+        // baseStart's own day-of-month.
+        int baseDay = day(baseStart);
+        dayOfMonth = (baseDay <= daysInMonthCalc(year, month)) ? baseDay : 0;
+    }
+    if (dayOfMonth <= 0) {
+        return 0;
+    }
+
+    tmElements_t tm;
+    tm.Year = year - 1970;
+    tm.Month = month;
+    tm.Day = dayOfMonth;
+    tm.Hour = hour(baseStart);
+    tm.Minute = minute(baseStart);
+    tm.Second = second(baseStart);
+    return makeTime(tm);
 }
 
 void IcsParser::expandRecurrence(const PendingMaster &master, time_t windowStart, time_t windowEnd,
@@ -344,7 +620,7 @@ void IcsParser::expandRecurrence(const PendingMaster &master, time_t windowStart
             occurrencesEmitted++;
             cursor += (time_t)master.rrule.interval * oneDay;
         }
-    } else if (!master.rrule.hasByDay) { // WEEKLY, no BYDAY
+    } else if (master.rrule.freq == RRuleFreq::Weekly && !master.rrule.hasByDay) {
         time_t cursor = master.baseStart;
         while (cursor <= effectiveWindowEnd) {
             if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
@@ -353,7 +629,7 @@ void IcsParser::expandRecurrence(const PendingMaster &master, time_t windowStart
             occurrencesEmitted++;
             cursor += (time_t)master.rrule.interval * 7 * oneDay;
         }
-    } else { // WEEKLY with BYDAY
+    } else if (master.rrule.freq == RRuleFreq::Weekly) { // WEEKLY with BYDAY
         int startWeekday = weekday(master.baseStart) - 1; // 0=Sunday..6=Saturday
         time_t weekStart = master.baseStart - (time_t)startWeekday * oneDay;
         while (weekStart <= effectiveWindowEnd) {
@@ -374,6 +650,38 @@ void IcsParser::expandRecurrence(const PendingMaster &master, time_t windowStart
                 occurrencesEmitted++;
             }
             weekStart += (time_t)master.rrule.interval * 7 * oneDay;
+        }
+    } else { // MONTHLY or YEARLY
+        // Loops forward one cycle (month, or year for YEARLY) at a time from
+        // the series' own start rather than jump-computing a nearby cycle -
+        // see the plan's rationale: for any realistic series age this is at
+        // most a few dozen cheap integer-arithmetic iterations, and counting
+        // from the true start keeps COUNT semantics correct for free.
+        int cycleYear = year(master.baseStart);
+        int cycleMonth = master.rrule.hasByMonth ? master.rrule.byMonth : month(master.baseStart);
+        // Generous but bounded safety cap guarding against runaway iteration
+        // from a malformed UNTIL (~50 years for MONTHLY, ~100 for YEARLY).
+        int maxCycles = (master.rrule.freq == RRuleFreq::Monthly) ? 600 : 100;
+        for (int cyclesEmitted = 0; cyclesEmitted < maxCycles; cyclesEmitted++) {
+            if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
+                break;
+            time_t monthStart = firstOfMonthEpoch(cycleYear, cycleMonth);
+            if (monthStart > effectiveWindowEnd)
+                break;
+            time_t candidate = computeMonthlyYearlyCandidate(master.rrule, master.baseStart, cycleYear, cycleMonth);
+            if (candidate != 0 && candidate >= master.baseStart) {
+                emitIfInWindow(candidate);
+                occurrencesEmitted++;
+            }
+            if (master.rrule.freq == RRuleFreq::Monthly) {
+                cycleMonth += master.rrule.interval;
+                while (cycleMonth > 12) {
+                    cycleMonth -= 12;
+                    cycleYear++;
+                }
+            } else { // YEARLY
+                cycleYear += master.rrule.interval;
+            }
         }
     }
 }
@@ -442,7 +750,7 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
         // RECURRENCE-ID override seen later (or earlier - order doesn't
         // matter, only that both are seen by the time expansion runs) can
         // suppress the stale occurrence this master would otherwise emit.
-        bufferPendingMaster(pending, uidHash, start, end, allDay, windowStart, windowEnd);
+        bufferPendingMaster(pending, uidHash, start, end, allDay, windowStart, windowEnd, localOffsetSeconds);
         return;
     }
 

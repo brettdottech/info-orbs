@@ -20,12 +20,17 @@
 // event's original DTSTART is.
 //
 // v1 scope: SUMMARY/LOCATION/DTSTART/DTEND/STATUS/RRULE/UID/RECURRENCE-ID/
-// EXDATE. No VTIMEZONE table parsing - only Z-suffixed (UTC) timestamps are
-// timezone-correct, everything else is treated as already being in the
-// device's local time. RRULE expansion covers FREQ=DAILY/WEEKLY with
-// INTERVAL, COUNT/UNTIL, and a simple BYDAY weekday list; anything else
-// (MONTHLY/YEARLY, ordinal BYDAY, RDATE, ...) causes the whole event to be
-// dropped rather than partially expanded.
+// EXDATE. RRULE expansion covers FREQ=DAILY/WEEKLY/MONTHLY/YEARLY with
+// INTERVAL, COUNT/UNTIL, a simple (non-ordinal-per-token) BYDAY weekday
+// list, single-value BYMONTHDAY, and single-value BYMONTH; anything else
+// (RDATE, multi-ordinal BYDAY, BYSETPOS, ...) causes the whole event to be
+// dropped rather than partially expanded. No VTIMEZONE-block parsing -
+// instead, a small curated table maps common named Windows TZIDs (as seen
+// in Outlook exports) to POSIX TZ strings, converted via the standard C
+// library's setenv()/tzset()/mktime() (correct DST handling for whatever
+// rule the matched zone uses, not a hand-rolled one). An unrecognized TZID,
+// or no TZID at all, falls back to treating the timestamp as already being
+// in the device's local time.
 //
 // Individually-rescheduled occurrences of a recurring series (a separate
 // VEVENT with RECURRENCE-ID, common in Outlook exports) are deduplicated
@@ -55,10 +60,18 @@ private:
         IN_VTIMEZONE // skip all content lines until END:VTIMEZONE
     };
 
-    enum class RRuleFreq { Daily, Weekly };
+    enum class RRuleFreq { Daily, Weekly, Monthly, Yearly };
 
     // Parsed RRULE fields, computed once at buffering time rather than
     // re-tokenized at expansion time - see parseRRule()/bufferPendingMaster().
+    //
+    // Scope note: a single byDayOrdinal applies to all set byDayFlags bits,
+    // rather than RFC5545's full per-token-ordinal generality (e.g.
+    // "BYDAY=1MO,-1FR" meaning different ordinals per weekday). Every real
+    // MONTHLY/YEARLY RRULE seen in practice has exactly one BYDAY token; a
+    // hypothetical multi-ordinal rule still parses (last token's ordinal
+    // wins) rather than being rejected - graceful degradation, consistent
+    // with this parser's "common case only" philosophy.
     struct ParsedRRule {
         RRuleFreq freq = RRuleFreq::Daily;
         int interval = 1;
@@ -66,6 +79,11 @@ private:
         time_t until = 0; // 0 = none specified
         bool hasByDay = false;
         bool byDayFlags[7] = {false, false, false, false, false, false, false}; // 0=Sunday..6=Saturday
+        int byDayOrdinal = 0; // 0 = not ordinal; 1..5 = 1st..5th; -1 = last (MONTHLY/YEARLY only)
+        bool hasByMonthDay = false;
+        int byMonthDay = 0; // 1..31 (single value only - matches all real data)
+        bool hasByMonth = false;
+        int byMonth = 0; // 1..12 (single value only - matches all real data)
     };
 
     // A recurring VEVENT (has RRULE), buffered instead of expanded
@@ -145,11 +163,33 @@ private:
     // (CALENDAR_LOCATION_MAX_LEN).
     void copyTruncated(const String &text, char outBuf[], int maxLen);
 
-    // Tokenizes an RRULE value's FREQ/INTERVAL/COUNT/UNTIL/BYDAY parts into
-    // `out`. Returns false if FREQ isn't DAILY or WEEKLY (the only shapes
-    // this parser expands) - the caller then drops the whole event, matching
-    // the ADR's "common case only" framing.
-    bool parseRRule(const String &rrule, ParsedRRule &out);
+    // Tokenizes an RRULE value's FREQ/INTERVAL/COUNT/UNTIL/BYDAY/BYMONTHDAY/
+    // BYMONTH parts into `out`. Returns false if FREQ isn't one of the four
+    // supported shapes - the caller then drops the whole event, matching
+    // the ADR's "common case only" framing. `localOffsetSeconds` is needed
+    // to parse `UNTIL` into the same device-local-epoch space as every other
+    // timestamp in this parser (previously hardcoded to 0 - a latent bug,
+    // since UNTIL is RFC5545-required to be Z-suffixed but still needs the
+    // device offset applied like any other Z-suffixed value).
+    bool parseRRule(const String &rrule, int localOffsetSeconds, ParsedRRule &out);
+
+    // Splits an RRULE BYDAY token like "2WE", "-1FR", or a bare "MO" into an
+    // optional leading ordinal (outOrdinal, 0 if none present) and the
+    // trailing 2-letter weekday code. Returns weekdayCodeToIndex()'s result
+    // for the code (-1 if unrecognized).
+    int parseByDayToken(const String &token, int &outOrdinal);
+
+    // Weekday index (0=Sunday..6=Saturday, matching weekdayCodeToIndex()) of
+    // the calendar date literally encoded in the first 8 characters of a raw
+    // ICS date/date-time value (e.g. "20260630T180000") - i.e. the date as
+    // authored, with no TZID/UTC-offset adjustment applied. Used to detect
+    // when TZID conversion (or a UTC offset) has shifted DTSTART onto a
+    // different device-local calendar day than it was written on, so
+    // RRULE BYDAY flags (authored relative to that original date) can be
+    // rotated to match. Returns 0 (Sunday) if `value` is too short to
+    // contain a date - callers only reach that case for malformed input
+    // already rejected elsewhere.
+    int naiveWeekdayFromDateValue(const String &value);
 
     // Buffers a recurring VEVENT for expansion after the whole feed has been
     // read (see class-level comment). Silently skips (without consuming a
@@ -162,7 +202,38 @@ private:
     // (Serial-logged) if its RRULE shape is unsupported or the table is
     // still full after that filter.
     void bufferPendingMaster(const PendingEvent &pending, uint32_t uidHash, time_t baseStart, time_t baseEnd,
-                              bool allDay, time_t windowStart, time_t windowEnd);
+                              bool allDay, time_t windowStart, time_t windowEnd, int localOffsetSeconds);
+
+    // Calendar-math helpers for MONTHLY/YEARLY expansion, mirroring
+    // CalendarWidget's daysInMonth()/firstWeekdayOfMonth() tmElements_t+
+    // makeTime() idiom (duplicated rather than shared - the two classes
+    // have no common base, and factoring out ~10 lines for 2 call sites
+    // isn't worth it).
+    time_t firstOfMonthEpoch(int year, int month); // epoch of day 1, 00:00:00
+    int daysInMonthCalc(int year, int month); // via "day 1 of next month minus 1 day"
+
+    // Day-of-month (1-31) of the Nth (ordinal 1..5) or last (ordinal -1)
+    // occurrence of targetWeekday (0=Sunday..6=Saturday) in month/year.
+    // Returns 0 if that ordinal doesn't exist in this month (e.g. "5th
+    // Monday" when the month only has 4).
+    int nthWeekdayOfMonth(int year, int month, int targetWeekday, int ordinal);
+
+    // Resolves one MONTHLY/YEARLY cycle's candidate occurrence for the given
+    // year/month: uses nthWeekdayOfMonth() if rrule.hasByDay, byMonthDay if
+    // rrule.hasByMonthDay, or falls back to baseStart's own day-of-month
+    // (plain FREQ=MONTHLY/YEARLY with no BY* qualifier). Overlays
+    // baseStart's time-of-day. Returns 0 if the day doesn't exist in that
+    // month.
+    time_t computeMonthlyYearlyCandidate(const ParsedRRule &rrule, time_t baseStart, int year, int month);
+
+    // Looks up `tzid` (a Windows timezone identifier from a TZID= param)
+    // against a small curated table and, if found, converts the given naive
+    // local calendar fields (as authored in that zone) to true UTC via the
+    // C library's own tzset()/mktime() - correctly resolving DST for
+    // whatever rule the matched POSIX TZ string encodes. Returns false
+    // (leaves outUtc untouched) if tzid isn't in the table.
+    bool convertTzidToUtc(const String &tzid, int year, int month, int day, int hour, int minute, int second,
+                          time_t &outUtc);
 
     // Expands a buffered master's RRULE into individual occurrences within
     // [windowStart, windowEnd], skipping any occurrence that matches the
@@ -199,6 +270,13 @@ private:
     static int m_pendingMasterCount;
     static SuppressedOccurrence m_suppressed[CALENDAR_MAX_SUPPRESSED];
     static int m_suppressedCount;
+
+    // Caches which POSIX TZ string is currently active (via setenv/tzset),
+    // so convertTzidToUtc() can skip the setenv()/tzset() round-trip when
+    // consecutive calls share the same zone - common, since most events in
+    // one feed use a small handful of distinct TZIDs, and tzset() re-parses
+    // its rule string on every call.
+    static String m_activePosixTz;
 };
 
 #endif // ICS_PARSER_H
