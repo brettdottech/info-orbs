@@ -32,7 +32,16 @@ void GlobalTime::updateTime() {
     if (elapsed >= m_oneSecond) {
         m_updateTimer += m_oneSecond * (elapsed / m_oneSecond);
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
-            getTimeZoneOffsetFromAPI();
+            // getTimeZoneOffsetFromAPI() is a blocking HTTP call (up to ~5s on
+            // a dead server) and timezonedb rate-limits to ~1 req/s, so calling
+            // it on every 1s tick both stalls the render loop and guarantees
+            // rate-limit failures. Gate the attempts: fast retry until the
+            // first successful fetch, slow retry afterwards (DST changeover).
+            uint32_t tzRetryInterval = (m_timeZoneOffset == -1) ? m_tzInitialRetryInterval : m_tzRetryInterval;
+            if (m_lastTimeZoneAttempt == 0 || (uint32_t) (now - m_lastTimeZoneAttempt) >= tzRetryInterval) {
+                m_lastTimeZoneAttempt = now;
+                getTimeZoneOffsetFromAPI();
+            }
         }
         // NTPClient::update() re-attempts a *blocking* forceUpdate() (up to
         // ~1010ms of delay(10) waiting for the UDP reply) on EVERY call once a

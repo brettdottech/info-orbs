@@ -13,7 +13,8 @@ void Button::begin() {
     pinMode(m_pin, BUTTON_MODE);
 }
 
-void Button::isrButtonChange() {
+// IRAM_ATTR: called from a GPIO interrupt; must not execute from flash cache
+void IRAM_ATTR Button::isrButtonChange() {
     if (millis() - m_lastPinLevelChange < DEBOUNCE_TIME) {
         return;
     }

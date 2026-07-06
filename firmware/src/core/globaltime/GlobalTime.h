@@ -86,6 +86,12 @@ private:
     unsigned long m_ntpInitialRetryInterval = 5 * 1000;
     unsigned long m_lastNtpAttempt = 0;
 
+    // Timezone API attempt gating (see updateTime()): the API call is a
+    // blocking HTTP request and timezonedb rate-limits free keys to ~1 req/s.
+    unsigned long m_tzInitialRetryInterval = 30 * 1000; // until first success
+    unsigned long m_tzRetryInterval = 5 * 60 * 1000; // after a failed refresh
+    unsigned long m_lastTimeZoneAttempt = 0;
+
     bool m_format24hour{FORMAT_24_HOUR};
 
     void getTimeZoneOffsetFromAPI();

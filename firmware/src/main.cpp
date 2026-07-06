@@ -60,11 +60,13 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) 
 }
 
 /**
- * The ISR handlers must be static
+ * The ISR handlers must be static and must live in IRAM: without IRAM_ATTR a
+ * button edge during a flash write (e.g. NVS/config save) crashes the ESP32
+ * with "Cache disabled but cached memory region accessed".
  */
-void isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
-void isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
-void isrButtonChangeRight() { buttonRight.isrButtonChange(); }
+void IRAM_ATTR isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
+void IRAM_ATTR isrButtonChangeMiddle() { buttonOK.isrButtonChange(); }
+void IRAM_ATTR isrButtonChangeRight() { buttonRight.isrButtonChange(); }
 
 void setupButtons() {
     buttonLeft.begin();

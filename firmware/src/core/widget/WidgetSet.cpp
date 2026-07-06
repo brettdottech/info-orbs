@@ -75,7 +75,7 @@ void WidgetSet::showLoading() {
 }
 
 void WidgetSet::updateAll() {
-    for (int8_t i; i < m_widgetCount; i++) {
+    for (int8_t i = 0; i < m_widgetCount; i++) {
         Serial.printf("updating widget %s\n", m_widgets[i]->getName().c_str());
         showCenteredLine(4, m_widgets[i]->getName());
         m_widgets[i]->update();
