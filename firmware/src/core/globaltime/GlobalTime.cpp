@@ -34,7 +34,21 @@ void GlobalTime::updateTime() {
         if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
             getTimeZoneOffsetFromAPI();
         }
-        m_timeClient->update();
+        // NTPClient::update() re-attempts a *blocking* forceUpdate() (up to
+        // ~1010ms of delay(10) waiting for the UDP reply) on EVERY call once a
+        // refresh is due, because a failed attempt never advances _lastUpdate.
+        // If the NTP server stops responding, that turns this once-per-second
+        // tick into a ~1s stall of the whole render loop (colon blink visibly
+        // halves to 1s on / 1s off). Gate the attempts ourselves so a dead
+        // server costs at most one stall per retry interval; timekeeping
+        // continues via millis() inside getEpochTime() meanwhile.
+        uint32_t ntpRetryInterval = m_timeClient->isTimeSet() ? m_ntpRetryInterval : m_ntpInitialRetryInterval;
+        if (m_lastNtpAttempt == 0 || (uint32_t) (now - m_lastNtpAttempt) >= ntpRetryInterval) {
+            m_lastNtpAttempt = now;
+            if (!m_timeClient->update() && m_timeClient->isTimeSet()) {
+                Serial.println("NTP update failed (server not responding), will retry later");
+            }
+        }
         m_unixEpoch = m_timeClient->getEpochTime();
         m_minute = minute(m_unixEpoch);
         if (m_format24hour) {

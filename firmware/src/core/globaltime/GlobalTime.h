@@ -79,6 +79,13 @@ private:
     unsigned long m_oneSecond = 1000;
     unsigned long m_updateTimer = 0;
 
+    // NTP attempt gating (see updateTime()): slightly above NTPClient's
+    // internal 60s interval so every gated call performs a real attempt.
+    unsigned long m_ntpRetryInterval = 61 * 1000;
+    // Retry faster until the first successful sync after boot
+    unsigned long m_ntpInitialRetryInterval = 5 * 1000;
+    unsigned long m_lastNtpAttempt = 0;
+
     bool m_format24hour{FORMAT_24_HOUR};
 
     void getTimeZoneOffsetFromAPI();

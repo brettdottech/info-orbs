@@ -47,8 +47,13 @@ void ClockWidget::draw(bool force) {
     if (elapsed >= m_colonBlinkInterval) {
         // Advance in whole periods so no cumulative drift builds up,
         // and catch up in one step if the loop was blocked for a while.
-        m_colonBlinkPrev += m_colonBlinkInterval * (elapsed / m_colonBlinkInterval);
-        m_colonVisible = !m_colonVisible;
+        // Toggle by period parity so a blocked loop (e.g. a blocking
+        // network call) can never invert the blink phase.
+        uint32_t periods = elapsed / m_colonBlinkInterval;
+        m_colonBlinkPrev += m_colonBlinkInterval * periods;
+        if (periods % 2 == 1) {
+            m_colonVisible = !m_colonVisible;
+        }
         displayColon();
     } else if (force) {
         displayColon();

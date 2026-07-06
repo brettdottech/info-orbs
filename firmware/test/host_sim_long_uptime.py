@@ -88,6 +88,38 @@ def simulate_colon_blink(start_ms, duration_ms, loop_latency_ms):
     return intervals
 
 
+def simulate_colon_with_stalls(duration_ms, stall_every_ms, stall_ms, loop_latency_ms):
+    """NEW parity-correct colon blinker with periodic loop stalls injected
+    (models one blocking NTP attempt per retry interval).
+
+    Returns (phase_errors, toggles): phase_errors counts observations where the
+    colon state disagrees with the ideal 500 ms square wave outside a stall.
+    """
+    ms = 0
+    prev = 0
+    visible = True
+    next_stall = stall_every_ms
+    phase_errors = toggles = 0
+    while ms < duration_ms:
+        if ms >= next_stall:
+            ms += stall_ms  # blocking NTP forceUpdate timeout
+            next_stall += stall_every_ms
+        else:
+            ms += loop_latency_ms
+        elapsed = u32(u32(ms) - u32(prev))
+        if elapsed >= 500:
+            periods = elapsed // 500
+            prev = prev + 500 * periods
+            if periods % 2 == 1:
+                visible = not visible
+            toggles += 1
+            # Ideal square wave: visible == (whole 500ms periods since t0) even
+            ideal = (prev // 500) % 2 == 0
+            if visible != ideal:
+                phase_errors += 1
+    return phase_errors, toggles
+
+
 def check_seconds_dot():
     """Validate displaySeconds() guards and arc angle bounds."""
     for orb in range(-2, 7):
@@ -145,6 +177,19 @@ assert abs(drift) <= 7, "cumulative drift detected"
 print("=== 7. Seconds-dot bounds / orb ownership (all orbs x seconds -5..65) ===")
 check_seconds_dot()
 print("    all draws bounded to orb 2, seconds 0..59, angles within 0..360")
+
+print("=== 8. Colon blink under NTP failure ===")
+# OLD GlobalTime: dead NTP server blocks EVERY 1s tick ~1010 ms -> the render
+# loop runs ~1x/s and the colon degrades to ~1s on / 1s off (reported bug).
+intervals = simulate_colon_blink(0, 3600 * 1000, 1010)
+print(f"    old (loop stalled every tick): median toggle interval = {sorted(intervals)[len(intervals) // 2]} ms (bug: ~1010, not 500)")
+assert sorted(intervals)[len(intervals) // 2] > 900
+# NEW GlobalTime: attempts gated to one per 61 s -> a single ~1s stall per
+# minute; parity-correct catch-up keeps the colon phase-locked to the 500 ms
+# grid at all other times.
+errors, toggles = simulate_colon_with_stalls(2 * 3600 * 1000, 61_000, 1010, 5)
+print(f"    new (1 gated stall / 61s): {toggles} toggles over 2h, phase errors: {errors}")
+assert errors == 0
 
 print()
 print("ALL CHECKS PASSED")
