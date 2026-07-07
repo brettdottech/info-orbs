@@ -31,13 +31,11 @@ public:
     const CalendarEvent &getEvent(int index) const;
 
     CalendarFetchStatus getStatus() const;
-    unsigned long getLastSuccessfulFetchMillis() const;
 
 private:
     CalendarEvent m_events[CALENDAR_MAX_EVENTS];
     int m_eventCount = 0;
     CalendarFetchStatus m_status = CalendarFetchStatus::NOT_YET_FETCHED;
-    unsigned long m_lastSuccessfulFetchMillis = 0;
 
     void sortEventsByStart();
 };

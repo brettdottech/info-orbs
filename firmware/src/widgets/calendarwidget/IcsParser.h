@@ -20,7 +20,8 @@
 // event's original DTSTART is.
 //
 // v1 scope: SUMMARY/LOCATION/DTSTART/DTEND/STATUS/RRULE/UID/RECURRENCE-ID/
-// EXDATE. RRULE expansion covers FREQ=DAILY/WEEKLY/MONTHLY/YEARLY with
+// EXDATE/ATTENDEE (PARTSTAT=DECLINED only). RRULE expansion covers
+// FREQ=DAILY/WEEKLY/MONTHLY/YEARLY with
 // INTERVAL, COUNT/UNTIL, a simple (non-ordinal-per-token) BYDAY weekday
 // list, single-value BYMONTHDAY, and single-value BYMONTH; anything else
 // (RDATE, multi-ordinal BYDAY, BYSETPOS, ...) causes the whole event to be
@@ -133,6 +134,16 @@ private:
         bool hasRecurrenceId = false;
         time_t exdates[CALENDAR_MAX_EXDATES_PER_MASTER] = {0}; // in-window-only
         int exdateCount = 0;
+
+        // True if any ATTENDEE line in this VEVENT carries PARTSTAT=DECLINED.
+        // A personal/subscription ICS feed typically lists only the
+        // subscriber's own attendance status (providers commonly strip other
+        // attendees' details for privacy), so in practice this is a
+        // locale/provider-independent signal for "I declined this" - see
+        // finalizeEvent()'s decline filter. Note: for a feed that does expose
+        // a full attendee list (e.g. one exported by the meeting's own
+        // organizer), this would also match another attendee's decline.
+        bool anyAttendeeDeclined = false;
     };
 
     // Reads one logical (unfolded) content line from stream into `outLine`.
@@ -212,10 +223,11 @@ private:
     time_t firstOfMonthEpoch(int year, int month); // epoch of day 1, 00:00:00
     int daysInMonthCalc(int year, int month); // via "day 1 of next month minus 1 day"
 
-    // Day-of-month (1-31) of the Nth (ordinal 1..5) or last (ordinal -1)
-    // occurrence of targetWeekday (0=Sunday..6=Saturday) in month/year.
-    // Returns 0 if that ordinal doesn't exist in this month (e.g. "5th
-    // Monday" when the month only has 4).
+    // Day-of-month (1-31) of the Nth (ordinal 1..5) or Nth-from-last
+    // (ordinal -1..-5, e.g. -1 = last, -2 = 2nd-to-last) occurrence of
+    // targetWeekday (0=Sunday..6=Saturday) in month/year. Returns 0 if that
+    // ordinal doesn't exist in this month (e.g. "5th Monday" when the month
+    // only has 4).
     int nthWeekdayOfMonth(int year, int month, int targetWeekday, int ordinal);
 
     // Resolves one MONTHLY/YEARLY cycle's candidate occurrence for the given

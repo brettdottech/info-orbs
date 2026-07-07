@@ -343,6 +343,16 @@ void CalendarWidget::drawAgendaDaySlot(int screenIndex, time_t dayStart) {
     const int firstEventY = 52;
     const int eventRowSpacing = 17;
     const int maxTitleCharsCompact = 20; // shorter than the events-mode title cap - shares the row with a time prefix
+
+    // Two passes instead of switching fonts per row: ScreenManager::setFont()
+    // tears down and reinitializes the whole FreeType engine on every actual
+    // font change, so alternating ROBOTO_BOLD/DEFAULT_FONT once per row (up
+    // to 9 rows) would mean ~18 font-engine reinits per draw of this screen.
+    // Drawing all regular-weight time prefixes first, then switching to bold
+    // once for every title, cuts that to 2.
+    String titleParts[maxDayEvents];
+    int titleX[maxDayEvents];
+    int titleY[maxDayEvents];
     for (int i = 0; i < shown; i++) {
         String timePart = dayEvents[i]->allDay ? "All day" : formatEventTime((time_t)dayEvents[i]->start);
         String titlePart = String(dayEvents[i]->title);
@@ -352,11 +362,16 @@ void CalendarWidget::drawAgendaDaySlot(int screenIndex, time_t dayStart) {
         int y = firstEventY + i * eventRowSpacing;
         String timePrefix = timePart + "  ";
         m_manager.drawString(timePrefix, kAgendaLeftMargin, y, calendarFontSize, Align::MiddleLeft);
-        int titleX = kAgendaLeftMargin + m_manager.getTextWidth(timePrefix, calendarFontSize);
-        m_manager.setFont(ROBOTO_BOLD);
-        m_manager.drawString(titlePart, titleX, y, calendarFontSize, Align::MiddleLeft);
-        m_manager.setFont(DEFAULT_FONT);
+        titleParts[i] = titlePart;
+        titleX[i] = kAgendaLeftMargin + m_manager.getTextWidth(timePrefix, calendarFontSize);
+        titleY[i] = y;
     }
+
+    m_manager.setFont(ROBOTO_BOLD);
+    for (int i = 0; i < shown; i++) {
+        m_manager.drawString(titleParts[i], titleX[i], titleY[i], calendarFontSize, Align::MiddleLeft);
+    }
+    m_manager.setFont(DEFAULT_FONT);
 
     if (totalCount > shown) {
         int y = firstEventY + shown * eventRowSpacing;

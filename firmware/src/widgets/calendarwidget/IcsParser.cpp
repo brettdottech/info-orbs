@@ -86,8 +86,22 @@ IcsParser::IcsParser() {
 
 bool IcsParser::readLogicalLine(Stream &stream, String &outLine) {
     String line = stream.readStringUntil('\n');
-    if (line.length() == 0 && stream.peek() == -1) {
-        return false; // end of stream
+    if (line.length() == 0) {
+        // readStringUntil() returning empty usually means its own read
+        // timeout expired without finding '\n' (a genuinely blank input line
+        // would also land here, which is fine to also stop on). A single
+        // peek()==-1 right after that can be a transient "no bytes buffered
+        // this instant" blip on a live, still-open network stream rather
+        // than the connection actually being closed - so require it to hold
+        // across a few short retries before concluding the feed has ended,
+        // to avoid silently truncating the rest of the calendar on a
+        // momentary WiFi stall.
+        for (int attempt = 0; attempt < 3 && stream.peek() == -1; attempt++) {
+            delay(5);
+        }
+        if (stream.peek() == -1) {
+            return false; // end of stream
+        }
     }
     if (line.endsWith("\r")) {
         line.remove(line.length() - 1);
@@ -280,9 +294,21 @@ String IcsParser::unescapeText(const String &value) {
 }
 
 void IcsParser::copyTruncated(const String &text, char outBuf[], int maxLen) {
+    if (maxLen <= 0) {
+        outBuf[0] = '\0';
+        return;
+    }
     if ((int)text.length() <= maxLen) {
         strncpy(outBuf, text.c_str(), maxLen);
         outBuf[text.length()] = '\0';
+    } else if (maxLen < 3) {
+        // Not enough room for the "..." marker (only reachable if a user's
+        // config.h sets CALENDAR_TITLE_MAX_LEN/CALENDAR_LOCATION_MAX_LEN
+        // below 3) - hard-truncate instead of letting `maxLen - 3` go
+        // negative, which would otherwise turn into a huge size_t once it
+        // reaches strncpy() and overflow outBuf.
+        strncpy(outBuf, text.c_str(), maxLen);
+        outBuf[maxLen] = '\0';
     } else {
         String truncated = text.substring(0, maxLen - 3) + "...";
         strncpy(outBuf, truncated.c_str(), maxLen);
@@ -510,12 +536,16 @@ int IcsParser::nthWeekdayOfMonth(int year, int month, int targetWeekday, int ord
     int firstOccurrenceDay = 1 + ((targetWeekday - firstWeekday + 7) % 7);
     int totalDays = daysInMonthCalc(year, month);
 
-    if (ordinal == -1) { // last occurrence
+    if (ordinal < 0) { // counting from the last occurrence (-1 = last, -2 = 2nd-to-last, ...)
         int lastOccurrenceDay = firstOccurrenceDay;
         while (lastOccurrenceDay + 7 <= totalDays) {
             lastOccurrenceDay += 7;
         }
-        return lastOccurrenceDay;
+        int candidateDay = lastOccurrenceDay + (ordinal + 1) * 7;
+        if (candidateDay < 1) {
+            return 0; // that ordinal doesn't exist this month
+        }
+        return candidateDay;
     }
 
     int candidateDay = firstOccurrenceDay + (ordinal - 1) * 7;
@@ -612,22 +642,49 @@ void IcsParser::expandRecurrence(const PendingMaster &master, time_t windowStart
     };
 
     if (master.rrule.freq == RRuleFreq::Daily) {
+        time_t step = (time_t)master.rrule.interval * oneDay;
         time_t cursor = master.baseStart;
+        // Fast-forward past occurrences that already ended before
+        // windowStart, instead of walking one interval at a time from a
+        // possibly years-old baseStart (a daily/weekly series with no
+        // COUNT/UNTIL would otherwise re-walk its entire history on every
+        // hourly re-fetch). occurrencesEmitted is advanced by the same
+        // number of steps skipped so COUNT bookkeeping stays correct, and
+        // the jump always lands at-or-before the last still-irrelevant
+        // occurrence (integer division floors), so no relevant occurrence
+        // is skipped.
+        if (step > 0 && cursor + duration <= windowStart) {
+            time_t elapsed = (windowStart - duration) - cursor;
+            long steps = elapsed / step;
+            if (steps > 0) {
+                cursor += (time_t)steps * step;
+                occurrencesEmitted += (int)steps;
+            }
+        }
         while (cursor <= effectiveWindowEnd) {
             if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
                 break;
             emitIfInWindow(cursor);
             occurrencesEmitted++;
-            cursor += (time_t)master.rrule.interval * oneDay;
+            cursor += step;
         }
     } else if (master.rrule.freq == RRuleFreq::Weekly && !master.rrule.hasByDay) {
+        time_t step = (time_t)master.rrule.interval * 7 * oneDay;
         time_t cursor = master.baseStart;
+        if (step > 0 && cursor + duration <= windowStart) {
+            time_t elapsed = (windowStart - duration) - cursor;
+            long steps = elapsed / step;
+            if (steps > 0) {
+                cursor += (time_t)steps * step;
+                occurrencesEmitted += (int)steps;
+            }
+        }
         while (cursor <= effectiveWindowEnd) {
             if (master.rrule.count > 0 && occurrencesEmitted >= master.rrule.count)
                 break;
             emitIfInWindow(cursor);
             occurrencesEmitted++;
-            cursor += (time_t)master.rrule.interval * 7 * oneDay;
+            cursor += step;
         }
     } else if (master.rrule.freq == RRuleFreq::Weekly) { // WEEKLY with BYDAY
         int startWeekday = weekday(master.baseStart) - 1; // 0=Sunday..6=Saturday
@@ -707,11 +764,15 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
         bool recurAllDayIgnored;
         time_t recurTime = parseDateTime(pending.recurrenceIdValue, pending.recurrenceIdParams, localOffsetSeconds,
                                           recurAllDayIgnored);
-        if (recurTime > 0 && recurTime >= windowStart && recurTime <= windowEnd &&
-            m_suppressedCount < CALENDAR_MAX_SUPPRESSED) {
-            m_suppressed[m_suppressedCount].uidHash = uidHash;
-            m_suppressed[m_suppressedCount].originalTime = recurTime;
-            m_suppressedCount++;
+        if (recurTime > 0 && recurTime >= windowStart && recurTime <= windowEnd) {
+            if (m_suppressedCount < CALENDAR_MAX_SUPPRESSED) {
+                m_suppressed[m_suppressedCount].uidHash = uidHash;
+                m_suppressed[m_suppressedCount].originalTime = recurTime;
+                m_suppressedCount++;
+            } else {
+                Serial.println("IcsParser: suppressed-occurrences table full, a rescheduled/cancelled "
+                                "occurrence may show a stale duplicate");
+            }
         }
     }
 
@@ -725,11 +786,11 @@ void IcsParser::finalizeEvent(const PendingEvent &pending, time_t windowStart, t
         return;
     }
 
-    // Outlook doesn't expose per-attendee decline via a parseable status
-    // field in personal ICS exports - it just prepends "Declined: " to the
-    // SUMMARY itself. Filtering on that prefix is the practical equivalent
-    // of skipping declined meetings.
-    if (pending.title.startsWith("Declined: ")) {
+    // Primary signal: an ATTENDEE line with PARTSTAT=DECLINED (works
+    // regardless of calendar provider or locale). Kept alongside the
+    // "Declined: " SUMMARY-prefix check as a fallback for feeds that use
+    // that Outlook convention instead of (or in addition to) ATTENDEE.
+    if (pending.anyAttendeeDeclined || pending.title.startsWith("Declined: ")) {
         return;
     }
 
@@ -836,6 +897,12 @@ int IcsParser::parse(Stream &stream, time_t windowStart, time_t windowEnd, int l
             pending.recurrenceIdValue = value;
             pending.recurrenceIdParams = params;
             pending.hasRecurrenceId = true;
+        } else if (name == "ATTENDEE") {
+            String upParams = params;
+            upParams.toUpperCase();
+            if (upParams.indexOf("PARTSTAT=DECLINED") != -1) {
+                pending.anyAttendeeDeclined = true;
+            }
         } else if (name == "EXDATE") {
             // RFC5545 allows multiple comma-separated dates on one line, and/
             // or multiple EXDATE lines within the same VEVENT (both just

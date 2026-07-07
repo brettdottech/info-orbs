@@ -30,10 +30,19 @@ bool CalendarDataModel::fetchAndParse(const String &url) {
 
     int offsetSeconds = globalTime->getTimeZoneOffsetSeconds();
     if (offsetSeconds == -1) {
-        // Timezone offset not yet fetched from the API - fail closed
-        // (treat as 0) rather than applying a bogus hour-scale error to
-        // every Z-suffixed timestamp.
-        offsetSeconds = 0;
+        // Timezone offset not yet fetched from the API. Falling back to 0
+        // here would parse every Z-suffixed/TZID timestamp as if the device
+        // were in UTC, silently misplacing every event by the device's real
+        // UTC offset until the next hourly re-fetch. Treat this the same as
+        // the epoch-not-ready case above instead: skip this attempt (no
+        // HTTP fetch spent) and flag NOT_READY, so networkRefreshIfDue()
+        // doesn't advance m_lastFetchedHour and retries on its very next
+        // update() call rather than waiting up to an hour with a
+        // wrong-offset parse - this is expected to resolve within a second
+        // or two after boot, once GlobalTime's own throttled API call
+        // returns.
+        m_status = CalendarFetchStatus::NOT_READY;
+        return false;
     }
 
     time_t windowStart = now;
@@ -50,6 +59,7 @@ bool CalendarDataModel::fetchAndParse(const String &url) {
     Serial.printf("Calendar: HTTP %d, Size %d\n", httpCode, http.getSize());
 
     if (httpCode != 200) {
+        Serial.printf("Calendar: HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
         http.end();
         m_status = CalendarFetchStatus::HTTP_ERROR;
         return false; // keep whatever event list we already had (last-good)
@@ -68,7 +78,6 @@ bool CalendarDataModel::fetchAndParse(const String &url) {
     m_eventCount = count;
     sortEventsByStart();
     m_status = CalendarFetchStatus::OK;
-    m_lastSuccessfulFetchMillis = millis();
     return true;
 }
 
@@ -82,10 +91,6 @@ const CalendarEvent &CalendarDataModel::getEvent(int index) const {
 
 CalendarFetchStatus CalendarDataModel::getStatus() const {
     return m_status;
-}
-
-unsigned long CalendarDataModel::getLastSuccessfulFetchMillis() const {
-    return m_lastSuccessfulFetchMillis;
 }
 
 void CalendarDataModel::sortEventsByStart() {
