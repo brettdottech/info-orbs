@@ -18,6 +18,8 @@ public:
 
 private:
     void connectionTimedOut();
+    int selectStartingTxPowerIndex(const String &ssid);
+    bool tryConnectWithEscalation(const String &ssid, const String &pass);
 
     WiFiManager &m_wifiManager;
 

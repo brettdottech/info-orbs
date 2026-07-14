@@ -10,6 +10,20 @@ const int statusScreenIndex = 3;
 const int fontSize = 19;
 const int messageDelay = 5000;
 
+// Ascending TX power tiers. We start low (to reduce the current spike from
+// the radio while the displays are already drawing steady current) and only
+// escalate if the lower tiers fail to connect.
+const wifi_power_t txPowerTiers[] = {
+    WIFI_POWER_8_5dBm,
+    WIFI_POWER_11dBm,
+    WIFI_POWER_13dBm,
+    WIFI_POWER_15dBm,
+    WIFI_POWER_17dBm,
+    WIFI_POWER_19_5dBm,
+};
+const int numTxPowerTiers = sizeof(txPowerTiers) / sizeof(txPowerTiers[0]);
+const unsigned long txPowerAttemptTimeout = 5000; // ms to wait for a connection at each power tier
+
 WifiWidget::WifiWidget(ScreenManager &manager, ConfigManager &config, WiFiManager &wifiManager) : Widget(manager, config), m_wifiManager(wifiManager) {}
 
 WifiWidget::~WifiWidget() {}
@@ -69,7 +83,18 @@ void WifiWidget::setup() {
 
     Log.noticeln("Hostname: %s", hostname.c_str());
 
+    // Try connecting at a reduced TX power first, escalating only if needed.
+    // This avoids stacking a full-power radio TX burst on top of the displays'
+    // already-steady current draw, which can brown out a marginal power supply.
+    String savedSsid = m_wifiManager.getWiFiSSID();
+    String savedPass = m_wifiManager.getWiFiPass();
+    if (savedSsid.length() > 0) {
+        bool preConnected = tryConnectWithEscalation(savedSsid, savedPass);
+        Serial.printf("Pre-connect at reduced TX power %s.\n", preConnected ? "succeeded" : "did not succeed, falling back to WiFiManager");
+    }
+
     // WiFiManager automatically connects using saved credentials...
+    // (if preConnected is true, this returns almost immediately since WiFi is already connected)
     if (m_wifiManager.autoConnect(m_apssid.c_str())) {
         Log.infoln("WifiManager connected.");
     } else { // ...if connection fails (no saved credentials), it starts an access point with a WiFi setup portal at 192.168.4.1
@@ -176,6 +201,57 @@ void WifiWidget::connectionTimedOut() {
         m_connectionString = "Unknown";
         break;
     }
+}
+
+// Passively scan (no probe requests, so negligible TX current) for the saved
+// SSID's RSSI and use it to guess the lowest TX power tier likely to reach it.
+// Signal strength on the AP->client link is a reasonable proxy for the
+// power needed on the client->AP link, though not a guaranteed match.
+int WifiWidget::selectStartingTxPowerIndex(const String &ssid) {
+    int startIndex = 1; // default: skip only the very lowest tier if we can't measure RSSI
+    int numNetworks = WiFi.scanNetworks(false /*async*/, false /*show_hidden*/, true /*passive*/, 110 /*ms per channel*/);
+    for (int i = 0; i < numNetworks; i++) {
+        if (WiFi.SSID(i) == ssid) {
+            int rssi = WiFi.RSSI(i);
+            Serial.printf("Found saved SSID '%s' at RSSI %d during passive scan.\n", ssid.c_str(), rssi);
+            if (rssi > -50) {
+                startIndex = 0; // very strong signal, try the lowest power tier
+            } else if (rssi > -65) {
+                startIndex = 1;
+            } else if (rssi > -75) {
+                startIndex = 3;
+            } else {
+                startIndex = numTxPowerTiers - 1; // weak signal, go straight to full power
+            }
+            break;
+        }
+    }
+    WiFi.scanDelete();
+    return startIndex;
+}
+
+// Attempts to connect starting at a reduced TX power, escalating one tier at a
+// time on failure. Returns true if connected, leaving WiFi connected; returns
+// false if every tier was exhausted, leaving WiFi disconnected for the caller
+// (WiFiManager::autoConnect) to take over.
+bool WifiWidget::tryConnectWithEscalation(const String &ssid, const String &pass) {
+    int startIndex = selectStartingTxPowerIndex(ssid);
+    for (int i = startIndex; i < numTxPowerTiers; i++) {
+        Serial.printf("Attempting WiFi connect at TX power tier %d.\n", (int) txPowerTiers[i]);
+        WiFi.setTxPower(txPowerTiers[i]);
+        WiFi.begin(ssid.c_str(), pass.c_str());
+
+        unsigned long attemptStart = millis();
+        while (WiFi.status() != WL_CONNECTED && millis() - attemptStart < txPowerAttemptTimeout) {
+            delay(100);
+        }
+
+        if (WiFi.status() == WL_CONNECTED) {
+            return true;
+        }
+        WiFi.disconnect(true);
+    }
+    return false;
 }
 
 String WifiWidget::getName() {
