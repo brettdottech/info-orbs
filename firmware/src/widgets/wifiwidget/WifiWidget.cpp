@@ -237,7 +237,7 @@ int WifiWidget::selectStartingTxPowerIndex(const String &ssid) {
 bool WifiWidget::tryConnectWithEscalation(const String &ssid, const String &pass) {
     int startIndex = selectStartingTxPowerIndex(ssid);
     for (int i = startIndex; i < numTxPowerTiers; i++) {
-        Serial.printf("Attempting WiFi connect at TX power tier %d.\n", (int)txPowerTiers[i]);
+        Serial.printf("Attempting WiFi connect at TX power tier %d.\n", (int) txPowerTiers[i]);
         WiFi.setTxPower(txPowerTiers[i]);
         WiFi.begin(ssid.c_str(), pass.c_str());
 
