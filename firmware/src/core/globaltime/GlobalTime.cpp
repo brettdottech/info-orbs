@@ -35,31 +35,69 @@ time_t GlobalTime::getUnixEpochIfAvailable() {
 }
 
 void GlobalTime::updateTime(bool force) {
-    if (force || millis() - m_updateTimer > m_oneSecond) {
-        m_updateTimer = millis();
-        m_timeClient->update();
-        if (m_timeClient->isTimeSet()) {
-            // NTP time is valid
-            if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
+    // Rollover-safe, drift-free 1s scheduler.
+    // Advancing m_updateTimer by whole periods (instead of setting it to now)
+    // keeps this sampler phase-locked to the 1000ms grid of millis(), so
+    // displayed seconds are never skipped due to accumulated drift (the old
+    // "> 1000 then timer = millis()" version drifted by the loop latency on
+    // every tick and skipped roughly one displayed second per 3 minutes).
+    uint32_t now = millis();
+    uint32_t elapsed = now - (uint32_t) m_updateTimer;
+    if (!force && elapsed < m_oneSecond) {
+        return;
+    }
+    if (elapsed >= m_oneSecond) {
+        m_updateTimer += m_oneSecond * (elapsed / m_oneSecond);
+    }
+    // NTPClient::update() re-attempts a *blocking* forceUpdate() (up to
+    // ~1010ms of delay(10) waiting for the UDP reply) on EVERY call once a
+    // refresh is due, because a failed attempt never advances _lastUpdate.
+    // If the NTP server stops responding, that turns this once-per-second
+    // tick into a ~1s stall of the whole render loop. Gate the attempts
+    // ourselves so a dead server costs at most one stall per retry
+    // interval; timekeeping continues via millis() inside getEpochTime().
+    uint32_t ntpRetryInterval = m_timeClient->isTimeSet() ? m_ntpRetryInterval : m_ntpInitialRetryInterval;
+    if (force || m_lastNtpAttempt == 0 || (uint32_t) (now - m_lastNtpAttempt) >= ntpRetryInterval) {
+        m_lastNtpAttempt = now;
+        if (m_timeClient->update()) {
+            m_lastNtpSync = now;
+        } else if (m_timeClient->isTimeSet() && (uint32_t) (now - m_lastNtpSync) >= m_updateInterval + m_ntpRetryInterval) {
+            // Only a real failure: a refresh is overdue (m_updateInterval
+            // has passed since the last successful sync) and the attempt
+            // did not succeed. update() also returns false when a refresh
+            // simply is not due yet, which must not be logged.
+            Log.warningln("NTP update failed (server not responding), will retry later");
+        }
+    }
+    if (m_timeClient->isTimeSet()) {
+        // NTP time is valid
+        if (m_timeZoneOffset == -1 || (m_nextTimeZoneUpdate > 0 && m_unixEpoch > m_nextTimeZoneUpdate)) {
+            // getTimeZoneOffsetFromAPI() is a blocking HTTP call (multiple
+            // seconds on an unreachable server). Without gating it is
+            // retried on every 1s tick until it succeeds (boot with a dead
+            // API, or DST changeover), stalling the render loop each time.
+            uint32_t tzRetryInterval = (m_timeZoneOffset == -1) ? m_tzInitialRetryInterval : m_tzRetryInterval;
+            if (m_lastTimeZoneAttempt == 0 || (uint32_t) (now - m_lastTimeZoneAttempt) >= tzRetryInterval) {
+                m_lastTimeZoneAttempt = now;
                 getTimeZoneOffsetFromAPI();
             }
-            m_unixEpoch = m_timeClient->getEpochTime();
-            m_minute = minute(m_unixEpoch);
-            if (m_format24hour) {
-                m_hour = hour(m_unixEpoch);
-            } else {
-                m_hour = hourFormat12(m_unixEpoch);
-            }
-            m_hour24 = hour(m_unixEpoch);
-            m_second = second(m_unixEpoch);
-
-            m_day = day(m_unixEpoch);
-            m_month = month(m_unixEpoch);
-            m_monthName = i18n(t_months, m_month - 1);
-            m_year = year(m_unixEpoch);
-            m_weekday = i18n(t_weekdays, weekday(m_unixEpoch) - 1);
-            m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
         }
+        m_unixEpoch = m_timeClient->getEpochTime();
+        m_minute = minute(m_unixEpoch);
+        if (m_format24hour) {
+            m_hour = hour(m_unixEpoch);
+        } else {
+            m_hour = hourFormat12(m_unixEpoch);
+        }
+        m_hour24 = hour(m_unixEpoch);
+        m_second = second(m_unixEpoch);
+
+        m_day = day(m_unixEpoch);
+        m_month = month(m_unixEpoch);
+        m_monthName = i18n(t_months, m_month - 1);
+        m_year = year(m_unixEpoch);
+        m_weekday = i18n(t_weekdays, weekday(m_unixEpoch) - 1);
+        m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
     }
 }
 

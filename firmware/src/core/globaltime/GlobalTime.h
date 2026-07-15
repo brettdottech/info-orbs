@@ -78,6 +78,20 @@ private:
     unsigned long m_oneSecond = 1000;
     unsigned long m_updateTimer = 0;
 
+    // NTP attempt gating (see updateTime()): NTPClient's blocking forceUpdate()
+    // is re-attempted on every update() call once a refresh is due, so failed
+    // attempts must be rate-limited ourselves.
+    unsigned long m_ntpRetryInterval = 61 * 1000; // between attempts after a failed refresh
+    unsigned long m_ntpInitialRetryInterval = 5 * 1000; // until the first successful sync after boot
+    unsigned long m_lastNtpAttempt = 0;
+    unsigned long m_lastNtpSync = 0;
+
+    // Timezone API attempt gating (see updateTime()): the API call is a
+    // blocking HTTP request and must not be retried on every 1s tick.
+    unsigned long m_tzInitialRetryInterval = 30 * 1000; // until the first successful fetch
+    unsigned long m_tzRetryInterval = 5 * 60 * 1000; // after a failed refresh
+    unsigned long m_lastTimeZoneAttempt = 0;
+
     bool m_format24hour{FORMAT_24_HOUR};
     std::string m_ntpServer{NTP_SERVER};
 
