@@ -38,11 +38,13 @@ void MainHelper::init(WiFiManager *wm, ConfigManager *cm, ScreenManager *sm, Wid
 }
 
 /**
- * The ISR handlers must be static
+ * The ISR handlers must be static and must live in IRAM: without IRAM_ATTR a
+ * button edge during a flash write (e.g. saving config to NVS/LittleFS)
+ * crashes the ESP32 with "Cache disabled but cached memory region accessed".
  */
-void MainHelper::isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
-void MainHelper::isrButtonChangeMiddle() { buttonMiddle.isrButtonChange(); }
-void MainHelper::isrButtonChangeRight() { buttonRight.isrButtonChange(); }
+void IRAM_ATTR MainHelper::isrButtonChangeLeft() { buttonLeft.isrButtonChange(); }
+void IRAM_ATTR MainHelper::isrButtonChangeMiddle() { buttonMiddle.isrButtonChange(); }
+void IRAM_ATTR MainHelper::isrButtonChangeRight() { buttonRight.isrButtonChange(); }
 
 void MainHelper::setupButtons() {
     bool invertButtons = s_orbRotation == 1 || s_orbRotation == 2;

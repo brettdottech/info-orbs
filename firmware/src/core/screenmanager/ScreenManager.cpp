@@ -96,12 +96,22 @@ OpenFontRender &ScreenManager::getRender() {
 
 // Selects a single screen
 void ScreenManager::selectScreen(int screen) {
+    // Deselect all screens first: writing the CS pins in a single pass can
+    // briefly leave both the old and the new screen selected at the same
+    // time, so SPI data may leak to the wrong panel during the transition.
     for (int i = 0; i < NUM_SCREENS; i++) {
-        int orbRotation = ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION);
-        bool rotateDisplays = orbRotation == 1 || orbRotation == 2;
-        int currentDisplay = rotateDisplays ? NUM_SCREENS - i - 1 : i;
-        digitalWrite(m_screen_cs[currentDisplay], i == screen ? LOW : HIGH);
+        digitalWrite(m_screen_cs[i], HIGH);
     }
+    if (screen < 0 || screen >= NUM_SCREENS) {
+        // Invalid index: leave all screens deselected instead of selecting
+        // an out-of-bounds CS pin / wrong panel
+        Log.warningln("selectScreen: invalid screen index %d", screen);
+        return;
+    }
+    int orbRotation = ConfigManager::getInstance()->getConfigInt("orbRotation", ORB_ROTATION);
+    bool rotateDisplays = orbRotation == 1 || orbRotation == 2;
+    int targetDisplay = rotateDisplays ? NUM_SCREENS - screen - 1 : screen;
+    digitalWrite(m_screen_cs[targetDisplay], LOW);
 }
 
 // Fills all screens with a color
