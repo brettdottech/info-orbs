@@ -65,6 +65,10 @@ void ClockWidget::setup() {
     m_lastDisplay2Digit = "";
     m_lastDisplay4Digit = "";
     m_lastDisplay5Digit = "";
+    m_lastAmPm = "";
+    m_lastSecondSingle = -1;
+    m_colonVisible = true;
+    m_colonBlinkPrev = millis();
 }
 
 void ClockWidget::draw(bool force) {
@@ -88,35 +92,73 @@ void ClockWidget::draw(bool force) {
         m_lastDisplay5Digit = m_display5Digit;
     }
 
-    if (m_secondSingle != m_lastSecondSingle || force) {
-        if (m_secondSingle % 2 == 0) {
-            displayDigit(2, "", ":", m_fgColor, false);
-        } else {
-            displayDigit(2, "", ":", m_shadowColor, false);
+    if (m_type == (int) ClockType::NORMAL) {
+        // Colon blink: stable 500ms on / 500ms off, driven directly by
+        // millis() instead of the parity of the displayed second, so a
+        // skipped or repeated second (scheduler drift, NTP resync) can
+        // never stall the blink. Rollover-safe unsigned arithmetic.
+        uint32_t now = millis();
+        uint32_t elapsed = now - (uint32_t) m_colonBlinkPrev;
+        if (elapsed >= m_colonBlinkInterval) {
+            // Advance in whole periods so no cumulative drift builds up,
+            // and catch up in one step if the loop was blocked for a while.
+            // Toggle by period parity so a blocked loop (e.g. a blocking
+            // network call) can never invert the blink phase.
+            uint32_t periods = elapsed / m_colonBlinkInterval;
+            m_colonBlinkPrev += m_colonBlinkInterval * periods;
+            if (periods % 2 == 1) {
+                m_colonVisible = !m_colonVisible;
+            }
+            displayColon();
+        } else if (force) {
+            displayColon();
         }
+    } else if (m_secondSingle != m_lastSecondSingle || force) {
+        // NIXIE/custom clocks: the colon is a full-screen image, so keep the
+        // original 1s cadence (on during even seconds) instead of doubling
+        // the JPG decode load with a 500ms blink.
+        if (m_secondSingle % 2 == 0) {
+            displayDigit(SCREEN_STATUS, "", ":", m_fgColor, false);
+        } else {
+            displayDigit(SCREEN_STATUS, "", ":", m_shadowColor, false);
+        }
+    }
+
+    if (m_secondSingle != m_lastSecondSingle || force) {
         if (m_showSecondTicks) {
             if (!isCustomClock(m_type)) {
                 // not a custom clock -> clear background
-                displaySeconds(2, m_lastSecondSingle, TFT_BLACK);
+                displaySeconds(SCREEN_STATUS, m_lastSecondSingle, TFT_BLACK);
             }
-            displaySeconds(2, m_secondSingle, m_fgColor);
+            displaySeconds(SCREEN_STATUS, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
-        if (m_type == (int) ClockType::NORMAL) {
-            if (m_format == CLOCK_FORMAT_12_HOUR_AMPM) {
-                if (m_amPm != m_lastAmPm) {
-                    // Clear old AM/PM
-                    displayAmPm(m_lastAmPm, TFT_BLACK);
-                    m_lastAmPm = m_amPm;
-                }
-                displayAmPm(m_amPm, m_fgColor);
+    }
+
+    if (m_type == (int) ClockType::NORMAL && m_format == CLOCK_FORMAT_12_HOUR_AMPM) {
+        // Only redraw AM/PM when it actually changes (or on a forced redraw).
+        // Redrawing it every second forced a TTF font unload/reload cycle each
+        // time (see displayAmPm), which fragments the heap over long uptimes
+        // and eventually corrupts rendering.
+        if (m_amPm != m_lastAmPm || force) {
+            if (m_lastAmPm.length() > 0 && m_amPm != m_lastAmPm) {
+                // Clear old AM/PM
+                displayAmPm(m_lastAmPm, TFT_BLACK);
             }
+            displayAmPm(m_amPm, m_fgColor);
+            m_lastAmPm = m_amPm;
         }
     }
 }
 
+void ClockWidget::displayColon() {
+    // The colon lives on the middle/status orb only
+    displayDigit(SCREEN_STATUS, "", ":", m_colonVisible ? m_fgColor : m_shadowColor, false);
+}
+
 void ClockWidget::displayAmPm(String &amPm, uint32_t color) {
-    m_manager.selectScreen(2);
+    // The AM/PM indicator is owned by the middle/status orb
+    m_manager.selectScreen(SCREEN_STATUS);
     m_manager.setFontColor(color, TFT_BLACK);
     // Workaround for 12h AM/PM problem
     // The colon is slightly offset and that's a problem because to remove them, we paint over them
@@ -235,6 +277,10 @@ DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {
 }
 
 void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing) {
+    if (displayIndex < 0 || displayIndex >= NUM_SCREENS) {
+        // Never draw to an invalid orb
+        return;
+    }
     uint32_t start = millis();
     if (m_type == (int) ClockType::NIXIE || isCustomClock(m_type)) {
         if (digit == ":" && color == m_shadowColor) {
@@ -284,6 +330,14 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
+    if (displayIndex != SCREEN_STATUS) {
+        // The seconds tick is owned by the middle/status orb; never draw it elsewhere
+        return;
+    }
+    if (seconds < 0 || seconds > 59) {
+        // Out-of-range (e.g. -1 before the first update): nothing to draw or clear
+        return;
+    }
     if (color != m_fgColor && m_type != (int) ClockType::NORMAL) {
         // ignore clear tick (we draw the whole image anyway)
         return;
