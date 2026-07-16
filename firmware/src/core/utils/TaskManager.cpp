@@ -29,11 +29,9 @@ TaskManager *TaskManager::getInstance() {
 }
 
 bool TaskManager::addTask(std::unique_ptr<Task> task) {
-    if (isUrlInQueue(task->url)) {
-        Log.errorln("Duplicate Task. Task already in the queue to waiting to be processed.");
-        return false;
-    }
-
+    // Note: Removed duplicate URL check as it was causing queue corruption
+    // Multiple requests to the same URL are now allowed
+    
     auto *params = new TaskParams{task->url, task->callback, task->preProcessResponse, task->taskExec};
     taskParamsCount++; // Increment the count
 #ifdef TASKMANAGER_DEBUG
@@ -41,6 +39,7 @@ bool TaskManager::addTask(std::unique_ptr<Task> task) {
 #endif
 
     if (xQueueSend(requestQueue, &params, 0) != pdPASS) {
+        Log.errorln("Failed to add task to queue (queue full)");
         delete params;
         taskParamsCount--;
 #ifdef TASKMANAGER_DEBUG
@@ -93,11 +92,18 @@ void TaskManager::processAwaitingTasks() {
     BaseType_t result = xTaskCreate(
         [](void *params) {
             auto *taskParams = static_cast<TaskParams *>(params);
-            taskParams->taskExec();
-            delete taskParams; // Ensure cleanup after execution
-            taskParamsCount--; // Decrement the count
-            // Log.traceln("TaskParams deleted: %d", taskParamsCount);
-
+            
+            // Use try-catch to ensure cleanup even if task execution fails
+            try {
+                taskParams->taskExec();
+            } catch (...) {
+                Log.errorln("Task execution threw an exception");
+            }
+            
+            // Always cleanup, even if execution failed
+            delete taskParams;
+            taskParamsCount--;
+            
             Utils::setBusy(false);
             Log.noticeln("✅ Release semaphore");
             xSemaphoreGive(taskSemaphore);
@@ -111,8 +117,9 @@ void TaskManager::processAwaitingTasks() {
 
     if (result != pdPASS) {
         Log.errorln("Failed to create HTTP request task");
-        delete taskParams; // Ensure the object is deleted if task creation fails
-        taskParamsCount--; // Decrement the count if task creation fails
+        delete taskParams;
+        taskParamsCount--;
+        activeRequests--; // Also decrement activeRequests
         Log.errorln("TaskParams deleted (task creation failed): %d", taskParamsCount);
         Utils::setBusy(false);
         xSemaphoreGive(taskSemaphore);
@@ -141,17 +148,3 @@ void TaskManager::processTaskResponses() {
     }
 }
 
-bool TaskManager::isUrlInQueue(const String &url) {
-    UBaseType_t queueLength = uxQueueMessagesWaiting(requestQueue);
-    for (UBaseType_t i = 0; i < queueLength; i++) {
-        TaskParams *taskParams;
-        if (xQueuePeek(requestQueue, &taskParams, 0) == pdPASS) {
-            if (taskParams->url == url) {
-                return true;
-            }
-            xQueueReceive(requestQueue, &taskParams, 0);
-            xQueueSend(requestQueue, &taskParams, 0);
-        }
-    }
-    return false;
-}

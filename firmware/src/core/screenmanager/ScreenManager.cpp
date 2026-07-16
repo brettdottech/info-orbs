@@ -401,3 +401,41 @@ JRESULT ScreenManager::drawFsJpg(int32_t x, int32_t y, const char *filename, uin
     m_imageColor = 0;
     return result;
 }
+uint16_t ScreenManager::color565FromHex(const String &hex) {
+    if (hex.length() != 7 || hex[0] != '#') {
+        return TFT_WHITE; // Default color if invalid format
+    }
+
+    // Convert #RRGGBB to uint16_t RGB565
+    long rgb = strtol(hex.substring(1).c_str(), NULL, 16);
+    return color565(
+        (rgb >> 16) & 0xFF, // Red
+        (rgb >> 8) & 0xFF, // Green
+        rgb & 0xFF // Blue
+    );
+}
+
+void ScreenManager::drawTitleBars(uint16_t topColor, uint16_t bottomColor,
+                                  const String &topText, const String &bottomText,
+                                  uint16_t topTextColor, uint16_t bottomTextColor,
+                                  uint8_t topHeight, uint8_t bottomHeight,
+                                  uint8_t topTextSize, uint8_t bottomTextSize) {
+    // Draw top bar
+    fillRect(0, 0, width(), topHeight, topColor);
+    if (!topText.isEmpty()) {
+        setFontColor(topTextColor, topColor);
+        setFontSize(topTextSize);
+        setAlignment(Align::MiddleCenter);
+        drawString(topText, width() / 2, topHeight / 2);
+    }
+
+    // Draw bottom bar
+    int16_t y = height() - bottomHeight;
+    fillRect(0, y, width(), bottomHeight, bottomColor);
+    if (!bottomText.isEmpty()) {
+        setFontColor(bottomTextColor, bottomColor);
+        setFontSize(bottomTextSize);
+        setAlignment(Align::MiddleCenter);
+        drawString(bottomText, width() / 2, y + bottomHeight / 2);
+    }
+}

@@ -23,7 +23,7 @@ bool VisualCrossingFeed::getWeatherData(WeatherDataModel &model) {
     }
 
     String httpRequestAddress = String(WEATHER_VISUALCROSSING_API_URL) +
-                                String(m_weatherLocation.c_str()) + "/next3days?key=" + apiKey + "&unitGroup=" + tempUnits +
+                                String(m_weatherLocation.c_str()) + "/next4days?key=" + apiKey + "&unitGroup=" + tempUnits +
                                 "&include=days,current&iconSet=icons1&lang=" + lang;
 
     auto task = TaskFactory::createHttpGetTask(
@@ -47,11 +47,21 @@ void VisualCrossingFeed::preProcessResponse(int httpCode, String &response) {
         JsonDocument filter;
         filter["resolvedAddress"] = true;
         filter["currentConditions"]["temp"] = true;
-        filter["days"][0]["description"] = true;
         filter["currentConditions"]["icon"] = true;
+        // Need days 0-3 for today + 3 day forecast
+        filter["days"][0]["description"] = true;
         filter["days"][0]["icon"] = true;
         filter["days"][0]["tempmax"] = true;
         filter["days"][0]["tempmin"] = true;
+        filter["days"][1]["icon"] = true;
+        filter["days"][1]["tempmax"] = true;
+        filter["days"][1]["tempmin"] = true;
+        filter["days"][2]["icon"] = true;
+        filter["days"][2]["tempmax"] = true;
+        filter["days"][2]["tempmin"] = true;
+        filter["days"][3]["icon"] = true;
+        filter["days"][3]["tempmax"] = true;
+        filter["days"][3]["tempmin"] = true;
 
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response, DeserializationOption::Filter(filter));

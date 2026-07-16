@@ -502,7 +502,12 @@ void MainHelper::setupLittleFS() {
 void MainHelper::watchdogInit() {
     Log.noticeln("Initializing watchdog timer to %d seconds... ", WDT_TIMEOUT);
     // Initialize the watchdog timer for the main task
-    if (esp_task_wdt_init(WDT_TIMEOUT, true) == ESP_OK) {
+    esp_task_wdt_config_t wdt_config = {
+        .timeout_ms = WDT_TIMEOUT * 1000,
+        .idle_core_mask = 0,
+        .trigger_panic = true
+    };
+    if (esp_task_wdt_init(&wdt_config) == ESP_OK) {
         Log.noticeln("done!");
         // Add the main task to the watchdog
         if (esp_task_wdt_add(nullptr) == ESP_OK) {

@@ -2,6 +2,8 @@
 #define GLOBALTIME_H
 
 #include "config_helper.h"
+#include <WiFi.h>
+#include <WiFiUdp.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
 #include <TimeLib.h>

@@ -3,6 +3,7 @@
 
 #include "Button.h"
 #include <Arduino.h>
+#include <string>
 
 #define MAX_WRAPPED_LINES 10
 

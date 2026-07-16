@@ -8,7 +8,7 @@
 #include <string> // Include for std::string
 
 #ifndef TEMPEST_PROXY_URL
-    #define TEMPEST_PROXY_URL "https://info-orbs-tempest-proxy.onrender.com/proxy"
+    #define TEMPEST_PROXY_URL "https://info-orbs-proxy.onrender.com/tempest/proxy"
 #endif
 #ifndef WEATHER_TEMPEST_STATION_ID
     #define WEATHER_TEMPEST_STATION_ID "136542" // just a default, change to your station ID

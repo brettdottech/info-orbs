@@ -22,6 +22,9 @@ void WidgetSet::drawCurrent(bool force) {
     Widget *currentWidget = m_widgets[m_currentWidget];
     if (force || currentWidget->isItTimeToDraw()) {
         Log.traceln("Drawing widget: %s", currentWidget->getName().c_str());
+        if (currentWidget->isItTimeToUpdate()) {
+            currentWidget->update();
+        }
         if (m_clearScreensOnDrawCurrent) {
             m_screenManager->clearAllScreens();
             m_clearScreensOnDrawCurrent = false;

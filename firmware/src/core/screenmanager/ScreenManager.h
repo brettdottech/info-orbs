@@ -95,6 +95,15 @@ public:
     void setTextSize(uint8_t s);
     void print(String s);
     void print(char c);
+    // Color conversion
+    uint16_t color565FromHex(const String &hex);
+
+    // Title bar drawing
+    void drawTitleBars(uint16_t topColor, uint16_t bottomColor,
+                       const String &topText = "", const String &bottomText = "",
+                       uint16_t topTextColor = TFT_WHITE, uint16_t bottomTextColor = TFT_WHITE,
+                       uint8_t topHeight = 30, uint8_t bottomHeight = 30,
+                       uint8_t topTextSize = 16, uint8_t bottomTextSize = 16);
 
 private:
     static ScreenManager *instance;
