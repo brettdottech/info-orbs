@@ -112,22 +112,26 @@ void ClockWidget::draw(bool force) {
     }
 
     if (m_lastDisplay5Digit != m_display5Digit || force) {
-        if (force) m_lastDisplay5Digit = m_display5Digit;
+        if (force)
+            m_lastDisplay5Digit = m_display5Digit;
         displayDigit(4, m_lastDisplay5Digit, m_display5Digit, m_fgColor);
         m_lastDisplay5Digit = m_display5Digit;
     }
     if (m_lastDisplay4Digit != m_display4Digit || force) {
-        if (force) m_lastDisplay4Digit = m_display4Digit;
+        if (force)
+            m_lastDisplay4Digit = m_display4Digit;
         displayDigit(3, m_lastDisplay4Digit, m_display4Digit, m_fgColor);
         m_lastDisplay4Digit = m_display4Digit;
     }
     if (m_lastDisplay2Digit != m_display2Digit || force) {
-        if (force) m_lastDisplay2Digit = m_display2Digit;
+        if (force)
+            m_lastDisplay2Digit = m_display2Digit;
         displayDigit(1, m_lastDisplay2Digit, m_display2Digit, m_fgColor);
         m_lastDisplay2Digit = m_display2Digit;
     }
     if (m_lastDisplay1Digit != m_display1Digit || force) {
-        if (force) m_lastDisplay1Digit = m_display1Digit;
+        if (force)
+            m_lastDisplay1Digit = m_display1Digit;
         displayDigit(0, m_lastDisplay1Digit, m_display1Digit, m_fgColor);
         m_lastDisplay1Digit = m_display1Digit;
     }
@@ -181,7 +185,7 @@ void ClockWidget::update(bool force) {
 void ClockWidget::changeFormat() {
     GlobalTime *time = GlobalTime::getInstance();
     m_format++;
-    if (m_type == (int) ClockType::NORMAL || m_type == (int) ClockType::MORPH){
+    if (m_type == (int) ClockType::NORMAL || m_type == (int) ClockType::MORPH) {
         if (m_format > 2)
             m_format = 0;
     } else if (m_format > 1)
@@ -256,7 +260,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
     } else {
         m_manager.selectScreen(displayIndex);
         if ((m_type == (int) ClockType::MORPH) && (displayIndex != 2)) {
-                displayMorphDigit(displayIndex, lastDigit, digit, color);
+            displayMorphDigit(displayIndex, lastDigit, digit, color);
         } else {
             // Normal clock
             int fontSize = CLOCK_FONT_SIZE;
@@ -299,7 +303,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (color != m_fgColor && ( isCustomClock(m_type) || m_type == (int) ClockType::NIXIE) ) {
+    if (color != m_fgColor && (isCustomClock(m_type) || m_type == (int) ClockType::NIXIE)) {
         // ignore clear tick (we draw the whole image anyway)
         return;
     }
