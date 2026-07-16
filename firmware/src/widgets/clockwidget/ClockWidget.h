@@ -67,8 +67,8 @@ struct DigitOffset {
 
 enum class ClockType {
     NORMAL = 0,
-    MORPH = 1,
-    NIXIE = 2,
+    NIXIE = 1,
+    MORPH = 2,
     CUSTOM0 = 3,
     CUSTOM1 = 4,
     CUSTOM2 = 5,
