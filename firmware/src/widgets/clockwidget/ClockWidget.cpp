@@ -98,29 +98,36 @@ void ClockWidget::draw(bool force) {
         // skipped or repeated second (scheduler drift, NTP resync) can
         // never stall the blink. Rollover-safe unsigned arithmetic.
         uint32_t now = millis();
-        uint32_t elapsed = now - (uint32_t) m_colonBlinkPrev;
-        if (elapsed >= m_colonBlinkInterval) {
-            // Advance in whole periods so no cumulative drift builds up,
-            // and catch up in one step if the loop was blocked for a while.
-            // Toggle by period parity so a blocked loop (e.g. a blocking
-            // network call) can never invert the blink phase.
-            uint32_t periods = elapsed / m_colonBlinkInterval;
-            m_colonBlinkPrev += m_colonBlinkInterval * periods;
-            if (periods % 2 == 1) {
-                m_colonVisible = !m_colonVisible;
+        if (force) {
+            // Forced redraws (widget switch, clock face change) restart the
+            // blink phase with the colon visible, so it never reappears in
+            // the "off" state right after a screen clear.
+            m_colonVisible = true;
+            m_colonBlinkPrev = now;
+            displayColon();
+        } else {
+            uint32_t elapsed = now - (uint32_t) m_colonBlinkPrev;
+            if (elapsed >= m_colonBlinkInterval) {
+                // Advance in whole periods so no cumulative drift builds up,
+                // and catch up in one step if the loop was blocked for a while.
+                // Toggle by period parity so a blocked loop (e.g. a blocking
+                // network call) can never invert the blink phase.
+                uint32_t periods = elapsed / m_colonBlinkInterval;
+                m_colonBlinkPrev += m_colonBlinkInterval * periods;
+                if (periods % 2 == 1) {
+                    m_colonVisible = !m_colonVisible;
+                }
+                displayColon();
             }
-            displayColon();
-        } else if (force) {
-            displayColon();
         }
     } else if (m_secondSingle != m_lastSecondSingle || force) {
         // NIXIE/custom clocks: the colon is a full-screen image, so keep the
         // original 1s cadence (on during even seconds) instead of doubling
         // the JPG decode load with a 500ms blink.
         if (m_secondSingle % 2 == 0) {
-            displayDigit(SCREEN_STATUS, "", ":", m_fgColor, false);
+            displayDigit(SCREEN_MIDDLE, "", ":", m_fgColor, false);
         } else {
-            displayDigit(SCREEN_STATUS, "", ":", m_shadowColor, false);
+            displayDigit(SCREEN_MIDDLE, "", ":", m_shadowColor, false);
         }
     }
 
@@ -128,9 +135,9 @@ void ClockWidget::draw(bool force) {
         if (m_showSecondTicks) {
             if (!isCustomClock(m_type)) {
                 // not a custom clock -> clear background
-                displaySeconds(SCREEN_STATUS, m_lastSecondSingle, TFT_BLACK);
+                displaySeconds(SCREEN_MIDDLE, m_lastSecondSingle, TFT_BLACK);
             }
-            displaySeconds(SCREEN_STATUS, m_secondSingle, m_fgColor);
+            displaySeconds(SCREEN_MIDDLE, m_secondSingle, m_fgColor);
         }
         m_lastSecondSingle = m_secondSingle;
     }
@@ -153,12 +160,12 @@ void ClockWidget::draw(bool force) {
 
 void ClockWidget::displayColon() {
     // The colon lives on the middle/status orb only
-    displayDigit(SCREEN_STATUS, "", ":", m_colonVisible ? m_fgColor : m_shadowColor, false);
+    displayDigit(SCREEN_MIDDLE, "", ":", m_colonVisible ? m_fgColor : m_shadowColor, false);
 }
 
 void ClockWidget::displayAmPm(String &amPm, uint32_t color) {
     // The AM/PM indicator is owned by the middle/status orb
-    m_manager.selectScreen(SCREEN_STATUS);
+    m_manager.selectScreen(SCREEN_MIDDLE);
     m_manager.setFontColor(color, TFT_BLACK);
     // Workaround for 12h AM/PM problem
     // The colon is slightly offset and that's a problem because to remove them, we paint over them
@@ -330,7 +337,7 @@ void ClockWidget::displayDigit(int displayIndex, const String &lastDigit, const 
 }
 
 void ClockWidget::displaySeconds(int displayIndex, int seconds, int color) {
-    if (displayIndex != SCREEN_STATUS) {
+    if (displayIndex != SCREEN_MIDDLE) {
         // The seconds tick is owned by the middle/status orb; never draw it elsewhere
         return;
     }

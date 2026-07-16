@@ -89,9 +89,9 @@ public:
     String getName() override;
 
 private:
-    // The middle/status orb exclusively owns the colon, the seconds tick
-    // and the AM/PM indicator. Digit orbs (0, 1, 3, 4) must never receive them.
-    static constexpr int SCREEN_STATUS = 2;
+    // The middle orb exclusively owns the colon, the seconds tick and the
+    // AM/PM indicator. Digit orbs (0, 1, 3, 4) must never receive them.
+    static constexpr int SCREEN_MIDDLE = 2;
 
     void addConfigToManager();
     void changeFormat();
