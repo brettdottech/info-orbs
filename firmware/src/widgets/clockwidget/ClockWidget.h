@@ -89,8 +89,13 @@ public:
     String getName() override;
 
 private:
+    // The middle orb exclusively owns the colon, the seconds tick and the
+    // AM/PM indicator. Digit orbs (0, 1, 3, 4) must never receive them.
+    static constexpr int SCREEN_MIDDLE = 2;
+
     void addConfigToManager();
     void changeFormat();
+    void displayColon();
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);
@@ -121,16 +126,27 @@ private:
     time_t m_unixEpoch;
     int m_timeZoneOffset;
 
+// Sample the (cached) global time and redraw at 10Hz. Sampling well below 1s
+// guarantees no displayed second is ever skipped due to sampling aliasing,
+// and allows the colon to blink at a stable 500ms cadence. draw()/update()
+// are cheap no-ops when nothing changed.
 #ifndef CLOCK_UPDATE_DELAY
-    #define CLOCK_UPDATE_DELAY TimeFrequency::OneSecond
+    #define CLOCK_UPDATE_DELAY TimeFrequency::OneHundredMilliseconds
 #endif
 
 #ifndef CLOCK_DRAW_DELAY
-    #define CLOCK_DRAW_DELAY TimeFrequency::OneSecond
+    #define CLOCK_DRAW_DELAY TimeFrequency::OneHundredMilliseconds
 #endif
 
     WidgetTimer &m_drawTimer;
     WidgetTimer &m_updateTimer;
+
+    // Colon blink (NORMAL clock): full 1s cycle (500ms on / 500ms off), driven
+    // directly by millis() and independent of the seconds counter so it can
+    // never stall when a second is skipped or repeated (e.g. NTP resync).
+    unsigned long m_colonBlinkInterval = 500;
+    unsigned long m_colonBlinkPrev = 0;
+    bool m_colonVisible = true;
 
     int m_minuteSingle;
     int m_hourSingle;
