@@ -104,6 +104,246 @@ const char WEBPORTAL_BUTTONS_SCRIPT[] = R"(
 </script>
 )";
 
+const char WEBPORTAL_CUSTOM_IMAGES_PAGE[] = R"HTML(
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>InfoOrbs Custom Images</title>
+    <style>
+        :root { color-scheme: dark; --blue:#1fa3ec; --panel:#151515; --muted:#a8a8a8; }
+        * { box-sizing: border-box; }
+        body { margin:0; background:#060606; color:#fff; font-family:Verdana,sans-serif; }
+        main { width:min(1050px,100%); margin:auto; padding:20px; }
+        h1 { margin-bottom:8px; }
+        .muted { color:var(--muted); line-height:1.5; }
+        .toolbar { display:flex; flex-wrap:wrap; gap:14px; align-items:end; padding:16px;
+                   background:var(--panel); border-radius:10px; margin:20px 0; }
+        label { display:block; font-size:.9rem; margin-bottom:6px; }
+        input[type=number], select { min-height:42px; padding:8px 10px; color:#fff; background:#292929;
+                                    border:1px solid #555; border-radius:6px; font-size:1rem; }
+        input[type=number] { width:100px; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; }
+        .card { padding:12px; background:var(--panel); border:1px solid #333; border-radius:10px; text-align:center; }
+        canvas { display:block; width:100%; max-width:240px; aspect-ratio:1; margin:0 auto 10px;
+                 background:#000; border:1px solid #444; border-radius:50%; }
+        input[type=file] { display:none; }
+        button, .pick { display:inline-block; padding:11px 16px; border:0; border-radius:6px;
+                        color:#fff; background:var(--blue); cursor:pointer; font-size:1rem; }
+        button:hover, .pick:hover { filter:brightness(.88); }
+        button:disabled { opacity:.45; cursor:not-allowed; }
+        .pick { width:100%; }
+        .filename { height:34px; margin-top:8px; color:var(--muted); font-size:.78rem;
+                    overflow-wrap:anywhere; }
+        .actions { display:flex; gap:10px; margin-top:18px; }
+        .actions button { flex:1; }
+        .back { background:#444; text-decoration:none; text-align:center; }
+        #status { min-height:24px; margin-top:14px; font-weight:bold; }
+        .ok { color:#62d98b; } .error { color:#ff7777; }
+        .progress { width:100%; height:8px; margin-top:12px; overflow:hidden; background:#333; border-radius:5px; }
+        .bar { width:0; height:100%; background:var(--blue); transition:width .2s; }
+        @media(max-width:520px) { main{padding:14px}.grid{grid-template-columns:1fr 1fr}.actions{flex-direction:column} }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Custom Images</h1>
+    <p class="muted">Choose one image for each display. Images are resized in this browser to a
+       240 &times; 240 baseline JPEG before upload. LittleFS: {{LITTLEFS_USED}} / {{LITTLEFS_TOTAL}} KiB used.</p>
+
+    <div class="toolbar">
+        <div>
+            <label for="page">Image page (1-100)</label>
+            <input id="page" type="number" min="1" max="100" value="1">
+        </div>
+        <div>
+            <label for="fit">Image fitting</label>
+            <select id="fit">
+                <option value="cover">Fill screen (crop edges)</option>
+                <option value="contain">Show whole image (black margins)</option>
+            </select>
+        </div>
+        <p class="muted">Page 1 uses the original filenames. A page becomes active after it and every earlier page have all five slots.</p>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div id="status"></div>
+    <div class="actions">
+        <button id="upload" type="button">Resize and upload selected images</button>
+        <a class="pick back" href="/">Back</a>
+    </div>
+</main>
+
+<script>
+(() => {
+    const SIZE = 240;
+    const slots = [];
+    const grid = document.getElementById('grid');
+    const pageInput = document.getElementById('page');
+    const fitInput = document.getElementById('fit');
+    const uploadButton = document.getElementById('upload');
+    const status = document.getElementById('status');
+    const bar = document.getElementById('bar');
+
+    const fileNameFor = (page, screen) => page === 1
+        ? `screen_${screen}.jpg`
+        : `page_${page}_screen_${screen}.jpg`;
+    const fileUrlFor = (page, screen) =>
+        `/download?path=${encodeURIComponent('/CustomImageWidget/' + fileNameFor(page, screen))}&v=${Date.now()}`;
+
+    function setStatus(text, type = '') {
+        status.textContent = text;
+        status.className = type;
+    }
+
+    function clearCanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, SIZE, SIZE);
+        ctx.fillStyle = '#777';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No image', SIZE / 2, SIZE / 2);
+    }
+
+    function drawFitted(source, canvas, mode) {
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, SIZE, SIZE);
+        const scale = mode === 'cover'
+            ? Math.max(SIZE / source.width, SIZE / source.height)
+            : Math.min(SIZE / source.width, SIZE / source.height);
+        const width = source.width * scale;
+        const height = source.height * scale;
+        ctx.drawImage(source, (SIZE - width) / 2, (SIZE - height) / 2, width, height);
+    }
+
+    function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    async function previewSelected(slot) {
+        if (!slot.file) return;
+        const url = URL.createObjectURL(slot.file);
+        try {
+            const img = await loadImage(url);
+            drawFitted(img, slot.canvas, fitInput.value);
+            slot.name.textContent = slot.file.name + ' → 240×240 JPEG';
+        } catch (_) {
+            clearCanvas(slot.canvas);
+            slot.name.textContent = 'This browser cannot decode that image';
+        } finally {
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    async function loadExisting() {
+        const page = Math.max(1, Math.min(100, Number(pageInput.value) || 1));
+        pageInput.value = page;
+        setStatus('');
+        for (const slot of slots) {
+            slot.file = null;
+            slot.input.value = '';
+            try {
+                const img = await loadImage(fileUrlFor(page, slot.screen));
+                drawFitted(img, slot.canvas, 'contain');
+                slot.name.textContent = fileNameFor(page, slot.screen) + ' (already uploaded)';
+            } catch (_) {
+                clearCanvas(slot.canvas);
+                slot.name.textContent = 'Empty slot';
+            }
+        }
+    }
+
+    function canvasBlob(canvas) {
+        return new Promise((resolve, reject) => canvas.toBlob(
+            blob => blob ? resolve(blob) : reject(new Error('JPEG conversion failed')),
+            'image/jpeg', 0.9));
+    }
+
+    async function convertedBlob(slot) {
+        const url = URL.createObjectURL(slot.file);
+        try {
+            const img = await loadImage(url);
+            drawFitted(img, slot.canvas, fitInput.value);
+            return await canvasBlob(slot.canvas);
+        } finally {
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    async function uploadSlot(slot, page) {
+        const blob = await convertedBlob(slot);
+        const data = new FormData();
+        data.append('/CustomImageWidget/', blob, fileNameFor(page, slot.screen));
+        const response = await fetch('/upload', { method: 'POST', body: data });
+        if (!response.ok) throw new Error(`Upload failed for screen ${slot.screen}`);
+    }
+
+    for (let screen = 1; screen <= 5; screen++) {
+        const card = document.createElement('section');
+        card.className = 'card';
+        card.innerHTML = `<h3>Screen ${screen}</h3><canvas width="240" height="240"></canvas>
+            <label class="pick">Choose image<input type="file" accept="image/*"></label>
+            <div class="filename"></div>`;
+        grid.appendChild(card);
+        const slot = {
+            screen,
+            file: null,
+            canvas: card.querySelector('canvas'),
+            input: card.querySelector('input'),
+            name: card.querySelector('.filename')
+        };
+        slot.input.addEventListener('change', () => {
+            slot.file = slot.input.files[0] || null;
+            previewSelected(slot);
+        });
+        slots.push(slot);
+    }
+
+    pageInput.addEventListener('change', loadExisting);
+    fitInput.addEventListener('change', () => slots.forEach(previewSelected));
+    uploadButton.addEventListener('click', async () => {
+        const selected = slots.filter(slot => slot.file);
+        if (!selected.length) {
+            setStatus('Choose at least one image first.', 'error');
+            return;
+        }
+
+        const page = Number(pageInput.value);
+        uploadButton.disabled = true;
+        bar.style.width = '0';
+        try {
+            for (let i = 0; i < selected.length; i++) {
+                setStatus(`Converting and uploading screen ${selected[i].screen}...`);
+                await uploadSlot(selected[i], page);
+                bar.style.width = `${((i + 1) / selected.length) * 100}%`;
+            }
+            setStatus('Upload complete. The image page is ready when all five slots are present.', 'ok');
+            await loadExisting();
+            setStatus('Upload complete. The image page is ready when all five slots are present.', 'ok');
+        } catch (error) {
+            setStatus(error.message || 'Upload failed.', 'error');
+        } finally {
+            uploadButton.disabled = false;
+        }
+    });
+
+    loadExisting();
+})();
+</script>
+</body>
+</html>
+)HTML";
+
 const char WEBPORTAL_BROWSE_HTML_START[] = R"(
 <html>
 <head>

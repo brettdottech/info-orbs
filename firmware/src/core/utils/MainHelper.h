@@ -69,6 +69,7 @@ public:
     static void setupWebPortalEndpoints();
     static void handleEndpointButton();
     static void handleEndpointButtons();
+    static void handleEndpointCustomImages();
     static void handleEndpointListFiles();
     static void handleEndpointUploadFile();
     static void handleEndpointDeleteFile();

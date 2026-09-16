@@ -17,6 +17,9 @@ libraries/
 
 # Local configuration and other untracked files
 firmware/config/config.h
+# Ignore additional local widget images; bundled logo samples are tracked.
+/images/CustomImageWidget/*
+!/images/CustomImageWidget/README.md
 *&&&*
 
 

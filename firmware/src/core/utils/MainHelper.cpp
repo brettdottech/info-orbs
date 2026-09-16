@@ -182,6 +182,13 @@ void MainHelper::handleEndpointButtons() {
     s_wifiManager->server->send(200, "text/html", msg);
 }
 
+void MainHelper::handleEndpointCustomImages() {
+    String html = WEBPORTAL_CUSTOM_IMAGES_PAGE;
+    html.replace("{{LITTLEFS_USED}}", String(LittleFS.usedBytes() / 1024));
+    html.replace("{{LITTLEFS_TOTAL}}", String(LittleFS.totalBytes() / 1024));
+    s_wifiManager->server->send(200, "text/html", html);
+}
+
 void MainHelper::handleEndpointListFiles() {
     String html = WEBPORTAL_BROWSE_HTML_START;
     html += WEBPORTAL_BROWSE_STYLE;
@@ -394,8 +401,13 @@ void MainHelper::handleEndpointUploadFile() {
             Log.errorln("Upload Aborted: %s", filePath.c_str());
         }
     }
-    // Update ClockWidget (we might be showing the changed custom clock)
-    if (s_widgetSet->getCurrent()->getName() == "Clock") {
+    // Redraw widgets that display files which may have just changed.
+    const String currentWidget = s_widgetSet->getCurrent()->getName();
+    if (currentWidget == "Clock") {
+        s_widgetSet->setClearScreensOnDrawCurrent();
+    } else if (currentWidget == "Custom Images") {
+        // Re-scan image pages so newly uploaded pages are available immediately.
+        s_widgetSet->getCurrent()->setup();
         s_widgetSet->setClearScreensOnDrawCurrent();
     }
 }
@@ -418,6 +430,7 @@ void MainHelper::setupWebPortalEndpoints() {
     // To simulate button presses call e.g. http://<ip>/button?name=right&state=short
     s_wifiManager->server->on("/button", handleEndpointButton);
     s_wifiManager->server->on("/buttons", handleEndpointButtons);
+    s_wifiManager->server->on("/custom-images", HTTP_GET, handleEndpointCustomImages);
     s_wifiManager->server->on("/browse", HTTP_GET, handleEndpointListFiles);
     s_wifiManager->server->on("/download", HTTP_GET, handleEndpointDownloadFile);
     s_wifiManager->server->on("/fetchFromUrl", HTTP_POST, handleEndpointFetchFilesFromURL);

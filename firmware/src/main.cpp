@@ -9,6 +9,9 @@
 #include "weatherwidget/WeatherWidget.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
+#if INCLUDE_CUSTOM_IMAGE != WIDGET_DISABLED
+    #include "CustomImageWidget/CustomImageWidget.h"
+#endif
 #include <ArduinoLog.h>
 
 TFT_eSPI tft = TFT_eSPI();
@@ -23,6 +26,10 @@ WidgetSet *widgetSet{nullptr};
 void addWidgets() {
     // Always add clock
     widgetSet->add(new ClockWidget(*sm, *config));
+
+#if INCLUDE_CUSTOM_IMAGE != WIDGET_DISABLED
+    widgetSet->add(new CustomImageWidget(*sm, *config));
+#endif
 
 #if INCLUDE_WEATHER != WIDGET_DISABLED
     widgetSet->add(new WeatherWidget(*sm, *config));

@@ -16,6 +16,7 @@
 #define INCLUDE_MQTT WIDGET_DISABLED
 #define INCLUDE_5ZONE WIDGET_OFF
 #define INCLUDE_MATRIXSCREEN WIDGET_OFF
+#define INCLUDE_CUSTOM_IMAGE WIDGET_OFF
 
 // WEATHER FEED SELECTION (ONLY SET ONE FEED TO TRUE)
 #define WEATHER_VISUALCROSSING_FEED true
@@ -61,6 +62,10 @@
 #define ORB_ROTATION 0 // 0 = Normal, 1 = 90 degrees CW, 2 = 180 degrees, 3 = 270 degrees
 #define WIDGET_CYCLE_DELAY 0 // Automatically cycle widgets every X seconds, set to 0 to disable
 #define LANGUAGE LANG_EN // Language selection - possible values are LANG_EN, LANG_DE, LANG_FR
+
+// CUSTOM IMAGE CONFIGURATION
+// Seconds between image pages. Set to 0 to disable automatic changes.
+#define CUSTOM_IMAGE_CHANGE_INTERVAL_SEC 30
 
 // CLOCK CONFIGURATION
 #define FORMAT_24_HOUR false // Toggle 24 hour clock vs 12 hour clock, change between true/false
